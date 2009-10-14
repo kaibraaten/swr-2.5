@@ -72,7 +72,7 @@ void do_buyhome( CHAR_DATA *ch, char *argument )
      fold_area( room->area, room->area->filename, FALSE );
 
      ch->plr_home = room;
-     do_save( ch , "" );
+     do_save( ch , const_char_to_nonconst( "" ) );
 
 }
 
@@ -330,7 +330,7 @@ void do_setblaster( CHAR_DATA *ch, char *argument )
       return;
    } 
    else
-     do_setblaster( ch , "" );
+     do_setblaster( ch , const_char_to_nonconst("") );
 
 }
 
@@ -1310,7 +1310,7 @@ void do_hail( CHAR_DATA *ch , char *argument )
     send_to_char( "A speederbike picks you up and drives you to a safe location.\n\rYou pay the driver 20 credits.\n\r\n\n" , ch );
     act( AT_ACTION, "$n $T", ch, NULL, "arrives on a speederbike, gets off and pays the driver before it leaves.",  TO_ROOM );
                                
-    do_look( ch, "auto" );
+    do_look( ch, const_char_to_nonconst("auto") );
    
 }
 
@@ -1381,7 +1381,7 @@ void do_bank( CHAR_DATA *ch, char *argument )
        if ( amount  <= 0 )
        {
           send_to_char( "You may only deposit amounts greater than zero.\n\r", ch );
-          do_bank( ch , "" );
+          do_bank( ch , const_char_to_nonconst("") );
           return;
        }
        
@@ -1402,7 +1402,7 @@ void do_bank( CHAR_DATA *ch, char *argument )
        if ( amount  <= 0 )
        {
           send_to_char( "You may only withdraw amounts greater than zero.\n\r", ch );
-          do_bank( ch , "" );
+          do_bank( ch , const_char_to_nonconst("") );
           return;
        }
      
@@ -1426,7 +1426,7 @@ void do_bank( CHAR_DATA *ch, char *argument )
     }
     else
     {
-      do_bank( ch , "" );
+      do_bank( ch , const_char_to_nonconst("") );
       return;
     }
     

@@ -6,7 +6,7 @@
 ch_ret	simple_damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt );
 CHAR_DATA * get_char_room_mp  args( ( CHAR_DATA *ch, char *argument ) );
 
-char *mprog_type_to_name( int type )
+const char *mprog_type_to_name( int type )
 {
     switch ( type )
     {
@@ -81,7 +81,7 @@ void do_mp_offer_job( CHAR_DATA *ch, char *argument )
     
     if ( !ch->in_room || !ch->in_room->area || !ch->in_room->area->planet )
     {
-          do_say( ch , "I have no jobs to offer you at this time." );
+      do_say( ch , const_char_to_nonconst( "I have no jobs to offer you at this time." ) );
           return;
     }
     
@@ -89,7 +89,7 @@ void do_mp_offer_job( CHAR_DATA *ch, char *argument )
     {  
        if ( ( pObjIndex = get_obj_index( OBJ_VNUM_PACKAGE ) ) == NULL )
        {
-          do_say( ch , "I have no jobs to offer you at this time." );
+	 do_say( ch , const_char_to_nonconst( "I have no jobs to offer you at this time." ) );
           return;
        }
          
@@ -106,7 +106,7 @@ void do_mp_offer_job( CHAR_DATA *ch, char *argument )
        
        if( !dPlanet || dPlanet == ch->in_room->area->planet )
        {
-          do_say( ch , "I have no jobs to offer you at this time." );
+	 do_say( ch , const_char_to_nonconst( "I have no jobs to offer you at this time." ) );
           return;
        }
 
@@ -114,7 +114,7 @@ void do_mp_offer_job( CHAR_DATA *ch, char *argument )
        
        if ( get_obj_world( ch, buf ) )
        {
-          do_say( ch , "I have no jobs to offer you at this time." );
+	 do_say( ch , const_char_to_nonconst( "I have no jobs to offer you at this time." ) );
           return;
        }
 
@@ -136,7 +136,7 @@ void do_mp_offer_job( CHAR_DATA *ch, char *argument )
        return;
     }
 
-    do_say( ch , "I have no jobs to offer you at this time." );
+    do_say( ch , const_char_to_nonconst( "I have no jobs to offer you at this time." ) );
 
     return;
 }
@@ -1637,7 +1637,7 @@ void do_mpapplyb( CHAR_DATA *ch, char *argument )
         char_to_room(victim, get_room_index(ROOM_VNUM_SCHOOL));
         act( AT_WHITE, "$n enters this world from within a column of blinding light!",
             victim, NULL, NULL, TO_ROOM );
-        do_look(victim, "auto");
+        do_look(victim, const_char_to_nonconst("auto"));
   break;
   }
 
@@ -1902,8 +1902,8 @@ ch_ret simple_damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
     {
 	if ( number_range( 0, victim->wait ) == 0 )
 	{
-	    do_recall( victim, "" );
-	    return rNONE;
+	  do_recall( victim, const_char_to_nonconst("") );
+	  return rNONE;
 	}
     }
 
@@ -1919,7 +1919,7 @@ ch_ret simple_damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
 	{
 	    start_fearing( victim, ch );
 	    stop_hunting( victim );
-	    do_flee( victim, "" );
+	    do_flee( victim, const_char_to_nonconst("") );
 	}
     }
 
@@ -1927,10 +1927,10 @@ ch_ret simple_damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
     &&   victim->hit > 0
     &&   victim->hit <= victim->wimpy
     &&   victim->wait == 0 )
-	do_flee( victim, "" );
+      do_flee( victim, const_char_to_nonconst("") );
     else
     if ( !npcvict && IS_SET( victim->act, PLR_FLEE ) )
-	do_flee( victim, "" );
+      do_flee( victim, const_char_to_nonconst("") );
 
     tail_chain( );
     return rNONE;

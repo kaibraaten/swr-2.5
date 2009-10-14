@@ -14,7 +14,7 @@ extern OBJ_INDEX_DATA *obj_index_hash[MAX_KEY_HASH];
 extern MOB_INDEX_DATA *mob_index_hash[MAX_KEY_HASH];
 extern ROOM_INDEX_DATA *room_index_hash[MAX_KEY_HASH];
 
-char *  const   weapon_table    [13] =
+const char *  const   weapon_table    [13] =
 {
     "none",
     "w1",  "vibro-blade",  "lightsaber", "w4", "w5",
@@ -22,14 +22,14 @@ char *  const   weapon_table    [13] =
     "w11", "w12"
 };
 
-char *  const   ex_flags [] = 
+const char *  const   ex_flags [] = 
 { 
 "isdoor", "closed", "locked", "secret", "swim", "pickproof", "fly", "climb",
 "dig", "r1", "nopassdoor", "hidden", "passage", "portal", "r2", "r3",
 "can_climb", "can_enter", "can_leave", "auto", "r4", "searchable", 
 "bashed", "bashproof", "nomob", "window", "can_look" };
 
-char *	const	r_flags	[] =
+const char *	const	r_flags	[] =
 {
 "dark", "reserved", "nomob", "indoors", "can_land", "garage", "control",
 "trade", "bank", "r9", "safe", "mail", "information", "r13",
@@ -38,7 +38,7 @@ char *	const	r_flags	[] =
 "bar", "employment", "spacecraft", "r30", "auction"
 };
 
-char *	const	o_flags	[] =
+const char *	const	o_flags	[] =
 {
 "glow", "hum", "dark", "hutt_size", "i4", "invis", "magic", "nodrop", "bless",
 "i9", "i10", "i11", "noremove", "inventory",
@@ -47,13 +47,13 @@ char *	const	o_flags	[] =
 "hidden", "poisoned", "covering", "deathrot", "burried", "prototype", "human_size"
 };
 
-char *	const	mag_flags	[] =
+const char *	const	mag_flags	[] =
 {
 "returning", "backstabber", "bane", "loyal", "haste", "drain", 
 "lightning_blade" 
 };
 
-char *	const	w_flags	[] =
+const char *	const	w_flags	[] =
 {
 "take", "finger", "neck", "body", "head", "legs", "feet", "hands", "arms",
 "shield", "about", "waist", "wrist", "wield", "hold", "_dual_", "ears", "eyes",
@@ -61,7 +61,7 @@ char *	const	w_flags	[] =
 "r7","r8","r9","r10","r11","r12","r13"
 };
 
-char *	const	area_flags	[] =
+const char *	const	area_flags	[] =
 {
 "nopkill", "modified", "r2", "r3", "r4", "r5", "r6", "r7", "r8",
 "r9", "r10", "r11", "r12", "r13", "r14", "r15", "r16", "r17",
@@ -69,7 +69,7 @@ char *	const	area_flags	[] =
 "r25","r26","r27","r28","r29","r30","r31"
 };
 
-char *	const	o_types	[] =
+const char *	const	o_types	[] =
 {
 "none", "light", "weapon", "armor", "furniture", 
 "trash", "container", "paper", "drinkcon", "food", 
@@ -81,7 +81,7 @@ char *	const	o_types	[] =
 "device", "droid_corpse", "resource"
 };
 
-char *	const	a_types	[] =
+const char *	const	a_types	[] =
 {
 "none", "strength", "dexterity", "intelligence", "wisdom", "constitution",
 "sex", "null", "level", "age", "height", "weight", "force", "hit", "move",
@@ -94,7 +94,7 @@ char *	const	a_types	[] =
 "stripsn", "remove", "dig", "full", "thirst", "drunk", "blood"
 };
 
-char *	const	a_flags [] =
+const char *	const	a_flags [] =
 {
 "blind", "invisible", "detect_evil", "detect_invis", "detect_magic",
 "detect_hidden", "weaken", "sanctuary", "faerie_fire", "infrared", "curse",
@@ -103,7 +103,7 @@ char *	const	a_flags [] =
 "scrying", "fireshield", "shockshield", "r1", "iceshield", "possess", 
 "berserk", "aqua_breath" };
 
-char *	const	act_flags [] =
+const char *	const	act_flags [] =
 {
 "npc", "sentinel", "scavenger", "r3", "r4", "aggressive", "stayarea",
 "wimpy", "pet", "train", "practice", "immortal", "deadly", "polyself",
@@ -111,7 +111,7 @@ char *	const	act_flags [] =
 "secretive", "polymorphed", "mobinvis", "noassist", "nokill", "droid", "nocorpse", 
 "r28", "r29", "prototype", "r31" };
 
-char *	const	pc_flags [] =
+const char *	const	pc_flags [] =
 {
 "r1", "deadly", "unauthed", "norecall", "nointro", "gag", "retired", "guest",
 "nosummon", "pageron", "notitled", "room", "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13",
@@ -119,7 +119,7 @@ char *	const	pc_flags [] =
 "r25"
 };
 
-char *	const	plr_flags [] =
+const char *	const	plr_flags [] =
 {
 "npc", "boughtpet", "shovedrag", "autoexits", "autoloot", "autosac", "blank", 
 "outcast", "brief", "combine", "prompt", "telnet_ga", "holylight", 
@@ -128,7 +128,7 @@ char *	const	plr_flags [] =
 "flee" ,"autocred", "automap", "afk"
 };
 
-char *	const	trap_flags [] =
+const char *	const	trap_flags [] =
 {
 "room", "obj", "enter", "leave", "open", "close", "get", "put", "pick",
 "unlock", "north", "south", "east", "r1", "west", "up", "down", "examine",
@@ -136,14 +136,14 @@ char *	const	trap_flags [] =
 "r14", "r15" 
 };
 
-char *	const	wear_locs [] =
+const char *	const	wear_locs [] =
 {
 "light", "finger1", "finger2", "neck1", "neck2", "body", "head", "legs",
 "feet", "hands", "arms", "shield", "about", "waist", "wrist1", "wrist2",
 "wield", "hold", "dual_wield", "ears", "eyes", "missile_wield"
 };
 
-char *	const	ris_flags [] =
+const char *	const	ris_flags [] =
 {
 "fire", "cold", "electricity", "energy", "blunt", "pierce", "slash", "acid",
 "poison", "drain", "sleep", "charm", "hold", "nonmagic", "plus1", "plus2",
@@ -151,7 +151,7 @@ char *	const	ris_flags [] =
 "r4", "r5", "r6", "r7", "r8", "r9", "r10"
 };
 
-char *	const	trig_flags [] =
+const char *	const	trig_flags [] =
 {
 "up", "unlock", "lock", "d_north", "d_south", "d_east", "d_west", "d_up",
 "d_down", "door", "container", "open", "close", "passage", "oload", "mload",
@@ -160,7 +160,7 @@ char *	const	trig_flags [] =
 "showroomdesc", "autoreturn", "r2", "r3"
 };
 
-char *	const	part_flags [] =
+const char *	const	part_flags [] =
 {
 "head", "arms", "legs", "heart", "brains", "guts", "hands", "feet", "fingers",
 "ear", "eye", "long_tongue", "eyestalks", "tentacles", "fins", "wings",
@@ -169,7 +169,7 @@ char *	const	part_flags [] =
 "r1", "r2"
 };
 
-char *	const	attack_flags [] =
+const char *	const	attack_flags [] =
 {
 "bite", "claws", "tail", "sting", "punch", "kick", 
 "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "r16", "r17", 
@@ -177,7 +177,7 @@ char *	const	attack_flags [] =
 "r30", "r31"
 };
 
-char *	const	defense_flags [] =
+const char *	const	defense_flags [] =
 {
 "parry", "dodge", "r2", "r3", "r4" ,"r5",
 "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "r16", "r17", 
@@ -198,7 +198,7 @@ char *	const	defense_flags [] =
  *  hour and time, rand and randiw, speech and speechiw
  * 
  */
-char *	const	mprog_flags [] =
+const char *	const	mprog_flags [] =
 {
 "act", "speech", "rand", "fight", "death", "hitprcnt", "entry", "greet",
 "allgreet", "give", "bribe", "hour", "time", "wear", "remove", "sac",
@@ -207,7 +207,7 @@ char *	const	mprog_flags [] =
 };
 
 
-char *flag_string( int bitvector, char * const flagarray[] )
+char *flag_string( int bitvector, const char * const flagarray[] )
 {
     static char buf[MAX_STRING_LENGTH];
     int x;
@@ -286,7 +286,7 @@ bool can_medit( CHAR_DATA *ch, MOB_INDEX_DATA *mob )
 	return FALSE;
 }
 
-int get_otype( char *type )
+int get_otype( const char *type )
 {
     int x;
 
@@ -296,7 +296,7 @@ int get_otype( char *type )
     return -1;
 }
 
-int get_aflag( char *flag )
+int get_aflag( const char *flag )
 {
     int x;
 
@@ -306,7 +306,7 @@ int get_aflag( char *flag )
     return -1;
 }
 
-int get_trapflag( char *flag )
+int get_trapflag( const char *flag )
 {
     int x;
 
@@ -316,7 +316,7 @@ int get_trapflag( char *flag )
     return -1;
 }
 
-int get_atype( char *type )
+int get_atype( const char *type )
 {
     int x;
 
@@ -326,7 +326,7 @@ int get_atype( char *type )
     return -1;
 }
 
-int get_wearloc( char *type )
+int get_wearloc( const char *type )
 {
     int x;
     
@@ -336,7 +336,7 @@ int get_wearloc( char *type )
     return -1;
 }
 
-int get_exflag( char *flag )
+int get_exflag( const char *flag )
 {
     int x;
     
@@ -346,7 +346,7 @@ int get_exflag( char *flag )
     return -1;
 }
 
-int get_rflag( char *flag )
+int get_rflag( const char *flag )
 {
     int x;
     
@@ -356,7 +356,7 @@ int get_rflag( char *flag )
     return -1;
 }
 
-int get_mpflag( char *flag )
+int get_mpflag( const char *flag )
 {
     int x;
     
@@ -366,7 +366,7 @@ int get_mpflag( char *flag )
     return -1;
 }
 
-int get_oflag( char *flag )
+int get_oflag( const char *flag )
 {
     int x;
 
@@ -376,7 +376,7 @@ int get_oflag( char *flag )
     return -1;
 }
 
-int get_areaflag( char *flag )
+int get_areaflag( const char *flag )
 {
     int x;
 
@@ -386,7 +386,7 @@ int get_areaflag( char *flag )
     return -1;
 }
 
-int get_wflag( char *flag )
+int get_wflag( const char *flag )
 {
     int x;
 
@@ -396,7 +396,7 @@ int get_wflag( char *flag )
     return -1;
 }
 
-int get_actflag( char *flag )
+int get_actflag( const char *flag )
 {
     int x;
 
@@ -406,7 +406,7 @@ int get_actflag( char *flag )
     return -1;
 }
 
-int get_pcflag( char *flag )
+int get_pcflag( const char *flag )
 {
     int x;
 
@@ -415,7 +415,7 @@ int get_pcflag( char *flag )
         return x;
     return -1;
 }
-int get_plrflag( char *flag )
+int get_plrflag( const char *flag )
 {
     int x;
 
@@ -425,7 +425,7 @@ int get_plrflag( char *flag )
     return -1;
 }
 
-int get_risflag( char *flag )
+int get_risflag( const char *flag )
 {
     int x;
 
@@ -435,7 +435,7 @@ int get_risflag( char *flag )
     return -1;
 }
 
-int get_trigflag( char *flag )
+int get_trigflag( const char *flag )
 {
     int x;
 
@@ -445,7 +445,7 @@ int get_trigflag( char *flag )
     return -1;
 }
 
-int get_partflag( char *flag )
+int get_partflag( const char *flag )
 {
     int x;
 
@@ -455,7 +455,7 @@ int get_partflag( char *flag )
     return -1;
 }
 
-int get_attackflag( char *flag )
+int get_attackflag( const char *flag )
 {
     int x;
 
@@ -465,7 +465,7 @@ int get_attackflag( char *flag )
     return -1;
 }
 
-int get_defenseflag( char *flag )
+int get_defenseflag( const char *flag )
 {
     int x;
 
@@ -478,7 +478,7 @@ int get_defenseflag( char *flag )
 /*
  * Remove carriage returns from a line
  */
-char *strip_cr( char *str )
+char *strip_cr( const char *str )
 {
     static char newstr[MAX_STRING_LENGTH];
     int i, j;
@@ -690,7 +690,7 @@ void do_goto( CHAR_DATA *ch, char *argument )
 	act( AT_IMMORT, "$n $T", ch, NULL, "enters in a swirl of the Force.",  TO_ROOM );
     }
 
-  do_look( ch, "auto" );
+  do_look( ch, const_char_to_nonconst( "auto" ) );
 
   if ( ch->in_room == in_room )
     return;
@@ -778,7 +778,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	{
 	    send_to_char( "Your victim died!\n\r", ch );
 	    victim = NULL;
-	    argument = "done";
+	    argument = const_char_to_nonconst( "done" );
 	}
 	if ( argument[0] == '\0' || !str_cmp( argument, " " )
 	||   !str_cmp( argument, "stat" ) )
@@ -2113,7 +2113,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	ch->last_cmd = do_mset;
     }
     else
-	do_mset( ch, "" );
+      do_mset( ch, const_char_to_nonconst( "" ) );
     return;
 }
 
@@ -2211,7 +2211,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
 	{
 	    send_to_char( "Your object was extracted!\n\r", ch );
 	    obj = NULL;
-	    argument = "done";
+	    argument = const_char_to_nonconst( "done" );
 	}
 	if ( argument[0] == '\0' || !str_cmp( argument, " " )
 	||   !str_cmp( argument, "stat" ) )
@@ -2966,7 +2966,8 @@ void do_oset( CHAR_DATA *ch, char *argument )
 	ch->last_cmd = do_oset;
     }
     else
-	do_oset( ch, "" );
+      do_oset( ch, const_char_to_nonconst( "" ) );
+
     return;
 }
 
@@ -2982,7 +2983,7 @@ void do_rset( CHAR_DATA *ch, char *argument )
 /*
  * Returns value 0 - 9 based on directional text.
  */
-int get_dir( char *txt )
+int get_dir( const char *txt )
 {
     int edir;
     char c1,c2;
@@ -3094,7 +3095,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
     {
 	if ( arg[0] == '\0' )
 	{
-	    do_rstat( ch, "" );
+	  do_rstat( ch, const_char_to_nonconst( "" ) );
 	    return;
 	}
 	if ( !str_cmp( arg, "done" ) || !str_cmp( arg, "off" ) )
@@ -3866,7 +3867,8 @@ void do_redit( CHAR_DATA *ch, char *argument )
 	ch->last_cmd = do_redit;
     }
     else
-	do_redit( ch, "" );
+      do_redit( ch, const_char_to_nonconst( "" ) );
+
     return;
 }
 
@@ -4286,7 +4288,7 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
 	    d->connected = CON_PLAYING;
 	    if ( !ch->last_cmd )
 	      return;
-	    (*ch->last_cmd) ( ch, "" );
+	    (*ch->last_cmd) ( ch, const_char_to_nonconst( "" ) );
 	    return;
 	}
    }
@@ -4347,7 +4349,7 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
       d->connected = CON_PLAYING;
       if ( !ch->last_cmd )
         return;
-      (*ch->last_cmd) ( ch, "" );
+      (*ch->last_cmd) ( ch, const_char_to_nonconst( "" ) );
       return;
    }
    send_to_char( "> ", ch );
@@ -4415,7 +4417,7 @@ void do_aassign( CHAR_DATA *ch, char *argument )
 }
 
 
-EXTRA_DESCR_DATA *SetRExtra( ROOM_INDEX_DATA *room, char *keywords )
+EXTRA_DESCR_DATA *SetRExtra( ROOM_INDEX_DATA *room, const char *keywords )
 {
     EXTRA_DESCR_DATA *ed;
     
@@ -4454,7 +4456,7 @@ bool DelRExtra( ROOM_INDEX_DATA *room, char *keywords )
     return TRUE;
 }
 
-EXTRA_DESCR_DATA *SetOExtra( OBJ_DATA *obj, char *keywords )
+EXTRA_DESCR_DATA *SetOExtra( OBJ_DATA *obj, const char *keywords )
 {
     EXTRA_DESCR_DATA *ed;
     
@@ -4493,7 +4495,7 @@ bool DelOExtra( OBJ_DATA *obj, char *keywords )
     return TRUE;
 }
 
-EXTRA_DESCR_DATA *SetOExtraProto( OBJ_INDEX_DATA *obj, char *keywords )
+EXTRA_DESCR_DATA *SetOExtraProto( OBJ_INDEX_DATA *obj, const char *keywords )
 {
     EXTRA_DESCR_DATA *ed;
     
@@ -4532,7 +4534,7 @@ bool DelOExtraProto( OBJ_INDEX_DATA *obj, char *keywords )
     return TRUE;
 }
 
-void fold_area( AREA_DATA *tarea, char *filename, bool install )
+void fold_area( AREA_DATA *tarea, const char *filename, bool install )
 {
     ROOM_INDEX_DATA	*room;
     MPROG_DATA		*mprog;
@@ -4921,7 +4923,7 @@ void do_aset( CHAR_DATA *ch, char *argument )
         return;
     }
 
-    do_aset( ch, "" );
+    do_aset( ch, const_char_to_nonconst( "" ) );
     return;
 }
 
@@ -5326,7 +5328,7 @@ void do_mpedit( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    do_mpedit( ch, "" );
+    do_mpedit( ch, const_char_to_nonconst( "" ) );
 }
 
 void do_opedit( CHAR_DATA *ch, char *argument )
@@ -5604,7 +5606,7 @@ void do_opedit( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    do_opedit( ch, "" );
+    do_opedit( ch, const_char_to_nonconst( "" ) );
 }
 
 
@@ -5878,7 +5880,7 @@ void do_rpedit( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    do_rpedit( ch, "" );
+    do_rpedit( ch, const_char_to_nonconst( "" ) );
 }
 
 void do_allsave( CHAR_DATA *ch , char * argument )

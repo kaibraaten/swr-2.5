@@ -15,14 +15,14 @@ CLAN_DATA * last_clan;
 
 /* local routines */
 void	fread_clan	args( ( CLAN_DATA *clan, FILE *fp ) );
-bool	load_clan_file	args( ( char *clanfile ) );
+bool	load_clan_file	args( ( const char *clanfile ) );
 void	write_clan_list	args( ( void ) );
 
 
 /*
  * Get pointer to clan structure from clan name.
  */
-CLAN_DATA *get_clan( char *name )
+CLAN_DATA *get_clan( const char *name )
 {
     CLAN_DATA *clan;
     
@@ -35,11 +35,11 @@ CLAN_DATA *get_clan( char *name )
          return clan;
 
     for ( clan = first_clan; clan; clan = clan->next )
-       if ( nifty_is_name( name, clan->name ) )
+      if ( nifty_is_name( const_char_to_nonconst( name ), clan->name ) )
          return clan;
 
     for ( clan = first_clan; clan; clan = clan->next )
-       if ( nifty_is_name_prefix( name, clan->name ) )
+      if ( nifty_is_name_prefix( const_char_to_nonconst( name ), clan->name ) )
          return clan;
 
     return NULL;
@@ -131,7 +131,7 @@ void save_clan( CLAN_DATA *clan )
 void fread_clan( CLAN_DATA *clan, FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
-    char *word;
+    const char *word;
     bool fMatch;
 
     for ( ; ; )
@@ -203,7 +203,7 @@ void fread_clan( CLAN_DATA *clan, FILE *fp )
  * Load a clan file
  */
 
-bool load_clan_file( char *clanfile )
+bool load_clan_file( const char *clanfile )
 {
     char filename[256];
     CLAN_DATA *clan;
@@ -276,7 +276,7 @@ bool load_clan_file( char *clanfile )
 void load_clans( )
 {
     FILE *fpList;
-    char *filename;
+    const char *filename;
     char clanlist[256];
     char buf[MAX_STRING_LENGTH];
     
@@ -576,7 +576,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    do_setclan( ch, "" );
+    do_setclan( ch, const_char_to_nonconst( "" ) );
     return;
 }
 

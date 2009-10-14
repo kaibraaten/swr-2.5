@@ -40,7 +40,7 @@ OBJ_DATA *	gobj_prev;
 
 CHAR_DATA *	timechar;
 
-char * corpse_descs[] =
+const char * corpse_descs[] =
    { 
      "The corpse of %s will soon be gone.", 
      "The corpse of %s lies here.",
@@ -49,7 +49,7 @@ char * corpse_descs[] =
      "The corpse of %s lies here."
    };
 
-char * d_corpse_descs[] =
+const char * d_corpse_descs[] =
    { 
      "The shattered remains %s will soon be gone.", 
      "The shattered remains %s are here.",
@@ -462,13 +462,13 @@ void mobile_update( void )
 	if ( IS_SET(ch->act, ACT_MOUNTED ) )
 	{
 	    if ( IS_SET(ch->act, ACT_AGGRESSIVE) )
-		do_emote( ch, "snarls and growls." );
+	      do_emote( ch, const_char_to_nonconst("snarls and growls." ));
 	    continue;
 	}
 
 	if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE )
 	&&   IS_SET(ch->act, ACT_AGGRESSIVE) )
-	    do_emote( ch, "glares around and snarls." );
+	  do_emote( ch, const_char_to_nonconst("glares around and snarls." ));
 
 
 	if ( last_descriptor )
@@ -1019,7 +1019,7 @@ void char_update( void )
 			   if ( (ch->position == POS_STANDING
 			   ||    ch->position < POS_FIGHTING)
 			   &&    number_percent()+10 < abs(ch->mental_state) )
-				do_sleep( ch, "" );
+			     do_sleep( ch, const_char_to_nonconst("") );
 			   else
 				send_to_char( "You're barely conscious.\n\r", ch );
 			}
@@ -1030,7 +1030,7 @@ void char_update( void )
 			   if ( (ch->position == POS_STANDING
 			   ||    ch->position < POS_FIGHTING)
 			   &&   (number_percent()+20) < abs(ch->mental_state) )
-				do_sleep( ch, "" );
+			     do_sleep( ch, const_char_to_nonconst("") );
 			   else
 				send_to_char( "You can barely keep your eyes open.\n\r", ch );
 			}
@@ -1040,7 +1040,7 @@ void char_update( void )
 			{
 			   if ( ch->position < POS_SITTING
 			   &&  (number_percent()+30) < abs(ch->mental_state) )
-				do_sleep( ch, "" );
+			     do_sleep( ch, const_char_to_nonconst("") );
 			   else
 				send_to_char( "You're extremely drowsy.\n\r", ch );
 			}
@@ -1101,7 +1101,7 @@ void obj_update( void )
     for ( obj = last_object; obj; obj = gobj_prev )
     {
 	CHAR_DATA *rch;
-	char *message;
+	const char *message;
 
 	if ( obj == first_object && obj->prev )
 	{
@@ -1548,7 +1548,7 @@ void aggr_update( void )
 }
 
 /* From interp.c */
-bool check_social  args( ( CHAR_DATA *ch, char *command, char *argument ) );
+bool check_social  args( ( CHAR_DATA *ch, const char *command, char *argument ) );
 
 /*
  * drunk randoms	- Tricops
@@ -1572,16 +1572,16 @@ void drunk_randoms( CHAR_DATA *ch )
     ch->position = POS_STANDING;
 
     if ( number_percent() < (2*drunk / 20) )
-	check_social( ch, "burp", "" );
+      check_social( ch, "burp", const_char_to_nonconst("") );
     else
     if ( number_percent() < (2*drunk / 20) )
-	check_social( ch, "hiccup", "" );
+      check_social( ch, "hiccup", const_char_to_nonconst("") );
     else
     if ( number_percent() < (2*drunk / 20) )
-	check_social( ch, "drool", "" );
+      check_social( ch, "drool", const_char_to_nonconst("") );
     else
     if ( number_percent() < (2*drunk / 20) )
-	check_social( ch, "fart", "" );
+      check_social( ch, "fart", const_char_to_nonconst("") );
     else
     if ( drunk > (10+(get_curr_con(ch)/5))
     &&   number_percent() < ( 2 * drunk / 18 ) )
@@ -1589,7 +1589,8 @@ void drunk_randoms( CHAR_DATA *ch )
 	for ( vch = ch->in_room->first_person; vch; vch = vch->next_in_room )
 	    if ( number_percent() < 10 )
 		rvch = vch;
-	check_social( ch, "puke", (rvch ? rvch->name : "") );
+	check_social( ch, "puke",
+		      (rvch ? rvch->name : const_char_to_nonconst("")) );
     }
 
     ch->position = position;
@@ -1600,7 +1601,7 @@ void halucinations( CHAR_DATA *ch )
 {
     if ( ch->mental_state >= 30 && number_bits(5 - (ch->mental_state >= 50) - (ch->mental_state >= 75)) == 0 )
     {
-	char *t;
+      const char *t;
 
 	switch( number_range( 1, UMIN(20, (ch->mental_state+5) / 5)) )
 	{
@@ -1838,7 +1839,7 @@ void remove_portal( OBJ_DATA *portal )
 
 void reboot_check( time_t reset )
 {
-  static char *tmsg[] =
+  static const char *tmsg[] =
   { "SYSTEM: Reboot in 10 seconds.",
     "SYSTEM: Reboot in 30 seconds.",
     "SYSTEM: Reboot in 1 minute.",

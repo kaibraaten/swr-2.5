@@ -2190,7 +2190,7 @@ bool  job_trigger( CHAR_DATA *victim, CHAR_DATA *ch, OBJ_DATA *obj )
      if ( str_cmp ( buf , obj->name ) )
         return FALSE;    
      
-     do_say( victim, "Thank you." );
+     do_say( victim, const_char_to_nonconst( "Thank you." ) );
      ch->gold += 1000;
 
      act( AT_GOLD, "$N gives you 1000 credits." , ch, NULL, victim, TO_CHAR  );

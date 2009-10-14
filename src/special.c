@@ -37,7 +37,7 @@ SPEC_FUN *spec_lookup( const char *name )
 /*
  * Given a pointer, return the appropriate spec fun text.
  */
-char *lookup_spec( SPEC_FUN *special )
+const char *lookup_spec( SPEC_FUN *special )
 {
     if ( special == spec_fido		)	return "spec_fido";
     if ( special == spec_guardian	)	return "spec_guardian";
@@ -69,9 +69,9 @@ bool spec_clan_guard( CHAR_DATA *ch )
                && victim->pcdata->clan  != ch->mob_clan 
                && nifty_is_name(victim->pcdata->clan->name , ch->mob_clan->atwar ) )
         {
-	      do_yell( ch, "Hey your not allowed in here!" );
-              multi_hit( ch, victim, TYPE_UNDEFINED );
-              return TRUE;         
+	  do_yell( ch, const_char_to_nonconst( "Hey your not allowed in here!" ));
+	  multi_hit( ch, victim, TYPE_UNDEFINED );
+	  return TRUE;         
         }
     }
 
@@ -97,9 +97,9 @@ bool spec_ship_guard( CHAR_DATA *ch )
                && victim->pcdata->clan  != ch->mob_clan 
                && nifty_is_name(victim->pcdata->clan->name , ch->mob_clan->atwar ) )
         {
-	      do_yell( ch, "Hey your not allowed in here!" );
-              multi_hit( ch, victim, TYPE_UNDEFINED );
-              return TRUE;         
+	  do_yell( ch, const_char_to_nonconst("Hey your not allowed in here!" ));
+	  multi_hit( ch, victim, TYPE_UNDEFINED );
+	  return TRUE;         
         }
     }
 
@@ -144,7 +144,7 @@ bool spec_guardian( CHAR_DATA *ch )
     CHAR_DATA *victim;
     CHAR_DATA *v_next;
     CHAR_DATA *ech;
-    char *crime;
+    const char *crime;
     int max_evil;
 
     if ( !IS_AWAKE(ch) || ch->fighting )

@@ -93,7 +93,7 @@ void reset_all( )
                      obj_to_char( obj, mob );
                      equip_char( mob, obj, WEAR_WIELD );                        
                   } 
-                  do_setblaster( mob , "full" );
+                  do_setblaster( mob , const_char_to_nonconst("full") );
                 }
                }
               
@@ -448,7 +448,7 @@ void reset_all( )
                  obj_to_char( blaster, mob );
                  equip_char( mob, blaster, WEAR_WIELD );                        
             } 
-            do_setblaster( mob , "full" );
+            do_setblaster( mob , const_char_to_nonconst("full") );
 
             CREATE( guard , GUARD_DATA , 1 );
                 

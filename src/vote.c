@@ -12,7 +12,7 @@ VOTE_DATA * last_poll;
 
 /* local routines */
 void	fread_poll	args( ( VOTE_DATA *poll, FILE *fp ) );
-bool	load_poll_file	args( ( char *pollfile ) );
+bool	load_poll_file	args( ( const char *pollfile ) );
 void	write_poll_list	args( ( void ) );
 
 
@@ -97,7 +97,7 @@ void save_poll( VOTE_DATA *poll )
 void fread_poll( VOTE_DATA *poll, FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
-    char *word;
+    const char *word;
     bool fMatch;
 
     for ( ; ; )
@@ -162,7 +162,7 @@ void fread_poll( VOTE_DATA *poll, FILE *fp )
  * Load a poll file
  */
 
-bool load_poll_file( char *pollfile )
+bool load_poll_file( const char *pollfile )
 {
     char player[256];
     VOTE_DATA *poll;
@@ -235,7 +235,7 @@ bool load_poll_file( char *pollfile )
 void load_polls( )
 {
     FILE *fpList;
-    char *player;
+    const char *player;
     char polllist[256];
     char buf[MAX_STRING_LENGTH];
     

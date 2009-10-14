@@ -14,7 +14,7 @@ void subtract_times( struct timeval *etime, struct timeval *stime );
 
 
 
-bool	check_social	args( ( CHAR_DATA *ch, char *command,
+bool	check_social	args( ( CHAR_DATA *ch, const char *command,
 			    char *argument ) );
 
 
@@ -262,7 +262,7 @@ void interpret( CHAR_DATA *ch, char *argument )
 
 	tempsub = ch->substate;
 	ch->substate = SUB_TIMER_DO_ABORT;
-	(timer->do_fun)(ch,"");
+	(timer->do_fun)(ch,const_char_to_nonconst(""));
 	if ( char_died(ch) )
 	  return;
 	if ( ch->substate != SUB_TIMER_CANT_ABORT )
@@ -351,7 +351,7 @@ void interpret( CHAR_DATA *ch, char *argument )
     tail_chain( );
 }
 
-CMDTYPE *find_command( char *command )
+CMDTYPE *find_command( const char *command )
 {
     CMDTYPE *cmd;
     int hash;
@@ -365,7 +365,7 @@ CMDTYPE *find_command( char *command )
     return NULL;
 }
 
-SOCIALTYPE *find_social( char *command )
+SOCIALTYPE *find_social( const char *command )
 {
     SOCIALTYPE *social;
     int hash;
@@ -382,7 +382,7 @@ SOCIALTYPE *find_social( char *command )
     return NULL;
 }
 
-bool check_social( CHAR_DATA *ch, char *command, char *argument )
+bool check_social( CHAR_DATA *ch, const char *command, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     CHAR_DATA *victim;
@@ -499,7 +499,7 @@ bool check_social( CHAR_DATA *ch, char *command, char *argument )
 /*
  * Return true if an argument is completely numeric.
  */
-bool is_number( char *arg )
+bool is_number( const char *arg )
 {
     if ( *arg == '\0' )
 	return FALSE;
@@ -518,25 +518,27 @@ bool is_number( char *arg )
 /*
  * Given a string like 14.foo, return 14 and 'foo'
  */
-int number_argument( char *argument, char *arg )
+int number_argument( const char *orig_argument, char *arg )
 {
-    char *pdot;
-    int number;
+  char *pdot;
+  int number;
+  char argument[MAX_STRING_LENGTH];
+  sprintf( argument, "%s", orig_argument );
 
-    for ( pdot = argument; *pdot != '\0'; pdot++ )
+  for ( pdot = argument; *pdot != '\0'; pdot++ )
     {
-	if ( *pdot == '.' )
+      if ( *pdot == '.' )
 	{
-	    *pdot = '\0';
-	    number = atoi( argument );
-	    *pdot = '.';
-	    strcpy( arg, pdot+1 );
-	    return number;
+	  *pdot = '\0';
+	  number = atoi( argument );
+	  *pdot = '.';
+	  strcpy( arg, pdot+1 );
+	  return number;
 	}
     }
 
-    strcpy( arg, argument );
-    return 1;
+  strcpy( arg, argument );
+  return 1;
 }
 
 

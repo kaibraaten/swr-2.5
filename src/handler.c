@@ -1288,10 +1288,10 @@ void extract_char( CHAR_DATA *ch, bool fPull )
     }
 
   if ( ch->desc && ch->desc->original && IS_SET(ch->act, ACT_POLYMORPHED))
-    do_revert( ch, "" );
+    do_revert( ch, const_char_to_nonconst( "" ) );
 
   if ( ch->desc && ch->desc->original )
-    do_return( ch, "" );
+    do_return( ch, const_char_to_nonconst( "" ) );
 
   for ( wch = first_char; wch; wch = wch->next )
     if ( wch->reply == ch )
@@ -1318,7 +1318,7 @@ void extract_char( CHAR_DATA *ch, bool fPull )
 /*
  * Find a char in the room.
  */
-CHAR_DATA *get_char_room( CHAR_DATA *ch, char *argument )
+CHAR_DATA *get_char_room( CHAR_DATA *ch, const char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     CHAR_DATA *rch;
@@ -1375,7 +1375,7 @@ CHAR_DATA *get_char_room( CHAR_DATA *ch, char *argument )
 /*
  * Find a char in the world.
  */
-CHAR_DATA *get_char_world( CHAR_DATA *ch, char *argument )
+CHAR_DATA *get_char_world( CHAR_DATA *ch, const char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     CHAR_DATA *wch;
@@ -1482,7 +1482,7 @@ OBJ_DATA *get_obj_type( OBJ_INDEX_DATA *pObjIndex )
 /*
  * Find an obj in a list.
  */
-OBJ_DATA *get_obj_list( CHAR_DATA *ch, char *argument, OBJ_DATA *list )
+OBJ_DATA *get_obj_list( CHAR_DATA *ch, const char *argument, OBJ_DATA *list )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -1512,7 +1512,7 @@ OBJ_DATA *get_obj_list( CHAR_DATA *ch, char *argument, OBJ_DATA *list )
 /*
  * Find an obj in a list...going the other way			-Thoric
  */
-OBJ_DATA *get_obj_list_rev( CHAR_DATA *ch, char *argument, OBJ_DATA *list )
+OBJ_DATA *get_obj_list_rev( CHAR_DATA *ch, const char *argument, OBJ_DATA *list )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -1544,7 +1544,7 @@ OBJ_DATA *get_obj_list_rev( CHAR_DATA *ch, char *argument, OBJ_DATA *list )
 /*
  * Find an obj in player's inventory.
  */
-OBJ_DATA *get_obj_carry( CHAR_DATA *ch, char *argument )
+OBJ_DATA *get_obj_carry( CHAR_DATA *ch, const char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -1587,7 +1587,7 @@ OBJ_DATA *get_obj_carry( CHAR_DATA *ch, char *argument )
 /*
  * Find an obj in player's equipment.
  */
-OBJ_DATA *get_obj_wear( CHAR_DATA *ch, char *argument )
+OBJ_DATA *get_obj_wear( CHAR_DATA *ch, const char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -1636,7 +1636,7 @@ OBJ_DATA *get_obj_wear( CHAR_DATA *ch, char *argument )
 /*
  * Find an obj in the room or in inventory.
  */
-OBJ_DATA *get_obj_here( CHAR_DATA *ch, char *argument )
+OBJ_DATA *get_obj_here( CHAR_DATA *ch, const char *argument )
 {
     OBJ_DATA *obj;
 
@@ -1661,7 +1661,7 @@ OBJ_DATA *get_obj_here( CHAR_DATA *ch, char *argument )
 /*
  * Find an obj in the world.
  */
-OBJ_DATA *get_obj_world( CHAR_DATA *ch, char *argument )
+OBJ_DATA *get_obj_world( CHAR_DATA *ch, const char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
@@ -1717,7 +1717,7 @@ bool ms_find_obj( CHAR_DATA *ch )
 {
     int ms = ch->mental_state;
     int drunk = IS_NPC(ch) ? 0 : ch->pcdata->condition[COND_DRUNK];
-    char *t;
+    const char *t;
 
     /*
      * we're going to be nice and let nothing weird happen unless
@@ -2055,7 +2055,7 @@ bool can_drop_obj( CHAR_DATA *ch, OBJ_DATA *obj )
 /*
  * Return ascii name of an item type.
  */
-char *item_type_name( OBJ_DATA *obj )
+const char *item_type_name( OBJ_DATA *obj )
 {
     if ( obj->item_type < 1 || obj->item_type > MAX_ITEM_TYPE )
     {
@@ -2071,7 +2071,7 @@ char *item_type_name( OBJ_DATA *obj )
 /*
  * Return ascii name of an affect location.
  */
-char *affect_loc_name( int location )
+const char *affect_loc_name( int location )
 {
     switch ( location )
     {
@@ -2156,39 +2156,106 @@ char *affect_bit_name( int vector )
     static char buf[512];
 
     buf[0] = '\0';
-    if ( vector & AFF_BLIND         ) strcat( buf, " blind"         );
-    if ( vector & AFF_INVISIBLE     ) strcat( buf, " invisible"     );
-    if ( vector & AFF_DETECT_EVIL   ) strcat( buf, " detect_evil"   );
-    if ( vector & AFF_DETECT_INVIS  ) strcat( buf, " detect_invis"  );
-    if ( vector & AFF_DETECT_MAGIC  ) strcat( buf, " detect_magic"  );
-    if ( vector & AFF_DETECT_HIDDEN ) strcat( buf, " detect_hidden" );
-    if ( vector & AFF_WEAKEN        ) strcat( buf, " weaken"        );
-    if ( vector & AFF_SANCTUARY     ) strcat( buf, " sanctuary"     );
-    if ( vector & AFF_FAERIE_FIRE   ) strcat( buf, " faerie_fire"   );
-    if ( vector & AFF_INFRARED      ) strcat( buf, " infrared"      );
-    if ( vector & AFF_CURSE         ) strcat( buf, " curse"         );
-    if ( vector & AFF_FLAMING       ) strcat( buf, " flaming"       );
-    if ( vector & AFF_POISON        ) strcat( buf, " poison"        );
-    if ( vector & AFF_PROTECT       ) strcat( buf, " protect"       );
-    if ( vector & AFF_PARALYSIS     ) strcat( buf, " paralysis"     );
-    if ( vector & AFF_SLEEP         ) strcat( buf, " sleep"         );
-    if ( vector & AFF_SNEAK         ) strcat( buf, " sneak"         );
-    if ( vector & AFF_HIDE          ) strcat( buf, " hide"          );
-    if ( vector & AFF_CHARM         ) strcat( buf, " charm"         );
-    if ( vector & AFF_POSSESS       ) strcat( buf, " possess"       );
-    if ( vector & AFF_FLYING        ) strcat( buf, " flying"        );
-    if ( vector & AFF_PASS_DOOR     ) strcat( buf, " pass_door"     );
-    if ( vector & AFF_FLOATING      ) strcat( buf, " floating"      );
-    if ( vector & AFF_TRUESIGHT     ) strcat( buf, " true_sight"    );
-    if ( vector & AFF_DETECTTRAPS   ) strcat( buf, " detect_traps"  );
-    if ( vector & AFF_SCRYING       ) strcat( buf, " scrying"       );
-    if ( vector & AFF_FIRESHIELD    ) strcat( buf, " fireshield"    );
-    if ( vector & AFF_SHOCKSHIELD   ) strcat( buf, " shockshield"   );
-    if ( vector & AFF_ICESHIELD     ) strcat( buf, " iceshield"     );
-    if ( vector & AFF_POSSESS       ) strcat( buf, " possess"       );
-    if ( vector & AFF_BERSERK       ) strcat( buf, " berserk"       );
-    if ( vector & AFF_AQUA_BREATH   ) strcat( buf, " aqua_breath"   );
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+
+    if ( vector & AFF_BLIND         )
+      strcat( buf, " blind"         );
+
+    if ( vector & AFF_INVISIBLE     )
+      strcat( buf, " invisible"     );
+
+    if ( vector & AFF_DETECT_EVIL   )
+      strcat( buf, " detect_evil"   );
+
+    if ( vector & AFF_DETECT_INVIS  )
+      strcat( buf, " detect_invis"  );
+
+    if ( vector & AFF_DETECT_MAGIC  )
+      strcat( buf, " detect_magic"  );
+
+    if ( vector & AFF_DETECT_HIDDEN )
+      strcat( buf, " detect_hidden" );
+
+    if ( vector & AFF_WEAKEN        )
+      strcat( buf, " weaken"        );
+
+    if ( vector & AFF_SANCTUARY     )
+      strcat( buf, " sanctuary"     );
+
+    if ( vector & AFF_FAERIE_FIRE   )
+      strcat( buf, " faerie_fire"   );
+
+    if ( vector & AFF_INFRARED      )
+      strcat( buf, " infrared"      );
+
+    if ( vector & AFF_CURSE         )
+      strcat( buf, " curse"         );
+
+    if ( vector & AFF_FLAMING       )
+      strcat( buf, " flaming"       );
+
+    if ( vector & AFF_POISON        )
+      strcat( buf, " poison"        );
+
+    if ( vector & AFF_PROTECT       )
+      strcat( buf, " protect"       );
+
+    if ( vector & AFF_PARALYSIS     )
+      strcat( buf, " paralysis"     );
+
+    if ( vector & AFF_SLEEP         )
+      strcat( buf, " sleep"         );
+
+    if ( vector & AFF_SNEAK         )
+      strcat( buf, " sneak"         );
+
+    if ( vector & AFF_HIDE          )
+      strcat( buf, " hide"          );
+
+    if ( vector & AFF_CHARM         )
+      strcat( buf, " charm"         );
+
+    if ( vector & AFF_POSSESS       )
+      strcat( buf, " possess"       );
+
+    if ( vector & AFF_FLYING        )
+      strcat( buf, " flying"        );
+
+    if ( vector & AFF_PASS_DOOR     )
+      strcat( buf, " pass_door"     );
+
+    if ( vector & AFF_FLOATING      )
+      strcat( buf, " floating"      );
+
+    if ( vector & AFF_TRUESIGHT     )
+      strcat( buf, " true_sight"    );
+
+    if ( vector & AFF_DETECTTRAPS   )
+      strcat( buf, " detect_traps"  );
+
+    if ( vector & AFF_SCRYING       )
+      strcat( buf, " scrying"       );
+
+    if ( vector & AFF_FIRESHIELD    )
+      strcat( buf, " fireshield"    );
+
+    if ( vector & AFF_SHOCKSHIELD   )
+      strcat( buf, " shockshield"   );
+
+    if ( vector & AFF_ICESHIELD     )
+      strcat( buf, " iceshield"     );
+
+    if ( vector & AFF_POSSESS       )
+      strcat( buf, " possess"       );
+
+    if ( vector & AFF_BERSERK       )
+      strcat( buf, " berserk"       );
+
+    if ( vector & AFF_AQUA_BREATH   )
+      strcat( buf, " aqua_breath"   );
+
+    sprintf( buf, "%s", buf[0] != '\0' ? buf + 1 : "none" );
+
+    return buf;
 }
 
 
@@ -2214,7 +2281,9 @@ char *extra_bit_name( int extra_flags )
     if ( extra_flags & ITEM_DONATION     ) strcat( buf, " donation"     );
     if ( extra_flags & ITEM_CLANOBJECT   ) strcat( buf, " clan"         );
     if ( extra_flags & ITEM_PROTOTYPE    ) strcat( buf, " prototype"    );
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+
+    sprintf( buf, "%s", buf[0] != '\0' ? buf + 1 : "none" );
+    return buf;
 }
 
 /*
@@ -2226,7 +2295,9 @@ char *magic_bit_name( int magic_flags )
 
     buf[0] = '\0';
     if ( magic_flags & ITEM_RETURNING     ) strcat( buf, " returning"     );
-    return ( buf[0] != '\0' ) ? buf+1 : "none";
+
+    sprintf( buf, "%s", buf[0] != '\0' ? buf + 1 : "none" );
+    return buf;
 }
 
 /*

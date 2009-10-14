@@ -20,33 +20,33 @@ GUARD_DATA * last_guard;
 
 /* local routines */
 void	fread_planet	args( ( PLANET_DATA *planet, FILE *fp ) );
-bool	load_planet_file	args( ( char *planetfile ) );
+bool	load_planet_file	args( ( const char *planetfile ) );
 void	write_planet_list	args( ( void ) );
 
-PLANET_DATA *get_planet( char *name )
+PLANET_DATA *get_planet( const char *name )
 {
-    PLANET_DATA *planet;
+  PLANET_DATA *planet;
     
-    if ( name[0] == '\0' )
-       return NULL;
-    
-    for ( planet = first_planet; planet; planet = planet->next )
-       if ( !str_cmp( name, planet->name ) )
-         return planet;
-    
-    for ( planet = first_planet; planet; planet = planet->next )
-       if ( nifty_is_name( name, planet->name ) )
-         return planet;
-    
-    for ( planet = first_planet; planet; planet = planet->next )
-       if ( !str_prefix( name, planet->name ) )
-         return planet;
-    
-    for ( planet = first_planet; planet; planet = planet->next )
-       if ( nifty_is_name_prefix( name, planet->name ) )
-         return planet;
-    
+  if ( name[0] == '\0' )
     return NULL;
+    
+  for ( planet = first_planet; planet; planet = planet->next )
+    if ( !str_cmp( name, planet->name ) )
+      return planet;
+    
+  for ( planet = first_planet; planet; planet = planet->next )
+    if ( nifty_is_name( const_char_to_nonconst(name), planet->name ) )
+      return planet;
+    
+  for ( planet = first_planet; planet; planet = planet->next )
+    if ( !str_prefix( name, planet->name ) )
+      return planet;
+    
+  for ( planet = first_planet; planet; planet = planet->next )
+    if ( nifty_is_name_prefix( const_char_to_nonconst(name), planet->name ) )
+      return planet;
+    
+  return NULL;
 }
 
 void write_planet_list( )
@@ -138,7 +138,7 @@ void save_planet( PLANET_DATA *planet )
 void fread_planet( PLANET_DATA *planet, FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
-    char *word;
+    const char *word;
     bool fMatch;
 
     for ( ; ; )
@@ -260,7 +260,7 @@ void fread_planet( PLANET_DATA *planet, FILE *fp )
     }
 }
 
-bool load_planet_file( char *planetfile )
+bool load_planet_file( const char *planetfile )
 {
     char filename[256];
     PLANET_DATA *planet;
@@ -334,7 +334,7 @@ bool load_planet_file( char *planetfile )
 void load_planets( )
 {
     FILE *fpList;
-    char *filename;
+    const char *filename;
     char planetlist[256];
     char buf[MAX_STRING_LENGTH];
     
@@ -462,7 +462,7 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
     }
 
 
-    do_setplanet( ch, "" );
+    do_setplanet( ch, const_char_to_nonconst("") );
     return;
 }
 

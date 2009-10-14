@@ -18,17 +18,17 @@ SPACE_DATA * last_starsystem;
 
 /* local routines */
 void	fread_ship	args( ( SHIP_DATA *ship, FILE *fp ) );
-bool	load_ship_file	args( ( char *shipfile ) );
+bool	load_ship_file	args( ( const char *shipfile ) );
 void	write_ship_list	args( ( void ) );
 void    fread_starsystem      args( ( SPACE_DATA *starsystem, FILE *fp ) );
-bool    load_starsystem  args( ( char *starsystemfile ) );
+bool    load_starsystem  args( ( const char *starsystemfile ) );
 void    write_starsystem_list args( ( void ) );
 void    resetship args( ( SHIP_DATA *ship ) );
 void    landship args( ( SHIP_DATA *ship, char *arg ) );
 void    launchship args( ( SHIP_DATA *ship ) );
 bool    land_bus args( ( SHIP_DATA *ship, int destination ) );
 void    launch_bus args( ( SHIP_DATA *ship ) );
-void    echo_to_room_dnr args( ( int ecolor , ROOM_INDEX_DATA *room ,  char *argument ) );
+void    echo_to_room_dnr args( ( int ecolor , ROOM_INDEX_DATA *room ,  const char *argument ) );
 ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship, EXIT_DATA  *exit , int fall );
 bool    autofly(SHIP_DATA *ship);
 bool is_facing( SHIP_DATA *ship , SHIP_DATA *target );
@@ -40,7 +40,7 @@ bool    write_to_descriptor     args( ( int desc, char *txt, int length ) );
 /* from act_info.c */
 bool 	is_online		args( ( char * argument ) );
 
-void echo_to_room_dnr ( int ecolor , ROOM_INDEX_DATA *room ,  char *argument ) 
+void echo_to_room_dnr ( int ecolor , ROOM_INDEX_DATA *room , const char *argument ) 
 {
     CHAR_DATA *vic;
     
@@ -738,7 +738,7 @@ void write_starsystem_list( )
 /*
  * Get pointer to space structure from starsystem name.
  */
-SPACE_DATA *starsystem_from_name( char *name )
+SPACE_DATA *starsystem_from_name( const char *name )
 {
     SPACE_DATA *starsystem;
     
@@ -847,7 +847,7 @@ void save_starsystem( SPACE_DATA *starsystem )
 void fread_starsystem( SPACE_DATA *starsystem, FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
-    char *word;
+    const char *word;
     bool fMatch;
 
  
@@ -909,7 +909,7 @@ void fread_starsystem( SPACE_DATA *starsystem, FILE *fp )
  * Load a starsystem file
  */
 
-bool load_starsystem( char *starsystemfile )
+bool load_starsystem( const char *starsystemfile )
 {
     char filename[256];
     SPACE_DATA *starsystem;
@@ -983,7 +983,7 @@ bool load_starsystem( char *starsystemfile )
 void load_space( )
 {
     FILE *fpList;
-    char *filename;
+    const char *filename;
     char starsystemlist[256];
     char buf[MAX_STRING_LENGTH];
     
@@ -1125,7 +1125,7 @@ void do_setstarsystem( CHAR_DATA *ch, char *argument )
 	return;
     }
     
-    do_setstarsystem( ch, "" );
+    do_setstarsystem( ch, const_char_to_nonconst("") );
     return;
 }
 
@@ -1181,16 +1181,16 @@ void do_starsystems( CHAR_DATA *ch, char *argument )
     }
 }
    
-void echo_to_ship( int color , SHIP_DATA *ship , char *argument )
+void echo_to_ship( int color , SHIP_DATA *ship , const char *argument )
 {
-     ROOM_INDEX_DATA * room;
+  ROOM_INDEX_DATA * room;
      
-     for ( room = ship->first_room ; room ; room = room->next_in_ship )
-         echo_to_room( color , room , argument );
+  for ( room = ship->first_room ; room ; room = room->next_in_ship )
+    echo_to_room( color , room , argument );
      
 }
 
-void echo_to_cockpit( int color , SHIP_DATA *ship , char *argument )
+void echo_to_cockpit( int color , SHIP_DATA *ship , const char *argument )
 {
      TURRET_DATA * turret;
 
@@ -1205,7 +1205,8 @@ void echo_to_cockpit( int color , SHIP_DATA *ship , char *argument )
             echo_to_room( color , turret->room , argument );
 }
 
-void echo_to_system( int color , SHIP_DATA *ship , char *argument , SHIP_DATA *ignore )
+void echo_to_system( int color , SHIP_DATA *ship ,
+		     const char *argument , SHIP_DATA *ignore )
 {
      SHIP_DATA *target;
      
@@ -1263,7 +1264,7 @@ void write_ship_list( )
     fclose( fpout );
 }
                                                                     
-SHIP_DATA * ship_in_room( ROOM_INDEX_DATA *room, char *name )
+SHIP_DATA * ship_in_room( ROOM_INDEX_DATA *room, const char *name )
 {
     SHIP_DATA *ship;
 
@@ -1279,7 +1280,7 @@ SHIP_DATA * ship_in_room( ROOM_INDEX_DATA *room, char *name )
          return ship;
     
     for ( ship = room->first_ship ; ship ; ship = ship->next_in_room )
-     if ( nifty_is_name( name, ship->name ) )
+      if ( nifty_is_name( const_char_to_nonconst(name), ship->name ) )
       if ( ship->owner && ship->owner[0] != '\0' )
        if ( get_clan( ship->owner ) || is_online( ship->owner )
        || is_online( ship->pilot ) || is_online( ship->copilot ))  
@@ -1293,11 +1294,11 @@ SHIP_DATA * ship_in_room( ROOM_INDEX_DATA *room, char *name )
          return ship;
     
     for ( ship = room->first_ship ; ship ; ship = ship->next_in_room )
-     if ( nifty_is_name_prefix( name, ship->name ) )
-      if ( ship->owner && ship->owner[0] != '\0' )
-       if ( get_clan( ship->owner ) || is_online( ship->owner )
-       || is_online( ship->pilot ) || is_online( ship->copilot ))  
-         return ship;
+      if ( nifty_is_name_prefix( const_char_to_nonconst(name), ship->name ) )
+	if ( ship->owner && ship->owner[0] != '\0' )
+	  if ( get_clan( ship->owner ) || is_online( ship->owner )
+	       || is_online( ship->pilot ) || is_online( ship->copilot ))  
+	    return ship;
     
     return NULL;    
 }
@@ -1305,60 +1306,60 @@ SHIP_DATA * ship_in_room( ROOM_INDEX_DATA *room, char *name )
 /*
  * Get pointer to ship structure from ship name.
  */
-SHIP_DATA *get_ship( char *name )
+SHIP_DATA *get_ship( const char *name )
 {
-    SHIP_DATA *ship;
+  SHIP_DATA *ship;
     
-    for ( ship = first_ship; ship; ship = ship->next )
-       if ( !str_cmp( name, ship->name ) )
-         return ship;
+  for ( ship = first_ship; ship; ship = ship->next )
+    if ( !str_cmp( name, ship->name ) )
+      return ship;
     
-    for ( ship = first_ship; ship; ship = ship->next )
-       if ( nifty_is_name( name, ship->name ) )
-         return ship;
+  for ( ship = first_ship; ship; ship = ship->next )
+    if ( nifty_is_name( const_char_to_nonconst(name), ship->name ) )
+      return ship;
 
-    for ( ship = first_ship; ship; ship = ship->next )
-       if ( !str_prefix( name, ship->name ) )
-         return ship;
+  for ( ship = first_ship; ship; ship = ship->next )
+    if ( !str_prefix( name, ship->name ) )
+      return ship;
     
-    for ( ship = first_ship; ship; ship = ship->next )
-       if ( nifty_is_name_prefix( name, ship->name ) )
-         return ship;
+  for ( ship = first_ship; ship; ship = ship->next )
+    if ( nifty_is_name_prefix( const_char_to_nonconst(name), ship->name ) )
+      return ship;
     
-    return NULL;
+  return NULL;
 }
 
 /*
  * Checks if ships in a starsystem and returns poiner if it is.
  */
-SHIP_DATA *get_ship_here( char *name , SPACE_DATA *starsystem)
+SHIP_DATA *get_ship_here( const char *name , SPACE_DATA *starsystem)
 {
-    SHIP_DATA *ship;
+  SHIP_DATA *ship;
     
-    if ( starsystem == NULL )
-         return NULL;
-    
-    for ( ship = starsystem->first_ship ; ship; ship = ship->next_in_starsystem )
-       if ( !str_cmp( name, ship->name ) )
-         return ship;
-    
-    for ( ship = starsystem->first_ship; ship; ship = ship->next_in_starsystem )
-       if ( nifty_is_name( name, ship->name ) )
-         return ship;
-
-    for ( ship = starsystem->first_ship ; ship; ship = ship->next_in_starsystem )
-       if ( !str_prefix( name, ship->name ) )
-         return ship;
-    
-    for ( ship = starsystem->first_ship; ship; ship = ship->next_in_starsystem )
-       if ( nifty_is_name_prefix( name, ship->name ) )
-         return ship;
-    
+  if ( starsystem == NULL )
     return NULL;
+    
+  for ( ship = starsystem->first_ship ; ship; ship = ship->next_in_starsystem )
+    if ( !str_cmp( name, ship->name ) )
+      return ship;
+    
+  for ( ship = starsystem->first_ship; ship; ship = ship->next_in_starsystem )
+    if ( nifty_is_name( const_char_to_nonconst(name), ship->name ) )
+      return ship;
+
+  for ( ship = starsystem->first_ship ; ship; ship = ship->next_in_starsystem )
+    if ( !str_prefix( name, ship->name ) )
+      return ship;
+    
+  for ( ship = starsystem->first_ship; ship; ship = ship->next_in_starsystem )
+    if ( nifty_is_name_prefix( const_char_to_nonconst(name), ship->name ) )
+      return ship;
+    
+  return NULL;
 }
 
 
-SHIP_DATA *ship_from_pilot( char *name )
+SHIP_DATA *ship_from_pilot( const char *name )
 {
     SHIP_DATA *ship;
     
@@ -1587,7 +1588,7 @@ void save_ship( SHIP_DATA *ship )
 void fread_ship( SHIP_DATA *ship, FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
-    char *word;
+    const char *word;
     bool fMatch;
     int dIndex = 0;
  
@@ -1725,7 +1726,7 @@ void fread_ship( SHIP_DATA *ship, FILE *fp )
  * Load a ship file
  */
 
-bool load_ship_file( char *shipfile )
+bool load_ship_file( const char *shipfile )
 {
     char filename[256];
     SHIP_DATA *ship;
@@ -1845,7 +1846,7 @@ bool load_ship_file( char *shipfile )
 void load_ships( )
 {
     FILE *fpList;
-    char *filename;
+    const char *filename;
     char shiplist[256];
     char buf[MAX_STRING_LENGTH];
     
@@ -2165,7 +2166,7 @@ void do_setship( CHAR_DATA *ch, char *argument )
 	return;
     }
  
-    do_setship( ch, "" );
+    do_setship( ch, const_char_to_nonconst("") );
     return;
 }
 
@@ -2823,7 +2824,7 @@ void do_board( CHAR_DATA *ch, char *argument )
        return;
    }
    
-   if ( ( ship = ship_in_room( ch->in_room , argument ) ) == NULL )
+   if ( ( ship = ship_in_room( ch->in_room , const_char_to_nonconst(argument) ) ) == NULL )
    {
             act( AT_PLAIN, "I see no $T here.", ch, NULL, argument, TO_CHAR );
            return;
@@ -2871,7 +2872,7 @@ void do_board( CHAR_DATA *ch, char *argument )
    	    char_to_room( ch , toroom );
    	    act( AT_PLAIN, "$n enters the ship.", ch,
 		NULL, argument , TO_ROOM );
-            do_look( ch , "auto" );
+            do_look( ch , const_char_to_nonconst("auto") );
 
         }                                                                  
         else
@@ -2926,7 +2927,7 @@ void do_leaveship( CHAR_DATA *ch, char *argument )
    	    char_to_room( ch , toroom );
    	    act( AT_PLAIN, "$n steps out of a ship.", ch,
 		NULL, argument , TO_ROOM );
-            do_look( ch , "auto" );
+            do_look( ch , const_char_to_nonconst("auto") );
      }       
      else
         send_to_char ( "The exit doesn't seem to be working properly.\n\r", ch );  
@@ -3307,7 +3308,7 @@ void do_land( CHAR_DATA *ch, char *argument )
                    else
                    {
     	                send_to_char("&RI don't see that here.\n\r&W",ch);
-    	                do_land( ch , "" );
+    	                do_land( ch , const_char_to_nonconst("") );
     	                return;
     	           }
     	        }
@@ -3625,22 +3626,22 @@ void do_buyship(CHAR_DATA *ch, char *argument )
    {
    	send_to_char( "&RThat model does not exist.\n\r" ,ch );
         if ( IS_SET( ch->in_room->room_flags , ROOM_SHIPYARD ) )
-           do_prototypes( ch, "ships" );
+	  do_prototypes( ch, const_char_to_nonconst("ships") );
    	else
-   	   do_prototypes( ch, "vehicles" );
+	  do_prototypes( ch, const_char_to_nonconst("vehicles") );
    	return;
    }
 
    if ( IS_SET( ch->in_room->room_flags , ROOM_SHIPYARD ) && prototype->class > SPACE_STATION )
    {
    	send_to_char( "&RThats not a ship prototype.\n\r" ,ch );
-        do_prototypes( ch, "ships" );
+        do_prototypes( ch, const_char_to_nonconst("ships") );
    	return;
    }
    if ( IS_SET( ch->in_room->room_flags , ROOM_GARAGE ) && prototype->class <= SPACE_STATION )
    {
    	send_to_char( "&RThats not a vehicle prototype.\n\r" ,ch );
-        do_prototypes( ch, "vehicles" );
+        do_prototypes( ch, const_char_to_nonconst("vehicles") );
    	return;
    }
 
@@ -3719,22 +3720,22 @@ void do_clanbuyship(CHAR_DATA *ch, char *argument )
    {
    	send_to_char( "&RThat model does not exist.\n\r" ,ch );
         if ( IS_SET( ch->in_room->room_flags , ROOM_SHIPYARD ) )
-           do_prototypes( ch, "ships" );
+	  do_prototypes( ch, const_char_to_nonconst("ships") );
    	else
-   	   do_prototypes( ch, "vehicles" );
+	  do_prototypes( ch, const_char_to_nonconst("vehicles") );
    	return;
    }
 
    if ( IS_SET( ch->in_room->room_flags , ROOM_SHIPYARD ) && prototype->class > SPACE_STATION )
    {
    	send_to_char( "&RThats not a ship prototype.\n\r" ,ch );
-        do_prototypes( ch, "ships" );
+        do_prototypes( ch, const_char_to_nonconst("ships") );
    	return;
    }
    if ( IS_SET( ch->in_room->room_flags , ROOM_GARAGE ) && prototype->class <= SPACE_STATION )
    {
    	send_to_char( "&RThats not a vehicle prototype.\n\r" ,ch );
-        do_prototypes( ch, "vehicles" );
+        do_prototypes( ch, const_char_to_nonconst("vehicles") );
    	return;
    }
 
@@ -5356,8 +5357,8 @@ ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship, EXIT_DATA  *pexit , int fall 
     ROOM_INDEX_DATA *from_room;
     ROOM_INDEX_DATA *original;
     char buf[MAX_STRING_LENGTH];
-    char *txt;
-    char *dtxt;
+    const char *txt;
+    const char *dtxt;
     ch_ret retcode;
     short door, distance;
     bool drunk = FALSE;
@@ -5599,7 +5600,7 @@ ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship, EXIT_DATA  *pexit , int fall 
         original = rch->in_room;
         char_from_room( rch );
         char_to_room( rch, to_room );
-        do_look( rch, "auto" );
+        do_look( rch, const_char_to_nonconst("auto") );
         char_from_room( rch );
         char_to_room( rch, original );
     }

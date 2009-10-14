@@ -44,14 +44,14 @@ CHAR_DATA *find_keeper( CHAR_DATA *ch )
      */
     if ( time_info.hour < pShop->open_hour )
     {
-	do_say( keeper, "Sorry, come back later." );
-	return NULL;
+      do_say( keeper, const_char_to_nonconst("Sorry, come back later.") );
+      return NULL;
     }
 
     if ( time_info.hour > pShop->close_hour )
     {
-	do_say( keeper, "Sorry, come back tomorrow." );
-	return NULL;
+      do_say( keeper, const_char_to_nonconst("Sorry, come back tomorrow.") );
+      return NULL;
     }
     
     return keeper;
@@ -84,14 +84,14 @@ CHAR_DATA *find_fixer( CHAR_DATA *ch )
      */
     if ( time_info.hour < rShop->open_hour )
     {
-	do_say( keeper, "Sorry, come back later." );
-	return NULL;
+      do_say( keeper, const_char_to_nonconst("Sorry, come back later.") );
+      return NULL;
     }
 
     if ( time_info.hour > rShop->close_hour )
     {
-	do_say( keeper, "Sorry, come back tomorrow." );
-	return NULL;
+      do_say( keeper, const_char_to_nonconst("Sorry, come back tomorrow.") );
+      return NULL;
     }
 
     
@@ -294,11 +294,11 @@ void do_buy( CHAR_DATA *ch, char *argument )
 
 	if ( !IS_OBJ_STAT( obj, ITEM_INVENTORY ) && ( noi > 1 ) )
 	{
-	    interpret( keeper, "laugh" );
-	    act( AT_TELL, "$n tells you 'I don't have enough of those in stock"
-	     " to sell more than one at a time.'", keeper, NULL, ch, TO_VICT );
-	    ch->reply = keeper;
-	    return;
+	  interpret( keeper, const_char_to_nonconst("laugh") );
+	  act( AT_TELL, "$n tells you 'I don't have enough of those in stock"
+	       " to sell more than one at a time.'", keeper, NULL, ch, TO_VICT );
+	  ch->reply = keeper;
+	  return;
 	}
 	
 	if ( ch->gold < cost )
@@ -633,8 +633,8 @@ void do_repair( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *keeper;
     OBJ_DATA *obj;
-    char *fixstr;
-    char *fixstr2;
+    char fixstr[MAX_STRING_LENGTH];
+    char fixstr2[MAX_STRING_LENGTH];
     int maxgold;
 
     if ( argument[0] == '\0' )
@@ -651,12 +651,13 @@ void do_repair( CHAR_DATA *ch, char *argument )
     {
 	default:
 	case SHOP_FIX:
-	  fixstr  = "repair";
-	  fixstr2 = "repairs";
+	  sprintf( fixstr, "%s", "repair" );
+	  sprintf( fixstr2, "%s", "repairs" );
 	  break;
+
 	case SHOP_RECHARGE:
-	  fixstr  = "recharge";
-	  fixstr2 = "recharges";
+	  sprintf( fixstr, "%s", "recharge" );
+          sprintf( fixstr2, "%s", "recharges" );
 	  break;
     }
 
@@ -685,7 +686,7 @@ void do_repair( CHAR_DATA *ch, char *argument )
 
     repair_one_obj( ch, keeper, obj, argument, maxgold, fixstr, fixstr2); }
 
-void appraise_all( CHAR_DATA *ch, CHAR_DATA *keeper, char *fixstr )
+void appraise_all( CHAR_DATA *ch, CHAR_DATA *keeper, const char *fixstr )
 {
   OBJ_DATA *obj;
   char buf[MAX_STRING_LENGTH], *pbuf=buf;
@@ -749,7 +750,7 @@ void do_appraise( CHAR_DATA *ch, char *argument )
     CHAR_DATA *keeper;
     OBJ_DATA *obj;
     int cost;
-    char *fixstr;
+    const char *fixstr;
 
     one_argument( argument, arg );
 
@@ -1038,7 +1039,7 @@ void do_shopset( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    do_shopset( ch, "" );
+    do_shopset( ch, const_char_to_nonconst("") );
     return;
 }
 
@@ -1304,7 +1305,7 @@ void do_repairset( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    do_repairset( ch, "" );
+    do_repairset( ch, const_char_to_nonconst("") );
     return;
 }
 

@@ -629,7 +629,7 @@ void fwrite_obj( CHAR_DATA *ch, OBJ_DATA *obj, FILE *fp, int iNest,
 /*
  * Load a char and inventory into a new ch structure.
  */
-bool load_char_obj( DESCRIPTOR_DATA *d, char *name, bool preload )
+bool load_char_obj( DESCRIPTOR_DATA *d, const char *name, bool preload )
 {
     char strsave[MAX_INPUT_LENGTH];
     CHAR_DATA *ch;
@@ -852,8 +852,8 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name, bool preload )
 void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
 {
     char buf[MAX_STRING_LENGTH];
-    char *line;
-    char *word;
+    const char *line;
+    const char *word;
     int x1, x2, x3, x4, x5, x6, x7;
     short killcnt;
     bool fMatch;
@@ -1400,7 +1400,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
 void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 {
     OBJ_DATA *obj;
-    char *word;
+    const char *word;
     int iNest;
     bool fMatch;
     bool fNest;

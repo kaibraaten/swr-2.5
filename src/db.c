@@ -265,14 +265,14 @@ void   		rprog_read_programs     args ( ( FILE* fp,
 						ROOM_INDEX_DATA *pRoomIndex) );
 
 
-void shutdown_mud( char *reason )
+void shutdown_mud( const char *reason )
 {
-    FILE *fp;
+  FILE *fp;
 
-    if ( (fp = fopen( SHUTDOWN_FILE, "a" )) != NULL )
+  if ( (fp = fopen( SHUTDOWN_FILE, "a" )) != NULL )
     {
-	fprintf( fp, "%s\n", reason );
-	fclose( fp );
+      fprintf( fp, "%s\n", reason );
+      fclose( fp );
     }
 }
 
@@ -2154,7 +2154,7 @@ int fread_number( FILE *fp )
 /*
  * custom str_dup using create					-Thoric
  */
-char *str_dup( char const *str )
+char *str_dup( const char *str )
 {
     static char *ret;
     int len;
@@ -2904,7 +2904,7 @@ bool isavowel( char letter )
 /*
  * Shove either "a " or "an " onto the beginning of a string	-Thoric
  */
-char *aoran( const char *str )
+const char *aoran( const char *str )
 {
     static char temp[MAX_STRING_LENGTH];
 
@@ -3062,7 +3062,7 @@ void boot_log( const char *str, ... )
 /*
  * Dump a text file to a player, a line at a time		-Thoric
  */
-void show_file( CHAR_DATA *ch, char *filename )
+void show_file( CHAR_DATA *ch, const char *filename )
 {
     FILE *fp;
     char buf[MAX_STRING_LENGTH];
@@ -4403,7 +4403,7 @@ void sort_area( AREA_DATA *pArea, bool proto )
  * Sorted, and flagged if loaded.
  */
 void show_vnums( CHAR_DATA *ch, int low, int high, bool proto, bool shownl,
-		 char *loadst, char *notloadst )
+		 const char *loadst, const char *notloadst )
 {
     return;
 }
@@ -4487,8 +4487,8 @@ void save_sysdata( SYSTEM_DATA sys )
 
 void fread_sysdata( SYSTEM_DATA *sys, FILE *fp )
 {
-    char *word;
-    bool fMatch;
+  const char *word;
+  bool fMatch;
 
     sys->time_of_max = NULL;
     sys->officials = NULL;

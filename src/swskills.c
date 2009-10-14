@@ -1672,7 +1672,7 @@ void add_reinforcements( CHAR_DATA *ch )
 	       stop_follower( mob[mob_cnt] );
 	    add_follower( mob[mob_cnt], ch );
             SET_BIT( mob[mob_cnt]->affected_by, AFF_CHARM );
-            do_setblaster( mob[mob_cnt] , "full" );
+            do_setblaster( mob[mob_cnt] , const_char_to_nonconst("full") );
             if ( ch->pcdata && ch->pcdata->clan )   
                mob[mob_cnt]->mob_clan = ch->pcdata->clan;
         }
@@ -1705,7 +1705,7 @@ void add_reinforcements( CHAR_DATA *ch )
             obj_to_char( blaster, mob );
             equip_char( mob, blaster, WEAR_WIELD );                        
         }
-        do_setblaster( mob , "full" );
+        do_setblaster( mob , const_char_to_nonconst("full") );
         if ( ch->pcdata && ch->pcdata->clan )   
                mob->mob_clan = ch->pcdata->clan;
      }                    
@@ -2929,8 +2929,8 @@ void do_landscape ( CHAR_DATA *ch , char *argument )
    }
    else
    {
-    	do_landscape( ch, "" );
-	return;   
+     do_landscape( ch, const_char_to_nonconst("") );
+     return;   
     }
 
     echo_to_room( AT_WHITE, location, "A construction crew enters the room and begins to work." );
@@ -3234,7 +3234,7 @@ void do_bridge ( CHAR_DATA *ch , char *argument )
    }
    else
    {
-        do_bridge( ch , "" );
+     do_bridge( ch , const_char_to_nonconst("") );
         return;
    }
    
