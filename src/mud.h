@@ -1,3 +1,6 @@
+#ifndef _MUD_H_
+#define _MUD_H_
+
 #include <stdlib.h>
 #include <limits.h>
 #include <sys/cdefs.h>
@@ -4213,3 +4216,5 @@ void rprog_act_trigger( char *buf, ROOM_INDEX_DATA *room, CHAR_DATA *ch,
 
 #define send_to_char  send_to_char_color
 #define send_to_pager send_to_pager_color
+
+#endif /* include guard */
