@@ -3182,8 +3182,6 @@ void do_whois( CHAR_DATA *ch, char *argument)
       sprintf (buf2, "%s's IP info: %s ", victim->name, victim->desc->hostip);
       if ( IS_IMMORTAL(ch) )
       {
-        strcat (buf2, victim->desc->user);
-        strcat (buf2, "@");
         strcat (buf2, victim->desc->host);
       }
       strcat (buf2, "\n\r");

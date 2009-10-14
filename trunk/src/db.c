@@ -3911,39 +3911,39 @@ ROOM_INDEX_DATA *make_room( long vnum )
 
 ROOM_INDEX_DATA *make_ship_room( SHIP_DATA * ship )
 {
-	ROOM_INDEX_DATA *pRoomIndex;
+  ROOM_INDEX_DATA *pRoomIndex;
 
-	CREATE( pRoomIndex, ROOM_INDEX_DATA, 1 );
-	pRoomIndex->first_person	= NULL;
-	pRoomIndex->last_person		= NULL;
-	pRoomIndex->first_content	= NULL;
-	pRoomIndex->last_content	= NULL;
-	pRoomIndex->first_extradesc	= NULL;
-	pRoomIndex->last_extradesc	= NULL;
-	pRoomIndex->first_ship          = NULL;
-	pRoomIndex->last_ship		= NULL;
-	pRoomIndex->next_in_area        = NULL;
-	pRoomIndex->prev_in_area	= NULL;
-	pRoomIndex->next_in_ship      	= NULL;
-	pRoomIndex->prev_in_ship      	= NULL;
-	pRoomIndex->area		= NULL;
-	pRoomIndex->vnum		= -1;
-	pRoomIndex->name		= STRALLOC( ship->name );
-	pRoomIndex->description		= STRALLOC( "" );
-	pRoomIndex->room_flags		= 0;
-	pRoomIndex->sector_type		= 0;
-	pRoomIndex->light		= 0;
-	pRoomIndex->first_exit		= NULL;
-	pRoomIndex->last_exit		= NULL;
+  CREATE( pRoomIndex, ROOM_INDEX_DATA, 1 );
+  pRoomIndex->first_person	= NULL;
+  pRoomIndex->last_person		= NULL;
+  pRoomIndex->first_content	= NULL;
+  pRoomIndex->last_content	= NULL;
+  pRoomIndex->first_extradesc	= NULL;
+  pRoomIndex->last_extradesc	= NULL;
+  pRoomIndex->first_ship          = NULL;
+  pRoomIndex->last_ship		= NULL;
+  pRoomIndex->next_in_area        = NULL;
+  pRoomIndex->prev_in_area	= NULL;
+  pRoomIndex->next_in_ship      	= NULL;
+  pRoomIndex->prev_in_ship      	= NULL;
+  pRoomIndex->area		= NULL;
+  pRoomIndex->vnum		= -1;
+  pRoomIndex->name		= STRALLOC( ship->name );
+  pRoomIndex->description		= STRALLOC( "" );
+  pRoomIndex->room_flags		= 0;
+  pRoomIndex->sector_type		= 0;
+  pRoomIndex->light		= 0;
+  pRoomIndex->first_exit		= NULL;
+  pRoomIndex->last_exit		= NULL;
         
-        SET_BIT ( pRoomIndex->room_flags , ROOM_SPACECRAFT );
-        SET_BIT ( pRoomIndex->room_flags , ROOM_INDOORS );
+  SET_BIT ( pRoomIndex->room_flags , ROOM_SPACECRAFT );
+  SET_BIT ( pRoomIndex->room_flags , ROOM_INDOORS );
         
-        LINK( pRoomIndex , ship->first_room , ship->last_room , next_in_ship , prev_in_ship );
+  LINK( pRoomIndex , ship->first_room , ship->last_room , next_in_ship , prev_in_ship );
         
-	top_room++;
+  top_room++;
 
-	return pRoomIndex;
+  return pRoomIndex;
 }
 
 /*

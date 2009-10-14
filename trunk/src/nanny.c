@@ -345,8 +345,7 @@ static void nanny_get_old_password( DESCRIPTOR_DATA *d, char *argument )
   free_char( d->character );
   fOld = load_char_obj( d, buf, FALSE );
   ch = d->character;
-  sprintf( log_buf, "%s@%s(%s) has connected.", ch->name, d->host,
-	   d->user );
+  sprintf( log_buf, "%s@%s has connected.", ch->name, d->host );
   log_string_plus( log_buf, LOG_COMM );
   show_title(d);
 

@@ -1728,85 +1728,90 @@ void fread_ship( SHIP_DATA *ship, FILE *fp )
 
 bool load_ship_file( const char *shipfile )
 {
-    char filename[256];
-    SHIP_DATA *ship;
-    FILE *fp;
-    bool found;
-    CLAN_DATA *clan;
+  char filename[256];
+  SHIP_DATA *ship;
+  FILE *fp;
+  bool found;
+  CLAN_DATA *clan;
         
-    CREATE( ship, SHIP_DATA, 1 );
+  CREATE( ship, SHIP_DATA, 1 );
 
-    found = FALSE;
-    sprintf( filename, "%s%s", SHIP_DIR, shipfile );
+  found = FALSE;
+  sprintf( filename, "%s%s", SHIP_DIR, shipfile );
 
-    if ( ( fp = fopen( filename, "r" ) ) != NULL )
+  if ( ( fp = fopen( filename, "r" ) ) != NULL )
     {
+      found = TRUE;
 
-	found = TRUE;
-	for ( ; ; )
+      for ( ; ; )
 	{
-	    char letter;
-	    char *word;
+	  char letter;
+	  const char *word;
 
-	    letter = fread_letter( fp );
-	    if ( letter == '*' )
+	  letter = fread_letter( fp );
+
+	  if ( letter == '*' )
 	    {
-		fread_to_eol( fp );
-		continue;
+	      fread_to_eol( fp );
+	      continue;
 	    }
 
-	    if ( letter != '#' )
+	  if ( letter != '#' )
 	    {
-		bug( "Load_ship_file: # not found.", 0 );
-		break;
+	      bug( "Load_ship_file: # not found.", 0 );
+	      break;
 	    }
 
-	    word = fread_word( fp );
-	    if ( !str_cmp( word, "SHIP"	) )
-	    {
-	    	fread_ship( ship, fp );
-	    	break;
-	    }
-	    else
-	    if ( !str_cmp( word, "END"	) )
-	        break;
-	    else
-	    {
-		char buf[MAX_STRING_LENGTH];
+	  word = fread_word( fp );
 
-		sprintf( buf, "Load_ship_file: bad section: %s.", word );
-		bug( buf, 0 );
-		break;
+	  if ( !str_cmp( word, "SHIP"	) )
+	    {
+	      fread_ship( ship, fp );
+	      break;
+	    }
+	  else if ( !str_cmp( word, "END"	) )
+	    break;
+	  else
+	    {
+	      char buf[MAX_STRING_LENGTH];
+	      
+	      sprintf( buf, "Load_ship_file: bad section: %s.", word );
+	      bug( buf, 0 );
+	      break;
 	    }
 	}
-	fclose( fp );
+
+      fclose( fp );
     }
-    if ( !(found) )
+
+  if ( !(found) )
+    {
       DISPOSE( ship );
-    else
-    {      
-       LINK( ship, first_ship, last_ship, next, prev );
-       if ( ship->ship_class == SPACE_STATION || ship->type == MOB_SHIP )
-       {
+    }
+  else
+    {
+      LINK( ship, first_ship, last_ship, next, prev );
+
+      if ( ship->ship_class == SPACE_STATION || ship->type == MOB_SHIP )
+	{
+	  ship->currspeed=0;
+	  ship->energy=ship->maxenergy;
+	  ship->chaff=ship->maxchaff;
+	  ship->hull=ship->maxhull;
+	  ship->shield=0;
+     
+	  ship->laserstate = LASER_READY; 
+	  ship->missilestate = LASER_READY;
        
-     	ship->currspeed=0;
-    	ship->energy=ship->maxenergy;
-     	ship->chaff=ship->maxchaff;
-     	ship->hull=ship->maxhull;
-     	ship->shield=0;
+	  ship->currjump=NULL;
+	  ship->target=NULL;
      
-     	ship->laserstate = LASER_READY; 
-    	ship->missilestate = LASER_READY;
-       
-     	ship->currjump=NULL;
-     	ship->target=NULL;
+	  ship->hatchopen = FALSE;
      
-     	ship->hatchopen = FALSE;
-     
-     	ship->missiles = ship->maxmissiles;
-     	ship->autorecharge = FALSE;
-     	ship->autotrack = FALSE;
-     	ship->autospeed = FALSE;
+	  ship->missiles = ship->maxmissiles;
+	  ship->autorecharge = FALSE;
+	  ship->autotrack = FALSE;
+	  ship->autospeed = FALSE;
           
           ship_to_starsystem(ship, starsystem_from_name(ship->home) );  
           ship->vx = number_range( -5000 , 5000 );
@@ -1819,25 +1824,23 @@ bool load_ship_file( const char *shipfile )
           ship->autopilot = TRUE;
           ship->autorecharge = TRUE;
           ship->shield = ship->maxshield;
-       
-       }
-       else
-       {
+	}
+      else
+	{
           ship_to_room( ship , ship->lastdoc );
           ship->location = ship->lastdoc;
-       }
+	}
               
-       if ( ship->type != MOB_SHIP && (clan = get_clan( ship->owner )) != NULL )
-       {
+      if ( ship->type != MOB_SHIP && (clan = get_clan( ship->owner )) != NULL )
+	{
           if ( ship->ship_class <= SPACE_STATION )
-             clan->spacecraft++;
+	    clan->spacecraft++;
           else
-             clan->vehicles++;
-       }  
-         
+	    clan->vehicles++;
+	}  
     }
     
-    return found;
+  return found;
 }
 
 /*
@@ -2814,69 +2817,70 @@ bool ship_to_room(SHIP_DATA *ship , long vnum )
 
 void do_board( CHAR_DATA *ch, char *argument )
 {
-   ROOM_INDEX_DATA *fromroom;
-   ROOM_INDEX_DATA *toroom;
-   SHIP_DATA *ship;
+  ROOM_INDEX_DATA *fromroom;
+  ROOM_INDEX_DATA *toroom;
+  SHIP_DATA *ship;
    
-   if ( !argument || argument[0] == '\0')
-   {
-       send_to_char( "Board what?\n\r", ch );
-       return;
-   }
+  if ( !argument || argument[0] == '\0')
+    {
+      send_to_char( "Board what?\n\r", ch );
+      return;
+    }
    
-   if ( ( ship = ship_in_room( ch->in_room , const_char_to_nonconst(argument) ) ) == NULL )
-   {
-            act( AT_PLAIN, "I see no $T here.", ch, NULL, argument, TO_CHAR );
-           return;
-   }
+  if ( ( ship = ship_in_room( ch->in_room , const_char_to_nonconst(argument) ) ) == NULL )
+    {
+      act( AT_PLAIN, "I see no $T here.", ch, NULL, argument, TO_CHAR );
+      return;
+    }
 
-   if ( IS_SET( ch->act, ACT_MOUNTED ) )
-   {
-          act( AT_PLAIN, "You can't go in there riding THAT.", ch, NULL, argument, TO_CHAR );  
-          return;
-   } 
+  if ( IS_SET( ch->act, ACT_MOUNTED ) )
+    {
+      act( AT_PLAIN, "You can't go in there riding THAT.", ch, NULL, argument, TO_CHAR );  
+      return;
+    } 
 
-   fromroom = ch->in_room;
+  fromroom = ch->in_room;
 
-        if ( ( toroom = ship->entrance )  != NULL )
-   	{
-   	   if ( ! ship->hatchopen )
-   	   {
-   	      send_to_char( "&RThe hatch is closed!\n\r", ch);
-   	      return;
-   	   }
+  if ( ( toroom = ship->entrance )  != NULL )
+    {
+      if ( ! ship->hatchopen )
+	{
+	  send_to_char( "&RThe hatch is closed!\n\r", ch);
+	  return;
+	}
    	
-           if ( toroom->tunnel > 0 )
-           {
-	        CHAR_DATA *ctmp;
-	        int count = 0;
+      if ( toroom->tunnel > 0 )
+	{
+	  CHAR_DATA *ctmp;
+	  int count = 0;
 	        
-	       for ( ctmp = toroom->first_person; ctmp; ctmp = ctmp->next_in_room )
-	       if ( ++count >= toroom->tunnel )
-	       {
-                  send_to_char( "There is no room for you in there.\n\r", ch );
-		  return;
-	       }
-           }
-            if ( ship->shipstate == SHIP_LAUNCH || ship->shipstate == SHIP_LAUNCH_2 )
-            {
-                 send_to_char("&rThat ship has already started launching!\n\r",ch);
-                 return;
-            }
-            
-            act( AT_PLAIN, "$n enters $T.", ch,
-		NULL, ship->name , TO_ROOM );
-	    act( AT_PLAIN, "You enter $T.", ch,
-		NULL, ship->name , TO_CHAR );
-   	    char_from_room( ch );
-   	    char_to_room( ch , toroom );
-   	    act( AT_PLAIN, "$n enters the ship.", ch,
-		NULL, argument , TO_ROOM );
-            do_look( ch , const_char_to_nonconst("auto") );
+	  for ( ctmp = toroom->first_person; ctmp; ctmp = ctmp->next_in_room )
+	    if ( ++count >= toroom->tunnel )
+	      {
+		send_to_char( "There is no room for you in there.\n\r", ch );
+		return;
+	      }
+	}
 
-        }                                                                  
-        else
-          send_to_char("That ship has no entrance!\n\r", ch);
+      if ( ship->shipstate == SHIP_LAUNCH || ship->shipstate == SHIP_LAUNCH_2 )
+	{
+	  send_to_char("&rThat ship has already started launching!\n\r",ch);
+	  return;
+	}
+            
+      act( AT_PLAIN, "$n enters $T.", ch,
+	   NULL, ship->name , TO_ROOM );
+      act( AT_PLAIN, "You enter $T.", ch,
+	   NULL, ship->name , TO_CHAR );
+      char_from_room( ch );
+      char_to_room( ch , toroom );
+      act( AT_PLAIN, "$n enters the ship.", ch,
+	   NULL, argument , TO_ROOM );
+      do_look( ch , const_char_to_nonconst("auto") );
+
+    }                                                                  
+  else
+    send_to_char("That ship has no entrance!\n\r", ch);
 }
 
 void do_leaveship( CHAR_DATA *ch, char *argument )

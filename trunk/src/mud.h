@@ -354,12 +354,6 @@ struct	descriptor_data
     char *		pagepoint;
     char		pagecmd;
     char		pagecolor;
-    int			auth_inc;
-    int			auth_state;
-    char		abuf[ 256 ];
-    int			auth_fd;
-    char *		user;
-    int 		atimes;
     int			newstate;
     unsigned char	prevcolor;
 };
@@ -1506,10 +1500,6 @@ typedef enum
 
 /* Board Types */
 typedef enum { BOARD_NOTE, BOARD_MAIL } board_types;
-
-/* Auth Flags */
-#define FLAG_WRAUTH		      1
-#define FLAG_AUTH		      2
 
 /***************************************************************************
  *                                                                         *
