@@ -332,7 +332,6 @@ bool check_skill( CHAR_DATA *ch, char *command, char *argument )
     end_timer(&time_used);
     update_userec(&time_used, &skill_table[sn]->userec);
 
-    tail_chain( );
     return TRUE;
 }
 

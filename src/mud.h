@@ -3606,7 +3606,6 @@ void	fix_area_exits	args( ( AREA_DATA *tarea ) );
 void	load_area_file	args( ( AREA_DATA *tarea, char *filename ) );
 void	randomize_exits	args( ( ROOM_INDEX_DATA *room, short maxdir ) );
 void	make_wizlist	args( ( void ) );
-void	tail_chain	args( ( void ) );
 bool    delete_room     args( ( ROOM_INDEX_DATA *room ) );
 bool    delete_obj      args( ( OBJ_INDEX_DATA *obj ) );
 bool    delete_mob      args( ( MOB_INDEX_DATA *mob ) );

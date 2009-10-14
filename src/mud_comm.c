@@ -1932,7 +1932,6 @@ ch_ret simple_damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
     if ( !npcvict && IS_SET( victim->act, PLR_FLEE ) )
       do_flee( victim, const_char_to_nonconst("") );
 
-    tail_chain( );
     return rNONE;
 }
 
