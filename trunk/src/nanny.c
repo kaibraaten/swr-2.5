@@ -3,30 +3,12 @@
  * The SWR2 license applies.
  */
 
-#include <sys/types.h>
-#include <sys/time.h>
-#include <sys/stat.h>
 #include <ctype.h>
-#include <errno.h>
 #include <stdio.h>
-#include <time.h>
 #include <string.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <stdarg.h>
-#include "mud.h"
+#include <arpa/telnet.h> // Telnet opt codes
 
-/*
- * Socket and TCP/IP stuff.
- */
-#include <unistd.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/in_systm.h>
-#include <netinet/ip.h>
-#include <arpa/inet.h>
-#include <arpa/telnet.h>
-#include <netdb.h>
+#include "mud.h"
 
 /*
  * Local function prototypes.
