@@ -1308,9 +1308,10 @@ SHIP_DATA * make_mob_ship( PLANET_DATA *planet , int model )
     ship->shield = 0;
 
     ship_to_starsystem(ship, starsystem_from_name(ship->home) );  
-    ship->vx = planet->x + number_range( -2000 , 2000 );
-    ship->vy = planet->y + number_range( -2000 , 2000 );
-    ship->vz = planet->z + number_range( -2000 , 2000 );
+    vector_copy( &ship->pos, &planet->pos );
+    ship->pos.x += number_range( -2000 , 2000 );
+    ship->pos.y += number_range( -2000 , 2000 );
+    ship->pos.z += number_range( -2000 , 2000 );
     ship->shipstate = SHIP_READY;
     ship->autopilot = TRUE;
     ship->autorecharge = TRUE;

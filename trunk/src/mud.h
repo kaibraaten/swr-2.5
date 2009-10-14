@@ -6,6 +6,7 @@
 #include <sys/cdefs.h>
 #include <sys/time.h>
 #include <math.h>
+#include "vector3.h"
 
 typedef	int				ch_ret;
 typedef	int				obj_ret;
@@ -600,25 +601,21 @@ struct	model_type
 
 struct space_data
 {
-    SPACE_DATA * next;
-    SPACE_DATA * prev;
-    SHIP_DATA  * first_ship;
-    SHIP_DATA  * last_ship;
-    MISSILE_DATA  * first_missile;
-    MISSILE_DATA  * last_missile;
-    PLANET_DATA * first_planet;
-    PLANET_DATA * last_planet;
-    char       * filename;
-    char       * name;
-    char       * star1;
-    char       * star2;
-    int          s1x;
-    int          s1y;
-    int          s1z;
-    int          s2x;
-    int          s2y;
-    int          s2z;
-    int          crash;
+  SPACE_DATA * next;
+  SPACE_DATA * prev;
+  SHIP_DATA  * first_ship;
+  SHIP_DATA  * last_ship;
+  MISSILE_DATA  * first_missile;
+  MISSILE_DATA  * last_missile;
+  PLANET_DATA * first_planet;
+  PLANET_DATA * last_planet;
+  char       * filename;
+  char       * name;
+  char       * star1;
+  char       * star2;
+  Vector3 star1_pos;
+  Vector3 star2_pos;
+  int          crash;
 };
 
 struct guard_data
@@ -634,28 +631,28 @@ struct guard_data
 
 struct  planet_data
 {
-    PLANET_DATA    * next;
-    PLANET_DATA    * prev;
-    PLANET_DATA    * next_in_system;
-    PLANET_DATA    * prev_in_system;
-    GUARD_DATA     * first_guard;
-    GUARD_DATA     * last_guard;
-    SPACE_DATA     * starsystem;
-    AREA_DATA      * area;
-    char           * name;
-    char           * filename;
-    CLAN_DATA      * governed_by;
-    int 	     population;
-    float            pop_support;
-    int		     sector;
-    int 	     x, y, z;
-    int              size;
-    int		     citysize;
-    int              wilderness;
-    int		     wildlife;
-    int		     farmland;
-    int		     barracks;
-    int		     controls;
+  PLANET_DATA    * next;
+  PLANET_DATA    * prev;
+  PLANET_DATA    * next_in_system;
+  PLANET_DATA    * prev_in_system;
+  GUARD_DATA     * first_guard;
+  GUARD_DATA     * last_guard;
+  SPACE_DATA     * starsystem;
+  AREA_DATA      * area;
+  char           * name;
+  char           * filename;
+  CLAN_DATA      * governed_by;
+  int 	     population;
+  float            pop_support;
+  int		     sector;
+  Vector3 pos;
+  int              size;
+  int		     citysize;
+  int              wilderness;
+  int		     wildlife;
+  int		     farmland;
+  int		     barracks;
+  int		     controls;
 };
 
 struct	clan_data
@@ -716,88 +713,89 @@ struct hanger_data
 
 struct ship_data
 {
-    SHIP_DATA * next;
-    SHIP_DATA * prev;
-    SHIP_DATA * next_in_starsystem;
-    SHIP_DATA * prev_in_starsystem;
-    SHIP_DATA * next_in_room;
-    SHIP_DATA * prev_in_room;
-    ROOM_INDEX_DATA *in_room;
-    ROOM_INDEX_DATA *first_room;
-    ROOM_INDEX_DATA *last_room;
-    ROOM_INDEX_DATA *pilotseat;
-    ROOM_INDEX_DATA *gunseat;
-    ROOM_INDEX_DATA *viewscreen;
-    ROOM_INDEX_DATA *engine;
-    ROOM_INDEX_DATA *entrance;
-    SPACE_DATA * starsystem;
-    TURRET_DATA *first_turret;
-    TURRET_DATA *last_turret;
-    HANGER_DATA *first_hanger;
-    HANGER_DATA *last_hanger;
-    char *      filename;
-    char *      name;
-    char *      home;
-    char *      description[MAX_SHIP_ROOMS];
-    char *      owner;
-    char *      pilot;
-    char *      copilot;
-    char *      dest;
-    short      type;
-    short      ship_class;
-    short      model;
-    short      hyperspeed;
-    int         hyperdistance;
-    short      realspeed;
-    short	currspeed;
-    short      shipstate;
-    short      laserstate;
-    short      missilestate;
-    short      missiles;
-    short      maxmissiles;
-    short      lasers;
-    short      tractorbeam;
-    short      manuever;
-    bool        hatchopen;
-    bool 	autorecharge;
-    bool        autotrack;
-    bool 	autospeed;
-    float       vx, vy, vz;
-    float       hx, hy, hz;
-    float       jx, jy, jz;
-    int         maxenergy;
-    int         energy;
-    int         shield;
-    int         maxshield;
-    int         hull;
-    int         maxhull;
-    int         location;
-    int         lastdoc;
-    int         shipyard;
-    long        collision;
-    SHIP_DATA  *target;
-    SPACE_DATA *currjump;
-    short      chaff;
-    short      maxchaff;
-    bool        chaff_released;
-    bool        autopilot;
+  SHIP_DATA * next;
+  SHIP_DATA * prev;
+  SHIP_DATA * next_in_starsystem;
+  SHIP_DATA * prev_in_starsystem;
+  SHIP_DATA * next_in_room;
+  SHIP_DATA * prev_in_room;
+  ROOM_INDEX_DATA *in_room;
+  ROOM_INDEX_DATA *first_room;
+  ROOM_INDEX_DATA *last_room;
+  ROOM_INDEX_DATA *pilotseat;
+  ROOM_INDEX_DATA *gunseat;
+  ROOM_INDEX_DATA *viewscreen;
+  ROOM_INDEX_DATA *engine;
+  ROOM_INDEX_DATA *entrance;
+  SPACE_DATA * starsystem;
+  TURRET_DATA *first_turret;
+  TURRET_DATA *last_turret;
+  HANGER_DATA *first_hanger;
+  HANGER_DATA *last_hanger;
+  char *      filename;
+  char *      name;
+  char *      home;
+  char *      description[MAX_SHIP_ROOMS];
+  char *      owner;
+  char *      pilot;
+  char *      copilot;
+  char *      dest;
+  short      type;
+  short      ship_class;
+  short      model;
+  short      hyperspeed;
+  int         hyperdistance;
+  short      realspeed;
+  short	currspeed;
+  short      shipstate;
+  short      laserstate;
+  short      missilestate;
+  short      missiles;
+  short      maxmissiles;
+  short      lasers;
+  short      tractorbeam;
+  short      manuever;
+  bool        hatchopen;
+  bool 	autorecharge;
+  bool        autotrack;
+  bool 	autospeed;
+  Vector3 pos;
+  Vector3 head;
+  Vector3 jump;
+  int         maxenergy;
+  int         energy;
+  int         shield;
+  int         maxshield;
+  int         hull;
+  int         maxhull;
+  int         location;
+  int         lastdoc;
+  int         shipyard;
+  long        collision;
+  SHIP_DATA  *target;
+  SPACE_DATA *currjump;
+  short      chaff;
+  short      maxchaff;
+  bool        chaff_released;
+  bool        autopilot;
 };
 
 
 
 struct missile_data
 {
-    MISSILE_DATA * next;
-    MISSILE_DATA * prev;
-    MISSILE_DATA * next_in_starsystem;
-    MISSILE_DATA * prev_in_starsystem;
-    SPACE_DATA * starsystem;
-    SHIP_DATA * target;
-    SHIP_DATA * fired_from;
-    char      * fired_by;
-    short      age;
-    int         speed;
-    int         mx, my, mz;
+  MISSILE_DATA * next;
+  MISSILE_DATA * prev;
+  MISSILE_DATA * next_in_starsystem;
+  MISSILE_DATA * prev_in_starsystem;
+  SPACE_DATA * starsystem;
+  SHIP_DATA * target;
+  SHIP_DATA * fired_from;
+  char      * fired_by;
+  short      age;
+  int         speed;
+  Vector3 pos;
+  Vector3 head;
 };
 
 
