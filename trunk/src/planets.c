@@ -24,6 +24,7 @@ GUARD_DATA * last_guard;
 void	fread_planet	args( ( PLANET_DATA *planet, FILE *fp ) );
 bool	load_planet_file	args( ( const char *planetfile ) );
 void	write_planet_list	args( ( void ) );
+static PLANET_DATA *planet_create( void );
 
 PLANET_DATA *get_planet( const char *name )
 {
@@ -171,12 +172,6 @@ void fread_planet( PLANET_DATA *planet, FILE *fp )
 	          {
 		    ROOM_INDEX_DATA *room;
 	             
-		    planet->size = 0;
-		    planet->citysize = 0;
-		    planet->wilderness = 0;
-		    planet->farmland = 0;
-		    planet->barracks = 0;
-		    planet->controls = 0;
 		    pArea->planet = planet; 
 		    planet->area = pArea;
 		    for( room = pArea->first_room ; room ; room = room->next_in_area )
@@ -267,21 +262,9 @@ void fread_planet( PLANET_DATA *planet, FILE *fp )
 bool load_planet_file( const char *planetfile )
 {
     char filename[256];
-    PLANET_DATA *planet;
     FILE *fp;
-    bool found;
-
-    CREATE( planet, PLANET_DATA, 1 );
-    
-    planet->governed_by = NULL;
-    planet->next_in_system = NULL;
-    planet->prev_in_system = NULL;
-    planet->starsystem = NULL ;
-    planet->area = NULL;
-    planet->first_guard = NULL;
-    planet->last_guard = NULL;
-    vector_init( &planet->pos );
-    found = FALSE;
+    PLANET_DATA *planet = planet_create();
+    bool found = FALSE;
     sprintf( filename, "%s%s", PLANET_DIR, planetfile );
 
     if ( ( fp = fopen( filename, "r" ) ) != NULL )
@@ -840,22 +823,10 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
   pArea = NULL;
   planet = NULL;
     
-  CREATE( planet, PLANET_DATA, 1 );
+  planet = planet_create();
   LINK( planet, first_planet, last_planet, next, prev );
-  planet->governed_by = NULL;
-  planet->next_in_system = NULL;
-  planet->prev_in_system = NULL;
-  planet->first_guard = NULL;
-  planet->last_guard = NULL;
   planet->name		= STRALLOC( capitalize(pname) );
   planet->sector = sector;
-  planet->size = 0;
-  planet->citysize = 0;
-  planet->wilderness = 0;
-  planet->farmland = 0;
-  planet->barracks = 0;
-  planet->controls = 0;
-  vector_init( &planet->pos );
   vector_randomize( &planet->pos, -10000, 10000 );
   
   if ( starsystem )
@@ -866,17 +837,13 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
     }
   else
     {
-      CREATE( starsystem, SPACE_DATA, 1 );
+      starsystem = starsystem_create();
       LINK( starsystem, first_starsystem, last_starsystem, next, prev );
       starsystem->name		= STRALLOC( capitalize(arg1) );
       starsystem->star1            = STRALLOC( arg1 );  
       starsystem->star2            = STRALLOC( "" );
       starsystem->first_planet = planet;
       starsystem->last_planet = planet;
-      starsystem->first_ship = NULL;
-      starsystem->last_ship = NULL;
-      starsystem->first_missile = NULL;
-      starsystem->last_missile = NULL; 
       sprintf( filename, "%s.system" , strlower(arg1) );
       replace_char( filename, ' ', '_' );
       starsystem->filename = str_dup( filename );
@@ -1101,4 +1068,36 @@ int max_population( PLANET_DATA *planet )
 
   pmax = pmax * support / 100;
   return UMIN( rmax , pmax );
+}
+
+static PLANET_DATA *planet_create( void )
+{
+  PLANET_DATA *planet = 0;
+
+  CREATE( planet, PLANET_DATA, 1 );
+
+  planet->next           = NULL;
+  planet->prev           = NULL;
+  planet->next_in_system = NULL;
+  planet->prev_in_system = NULL;
+  planet->first_guard    = NULL;
+  planet->last_guard     = NULL;
+  planet->starsystem     = NULL;
+  planet->area           = NULL;
+  planet->name           = NULL;
+  planet->filename       = NULL;
+  planet->governed_by    = NULL;
+  planet->population     = 0;
+  planet->pop_support    = 0.0;
+  planet->sector         = 0;
+  vector_init( &planet->pos );
+  planet->size           = 0;
+  planet->citysize       = 0;
+  planet->wilderness     = 0;
+  planet->wildlife       = 0;
+  planet->farmland       = 0;
+  planet->barracks       = 0;
+  planet->controls       = 0;
+
+  return planet;
 }

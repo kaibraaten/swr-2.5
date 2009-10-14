@@ -729,87 +729,60 @@ void do_makeship( CHAR_DATA *ch, char *argument )
 
 SHIP_DATA * make_ship( SHIP_PROTOTYPE *prototype )
 {
-    SHIP_DATA *ship;
-    int shipreg=0;
-    char filename[10];
-    char shipname[MAX_STRING_LENGTH];
-    int dIndex;
+  SHIP_DATA *ship;
+  int shipreg=0;
+  char filename[10];
+  char shipname[MAX_STRING_LENGTH];
     
-    if ( prototype == NULL )
-       return NULL;
+  if ( prototype == NULL )
+    return NULL;
 
-    for ( ship = first_ship ; ship ; ship = ship->next )
-        if ( shipreg < atoi( ship->filename ) )
-             shipreg = atoi( ship->filename );
+  for ( ship = first_ship ; ship ; ship = ship->next )
+    if ( shipreg < atoi( ship->filename ) )
+      shipreg = atoi( ship->filename );
 
-    shipreg++;
-    sprintf( filename , "%d" , shipreg );
-    sprintf( shipname , "%s %d" , prototype->name, shipreg );
+  shipreg++;
+  sprintf( filename , "%d" , shipreg );
+  sprintf( shipname , "%s %d" , prototype->name, shipreg );
     
-    CREATE( ship, SHIP_DATA, 1 );
-    LINK( ship, first_ship, last_ship, next, prev );
+  ship = ship_create();
+
+  LINK( ship, first_ship, last_ship, next, prev );
     
-    ship->filename = str_dup( filename ) ;
+  ship->filename = str_dup( filename ) ;
+  ship->name = STRALLOC( shipname );
+  ship->home = STRALLOC("");
+
+  if ( prototype->description )
+    ship->description[0] = STRALLOC( prototype->description );
+
+  ship->owner = STRALLOC("");
+  ship->pilot = STRALLOC("");
+  ship->copilot = STRALLOC("");
+  ship->type = PLAYER_SHIP;
+  ship->ship_class = prototype->ship_class;
+  ship->model = prototype->model;
+  ship->hyperspeed = prototype->hyperspeed;
+  ship->realspeed = prototype->realspeed;
+  ship->shipstate = SHIP_DOCKED;
+  ship->missiles = prototype->maxmissiles;
+  ship->maxmissiles = prototype->maxmissiles;
+  ship->lasers = prototype->lasers;
+  ship->tractorbeam = prototype->tractorbeam;
+  ship->manuever = prototype->manuever;
+  ship->maxenergy = prototype->maxenergy;
+  ship->energy = prototype->maxenergy;
+  ship->maxshield = prototype->maxshield;
+  ship->hull = prototype->maxhull;
+  ship->maxhull = prototype->maxhull;
+  ship->chaff = prototype->maxchaff;
+  ship->maxchaff = prototype->maxchaff;
+  create_ship_rooms ( ship );
     
-    ship->next_in_starsystem = NULL;
-    ship->prev_in_starsystem =NULL;
-    ship->next_in_room = NULL;
-    ship->prev_in_room = NULL;
-    ship->in_room = NULL;
-    ship->starsystem = NULL;
-    ship->first_hanger = NULL;
-    ship->last_hanger = NULL;
-    ship->first_turret = NULL;
-    ship->last_turret = NULL;
-    ship->name = STRALLOC( shipname );
-    ship->home = STRALLOC("");
-    for ( dIndex = 0 ; dIndex < MAX_SHIP_ROOMS ; dIndex++ );
-    	ship->description[dIndex] = NULL;
-    if ( prototype->description )
-        ship->description[0] = STRALLOC( prototype->description );
-    ship->owner = STRALLOC("");
-    ship->pilot = STRALLOC("");
-    ship->copilot = STRALLOC("");
-    ship->dest = NULL;
-    ship->type = PLAYER_SHIP;
-    ship->ship_class = prototype->ship_class;
-    ship->model = prototype->model;
-    ship->hyperspeed = prototype->hyperspeed;
-    ship->realspeed = prototype->realspeed;
-    ship->shipstate = SHIP_DOCKED;
-    ship->laserstate = LASER_READY;
-    ship->missilestate = MISSILE_READY;
-    ship->missiles = prototype->maxmissiles;
-    ship->maxmissiles = prototype->maxmissiles;
-    ship->lasers = prototype->lasers;
-    ship->tractorbeam = prototype->tractorbeam;
-    ship->manuever = prototype->manuever;
-    ship->hatchopen = FALSE;
-    ship->autorecharge = FALSE;
-    ship->autotrack = FALSE;
-    ship->autospeed = FALSE;
-    ship->maxenergy = prototype->maxenergy;
-    ship->energy = prototype->maxenergy;
-    ship->shield = 0;
-    ship->maxshield = prototype->maxshield;
-    ship->hull = prototype->maxhull;
-    ship->maxhull = prototype->maxhull;
-    ship->location = 0;
-    ship->lastdoc = 0;
-    ship->shipyard = 0;
-    ship->collision = 0;
-    ship->target = NULL;
-    ship->currjump = NULL;
-    ship->chaff = prototype->maxchaff;
-    ship->maxchaff = prototype->maxchaff;
-    ship->chaff_released = FALSE;
-    ship->autopilot = FALSE;
-    create_ship_rooms ( ship );
-    
-    save_ship( ship );
-    write_ship_list( );
+  save_ship( ship );
+  write_ship_list( );
 	
-    return ship;
+  return ship;
 }
 
 void do_prototypes( CHAR_DATA *ch, char *argument )
@@ -1628,7 +1601,6 @@ void do_designship( CHAR_DATA * ch , char * argument )
        char filename[10];
        char shipname[MAX_STRING_LENGTH];
        CLAN_DATA  * clan;     
-       int dIndex;
         
        if ( !str_cmp( arg1, "clanship" ) )
        {
@@ -1664,65 +1636,38 @@ void do_designship( CHAR_DATA * ch , char * argument )
        sprintf( filename , "%d" , shipreg );
        sprintf( shipname , "%s %d" , argument , shipreg );
     
-       CREATE( ship, SHIP_DATA, 1 );
+       ship = ship_create();
+
        LINK( ship, first_ship, last_ship, next, prev );
     
        ship->filename = str_dup( filename ) ;
-    
-       ship->next_in_starsystem = NULL;
-       ship->prev_in_starsystem =NULL;
-       ship->next_in_room = NULL;
-       ship->prev_in_room = NULL;
-       ship->in_room = NULL;
-       ship->starsystem = NULL;
-       ship->first_hanger = NULL;
-       ship->last_hanger = NULL;
-       ship->first_turret = NULL;
-       ship->last_turret = NULL;
        ship->name = STRALLOC( shipname );
        ship->home = STRALLOC("");
-       for ( dIndex = 0 ; dIndex < MAX_SHIP_ROOMS ; dIndex++ );
-      	  ship->description[dIndex] = NULL;
+
        if ( !str_cmp( arg1, "clanship" ) )
           ship->owner = STRALLOC( clan->name );
        else
           ship->owner = STRALLOC( ch->name );
+
        ship->pilot = STRALLOC("");
        ship->copilot = STRALLOC("");
-       ship->dest = NULL;
        ship->type = PLAYER_SHIP;
        ship->ship_class = SPACECRAFT;
        ship->model = smodel;
        ship->hyperspeed = model[smodel].hyperspeed;
        ship->realspeed = speed;
        ship->shipstate = SHIP_DOCKED;
-       ship->laserstate = LASER_READY;
-       ship->missilestate = MISSILE_READY;
        ship->missiles = missiles;
        ship->maxmissiles = missiles;
        ship->lasers = lasers;
-       ship->tractorbeam = 0;
        ship->manuever = manuever;
-       ship->hatchopen = FALSE;
-       ship->autorecharge = FALSE;
-       ship->autotrack = FALSE;
-       ship->autospeed = FALSE;
        ship->maxenergy = energy;
        ship->energy = energy;
-       ship->shield = 0;
        ship->maxshield = shield;
        ship->hull = hull;
        ship->maxhull = hull;
-       ship->location = 0;
-       ship->lastdoc = 0;
-       ship->shipyard = 0;
-       ship->collision = 0;
-       ship->target = NULL;
-       ship->currjump = NULL;
        ship->chaff = chaff;
        ship->maxchaff = chaff;
-       ship->chaff_released = FALSE;
-       ship->autopilot = FALSE;
        create_ship_rooms ( ship );
 
        if ( !str_cmp( arg1, "clanship" ) )

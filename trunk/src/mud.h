@@ -780,8 +780,6 @@ struct ship_data
   bool        autopilot;
 };
 
-
-
 struct missile_data
 {
   MISSILE_DATA * next;
@@ -3472,6 +3470,8 @@ int     max_population          args( ( PLANET_DATA *planet ) );
 long    get_taxes               args( ( PLANET_DATA *planet ) );
 
 /* space.c */
+SHIP_DATA *ship_create( void );
+SPACE_DATA *starsystem_create(  void );
 SH        *  get_ship          	    args( ( const char *name ) );
 void         load_ships        	    args( ( void ) );
 void         save_ship      	    args( ( SHIP_DATA *ship ) );

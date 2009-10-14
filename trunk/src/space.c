@@ -886,20 +886,37 @@ void fread_starsystem( SPACE_DATA *starsystem, FILE *fp )
  * Load a starsystem file
  */
 
+SPACE_DATA *starsystem_create( void )
+{
+  SPACE_DATA *starsystem = NULL;
+
+  CREATE( starsystem, SPACE_DATA, 1 );
+
+  starsystem->next          = NULL;
+  starsystem->prev          = NULL;
+  starsystem->first_planet  = NULL;
+  starsystem->last_planet   = NULL;
+  starsystem->first_ship    = NULL;
+  starsystem->last_ship     = NULL;
+  starsystem->first_missile = NULL;
+  starsystem->last_missile  = NULL;
+  starsystem->filename      = NULL;
+  starsystem->name          = NULL;
+  starsystem->star1         = NULL;
+  starsystem->star2         = NULL;
+  vector_init( &starsystem->star1_pos );
+  vector_init( &starsystem->star2_pos );
+  starsystem->crash         = 0;
+
+  return starsystem;
+}
+
 bool load_starsystem( const char *starsystemfile )
 {
     char filename[256];
-    SPACE_DATA *starsystem;
+    SPACE_DATA *starsystem = starsystem_create();
     FILE *fp;
     bool found;
-
-    CREATE( starsystem, SPACE_DATA, 1 );
-    starsystem->first_planet = NULL;
-    starsystem->last_planet = NULL;
-    starsystem->first_ship = NULL;
-    starsystem->last_ship = NULL;
-    starsystem->first_missile = NULL;
-    starsystem->last_missile = NULL;
 
     found = FALSE;
     sprintf( filename, "%s%s", SPACE_DIR, starsystemfile );
@@ -1687,13 +1704,11 @@ void fread_ship( SHIP_DATA *ship, FILE *fp )
 bool load_ship_file( const char *shipfile )
 {
   char filename[256];
-  SHIP_DATA *ship;
+  SHIP_DATA *ship = ship_create();
   FILE *fp;
   bool found;
   CLAN_DATA *clan;
         
-  CREATE( ship, SHIP_DATA, 1 );
-
   found = FALSE;
   sprintf( filename, "%s%s", SHIP_DIR, shipfile );
 
@@ -1752,24 +1767,14 @@ bool load_ship_file( const char *shipfile )
 
       if ( ship->ship_class == SPACE_STATION || ship->type == MOB_SHIP )
 	{
-	  ship->currspeed=0;
 	  ship->energy=ship->maxenergy;
 	  ship->chaff=ship->maxchaff;
 	  ship->hull=ship->maxhull;
-	  ship->shield=0;
      
 	  ship->laserstate = LASER_READY; 
 	  ship->missilestate = LASER_READY;
        
-	  ship->currjump=NULL;
-	  ship->target=NULL;
-     
-	  ship->hatchopen = FALSE;
-     
 	  ship->missiles = ship->maxmissiles;
-	  ship->autorecharge = FALSE;
-	  ship->autotrack = FALSE;
-	  ship->autospeed = FALSE;
           
           ship_to_starsystem(ship, starsystem_from_name(ship->home) );  
 	  vector_init( &ship->pos );
@@ -1777,7 +1782,6 @@ bool load_ship_file( const char *shipfile )
           ship->head.x = 1;
           ship->head.y = 1;
           ship->head.z = 1;
-          ship->shipstate = SHIP_READY;
           ship->autopilot = TRUE;
           ship->autorecharge = TRUE;
           ship->shield = ship->maxshield;
@@ -1805,143 +1809,141 @@ bool load_ship_file( const char *shipfile )
  */
 void load_ships( )
 {
-    FILE *fpList;
-    const char *filename;
-    char shiplist[256];
-    char buf[MAX_STRING_LENGTH];
+  FILE *fpList;
+  const char *filename;
+  char shiplist[256];
+  char buf[MAX_STRING_LENGTH];
     
+  first_ship	= NULL;
+  last_ship	= NULL;
+  first_missile = NULL;
+  last_missile = NULL;
     
-    first_ship	= NULL;
-    last_ship	= NULL;
-    first_missile = NULL;
-    last_missile = NULL;
-    
-    log_string( "Loading ships..." );
+  log_string( "Loading ships..." );
 
-    sprintf( shiplist, "%s%s", SHIP_DIR, SHIP_LIST );
-    fclose( fpReserve );
-    if ( ( fpList = fopen( shiplist, "r" ) ) == NULL )
+  sprintf( shiplist, "%s%s", SHIP_DIR, SHIP_LIST );
+  fclose( fpReserve );
+
+  if ( ( fpList = fopen( shiplist, "r" ) ) == NULL )
     {
-	perror( shiplist );
-	exit( 1 );
+      perror( shiplist );
+      exit( 1 );
     }
 
-    for ( ; ; )
+  for ( ; ; )
     {
-    
-	filename = feof( fpList ) ? "$" : fread_word( fpList );
+      filename = feof( fpList ) ? "$" : fread_word( fpList );
 
-	if ( filename[0] == '$' )
-	  break;
+      if ( filename[0] == '$' )
+	break;
 	         
-	if ( !load_ship_file( filename ) )
+      if ( !load_ship_file( filename ) )
 	{
 	  sprintf( buf, "Cannot load ship file: %s", filename );
 	  bug( buf, 0 );
 	}
-
     }
-    fclose( fpList );
-    log_string(" Done ships " );
-    fpReserve = fopen( NULL_FILE, "r" );
-    return;
+
+  fclose( fpList );
+  log_string(" Done ships " );
+  fpReserve = fopen( NULL_FILE, "r" );
 }
 
 void resetship( SHIP_DATA *ship )
 {
-     ship->shipstate = SHIP_READY;
+  ship->shipstate = SHIP_READY;
      
-     if ( ship->ship_class != SPACE_STATION && ship->type != MOB_SHIP )
-     {
-           extract_ship( ship );
-           ship_to_room( ship , ship->lastdoc ); 
-           ship->location = ship->lastdoc;
-           ship->shipstate = SHIP_DOCKED;
-           STRFREE( ship->home );
-           ship->home = STRALLOC( "" );
-     }
+  if ( ship->ship_class != SPACE_STATION && ship->type != MOB_SHIP )
+    {
+      extract_ship( ship );
+      ship_to_room( ship , ship->lastdoc ); 
+      ship->location = ship->lastdoc;
+      ship->shipstate = SHIP_DOCKED;
+      STRFREE( ship->home );
+      ship->home = STRALLOC( "" );
+    }
      
-     if (ship->starsystem)
-        ship_from_starsystem( ship, ship->starsystem );  
+  if (ship->starsystem)
+    ship_from_starsystem( ship, ship->starsystem );  
   
-     ship->currspeed=0;
-     ship->energy=ship->maxenergy;
-     ship->chaff=ship->maxchaff;
-     ship->hull=ship->maxhull;
-     ship->shield=0;
+  ship->currspeed=0;
+  ship->energy=ship->maxenergy;
+  ship->chaff=ship->maxchaff;
+  ship->hull=ship->maxhull;
+  ship->shield=0;
      
-     ship->laserstate = LASER_READY; 
-     ship->missilestate = LASER_READY;
+  ship->laserstate = LASER_READY; 
+  ship->missilestate = LASER_READY;
        
-     ship->currjump=NULL;
-     ship->target=NULL;
+  ship->currjump=NULL;
+  ship->target=NULL;
      
-     ship->hatchopen = FALSE;
+  ship->hatchopen = FALSE;
      
-     ship->missiles = ship->maxmissiles;
-     ship->autorecharge = FALSE;
-     ship->autotrack = FALSE;
-     ship->autospeed = FALSE;
+  ship->missiles = ship->maxmissiles;
+  ship->autorecharge = FALSE;
+  ship->autotrack = FALSE;
+  ship->autospeed = FALSE;
      
-     save_ship(ship);               
+  save_ship(ship);               
 }
 
 void do_resetship( CHAR_DATA *ch, char *argument )
 {    
-     SHIP_DATA *ship;
+  SHIP_DATA *ship = get_ship( argument );
+
+  if (ship == NULL)
+    {
+      send_to_char("&RNo such ship!",ch);
+      return;
+    } 
      
-     ship = get_ship( argument );
-     if (ship == NULL)
-     {
-        send_to_char("&RNo such ship!",ch);
-        return;
-     } 
+  resetship( ship ); 
      
-     resetship( ship ); 
-     
-     if ( ( ship->ship_class == SPACE_STATION || ship->type == MOB_SHIP ) 
-          && ship->home )
-     {
-          ship_to_starsystem(ship, starsystem_from_name(ship->home) );  
-	  vector_init( &ship->pos );
-	  vector_randomize( &ship->pos, -5000, 5000 );
-          ship->shipstate = SHIP_READY;
-          ship->autopilot = TRUE;
-          ship->autorecharge = TRUE;
-          ship->shield = ship->maxshield;
-     }
+  if ( ( ship->ship_class == SPACE_STATION || ship->type == MOB_SHIP ) 
+       && ship->home )
+    {
+      ship_to_starsystem(ship, starsystem_from_name(ship->home) );  
+      vector_init( &ship->pos );
+      vector_randomize( &ship->pos, -5000, 5000 );
+      ship->shipstate = SHIP_READY;
+      ship->autopilot = TRUE;
+      ship->autorecharge = TRUE;
+      ship->shield = ship->maxshield;
+    }
 }
 
 void do_setship( CHAR_DATA *ch, char *argument )
 {
-    char arg1[MAX_INPUT_LENGTH];
-    char arg2[MAX_INPUT_LENGTH];
-    SHIP_DATA *ship;
-    int  tempnum;
-    ROOM_INDEX_DATA *roomindex;
+  char arg1[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+  SHIP_DATA *ship;
+  int  tempnum;
+  ROOM_INDEX_DATA *roomindex;
     
-    if ( IS_NPC(ch) || !ch->pcdata )
-    	return;
+  if ( IS_NPC(ch) || !ch->pcdata )
+    return;
 
-    if ( !ch->desc )
-	return;
+  if ( !ch->desc )
+    return;
 
-    argument = one_argument( argument, arg1 );
-    argument = one_argument( argument, arg2 );
+  argument = one_argument( argument, arg1 );
+  argument = one_argument( argument, arg2 );
 
-    if ( arg1[0] == '\0' || arg2[0] == '\0' || arg1[0] == '\0' )
+  if ( arg1[0] == '\0' || arg2[0] == '\0' || arg1[0] == '\0' )
     {
-	send_to_char( "Usage: setship <ship> <field> <values>\r\n", ch );
-	send_to_char( "\r\nField being one of:\r\n", ch );
-	send_to_char( "name owner copilot pilot home\r\n", ch );
-	send_to_char( "manuever speed hyperspeed tractorbeam\r\n", ch );
-	send_to_char( "lasers missiles shield hull energy chaff\r\n", ch );
-	send_to_char( "lastdoc class\r\n", ch );
-	return;
+      send_to_char( "Usage: setship <ship> <field> <values>\r\n", ch );
+      send_to_char( "\r\nField being one of:\r\n", ch );
+      send_to_char( "name owner copilot pilot home\r\n", ch );
+      send_to_char( "manuever speed hyperspeed tractorbeam\r\n", ch );
+      send_to_char( "lasers missiles shield hull energy chaff\r\n", ch );
+      send_to_char( "lastdoc class\r\n", ch );
+      return;
     }
 
-    ship = get_ship( arg1 );
-    if ( !ship )
+  ship = get_ship( arg1 );
+
+  if ( !ship )
     {
 	send_to_char( "No such ship.\r\n", ch );
 	return;
@@ -5637,3 +5639,80 @@ bool autofly( SHIP_DATA *ship )
 void do_rentship( CHAR_DATA *ch, char *argument )
 {}
 
+SHIP_DATA *ship_create( void )
+{
+  SHIP_DATA *s = NULL;
+  CREATE( s, SHIP_DATA, 1 );
+
+  s->next               = NULL;
+  s->prev               = NULL;
+  s->next_in_starsystem = NULL;
+  s->prev_in_starsystem = NULL;
+  s->next_in_room       = NULL;
+  s->prev_in_room       = NULL;
+  s->in_room            = NULL;
+  s->first_room         = NULL;
+  s->last_room          = NULL;
+  s->pilotseat          = NULL;
+  s->gunseat            = NULL;
+  s->viewscreen         = NULL;
+  s->engine             = NULL;
+  s->entrance           = NULL;
+  s->starsystem         = NULL;
+  s->first_turret       = NULL;
+  s->last_turret        = NULL;
+  s->first_hanger       = NULL;
+  s->last_hanger        = NULL;
+  s->filename           = NULL;
+  s->name               = NULL;
+  s->home               = NULL;
+  s->owner              = NULL;
+  s->pilot              = NULL;
+  s->copilot            = NULL;
+  s->dest               = NULL;
+  s->type               = 0;
+  s->ship_class         = 0;
+  s->model              = 0;
+  s->hyperspeed         = 0;
+  s->hyperdistance      = 0;
+  s->realspeed          = 0;
+  s->currspeed          = 0;
+  s->shipstate          = SHIP_READY;
+  s->laserstate         = LASER_READY;
+  s->missilestate       = MISSILE_READY;
+  s->missiles           = 0;
+  s->maxmissiles        = 0;
+  s->lasers             = 0;
+  s->tractorbeam        = 0;
+  s->manuever           = 0;
+  s->hatchopen          = FALSE;
+  s->autorecharge       = FALSE;
+  s->autotrack          = FALSE;
+  s->autospeed          = FALSE;
+  s->maxenergy          = 0;
+  s->energy             = 0;
+  s->shield             = 0;
+  s->maxshield          = 0;
+  s->hull               = 0;
+  s->maxhull            = 0;
+  s->location           = 0;
+  s->lastdoc            = 0;
+  s->shipyard           = 0;
+  s->collision          = 0;
+  s->target             = NULL;
+  s->currjump           = NULL;
+  s->chaff              = 0;
+  s->maxchaff           = 0;
+  s->chaff_released     = FALSE;
+  s->autopilot          = FALSE;
+
+  vector_init( &s->pos );
+  vector_init( &s->head );
+  vector_init( &s->jump );
+
+  size_t n = 0;
+  for( n = 0; n < MAX_SHIP_ROOMS; ++n )
+    s->description[n] = NULL;
+
+  return s;
+}
