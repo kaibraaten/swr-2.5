@@ -2939,14 +2939,10 @@ void do_invis( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     short level;
-    
-    /*
-    if ( IS_NPC(ch))
-	return;
-    */
 
     argument = one_argument( argument, arg );
-    if ( arg && arg[0] != '\0' )
+
+    if ( arg[0] != '\0' )
     {
 	if ( !is_number( arg ) )
 	{
