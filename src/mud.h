@@ -3552,6 +3552,7 @@ void	act		args( ( short AType, const char *format, CHAR_DATA *ch,
 void	reset_all	args( ( ) );
 
 /* db.c */
+void replace_char( char *buf, char replace, char with );
 void	show_file	args( ( CHAR_DATA *ch, const char *filename ) );
 char *	str_dup		args( ( const char *str ) );
 void	boot_db		args( ( bool fCopyOver ) );

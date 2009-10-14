@@ -4945,7 +4945,8 @@ void do_rlist( CHAR_DATA *ch, char *argument )
 
     for ( tarea = first_area; tarea; tarea = tarea->next )
     {
-	if ( !str_cmp( tarea->name, arg ) )
+	if ( !str_cmp( tarea->name, arg )
+	     || !str_cmp( tarea->filename, arg ) )
 	{
           for ( room = tarea->first_room; room ; room = room->next_in_area )
              pager_printf( ch, "%5d) %s\n\r", room->vnum,
