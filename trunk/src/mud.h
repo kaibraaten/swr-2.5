@@ -305,7 +305,7 @@ typedef enum
   CON_ACCEPTED,         CON_GET_PKILL,		CON_READ_IMOTD,
   CON_GET_NEW_EMAIL,    CON_GET_MSP,            CON_GET_NEW_CLASS,
   CON_ROLL_STATS,	CON_STATS_OK,		CON_ADD_SKILLS,
-  CON_READ_NMOTD,	CON_PICK_CLAN 	
+  CON_READ_NMOTD,	CON_PICK_CLAN, CON_COPYOVER_RECOVER
 } connection_types;
 
 /*
@@ -2343,6 +2343,7 @@ extern  short  gsn_grip;
 #define SET_BIT(var, bit)	((var) |= (bit))
 #define REMOVE_BIT(var, bit)	((var) &= ~(bit))
 #define TOGGLE_BIT(var, bit)	((var) ^= (bit))
+#define CH(d) ((d)->original ? (d)->original : (d)->character)
 
 /*
  * Memory allocation macros.
@@ -2814,6 +2815,7 @@ extern		struct act_prog_data *	mob_act_list;
  * Command functions.
  * Defined in act_*.c (mostly).
  */
+DECLARE_DO_FUN( do_copyover );
 DECLARE_DO_FUN( do_arrest );
 DECLARE_DO_FUN( do_setwages );
 DECLARE_DO_FUN( do_war );
@@ -3353,7 +3355,8 @@ char *	crypt		args( ( const char *key, const char *salt ) );
 
 #define BOARD_FILE	"boards.txt"		/* For bulletin boards	 */
 #define SHUTDOWN_FILE	"shutdown.txt"		/* For 'shutdown'	 */
-
+#define COPYOVER_FILE   SYSTEM_DIR "copyover.dat"
+#define EXE_FILE        "../bin/swr"
 #define ANSITITLE_FILE	SYSTEM_DIR "mudtitle.ans"
 #define ASCTITLE_FILE	SYSTEM_DIR "mudtitle.asc"
 #define BOOTLOG_FILE	SYSTEM_DIR "boot.txt"	  /* Boot up error file	 */
@@ -3410,6 +3413,8 @@ char *	format_obj_to_char	args( ( OBJ_DATA *obj, CHAR_DATA *ch,
 				    bool fShort ) );
 void	show_list_to_char	args( ( OBJ_DATA *list, CHAR_DATA *ch,
 				    bool fShort, bool fShowNothing ) );
+void log_printf( const char *fmt, ... );
+void copyover_recover( void );
 
 /* act_move.c */
 void	clear_vrooms	args( ( void ) );
@@ -3549,7 +3554,7 @@ void	reset_all	args( ( ) );
 /* db.c */
 void	show_file	args( ( CHAR_DATA *ch, const char *filename ) );
 char *	str_dup		args( ( const char *str ) );
-void	boot_db		args( ( void ) );
+void	boot_db		args( ( bool fCopyOver ) );
 void	area_update	args( ( void ) );
 void	add_char	args( ( CHAR_DATA *ch ) );
 CD *	create_mobile	args( ( MOB_INDEX_DATA *pMobIndex ) );
@@ -3891,6 +3896,7 @@ void	fread_obj	args( ( CHAR_DATA *ch,  FILE *fp, short os_type ) );
 void	de_equip_char	args( ( CHAR_DATA *ch ) );
 void	re_equip_char	args( ( CHAR_DATA *ch ) );
 void	save_home	args( ( CHAR_DATA *ch ) );
+void load_home( CHAR_DATA *ch );
 
 /* shops.c */
 

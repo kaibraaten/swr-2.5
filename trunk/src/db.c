@@ -280,7 +280,7 @@ void shutdown_mud( const char *reason )
 /*
  * Big mama top level function.
  */
-void boot_db( void )
+void boot_db( bool fCopyOver )
 {
     short wear, x;
 
@@ -556,6 +556,12 @@ void boot_db( void )
 	reset_all( );
 	                
         MOBtrigger = TRUE;
+
+	if( fCopyOver )
+	  {
+	    log_string( "Running copyover_recover." );
+	    copyover_recover();
+	  }
     }
 
     /* init_maps ( ); */

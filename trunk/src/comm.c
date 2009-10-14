@@ -53,6 +53,7 @@ char		    str_boot_time[MAX_INPUT_LENGTH];
 char		    lastplayercmd[MAX_INPUT_LENGTH*2];
 time_t		    current_time;	/* Time of this pulse		*/
 int		    control;		/* Controlling descriptor	*/
+int port;
 int		    newdesc;		/* New descriptor		*/
 fd_set		    in_set;		/* Set of desc's for reading	*/
 fd_set		    out_set;		/* Set of desc's for writing	*/
@@ -98,7 +99,8 @@ void	mail_count		args( ( CHAR_DATA *ch ) );
 int main( int argc, char **argv )
 {
     struct timeval now_time;
-    int port;
+    /*int port;*/
+    bool fCopyOver = FALSE;
 
     /*
      * Memory debugging if needed.
@@ -169,31 +171,48 @@ int main( int argc, char **argv )
      * Get the port number.
      */
     port = 4000;
+
     if ( argc > 1 )
-    {
+      {
 	if ( !is_number( argv[1] ) )
-	{
+	  {
 	    fprintf( stderr, "Usage: %s [port #]\n", argv[0] );
 	    exit( 1 );
-	}
+	  }
 	else if ( ( port = atoi( argv[1] ) ) <= 1024 )
-	{
+	  {
 	    fprintf( stderr, "Port number must be above 1024.\n" );
 	    exit( 1 );
-	}
-    }
+	  }
+
+	if( argv[2] && argv[2][0] )
+	  {
+	    fCopyOver = TRUE;
+	    control = atoi( argv[3] );
+	  }
+	else
+	  {
+	    fCopyOver = FALSE;
+	  }
+      }
 
     /*
      * Run the game.
      */
     log_string("Booting Database");
-    boot_db( );
+    boot_db( fCopyOver );
     log_string("Initializing socket");
-    control  = init_socket( port   );
+
+    if( !fCopyOver )
+      {
+	control  = init_socket( port );
+      }
+
     sprintf( log_buf, "SWR 2.0 ready on port %d.", port );
     log_string( log_buf );
-    game_loop( );
-    close( control  );
+    game_loop();
+    close( control );
+
     /*
      * That's all, folks.
      */
@@ -618,6 +637,27 @@ void game_loop( )
 }
 
 
+void init_descriptor( DESCRIPTOR_DATA *dnew, int desc )
+{
+  dnew->next = NULL;
+  dnew->descriptor = desc;
+  dnew->connected = CON_GET_NAME;
+  dnew->outsize = 2000;
+  dnew->idle = 0;
+  dnew->lines = 0;
+  dnew->scrlen = 24;
+  dnew->user = STRALLOC( "unknown" );
+  dnew->auth_fd = -1;
+  dnew->auth_inc = 0;
+  dnew->auth_state = 0;
+  dnew->newstate = 0;
+  dnew->prevcolor = 0x07;
+  dnew->original = NULL;
+  dnew->character = NULL;
+
+  CREATE( dnew->outbuf, char, dnew->outsize );
+}
+
 void new_descriptor( int new_desc )
 {
     char buf[MAX_STRING_LENGTH];
@@ -638,7 +678,7 @@ void new_descriptor( int new_desc )
     set_alarm( 20 );
     if ( ( desc = accept( new_desc, (struct sockaddr *) &sock, &size) ) < 0 )
     {
-	perror( "New_descriptor: accept");
+      /*perror( "New_descriptor: accept");*/
 	set_alarm( 0 );
 	return;
     }
@@ -662,24 +702,9 @@ void new_descriptor( int new_desc )
       return;
 
     CREATE( dnew, DESCRIPTOR_DATA, 1 );
-    dnew->next		= NULL;
-    dnew->descriptor	= desc;
-    dnew->connected	= CON_GET_NAME;
-    dnew->outsize	= 2000;
-    dnew->idle		= 0;
-    dnew->lines		= 0;
-    dnew->scrlen	= 24;
-    dnew->port		= ntohs( sock.sin_port );
-    dnew->user 		= STRALLOC("unknown");
-    dnew->auth_fd	= -1;
-    dnew->auth_inc	= 0;
-    dnew->auth_state	= 0;
-    dnew->newstate	= 0;
-    dnew->prevcolor	= 0x07;
-    dnew->original      = NULL;
-    dnew->character     = NULL;
 
-    CREATE( dnew->outbuf, char, dnew->outsize );
+    init_descriptor( dnew, desc );
+    dnew->port          = ntohs( sock.sin_port );
 
     strcpy( buf, inet_ntoa( sock.sin_addr ) );
     sprintf( log_buf, "Sock.sinaddr:  %s, port %hd.",
@@ -1719,7 +1744,17 @@ void pager_printf(CHAR_DATA *ch, const char *fmt, ...)
     send_to_pager(buf, ch);
 }
 
+/* From Erwin */
+void log_printf( const char *fmt, ... )
+{
+  char buf[MAX_STRING_LENGTH * 2];
+  va_list args;
+  va_start( args, fmt );
+  vsprintf( buf, fmt, args );
+  va_end( args );
 
+  log_string( buf );
+}
 
 char *obj_short( OBJ_DATA *obj )
 {
