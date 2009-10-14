@@ -40,7 +40,6 @@ void save_home( CHAR_DATA *ch )
     {
        	FILE *fp;
        	char filename[256];
-       	sh_int templvl;
        	OBJ_DATA *contents;
 
 
@@ -455,142 +454,172 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 void fwrite_obj( CHAR_DATA *ch, OBJ_DATA *obj, FILE *fp, int iNest,
 		 sh_int os_type )
 {
-    EXTRA_DESCR_DATA *ed;
-    AFFECT_DATA *paf;
-    sh_int wear, wear_loc, x;
+  EXTRA_DESCR_DATA *ed;
+  AFFECT_DATA *paf;
+  sh_int wear, wear_loc, x;
 
-    if ( iNest >= MAX_NEST )
+  if ( iNest >= MAX_NEST )
     {
-	bug( "fwrite_obj: iNest hit MAX_NEST %d", iNest );
-	return;
+      bug( "fwrite_obj: iNest hit MAX_NEST %d", iNest );
+      return;
     }
 
-    /*
-     * Slick recursion to write lists backwards,
-     *   so loading them will load in forwards order.
-     */
-    if ( obj->prev_content && os_type != OS_CORPSE )
-	fwrite_obj( ch, obj->prev_content, fp, iNest, OS_CARRY );
+  /*
+   * Slick recursion to write lists backwards,
+   *   so loading them will load in forwards order.
+   */
+  if ( obj->prev_content && os_type != OS_CORPSE )
+    fwrite_obj( ch, obj->prev_content, fp, iNest, OS_CARRY );
+
+  /*
+   * Catch deleted objects					-Thoric
+   */
+  if ( obj_extracted(obj) )
+    return;
+
+  /*
+   * Do NOT save prototype items!				-Thoric
+   */
+  if ( IS_OBJ_STAT( obj, ITEM_PROTOTYPE ) )
+    return;
+
+  /* Corpse saving. -- Altrag */
+  fprintf( fp, (os_type == OS_CORPSE ? "#CORPSE\n" : "#OBJECT\n") );
+
+  if ( iNest )
+    fprintf( fp, "Nest         %d\n",	iNest		     );
+
+  if ( obj->count > 1 )
+    fprintf( fp, "Count        %d\n",	obj->count	     );
+
+  if( obj->name
+      && ( !obj->pIndexData->name
+           || str_cmp( obj->name, obj->pIndexData->name ) ) )
+    fprintf( fp, "Name         %s~\n",	obj->name	     );
 
 
-    /*
-     * Catch deleted objects					-Thoric
-     */
-    if ( obj_extracted(obj) )
-	return;
+  if( obj->short_descr
+      && ( !obj->pIndexData->short_descr
+           || str_cmp( obj->short_descr, obj->pIndexData->short_descr ) ) )
+    fprintf( fp, "ShortDescr   %s~\n",	obj->short_descr     );
 
-    /*
-     * Do NOT save prototype items!				-Thoric
-     */
-    if ( IS_OBJ_STAT( obj, ITEM_PROTOTYPE ) )
-	return;
+  if( obj->description
+      && ( !obj->pIndexData->description
+           || str_cmp( obj->description, obj->pIndexData->description ) ) )
+    fprintf( fp, "Description  %s~\n",	obj->description     );
 
-    /* Corpse saving. -- Altrag */
-    fprintf( fp, (os_type == OS_CORPSE ? "#CORPSE\n" : "#OBJECT\n") );
+  if( obj->action_desc
+      && ( !obj->pIndexData->action_desc
+           || str_cmp( obj->action_desc, obj->pIndexData->action_desc ) ) )
+    fprintf( fp, "ActionDesc   %s~\n",	obj->action_desc     );
 
-    if ( iNest )
-	fprintf( fp, "Nest         %d\n",	iNest		     );
-    if ( obj->count > 1 )
-	fprintf( fp, "Count        %d\n",	obj->count	     );
-    if ( QUICKMATCH( obj->name, obj->pIndexData->name ) == 0 )
-	fprintf( fp, "Name         %s~\n",	obj->name	     );
-    if ( QUICKMATCH( obj->short_descr, obj->pIndexData->short_descr ) == 0 )
-	fprintf( fp, "ShortDescr   %s~\n",	obj->short_descr     );
-    if ( QUICKMATCH( obj->description, obj->pIndexData->description ) == 0 )
-	fprintf( fp, "Description  %s~\n",	obj->description     );
-    if ( QUICKMATCH( obj->action_desc, obj->pIndexData->action_desc ) == 0 )
-	fprintf( fp, "ActionDesc   %s~\n",	obj->action_desc     );
-    fprintf( fp, "Vnum         %ld\n",	obj->pIndexData->vnum	     );
-    if ( os_type == OS_CORPSE && obj->in_room )
-      fprintf( fp, "Room         %ld\n",   obj->in_room->vnum         );
-    if ( obj->extra_flags != obj->pIndexData->extra_flags )
-	fprintf( fp, "ExtraFlags   %d\n",	obj->extra_flags     );
-    if ( obj->wear_flags != obj->pIndexData->wear_flags )
-	fprintf( fp, "WearFlags    %d\n",	obj->wear_flags	     );
-    wear_loc = -1;
-    for ( wear = 0; wear < MAX_WEAR; wear++ )
-	for ( x = 0; x < MAX_LAYERS; x++ )
-	   if ( obj == save_equipment[wear][x] )
-	   {
-		wear_loc = wear;
-		break;
-	   }
-	   else
-	   if ( !save_equipment[wear][x] )
-		break;
-    if ( wear_loc != -1 )
-	fprintf( fp, "WearLoc      %d\n",	wear_loc	     );
-    if ( obj->item_type != obj->pIndexData->item_type )
-	fprintf( fp, "ItemType     %d\n",	obj->item_type	     );
-    if ( obj->weight != obj->pIndexData->weight )
-      fprintf( fp, "Weight       %d\n",	obj->weight		     );
-    if ( obj->level )
-      fprintf( fp, "Level        %d\n",	obj->level		     );
-    if ( obj->timer )
-      fprintf( fp, "Timer        %d\n",	obj->timer		     );
-    if ( obj->cost != obj->pIndexData->cost )
-      fprintf( fp, "Cost         %d\n",	obj->cost		     );
-    if ( obj->value[0] || obj->value[1] || obj->value[2]
-    ||   obj->value[3] || obj->value[4] || obj->value[5] )
-      fprintf( fp, "Values       %d %d %d %d %d %d\n",
-	obj->value[0], obj->value[1], obj->value[2],
-	obj->value[3], obj->value[4], obj->value[5]     );
+  fprintf( fp, "Vnum         %ld\n",	obj->pIndexData->vnum	     );
 
-    switch ( obj->item_type )
+  if ( os_type == OS_CORPSE && obj->in_room )
+    fprintf( fp, "Room         %ld\n",   obj->in_room->vnum         );
+
+  if ( obj->extra_flags != obj->pIndexData->extra_flags )
+    fprintf( fp, "ExtraFlags   %d\n",	obj->extra_flags     );
+
+  if ( obj->wear_flags != obj->pIndexData->wear_flags )
+    fprintf( fp, "WearFlags    %d\n",	obj->wear_flags	     );
+
+  wear_loc = -1;
+
+  for ( wear = 0; wear < MAX_WEAR; wear++ )
+    {
+      for ( x = 0; x < MAX_LAYERS; x++ )
+	{
+	  if ( obj == save_equipment[wear][x] )
+	    {
+	      wear_loc = wear;
+	      break;
+	    }
+	  else if ( !save_equipment[wear][x] )
+	    {
+	      break;
+	    }
+	}
+    }
+
+  if ( wear_loc != -1 )
+    fprintf( fp, "WearLoc      %d\n",	wear_loc	     );
+
+  if ( obj->item_type != obj->pIndexData->item_type )
+    fprintf( fp, "ItemType     %d\n",	obj->item_type	     );
+
+  if ( obj->weight != obj->pIndexData->weight )
+    fprintf( fp, "Weight       %d\n",	obj->weight		     );
+
+  if ( obj->level )
+    fprintf( fp, "Level        %d\n",	obj->level		     );
+
+  if ( obj->timer )
+    fprintf( fp, "Timer        %d\n",	obj->timer		     );
+
+  if ( obj->cost != obj->pIndexData->cost )
+    fprintf( fp, "Cost         %d\n",	obj->cost		     );
+
+  if ( obj->value[0] || obj->value[1] || obj->value[2]
+       ||   obj->value[3] || obj->value[4] || obj->value[5] )
+    fprintf( fp, "Values       %d %d %d %d %d %d\n",
+	     obj->value[0], obj->value[1], obj->value[2],
+	     obj->value[3], obj->value[4], obj->value[5]     );
+
+  switch ( obj->item_type )
     {
     case ITEM_DEVICE:
-	if ( IS_VALID_SN(obj->value[3]) )
-	    fprintf( fp, "Spell 3      '%s'\n",
-		skill_table[obj->value[3]]->name );
-
-	break;
+      if ( IS_VALID_SN(obj->value[3]) )
+	fprintf( fp, "Spell 3      '%s'\n",
+		 skill_table[obj->value[3]]->name );
+      break;
     }
 
-    for ( paf = obj->first_affect; paf; paf = paf->next )
+  for ( paf = obj->first_affect; paf; paf = paf->next )
     {
-	/*
-	 * Save extra object affects				-Thoric
-	 */
-	if ( paf->type < 0 || paf->type >= top_sn )
+      /*
+       * Save extra object affects				-Thoric
+       */
+      if ( paf->type < 0 || paf->type >= top_sn )
 	{
 	  fprintf( fp, "Affect       %d %d %d %d %d\n",
-	    paf->type,
-	    paf->duration,
-	     ((paf->location == APPLY_WEAPONSPELL
-	    || paf->location == APPLY_WEARSPELL
-	    || paf->location == APPLY_REMOVESPELL
-	    || paf->location == APPLY_STRIPSN)
-	    && IS_VALID_SN(paf->modifier))
-	    ? skill_table[paf->modifier]->slot : paf->modifier,
-	    paf->location,
-	    paf->bitvector
-	    );
+		   paf->type,
+		   paf->duration,
+		   ((paf->location == APPLY_WEAPONSPELL
+		     || paf->location == APPLY_WEARSPELL
+		     || paf->location == APPLY_REMOVESPELL
+		     || paf->location == APPLY_STRIPSN)
+		    && IS_VALID_SN(paf->modifier))
+		   ? skill_table[paf->modifier]->slot : paf->modifier,
+		   paf->location,
+		   paf->bitvector
+		   );
 	}
-	else
+      else
+	{
 	  fprintf( fp, "AffectData   '%s' %d %d %d %d\n",
-	    skill_table[paf->type]->name,
-	    paf->duration,
-	     ((paf->location == APPLY_WEAPONSPELL
-	    || paf->location == APPLY_WEARSPELL
-	    || paf->location == APPLY_REMOVESPELL
-	    || paf->location == APPLY_STRIPSN)
-	    && IS_VALID_SN(paf->modifier))
-	    ? skill_table[paf->modifier]->slot : paf->modifier,
-	    paf->location,
-	    paf->bitvector
-	    );
+		   skill_table[paf->type]->name,
+		   paf->duration,
+		   ((paf->location == APPLY_WEAPONSPELL
+		     || paf->location == APPLY_WEARSPELL
+		     || paf->location == APPLY_REMOVESPELL
+		     || paf->location == APPLY_STRIPSN)
+		    && IS_VALID_SN(paf->modifier))
+		   ? skill_table[paf->modifier]->slot : paf->modifier,
+		   paf->location,
+		   paf->bitvector
+		   );
+	}
     }
 
-    for ( ed = obj->first_extradesc; ed; ed = ed->next )
-	fprintf( fp, "ExtraDescr   %s~ %s~\n",
-	    ed->keyword, ed->description );
+  for ( ed = obj->first_extradesc; ed; ed = ed->next )
+    fprintf( fp, "ExtraDescr   %s~ %s~\n",
+	     ed->keyword, ed->description );
 
-    fprintf( fp, "End\n\n" );
+  fprintf( fp, "End\n\n" );
 
-    if ( obj->first_content )
-	fwrite_obj( ch, obj->last_content, fp, iNest + 1, OS_CARRY );
-
-    return;
+  if ( obj->first_content )
+    fwrite_obj( ch, obj->last_content, fp, iNest + 1, OS_CARRY );
 }
 
 

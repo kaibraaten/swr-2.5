@@ -1372,23 +1372,22 @@ void    make_garage( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
 
 void do_designship( CHAR_DATA * ch , char * argument )
 {
-     int hull, energy, shield, speed, manuever, lasers, missiles, chaff, smodel;
-     char arg1[MAX_INPUT_LENGTH];
-     char arg2[MAX_INPUT_LENGTH];
-     char arg3[MAX_INPUT_LENGTH];
-     char arg4[MAX_INPUT_LENGTH];
-     char arg5[MAX_INPUT_LENGTH];
-     char arg6[MAX_INPUT_LENGTH];
-     char arg7[MAX_INPUT_LENGTH];
-     char arg8[MAX_INPUT_LENGTH];
-     char arg9[MAX_INPUT_LENGTH];
-     char arg0[MAX_INPUT_LENGTH];
-     char layout[MAX_INPUT_LENGTH];
-     long price;
-     SHIP_DATA * ship;
-     ROOM_INDEX_DATA *location;
-     
-    if ( IS_NPC(ch) || !ch->pcdata )
+  int hull, energy, shield, speed, manuever, lasers, missiles, chaff, smodel;
+  char arg1[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+  char arg3[MAX_INPUT_LENGTH];
+  char arg4[MAX_INPUT_LENGTH];
+  char arg5[MAX_INPUT_LENGTH];
+  char arg6[MAX_INPUT_LENGTH];
+  char arg7[MAX_INPUT_LENGTH];
+  char arg8[MAX_INPUT_LENGTH];
+  char arg9[MAX_INPUT_LENGTH];
+  char arg0[MAX_INPUT_LENGTH];
+  long price;
+  SHIP_DATA * ship;
+  ROOM_INDEX_DATA *location;
+
+  if ( IS_NPC(ch) || !ch->pcdata )
     return;
 
     if ( !ch->desc )

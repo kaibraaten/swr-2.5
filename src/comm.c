@@ -629,12 +629,11 @@ void new_descriptor( int new_desc )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *dnew;
-    BAN_DATA *pban;
     struct hostent  *from;
     char *hostname;
     struct sockaddr_in sock;
     int desc;
-    int size;
+    socklen_t size;
 
     set_alarm( 20 );
     size = sizeof(sock);
@@ -1270,7 +1269,6 @@ void nanny( DESCRIPTOR_DATA *d, char *argument )
     CHAR_DATA *ch;
     char *pwdnew;
     char *p;
-    int sn;
     BAN_DATA *pban;
     bool fOld, chk;
 

@@ -42,7 +42,6 @@ void save_poll( VOTE_DATA *poll )
 {
     FILE *fp;
     char player[256];
-    char buf[MAX_STRING_LENGTH];
 
     if ( !poll )
     {
