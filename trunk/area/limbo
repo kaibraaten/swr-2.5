@@ -45,7 +45,7 @@ To get in type: OPEN <shipname>
 And then: ENTER <shipname> 
 Good luck. 
 ~
-0 17412 1
+0 148484 1
 D2
 ~
 ~
@@ -54,7 +54,7 @@ S
 #6
 Academy on Terra Prime~
 ~
-0 4 1
+0 131076 1
 D0
 ~
 ~
@@ -67,7 +67,7 @@ S
 #7
 Basic Survival Training~
 ~
-0 4 1
+0 131076 1
 D3
 ~
 ~
@@ -76,7 +76,7 @@ S
 #8
 Political Science~
 ~
-0 4 1
+0 131076 1
 D1
 ~
 ~
@@ -85,7 +85,7 @@ S
 #9
 More of the Academy~
 ~
-0 4 1
+0 131076 1
 D0
 ~
 ~
@@ -116,7 +116,7 @@ character with the "suicide" command.
 Otherwise, type "enter" to start playing. 
  
 ~
-0 12 1
+0 131084 1
 D10
 ~
 ~
@@ -130,7 +130,7 @@ S
 #12
 Empoyment Office~
 ~
-0 268436492 0
+0 268567564 0
 D3
 ~
 ~
