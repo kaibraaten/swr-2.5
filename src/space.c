@@ -3278,13 +3278,13 @@ void do_land( CHAR_DATA *ch, char *argument )
 
 void landship( SHIP_DATA *ship, char *argument )
 {    
-    SHIP_DATA *target;
+    SHIP_DATA *target = 0;
     char buf[MAX_STRING_LENGTH];
-    int destination;
+    int destination = 0;
     char arg[MAX_INPUT_LENGTH];
     char arg1[MAX_INPUT_LENGTH];
-    PLANET_DATA * planet;
-    ROOM_INDEX_DATA * room;
+    PLANET_DATA * planet = NULL;
+    ROOM_INDEX_DATA * room = NULL;
 
     strcpy( arg , argument );        
     argument = one_argument( argument , arg1 );
@@ -4408,11 +4408,11 @@ void do_target(CHAR_DATA *ch, char *argument )
 
 void do_fire(CHAR_DATA *ch, char *argument )
 {
-    int chance;
-    SHIP_DATA *ship;
-    SHIP_DATA *target;
+    int chance = 0;
+    SHIP_DATA *ship = NULL;
+    SHIP_DATA *target = NULL;
     char buf[MAX_STRING_LENGTH];
-    TURRET_DATA *turret;
+    TURRET_DATA *turret = NULL;
     
         if (  (ship = ship_from_turret(ch->in_room))  == NULL )
         {
@@ -4658,139 +4658,137 @@ void do_fire(CHAR_DATA *ch, char *argument )
 
 void do_calculate(CHAR_DATA *ch, char *argument )
 {
-    char arg1[MAX_INPUT_LENGTH];
-    char arg2[MAX_INPUT_LENGTH];
-    char arg3[MAX_INPUT_LENGTH];  
-    int chance , count;
-    SHIP_DATA *ship;
-    PLANET_DATA *planet;
-    SPACE_DATA *starsystem;
+  char arg1[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+  char arg3[MAX_INPUT_LENGTH];
+  int chance = 0, count = 0;
+  SHIP_DATA *ship = NULL;
+  PLANET_DATA *planet = NULL;
+  SPACE_DATA *starsystem = NULL;
     
-    argument = one_argument( argument , arg1);
-    argument = one_argument( argument , arg2);
-    argument = one_argument( argument , arg3);
+  argument = one_argument( argument , arg1);
+  argument = one_argument( argument , arg2);
+  argument = one_argument( argument , arg3);
     
-    
-    	        if (  (ship = ship_from_pilotseat(ch->in_room))  == NULL )
-    	        {
-    	            send_to_char("&RYou must be in control of a ship to do that!\r\n",ch);
-    	            return;
-    	        }
-                
-                if ( ship->ship_class > SPACE_STATION )
-    	        {
-    	            send_to_char("&RThis isn't a spacecraft!\r\n",ch);
-    	            return;
-    	        }
-    	        
-                if ( autofly(ship)  )
-    	        {
-    	            send_to_char("&RYou'll have to turn off the ships autopilot first....\r\n",ch);
-    	            return;
-    	        }
-    	        
-                if  ( ship->ship_class == SPACE_STATION )
-                {
-                   send_to_char( "&RAnd what exactly are you going to calculate...?\r\n" , ch );
-                   return;
-                }   
-    	        if (ship->hyperspeed == 0)
-                {
-                  send_to_char("&RThis ship is not equipped with a hyperdrive!\r\n",ch);
-                  return;   
-                }
-                if (ship->shipstate == SHIP_DOCKED)
-    	        {
-    	            send_to_char("&RYou can't do that until after you've launched!\r\n",ch);
-    	            return;
-    	        }
-    	        if (ship->starsystem == NULL)
-    	        {
-    	            send_to_char("&RYou can only do that in realspace.\r\n",ch);
-    	            return;
-    	        }
-    	        if (argument[0] == '\0')
-    	        {
-    	            send_to_char("&WFormat: Calculate <starsystem> <entry x> <entry y> <entry z>\r\n&wPossible destinations:\r\n",ch);
-    	            for ( starsystem = first_starsystem; starsystem; starsystem = starsystem->next )
-                    {
-                       set_char_color( AT_NOTE, ch );
-                       ch_printf(ch,"%s ----- ",starsystem->name);
-                       count++;
-                    }
-                    if ( !count )
-                    {
-                        send_to_char( "No Starsystems found.\r\n", ch );
-                    }
-                    return;
-    	        }
-             	chance = IS_NPC(ch) ? 100
-             		: (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
-                if ( number_percent( ) > chance )
-    		{
-	           send_to_char("&RYou cant seem to figure the charts out today.\r\n",ch);
-    	   	   return;	
-    	   	}
-
-    
-    ship->currjump = starsystem_from_name( arg1 );
-    ship->jump.x = atoi(arg2);
-    ship->jump.y = atoi(arg3);
-    ship->jump.z = atoi(argument);
-    
-    if ( ship->currjump == NULL )
+  if (  (ship = ship_from_pilotseat(ch->in_room))  == NULL )
     {
-        send_to_char( "&RYou can't seem to find that starsytem on your charts.\r\n", ch);
-        return;
+      send_to_char("&RYou must be in control of a ship to do that!\r\n",ch);
+      return;
     }
-    else
-    { 
-        SPACE_DATA * starsystem;
-      
-        starsystem = ship->currjump;
-           
-          if ( starsystem->star1 && strcmp(starsystem->star1,"") && 
-	       vector_distance( &ship->jump, &starsystem->star1_pos ) < 300 )
-	    {
-	      echo_to_cockpit( AT_RED, ship, "WARNING.. Jump coordinates too close to stellar object.");
-	      echo_to_cockpit( AT_RED, ship, "WARNING.. Hyperjump NOT set.");
-	      ship->currjump = NULL;
-	      return;
-	    }
-          else if ( starsystem->star2 && strcmp(starsystem->star2,"") && 
-		    vector_distance( &ship->jump, &starsystem->star2_pos ) < 300 )
-	    {
-	      echo_to_cockpit( AT_RED, ship, "WARNING.. Jump coordinates too close to stellar object.");
-	      echo_to_cockpit( AT_RED, ship, "WARNING.. Hyperjump NOT set.");
-	      ship->currjump = NULL;
-	      return;
-	    }
+                
+  if ( ship->ship_class > SPACE_STATION )
+    {
+      send_to_char("&RThis isn't a spacecraft!\r\n",ch);
+      return;
+    }
+    	        
+  if ( autofly(ship)  )
+    {
+      send_to_char("&RYou'll have to turn off the ships autopilot first....\r\n",ch);
+      return;
+    }
+    	        
+  if  ( ship->ship_class == SPACE_STATION )
+    {
+      send_to_char( "&RAnd what exactly are you going to calculate...?\r\n" , ch );
+      return;
+    }
 
-          for ( planet = starsystem->first_planet ; planet ; planet = planet->next_in_system )                 
-	    if( vector_distance( &ship->jump, &planet->pos ) < 300 )
-	      {
-		echo_to_cockpit( AT_RED, ship, "WARNING.. Jump coordinates too close to stellar object.");
-		echo_to_cockpit( AT_RED, ship, "WARNING.. Hyperjump NOT set.");
-		ship->currjump = NULL;
-		return;
-	      }
+  if (ship->hyperspeed == 0)
+    {
+      send_to_char("&RThis ship is not equipped with a hyperdrive!\r\n",ch);
+      return;   
+    }
+
+  if (ship->shipstate == SHIP_DOCKED)
+    {
+      send_to_char("&RYou can't do that until after you've launched!\r\n",ch);
+      return;
+    }
+
+  if (ship->starsystem == NULL)
+    {
+      send_to_char("&RYou can only do that in realspace.\r\n",ch);
+      return;
+    }
+
+  if (argument[0] == '\0')
+    {
+      send_to_char("&WFormat: Calculate <starsystem> <entry x> <entry y> <entry z>\r\n&wPossible destinations:\r\n",ch);
+      for ( starsystem = first_starsystem; starsystem; starsystem = starsystem->next )
+	{
+	  set_char_color( AT_NOTE, ch );
+	  ch_printf(ch,"%s ----- ",starsystem->name);
+	  count++;
+	}
+      if ( !count )
+	{
+	  send_to_char( "No Starsystems found.\r\n", ch );
+	}
+      return;
+    }
+  chance = IS_NPC(ch) ? 100
+    : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+  if ( number_percent( ) > chance )
+    {
+      send_to_char("&RYou cant seem to figure the charts out today.\r\n",ch);
+      return;	
+    }
+
+  ship->currjump = starsystem_from_name( arg1 );
+  ship->jump.x = atoi(arg2);
+  ship->jump.y = atoi(arg3);
+  ship->jump.z = atoi(argument);
+    
+  if ( ship->currjump == NULL )
+    {
+      send_to_char( "&RYou can't seem to find that starsytem on your charts.\r\n", ch);
+      return;
+    }
+  else
+    { 
+      SPACE_DATA * starsystem = ship->currjump;
+           
+      if ( starsystem->star1 && strcmp(starsystem->star1,"") && 
+	   vector_distance( &ship->jump, &starsystem->star1_pos ) < 300 )
+	{
+	  echo_to_cockpit( AT_RED, ship, "WARNING.. Jump coordinates too close to stellar object.");
+	  echo_to_cockpit( AT_RED, ship, "WARNING.. Hyperjump NOT set.");
+	  ship->currjump = NULL;
+	  return;
+	}
+      else if ( starsystem->star2 && strcmp(starsystem->star2,"") && 
+		vector_distance( &ship->jump, &starsystem->star2_pos ) < 300 )
+	{
+	  echo_to_cockpit( AT_RED, ship, "WARNING.. Jump coordinates too close to stellar object.");
+	  echo_to_cockpit( AT_RED, ship, "WARNING.. Hyperjump NOT set.");
+	  ship->currjump = NULL;
+	  return;
+	}
+      
+      for ( planet = starsystem->first_planet ; planet ; planet = planet->next_in_system )                 
+	if( vector_distance( &ship->jump, &planet->pos ) < 300 )
+	  {
+	    echo_to_cockpit( AT_RED, ship, "WARNING.. Jump coordinates too close to stellar object.");
+	    echo_to_cockpit( AT_RED, ship, "WARNING.. Hyperjump NOT set.");
+	    ship->currjump = NULL;
+	    return;
+	  }
                             
-	  vector_randomize( &ship->jump, -250, 250 );
+      vector_randomize( &ship->jump, -250, 250 );
     }
     
-    if ( ship->starsystem == ship->currjump )
-        ship->hyperdistance = number_range(0, 200);
-    else
-        ship->hyperdistance = number_range(500 , 1000);
-    
-    send_to_char( "&GHyperspace course set. Ready for the jump to lightspeed.\r\n", ch);
-    act( AT_PLAIN, "$n does some calculations using the ships computer.", ch,
-		        NULL, argument , TO_ROOM );
-	                
-    learn_from_success( ch, gsn_spacecraft );
-    	
-    	
-    WAIT_STATE( ch , 2*PULSE_VIOLENCE );	
+  if ( ship->starsystem == ship->currjump )
+    ship->hyperdistance = number_range(0, 200);
+  else
+    ship->hyperdistance = number_range(500 , 1000);
+  
+  send_to_char( "&GHyperspace course set. Ready for the jump to lightspeed.\r\n", ch);
+  act( AT_PLAIN, "$n does some calculations using the ships computer.", ch,
+       NULL, argument , TO_ROOM );
+
+  learn_from_success( ch, gsn_spacecraft );
+  WAIT_STATE( ch , 2*PULSE_VIOLENCE );	
 }
 
 void do_recharge(CHAR_DATA *ch, char *argument )

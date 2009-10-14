@@ -356,12 +356,12 @@ void do_note( CHAR_DATA *ch, char *arg_passed, bool IS_MAIL )
 {
     char buf[MAX_STRING_LENGTH];
     char arg[MAX_INPUT_LENGTH];
-    NOTE_DATA  *pnote;
-    BOARD_DATA *board;
-    int vnum;
-    int anum;
-    int first_list;
-    OBJ_DATA *paper, *tmpobj = NULL;
+    NOTE_DATA  *pnote = NULL;
+    BOARD_DATA *board = NULL;
+    int vnum = 0;
+    int anum = 0;
+    int first_list = 0;
+    OBJ_DATA *paper = NULL, *tmpobj = NULL;
     EXTRA_DESCR_DATA *ed = NULL;
     char notebuf[MAX_STRING_LENGTH];  
     char short_desc_buf[MAX_STRING_LENGTH];

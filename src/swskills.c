@@ -28,13 +28,13 @@ void do_makeblade( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
-    int level, chance, charge;
-    bool checktool, checkdura, checkbatt, checkoven; 
-    OBJ_DATA *obj;
-    OBJ_INDEX_DATA *pObjIndex;
-    int vnum;
-    AFFECT_DATA *paf;
-    AFFECT_DATA *paf2;
+    int level = 0, chance = 0, charge = 0;
+    bool checktool = FALSE, checkdura = FALSE, checkbatt = FALSE, checkoven = FALSE;
+    OBJ_DATA *obj = NULL;
+    OBJ_INDEX_DATA *pObjIndex = NULL;
+    int vnum = 0;
+    AFFECT_DATA *paf = NULL;
+    AFFECT_DATA *paf2 = NULL;
             
     strcpy( arg , argument );
     
@@ -781,11 +781,11 @@ void do_makejewelry( CHAR_DATA *ch, char *argument )
     char arg[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
-    int level, chance;
-    bool checktool, checkoven, checkmetal; 
-    OBJ_DATA *obj;
-    OBJ_DATA *metal;
-    int value, cost;
+    int level = 0, chance = 0;
+    bool checktool = FALSE, checkoven = FALSE, checkmetal = FALSE; 
+    OBJ_DATA *obj = NULL;
+    OBJ_DATA *metal = NULL;
+    int value = 0, cost = 0;
             
     argument = one_argument( argument, arg );
     strcpy ( arg2, argument);
@@ -958,11 +958,11 @@ void do_makearmor( CHAR_DATA *ch, char *argument )
     char arg[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
-    int level, chance;
-    bool checksew, checkfab; 
-    OBJ_DATA *obj;
-    OBJ_DATA *material;
-    int value;
+    int level = 0, chance = 0;
+    bool checksew = FALSE, checkfab = FALSE; 
+    OBJ_DATA *obj = NULL;
+    OBJ_DATA *material = NULL;
+    int value = 0;
             
     argument = one_argument( argument, arg );
     strcpy ( arg2, argument);
@@ -1117,11 +1117,11 @@ void do_makeshield( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
-    int chance;
-    bool checktool, checkbatt, checkcond, checkcirc, checkgems;
-    OBJ_DATA *obj;
-    OBJ_INDEX_DATA *pObjIndex;
-    int vnum, level, charge, gemtype;
+    int chance = 0;
+    bool checktool = FALSE, checkbatt = FALSE, checkcond = FALSE, checkcirc = FALSE, checkgems = FALSE;
+    OBJ_DATA *obj = NULL;
+    OBJ_INDEX_DATA *pObjIndex = NULL;
+    int vnum = 0, level = 0, charge = 0, gemtype = 0;
     
     strcpy( arg, argument );    
     
@@ -1317,11 +1317,11 @@ void do_makecontainer( CHAR_DATA *ch, char *argument )
     char arg[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
-    int level, chance;
-    bool checksew, checkfab; 
-    OBJ_DATA *obj;
-    OBJ_DATA *material;
-    int value;
+    int level = 0, chance = 0;
+    bool checksew = FALSE, checkfab = FALSE; 
+    OBJ_DATA *obj = NULL;
+    OBJ_DATA *material = NULL;
+    int value = 0;
             
     argument = one_argument( argument, arg );
     strcpy( arg2 , argument );
@@ -1923,15 +1923,15 @@ void do_first_aid( CHAR_DATA *ch, char *argument )
 
 void do_snipe( CHAR_DATA *ch, char *argument )
 {
-   OBJ_DATA        * wield;
+   OBJ_DATA        * wield = NULL;
    char              arg[MAX_INPUT_LENGTH];  
    char              arg2[MAX_INPUT_LENGTH];
-   short            dir, dist;
+   short            dir = 0, dist = 0;
    short            max_dist = 3;
-   EXIT_DATA       * pexit;
-   ROOM_INDEX_DATA * was_in_room;
-   ROOM_INDEX_DATA * to_room;
-   CHAR_DATA       * victim;
+   EXIT_DATA       * pexit = NULL;
+   ROOM_INDEX_DATA * was_in_room = NULL;
+   ROOM_INDEX_DATA * to_room = NULL;
+   CHAR_DATA       * victim = NULL;
    char              buf[MAX_STRING_LENGTH];
    bool              pfound = FALSE;
    
@@ -2499,10 +2499,10 @@ void do_propeganda ( CHAR_DATA *ch , char *argument )
 {
     char buf  [MAX_STRING_LENGTH];
     char arg1 [MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
-    PLANET_DATA *planet;
-    CLAN_DATA   *clan;
-    int percent;
+    CHAR_DATA *victim = NULL;
+    PLANET_DATA *planet = NULL;
+    CLAN_DATA   *clan = NULL;
+    int percent = 0;
     
    if ( IS_NPC(ch) || !ch->pcdata || !ch->pcdata->clan || !ch->in_room->area || !ch->in_room->area->planet )
    {

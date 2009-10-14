@@ -315,9 +315,9 @@ void save_clone( CHAR_DATA *ch )
  */
 void fwrite_char( CHAR_DATA *ch, FILE *fp )
 {
-    AFFECT_DATA *paf;
-    int sn, track;
-    SKILLTYPE *skill;
+    AFFECT_DATA *paf = NULL;
+    int sn = 0, track = 0;
+    SKILLTYPE *skill = NULL;
 
     fprintf( fp, "#%s\n", IS_NPC(ch) ? "MOB" : "PLAYER"		);
 
@@ -925,16 +925,16 @@ bool load_char_obj( DESCRIPTOR_DATA *d, const char *name, bool preload )
 void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
 {
     char buf[MAX_STRING_LENGTH];
-    const char *line;
-    const char *word;
-    int x1, x2, x3, x4, x5, x6, x7;
-    short killcnt;
-    bool fMatch;
-    time_t lastplayed;
-    int sn, extra;
+    const char *line = NULL;
+    const char *word = NULL;
+    int x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, x6 = 0, x7 = 0;
+    short killcnt = 0;
+    bool fMatch = FALSE;
+    time_t lastplayed = 0;
+    int sn = 0, extra = 0;
          
     file_ver = 0;
-    killcnt = 0;
+
     for ( ; ; )
     {
 	word   = feof( fp ) ? "End" : fread_word( fp );
@@ -1472,13 +1472,13 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
 
 void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 {
-    OBJ_DATA *obj;
-    const char *word;
-    int iNest;
-    bool fMatch;
-    bool fNest;
-    bool fVnum;
-    ROOM_INDEX_DATA *room;
+    OBJ_DATA *obj = NULL;
+    const char *word = NULL;
+    int iNest = 0;
+    bool fMatch = FALSE;
+    bool fNest = FALSE;
+    bool fVnum = FALSE;
+    ROOM_INDEX_DATA *room = NULL;
 
     CREATE( obj, OBJ_DATA, 1 );
     obj->count		= 1;
@@ -1504,8 +1504,8 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 	case 'A':
 	    if ( !str_cmp( word, "Affect" ) || !str_cmp( word, "AffectData" ) )
 	    {
-		AFFECT_DATA *paf;
-		int pafmod;
+		AFFECT_DATA *paf = NULL;
+		int pafmod = 0;
 
 		CREATE( paf, AFFECT_DATA, 1 );
 		if ( !str_cmp( word, "Affect" ) )
@@ -1514,9 +1514,8 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 		}
 		else
 		{
-		    int sn;
+		    int sn = skill_lookup( fread_word( fp ) );
 
-		    sn = skill_lookup( fread_word( fp ) );
 		    if ( sn < 0 )
 			bug( "Fread_obj: unknown skill.", 0 );
 		    else
@@ -1614,14 +1613,14 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 		    }
 		    else if ( iNest == 0 || rgObjNest[iNest] == NULL )
 		    {
-			int slot;
+			int slot = 0;
 			bool reslot = FALSE;
 
 			if ( file_ver > 1
 			&&   wear_loc > -1
 			&&   wear_loc < MAX_WEAR )
 			{
-			   int x;
+			   int x = 0;
 
 			   for ( x = 0; x < MAX_LAYERS; x++ )
 			      if ( !save_equipment[wear_loc][x] )
@@ -1687,11 +1686,9 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 
 	    if ( !str_cmp( word, "Spell" ) )
 	    {
-		int iValue;
-		int sn;
+		int iValue = fread_number( fp );
+		int sn     = skill_lookup( fread_word( fp ) );
 
-		iValue = fread_number( fp );
-		sn     = skill_lookup( fread_word( fp ) );
 		if ( iValue < 0 || iValue > 5 )
 		    bug( "Fread_obj: bad iValue %d.", iValue );
 		else if ( sn < 0 )
@@ -1711,10 +1708,9 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 	case 'V':
 	    if ( !str_cmp( word, "Values" ) )
 	    {
-		int x1,x2,x3,x4,x5,x6;
+		int x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0, x6 = 0;
 		char *ln = fread_line( fp );
 
-		x1=x2=x3=x4=x5=x6=0;
 		sscanf( ln, "%d %d %d %d %d %d", &x1, &x2, &x3, &x4, &x5, &x6 );
 		/* clean up some garbage */
 		if ( file_ver < 3 )
@@ -1732,9 +1728,7 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 
 	    if ( !str_cmp( word, "Vnum" ) )
 	    {
-		int vnum;
-
-		vnum = fread_number( fp );
+		int vnum = fread_number( fp );
 		if ( ( obj->pIndexData = get_obj_index( vnum ) ) == NULL )
 		{
 		    fVnum = FALSE;
@@ -1764,8 +1758,8 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 
 	if ( !fMatch )
 	{
-	    EXTRA_DESCR_DATA *ed;
-	    AFFECT_DATA *paf;
+	    EXTRA_DESCR_DATA *ed = NULL;
+	    AFFECT_DATA *paf = NULL;
 
 	    bug( "Fread_obj: no match.", 0 );
 	    bug( word, 0 );
