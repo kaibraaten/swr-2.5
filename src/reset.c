@@ -4,6 +4,7 @@
 #include <string.h>
 #include <time.h>
 #include "mud.h"
+#include "vector3_aux.h"
 
 extern ROOM_INDEX_DATA *       room_index_hash         [MAX_KEY_HASH];
 
@@ -1193,129 +1194,97 @@ void reset_all( )
 
 SHIP_DATA * make_mob_ship( PLANET_DATA *planet , int model )
 {
-    SHIP_DATA *ship;
-    int shipreg = 0;
-    int dIndex = 0;
-    char filename[10];
-    char shipname[MAX_STRING_LENGTH];
+  SHIP_DATA *ship;
+  int shipreg = 0;
+  char filename[10];
+  char shipname[MAX_STRING_LENGTH];
     
-    if ( !planet || !planet->governed_by || !planet->starsystem )
-       return NULL;
+  if ( !planet || !planet->governed_by || !planet->starsystem )
+    return NULL;
        
-    /* mobships are given filenames < 0 and are not saved */   
+  /* mobships are given filenames < 0 and are not saved */   
        
-    for ( ship = first_ship ; ship ; ship = ship->next )
-        if ( shipreg > atoi( ship->filename ) )
-             shipreg = atoi( ship->filename );
+  for ( ship = first_ship ; ship ; ship = ship->next )
+    if ( shipreg > atoi( ship->filename ) )
+      shipreg = atoi( ship->filename );
 
-    shipreg--;
-    sprintf( filename , "%d" , shipreg );
+  shipreg--;
+  sprintf( filename , "%d" , shipreg );
     
-    CREATE( ship, SHIP_DATA, 1 );
-    LINK( ship, first_ship, last_ship, next, prev );
+  ship = ship_create();
+  LINK( ship, first_ship, last_ship, next, prev );
     
-    ship->filename = str_dup( filename ) ;
+  ship->filename = str_dup( filename ) ;
     
-    ship->next_in_starsystem = NULL;
-    ship->prev_in_starsystem =NULL;
-    ship->next_in_room = NULL;
-    ship->prev_in_room = NULL;
-    ship->first_turret = NULL;
-    ship->last_turret = NULL;
-    ship->first_hanger = NULL;
-    ship->last_hanger = NULL;
-    ship->in_room = NULL;
-    ship->starsystem = NULL;
-    ship->home = STRALLOC( planet->starsystem->name );
-    for ( dIndex = 0 ; dIndex < MAX_SHIP_ROOMS ; dIndex++ )
-       ship->description[dIndex] = NULL;
-    ship->owner = STRALLOC( planet->governed_by->name );
-    ship->pilot = STRALLOC("");
-    ship->copilot = STRALLOC("");
-    ship->dest = NULL;
-    ship->type = MOB_SHIP;
-    ship->ship_class = 0;
-    ship->model = model;
-    ship->hyperspeed = 0;
-    ship->laserstate = LASER_READY;
-    ship->missilestate = MISSILE_READY;
-    ship->tractorbeam = 2;
-    ship->hatchopen = FALSE;
-    ship->autotrack = FALSE;
-    ship->autospeed = FALSE;
-    ship->location = 0;
-    ship->lastdoc = 0;
-    ship->shipyard = 0;
-    ship->collision = 0;
-    ship->target = NULL;
-    ship->currjump = NULL;
-    ship->chaff = 0;
-    ship->maxchaff = 0;
-    ship->chaff_released = FALSE;
+  ship->home = STRALLOC( planet->starsystem->name );
+  ship->owner = STRALLOC( planet->governed_by->name );
+  ship->pilot = STRALLOC("");
+  ship->copilot = STRALLOC("");
+  ship->type = MOB_SHIP;
+  ship->model = model;
+  ship->tractorbeam = 2;
 
-    switch( ship->model )
+  switch( ship->model )
     {
     case MOB_BATTLESHIP:
-       ship->realspeed = 25;
-       ship->maxmissiles = 50;
-       ship->lasers = 10;
-       ship->maxenergy = 30000;
-       ship->maxshield = 1000;
-       ship->maxhull = 30000;
-       ship->manuever = 25;
-       sprintf( shipname , "Battlecruiser m%d (%s)" , 0-shipreg , planet->governed_by->name );
-       break;
+      ship->realspeed = 25;
+      ship->maxmissiles = 50;
+      ship->lasers = 10;
+      ship->maxenergy = 30000;
+      ship->maxshield = 1000;
+      ship->maxhull = 30000;
+      ship->manuever = 25;
+      sprintf( shipname , "Battlecruiser m%d (%s)" , 0-shipreg , planet->governed_by->name );
+      break;
 
     case MOB_CRUISER:
-       ship->realspeed = 50;
-       ship->maxmissiles = 30;
-       ship->lasers = 8;
-       ship->maxenergy = 15000;
-       ship->maxshield = 350;
-       ship->maxhull = 10000;
-       ship->manuever = 50;
-       sprintf( shipname , "Cruiser m%d (%s)" , 0-shipreg , planet->governed_by->name );
-       break;
+      ship->realspeed = 50;
+      ship->maxmissiles = 30;
+      ship->lasers = 8;
+      ship->maxenergy = 15000;
+      ship->maxshield = 350;
+      ship->maxhull = 10000;
+      ship->manuever = 50;
+      sprintf( shipname , "Cruiser m%d (%s)" , 0-shipreg , planet->governed_by->name );
+      break;
 
     case MOB_DESTROYER:
-       ship->realspeed = 100;
-       ship->maxmissiles = 20;
-       ship->lasers = 6;
-       ship->maxenergy = 7500;
-       ship->maxshield = 200;
-       ship->maxhull = 2000;
-       ship->manuever = 100;
-       ship->hyperspeed = 100;
-       sprintf( shipname , "Corvette m%d (%s)" , 0-shipreg , planet->governed_by->name );
-       break;
+      ship->realspeed = 100;
+      ship->maxmissiles = 20;
+      ship->lasers = 6;
+      ship->maxenergy = 7500;
+      ship->maxshield = 200;
+      ship->maxhull = 2000;
+      ship->manuever = 100;
+      ship->hyperspeed = 100;
+      sprintf( shipname , "Corvette m%d (%s)" , 0-shipreg , planet->governed_by->name );
+      break;
 
     default:
-       ship->realspeed = 255;
-       ship->maxmissiles = 0;
-       ship->lasers = 2;
-       ship->maxenergy = 2500;
-       ship->maxshield = 0;
-       ship->maxhull = 100;
-       ship->manuever = 100;
-       sprintf( shipname , "Patrol Starfighter m%d (%s)" , 0-shipreg , planet->governed_by->name );
-       break;
+      ship->realspeed = 255;
+      ship->maxmissiles = 0;
+      ship->lasers = 2;
+      ship->maxenergy = 2500;
+      ship->maxshield = 0;
+      ship->maxhull = 100;
+      ship->manuever = 100;
+      sprintf( shipname , "Patrol Starfighter m%d (%s)" , 0-shipreg , planet->governed_by->name );
+      break;
     }
     
-    ship->name = STRALLOC( shipname );
-    ship->hull = ship->maxhull;
-    ship->missiles = ship->maxmissiles;
-    ship->energy = ship->maxenergy;
-    ship->shield = 0;
+  ship->name = STRALLOC( shipname );
+  ship->hull = ship->maxhull;
+  ship->missiles = ship->maxmissiles;
+  ship->energy = ship->maxenergy;
+  ship->shield = 0;
 
-    ship_to_starsystem(ship, starsystem_from_name(ship->home) );  
-    vector_copy( &ship->pos, &planet->pos );
-    ship->pos.x += number_range( -2000 , 2000 );
-    ship->pos.y += number_range( -2000 , 2000 );
-    ship->pos.z += number_range( -2000 , 2000 );
-    ship->shipstate = SHIP_READY;
-    ship->autopilot = TRUE;
-    ship->autorecharge = TRUE;
-    ship->shield = ship->maxshield;
-    
-    return ship;
+  ship_to_starsystem(ship, starsystem_from_name(ship->home) );  
+  vector_copy( &ship->pos, &planet->pos );
+  vector_randomize( &ship->pos, -2000, 2000 );
+  ship->shipstate = SHIP_READY;
+  ship->autopilot = TRUE;
+  ship->autorecharge = TRUE;
+  ship->shield = ship->maxshield;
+
+  return ship;
 }
