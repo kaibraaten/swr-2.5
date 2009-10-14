@@ -7,7 +7,7 @@
 #include "mud.h"
 
 
-char *	const	where_name	[] =
+const char *	const	where_name	[] =
 {
     "<used as light>     ",
     "<worn on finger>    ",
@@ -79,7 +79,7 @@ char *format_obj_to_char( OBJ_DATA *obj, CHAR_DATA *ch, bool fShort )
 /*
  * Some increasingly freaky halucinated objects		-Thoric
  */
-char *halucinated_object( int ms, bool fShort )
+const char *halucinated_object( int ms, bool fShort )
 {
     int sms = URANGE( 1, (ms+10)/5, 20 );
 
@@ -663,7 +663,7 @@ bool check_blind( CHAR_DATA *ch )
 /*
  * Returns classical DIKU door direction based on text in arg	-Thoric
  */
-int get_door( char *arg )
+int get_door( const char *arg )
 {
     int door;
 
@@ -767,7 +767,7 @@ void do_look
  
 	
 	if ( !IS_NPC(ch) && IS_SET(ch->act, PLR_AUTOEXIT) )
-	        do_exits( ch, "" );
+	  do_exits( ch, const_char_to_nonconst( "" ) );
 
 	show_ships_to_char( ch->in_room->first_ship, ch );
 	show_list_to_char( ch->in_room->first_content, ch, FALSE, FALSE );
@@ -814,7 +814,7 @@ void do_look
 	            original = ch->in_room;
                     char_from_room( ch );
                     char_to_room( ch, to_room );
-                    do_glance( ch, "" );	
+                    do_glance( ch, const_char_to_nonconst( "" ) );	
                     char_from_room( ch );
                     char_to_room( ch, original );
                   }    
@@ -968,7 +968,7 @@ void do_look
         original = ch->in_room;
            char_from_room( ch );
            char_to_room( ch, pexit->to_room );
-        do_look( ch, "auto" );
+	   do_look( ch, const_char_to_nonconst( "auto" ) );
         do_scan( ch, arg1 );
         char_from_room( ch );
         char_to_room( ch, original );
@@ -1157,7 +1157,7 @@ void do_glance( CHAR_DATA *ch, char *argument )
   {
     save_act = ch->act;
     SET_BIT( ch->act, PLR_BRIEF );
-    do_look( ch, "auto" );
+    do_look( ch, const_char_to_nonconst( "auto" ) );
     ch->act = save_act;
     return;
   }
@@ -1466,13 +1466,13 @@ void do_exits( CHAR_DATA *ch, char *argument )
     return;
 }
 
-char *	const	day_name	[] =
+const char *	const	day_name	[] =
 {
     "the Moon", "the Bull", "Deception", "Thunder", "Freedom",
     "the Great Gods", "the Sun"
 };
 
-char *	const	month_name	[] =
+const char *	const	month_name	[] =
 {
     "Winter", "the Winter Wolf", "the Frost Giant", "the Old Forces",
     "the Grand Struggle", "the Spring", "Nature", "Futility", "the Dragon",
@@ -1484,7 +1484,7 @@ void do_time( CHAR_DATA *ch, char *argument )
 {
     extern char str_boot_time[];
     extern char reboot_time[];
-    char *suf;
+    const char *suf;
     int day;
 
     day     = time_info.day + 1;
@@ -1519,28 +1519,28 @@ void do_time( CHAR_DATA *ch, char *argument )
 
 void do_weather( CHAR_DATA *ch, char *argument )
 {
-    static char * const sky_look[4] =
+  static const char * const sky_look[4] =
     {
-	"cloudless",
-	"cloudy",
-	"rainy",
-	"lit by flashes of lightning"
+      "cloudless",
+      "cloudy",
+      "rainy",
+      "lit by flashes of lightning"
     };
 
-    if ( !IS_OUTSIDE(ch) )
+  if ( !IS_OUTSIDE(ch) )
     {
-	send_to_char( "You can't see the sky from here.\n\r", ch );
-	return;
+      send_to_char( "You can't see the sky from here.\n\r", ch );
+      return;
     }
 
-    set_char_color( AT_BLUE, ch );
-    ch_printf( ch, "The sky is %s and %s.\n\r",
-	sky_look[weather_info.sky],
-	weather_info.change >= 0
-	? "a warm southerly breeze blows"
-	: "a cold northern gust blows"
-	);
-    return;
+  set_char_color( AT_BLUE, ch );
+  ch_printf( ch, "The sky is %s and %s.\n\r",
+	     sky_look[weather_info.sky],
+	     weather_info.change >= 0
+	     ? "a warm southerly breeze blows"
+	     : "a cold northern gust blows"
+	     );
+  return;
 }
 
 
@@ -1557,7 +1557,7 @@ HELP_DATA *get_help( CHAR_DATA *ch, char *argument )
     int lev;
 
     if ( argument[0] == '\0' )
-	argument = "summary";
+      argument = const_char_to_nonconst( "summary" );
 
     if ( isdigit(argument[0]) )
     {
@@ -1680,16 +1680,17 @@ void do_hedit( CHAR_DATA *ch, char *argument )
 /*
  * Stupid leading space muncher fix				-Thoric
  */
-char *help_fix( char *text )
+const char *help_fix( char *text )
 {
-    char *fixed;
+  if ( !text )
+    return "";
 
-    if ( !text )
-      return "";
-    fixed = strip_cr(text);
-    if ( fixed[0] == ' ' )
-      fixed[0] = '.';
-    return fixed;
+  char *fixed = strip_cr(text);
+
+  if ( fixed[0] == ' ' )
+    fixed[0] = '.';
+
+  return fixed;
 }
 
 void do_hset( CHAR_DATA *ch, char *argument )
@@ -1767,7 +1768,7 @@ void do_hset( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    do_hset( ch, "" );
+    do_hset( ch, const_char_to_nonconst( "" ) );
 }
 
 /*
@@ -2081,7 +2082,7 @@ void do_compare( CHAR_DATA *ch, char *argument )
     OBJ_DATA *obj2;
     int value1;
     int value2;
-    char *msg;
+    const char *msg;
 
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
@@ -2231,7 +2232,7 @@ void do_consider( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
     CHAR_DATA *victim;
-    char *msg;
+    const char *msg;
     int diff;
 
     one_argument( argument, arg );
@@ -3028,7 +3029,7 @@ void do_config( CHAR_DATA *ch, char *argument )
 
 void do_credits( CHAR_DATA *ch, char *argument )
 {
-  do_help( ch, "credits" );
+  do_help( ch, const_char_to_nonconst( "credits" ) );
 }
 
 
@@ -3206,9 +3207,9 @@ void do_pager( CHAR_DATA *ch, char *argument )
   if ( !*arg )
   {
     if ( IS_SET(ch->pcdata->flags, PCFLAG_PAGERON) )
-      do_config(ch, "-pager");
+      do_config(ch, const_char_to_nonconst( "-pager" ) );
     else
-      do_config(ch, "+pager");
+      do_config(ch, const_char_to_nonconst( "+pager") );
     return;
   }
   if ( !is_number(arg) )

@@ -4,28 +4,28 @@
 #include <time.h>
 #include "mud.h"
 
-char * const spell_flag[] =
+const char * const spell_flag[] =
 { "water", "earth", "air", "astral", "area", "distant", "reverse",
 "save_half_dam", "save_negates", "accumulative", "recastable", "noscribe",
 "nobrew", "group", "object", "character", "secretskill", "pksensitive" };
 
-char * const spell_saves[] =
+const char * const spell_saves[] =
 { "none", "poison_death", "wands", "para_petri", "breath", "spell_staff" };
 
-char * const spell_damage[] =
+const char * const spell_damage[] =
 { "none", "fire", "cold", "electricity", "energy", "acid", "poison", "drain" };
 
-char * const spell_action[] =
+const char * const spell_action[] =
 { "none", "create", "destroy", "resist", "suscept", "divinate", "obscure",
 "change" };
 
-char * const spell_power[] =
+const char * const spell_power[] =
 { "none", "minor", "greater", "major" };
 
-char * const spell_class[] =
+const char * const spell_class[] =
 { "none", "lunar", "solar", "travel", "summon", "life", "death", "illusion" };
 
-char * const target_type[] =
+const char * const target_type[] =
 { "ignore", "offensive", "defensive", "self", "objinv" };
 
 
@@ -128,7 +128,7 @@ bool is_legal_kill(CHAR_DATA *ch, CHAR_DATA *vch)
 }
 
 
-extern char *target_name;	/* from magic.c */
+extern const char *target_name;	/* from magic.c */
 
 /*
  * Perform a binary search on a section of the skill table
@@ -1007,7 +1007,7 @@ void do_sset( CHAR_DATA *ch, char *argument )
 	    send_to_char( "Ok.\n\r", ch );
 	    return;
 	}
-	do_sset( ch, "" );
+	do_sset( ch, const_char_to_nonconst("") );
 	return;
     }
 
@@ -2016,7 +2016,7 @@ void do_recall( CHAR_DATA *ch, char *argument )
 	char_to_room( ch->mount, location );
     }
     act( AT_ACTION, "$n appears in a swirl of the Force.", ch, NULL, NULL, TO_ROOM );
-    do_look( ch, "auto" );
+    do_look( ch, const_char_to_nonconst("auto") );
 
     return;
 }

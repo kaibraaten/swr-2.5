@@ -8,7 +8,7 @@
 /*
  *  Locals
  */
-char *tiny_affect_loc_name(int location);
+const char *tiny_affect_loc_name(int location);
 
 void do_gold(CHAR_DATA * ch, char *argument)
 {
@@ -20,7 +20,7 @@ void do_gold(CHAR_DATA * ch, char *argument)
 void do_score(CHAR_DATA * ch, char *argument)
 {
     if ( IS_NPC(ch) || !ch->pcdata )
-       do_oldscore(ch, "");
+      do_oldscore(ch, const_char_to_nonconst(""));
     
     if ( IS_AFFECTED(ch, AFF_POSSESS) )
     {   
@@ -292,8 +292,7 @@ void do_score(CHAR_DATA * ch, char *argument)
 /*
  * Return ascii name of an affect location.
  */
-char           *
-tiny_affect_loc_name(int location)
+const char *tiny_affect_loc_name(int location)
 {
   switch (location)
     {

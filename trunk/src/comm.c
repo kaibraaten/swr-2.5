@@ -66,7 +66,7 @@ void	game_loop		args( ( ) );
 int	init_socket		args( ( int port ) );
 void	new_descriptor		args( ( int new_desc ) );
 bool	read_from_descriptor	args( ( DESCRIPTOR_DATA *d ) );
-bool	write_to_descriptor	args( ( int desc, char *txt, int length ) );
+bool	write_to_descriptor	args( ( int desc, const char *txt, int length ) );
 
 
 /*
@@ -783,7 +783,7 @@ void close_socket( DESCRIPTOR_DATA *dclose, bool force )
     if ( dclose->original )
     {
 	if ( ( ch = dclose->character ) != NULL )
-	  do_return(ch, "");
+	  do_return(ch, const_char_to_nonconst(""));
 	else
 	{
 	  bug( "Close_socket: dclose->original without character %s",
@@ -1211,7 +1211,7 @@ void write_to_buffer( DESCRIPTOR_DATA *d, const char *txt, int length )
  * If this gives errors on very long blocks (like 'ofind all'),
  *   try lowering the max block size.
  */
-bool write_to_descriptor( int desc, char *txt, int length )
+bool write_to_descriptor( int desc, const char *txt, int length )
 {
     int iStart;
     int nWrite;
@@ -1257,13 +1257,13 @@ void show_title( DESCRIPTOR_DATA *d )
  */
 bool check_parse_name( const char *name )
 {
+  static const char * const illegal_names = "all auto someone immortal self god supreme demigod dog guard cityguard cat cornholio spock hicaine hithoric death ass fuck shit piss crap quit luke darth vader skywalker han solo liea leia emporer palpatine chewie chewbacca lando anakin boba fett obiwan kenobi durga";
+
     /*
      * Reserved words.
      */
-    if ( is_name( name, "all auto someone immortal self god supreme demigod dog guard cityguard cat cornholio spock hicaine hithoric death ass fuck shit piss crap quit" ) )
-	return FALSE;
-    if ( is_name( name, "luke darth vader skywalker han solo liea leia emporer palpatine chewie chewbacca lando anakin boba fett obiwan kenobi durga" ) )
-	return FALSE;
+  if ( is_name( name, const_char_to_nonconst( illegal_names ) ) )
+    return FALSE;
 
     /*
      * Length restrictions.
@@ -1444,7 +1444,7 @@ bool check_playing( DESCRIPTOR_DATA *d, const char *name, bool kick )
 	    ch->desc	 = d;
 	    ch->timer	 = 0;
 	    if ( ch->switched )
-	      do_return( ch->switched, "" );
+	      do_return( ch->switched, const_char_to_nonconst("") );
 	    ch->switched = NULL;
 	    send_to_char( "Reconnecting.\n\r", ch );
 	    act( AT_ACTION, "$n has reconnected, kicking off old link.",
@@ -1694,7 +1694,7 @@ void set_pager_color( short AType, CHAR_DATA *ch )
 
 
 /* source: EOD, by John Booth <???> */
-void ch_printf(CHAR_DATA *ch, char *fmt, ...)
+void ch_printf(CHAR_DATA *ch, const char *fmt, ...)
 {
     char buf[MAX_STRING_LENGTH*2];	/* better safe than sorry */
     va_list args;
@@ -1706,7 +1706,7 @@ void ch_printf(CHAR_DATA *ch, char *fmt, ...)
     send_to_char(buf, ch);
 }
 
-void pager_printf(CHAR_DATA *ch, char *fmt, ...)
+void pager_printf(CHAR_DATA *ch, const char *fmt, ...)
 {
     char buf[MAX_STRING_LENGTH*2];
     va_list args;
@@ -1740,9 +1740,9 @@ char *obj_short( OBJ_DATA *obj )
 char *act_string(const char *format, CHAR_DATA *to, CHAR_DATA *ch,
 		 const void *arg1, const void *arg2)
 {
-  static char * const he_she  [] = { "it",  "he",  "she" };
-  static char * const him_her [] = { "it",  "him", "her" };
-  static char * const his_her [] = { "its", "his", "her" };
+  static const char * const he_she  [] = { "it",  "he",  "she" };
+  static const char * const him_her [] = { "it",  "him", "her" };
+  static const char * const his_her [] = { "its", "his", "her" };
   static char buf[MAX_STRING_LENGTH];
   char fname[MAX_INPUT_LENGTH];
   char *point = buf;
@@ -2324,4 +2324,11 @@ bool pager_output( DESCRIPTOR_DATA *d )
       ret = write_to_descriptor( d->descriptor, buf, 0 );
   }
   return ret;
+}
+
+char *const_char_to_nonconst( const char *argument )
+{
+  static char buf[MAX_STRING_LENGTH];
+  sprintf( buf, "%s", argument );
+  return buf;
 }

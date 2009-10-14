@@ -273,7 +273,7 @@ void do_noteroom( CHAR_DATA *ch, char *argument )
     switch( ch->substate )
     {
 	case SUB_WRITING_NOTE:
-	do_note(ch, arg_passed, FALSE);
+	  do_note(ch, arg_passed, FALSE);
  	break;
 
 	default:
@@ -683,7 +683,7 @@ void do_note( CHAR_DATA *ch, char *arg_passed, bool IS_MAIL )
 	    write_board( board );
 	    return;
 	}  
-	do_note( ch, "", FALSE );
+	do_note( ch, const_char_to_nonconst( "" ), FALSE );
     }
     if ( !str_cmp( arg, "write" ) )
     {
@@ -810,7 +810,9 @@ void do_note( CHAR_DATA *ch, char *arg_passed, bool IS_MAIL )
 
     if ( !str_cmp( arg, "show" ) )
     {
-	char *subject, *to_list, *text;
+      const char *subject;
+      const char *to_list;
+      const char *text;
 
 	if ( ( paper = get_eq_char(ch, WEAR_HOLD) ) == NULL
 	||     paper->item_type != ITEM_PAPER )
@@ -1059,7 +1061,7 @@ void do_note( CHAR_DATA *ch, char *arg_passed, bool IS_MAIL )
 BOARD_DATA *read_board( char *boardfile, FILE *fp )
 {
     BOARD_DATA *board;
-    char *word;
+    const char *word;
     char  buf[MAX_STRING_LENGTH];
     bool fMatch;
     char letter;
@@ -1477,7 +1479,7 @@ void do_bset( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    do_bset( ch, "" );
+    do_bset( ch, const_char_to_nonconst( "" ) );
     return;
 }
 

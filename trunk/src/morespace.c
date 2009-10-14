@@ -34,11 +34,11 @@ const	struct	model_type	model	[MAX_SHIP_MODEL+1] =
 
 /* local routines */
 void	fread_ship_prototype	args( ( SHIP_PROTOTYPE *ship, FILE *fp ) );
-bool	load_ship_prototype	args( ( char *shipfile ) );
+bool	load_ship_prototype	args( ( const char *shipfile ) );
 void	write_prototype_list	args( ( void ) );
 void	write_ship_list	args( ( void ) );
 void    bridge_rooms( ROOM_INDEX_DATA *rfrom , ROOM_INDEX_DATA *rto , int edir );
-void    bridge_elevator( ROOM_INDEX_DATA *rfrom , ROOM_INDEX_DATA *rto , int edir , char * exname );
+void    bridge_elevator( ROOM_INDEX_DATA *rfrom , ROOM_INDEX_DATA *rto , int edir , const char * exname );
 void 	post_ship_guard( ROOM_INDEX_DATA * pRoomIndex );
 void    make_cockpit( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
 void    make_turret( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
@@ -189,19 +189,19 @@ void write_prototype_list( )
     fclose( fpout );
 }
                                                                     
-SHIP_PROTOTYPE *get_ship_prototype( char *name )
+SHIP_PROTOTYPE *get_ship_prototype( const char *name )
 {
-    SHIP_PROTOTYPE *prototype;
+  SHIP_PROTOTYPE *prototype;
     
-    for ( prototype = first_ship_prototype; prototype; prototype = prototype->next )
-       if ( !str_cmp( name, prototype->name ) )
-         return prototype;
+  for ( prototype = first_ship_prototype; prototype; prototype = prototype->next )
+    if ( !str_cmp( name, prototype->name ) )
+      return prototype;
     
-    for ( prototype = first_ship_prototype; prototype; prototype = prototype->next )
-       if ( nifty_is_name_prefix( name, prototype->name ) )
-         return prototype;
+  for ( prototype = first_ship_prototype; prototype; prototype = prototype->next )
+    if ( nifty_is_name_prefix( const_char_to_nonconst(name), prototype->name ) )
+      return prototype;
     
-    return NULL;
+  return NULL;
 }
 
 void save_ship_prototype( SHIP_PROTOTYPE *prototype )
@@ -277,7 +277,7 @@ void save_ship_prototype( SHIP_PROTOTYPE *prototype )
 void fread_ship_prototype( SHIP_PROTOTYPE *prototype, FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
-    char *word;
+    const char *word;
     bool fMatch;
 
  
@@ -361,7 +361,7 @@ void fread_ship_prototype( SHIP_PROTOTYPE *prototype, FILE *fp )
  * Load a prototype file
  */
 
-bool load_ship_prototype( char *prototypefile )
+bool load_ship_prototype( const char *prototypefile )
 {
     char filename[256];
     SHIP_PROTOTYPE *prototype;
@@ -431,7 +431,7 @@ bool load_ship_prototype( char *prototypefile )
 void load_prototypes( )
 {
     FILE *fpList;
-    char *filename;
+    const char *filename;
     char prototypelist[256];
     char buf[MAX_STRING_LENGTH];
     
@@ -647,7 +647,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
 	return;
     }
  
-    do_setprototype( ch, "" );
+    do_setprototype( ch, const_char_to_nonconst("") );
     return;
 }
 
@@ -1144,20 +1144,20 @@ void bridge_rooms( ROOM_INDEX_DATA *rfrom , ROOM_INDEX_DATA *rto , int edir )
 	         xit->exit_info		= 0;
 }
 
-void bridge_elevator( ROOM_INDEX_DATA *rfrom , ROOM_INDEX_DATA *rto , int edir , char * exname )
+void bridge_elevator( ROOM_INDEX_DATA *rfrom , ROOM_INDEX_DATA *rto , int edir , const char * exname )
 {
-    EXIT_DATA *xit;
+  EXIT_DATA *xit;
 
-                 xit = make_exit( rfrom, rto, edir );
-	         xit->keyword		= STRALLOC( "" );
-	         xit->description	= STRALLOC( "" );
-	         xit->key		= -1;
-	         xit->exit_info		= 0;
-                 xit = make_exit( rto , rfrom  , DIR_SOMEWHERE );
-	         xit->keyword		= STRALLOC( exname );
-	         xit->description	= STRALLOC( "" );
-	         xit->key		= -1;
-	         xit->exit_info		= 526336;
+  xit = make_exit( rfrom, rto, edir );
+  xit->keyword		= STRALLOC( "" );
+  xit->description	= STRALLOC( "" );
+  xit->key		= -1;
+  xit->exit_info		= 0;
+  xit = make_exit( rto , rfrom  , DIR_SOMEWHERE );
+  xit->keyword		= STRALLOC( exname );
+  xit->description	= STRALLOC( "" );
+  xit->key		= -1;
+  xit->exit_info		= 526336;
 }
 
 void make_cockpit( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
@@ -1520,8 +1520,8 @@ void do_designship( CHAR_DATA * ch , char * argument )
       }
       else
       {
-          do_designship ( ch , "" );
-          return;
+	do_designship ( ch , const_char_to_nonconst("") );
+	return;
       }
     }
     
@@ -1539,7 +1539,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
     
         if ( smodel < 0 )
         {
-          do_designship ( ch , "" );
+          do_designship ( ch , const_char_to_nonconst("") );
           return;
         }    
     }
@@ -1788,7 +1788,7 @@ void post_ship_guard( ROOM_INDEX_DATA * pRoomIndex )
                  obj_to_char( blaster, mob );
                  equip_char( mob, blaster, WEAR_WIELD );                        
             } 
-            do_setblaster( mob , "full" );
+            do_setblaster( mob , const_char_to_nonconst("full") );
 
             if ( room_is_dark(pRoomIndex) )
                    SET_BIT(mob->affected_by, AFF_INFRARED);

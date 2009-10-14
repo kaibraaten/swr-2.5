@@ -21,9 +21,9 @@ int top_sn;
 
 SKILLTYPE *		skill_table	[MAX_SKILL];
 
-char * const skill_tname[] = { "unknown", "Spell", "Skill", "Weapon" };
+const char * const skill_tname[] = { "unknown", "Spell", "Skill", "Weapon" };
 
-SPELL_FUN *spell_function( char *name )
+SPELL_FUN *spell_function( const char *name )
 {
     if ( !str_cmp( name, "spell_smaug" ))	     return spell_smaug;
     if ( !str_cmp( name, "spell_blindness" ))	     return spell_blindness;
@@ -40,7 +40,7 @@ SPELL_FUN *spell_function( char *name )
     return spell_notfound;
 }
 
-DO_FUN *skill_function( char *name )
+DO_FUN *skill_function( const char *name )
 {
     switch( name[3] )
     {
@@ -486,7 +486,7 @@ DO_FUN *skill_function( char *name )
     return skill_notfound;
 }
 
-char *spell_name( SPELL_FUN *spell )
+const char *spell_name( SPELL_FUN *spell )
 {
     if ( spell == spell_smaug )		    return "spell_smaug";
     if ( spell == spell_blindness )	    return "spell_blindness";
@@ -501,7 +501,7 @@ char *spell_name( SPELL_FUN *spell )
     return "reserved";
 }
 
-char *skill_name( DO_FUN *skill )
+const char *skill_name( DO_FUN *skill )
 {   
     if ( skill == do_arrest )     return "do_arrest";
     if ( skill == do_war )     return "do_war";
@@ -1084,7 +1084,7 @@ void save_socials()
     fclose( fpout );
 }
 
-int get_skill( char *skilltype )
+int get_skill( const char *skilltype )
 {
     if ( !str_cmp( skilltype, "Spell" ) )
       return SKILL_SPELL;
@@ -1136,7 +1136,7 @@ void save_commands()
 SKILLTYPE *fread_skill( FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
-    char *word;
+    const char *word;
     bool fMatch;
     SKILLTYPE *skill;
 
@@ -1333,7 +1333,7 @@ void load_skill_table()
 void fread_social( FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
-    char *word;
+    const char *word;
     bool fMatch;
     SOCIALTYPE *social;
 
@@ -1452,7 +1452,7 @@ void load_socials()
 void fread_command( FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
-    char *word;
+    const char *word;
     bool fMatch;
     CMDTYPE *command;
 

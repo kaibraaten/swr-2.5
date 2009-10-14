@@ -11,7 +11,7 @@ const	short	movement_loss	[SECT_MAX]	=
     1, 2, 2, 3, 4, 6, 4, 1, 6, 10, 6, 5, 7, 4, 6, 4, 2, 3, 6, 3, 3, 5, 4, 3, 2, 3, 7
 };
 
-char *	const	dir_name	[]		=
+const char *	const	dir_name	[]		=
 {
     "north", "east", "south", "west", "up", "down",
     "northeast", "northwest", "southeast", "southwest", "somewhere"
@@ -26,7 +26,7 @@ const	short	rev_dir		[]		=
 
 
 
-char *	const		sect_names[SECT_MAX][2] =
+const char *	const		sect_names[SECT_MAX][2] =
 {
     { "In a room","inside"	},	{ "A City Street","cities"      },
     { "In a field","fields"	},	{ "In a forest","forests"	},
@@ -50,7 +50,7 @@ const	int		sent_total[SECT_MAX]		=
     4, 24, 4, 4, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 
 };
 
-char *	const		room_sents[SECT_MAX][25]	=
+const char *	const		room_sents[SECT_MAX][25]	=
 {
     {
 	"The rough hewn walls are made of granite.",
@@ -498,8 +498,8 @@ ch_ret move_char( CHAR_DATA *ch, EXIT_DATA *pexit, int fall )
     ROOM_INDEX_DATA *to_room;
     ROOM_INDEX_DATA *from_room;
     char buf[MAX_STRING_LENGTH];
-    char *txt;
-    char *dtxt;
+    const char *txt;
+    const char *dtxt;
     ch_ret retcode;
     short door, distance;
     bool drunk = FALSE;
@@ -964,7 +964,7 @@ ch_ret move_char( CHAR_DATA *ch, EXIT_DATA *pexit, int fall )
       }
     }
 
-    do_look( ch, "auto" );
+    do_look( ch, const_char_to_nonconst( "auto" ) );
     if ( brief ) 
       SET_BIT( ch->act, PLR_BRIEF );
 
@@ -1204,8 +1204,8 @@ void do_open( CHAR_DATA *ch, char *argument )
 
     if ( arg[0] == '\0' )
     {
-	do_openhatch( ch , "" );
-	return;
+      do_openhatch( ch , const_char_to_nonconst( "" ) );
+      return;
     }
 
     if ( ( pexit = find_door( ch, arg, TRUE ) ) != NULL )
@@ -1291,8 +1291,8 @@ void do_close( CHAR_DATA *ch, char *argument )
 
     if ( arg[0] == '\0' )
     {
-	do_closehatch(  ch , "" );
-	return;
+      do_closehatch( ch, const_char_to_nonconst( "" ) );
+      return;
     }
 
     if ( ( pexit = find_door( ch, arg, TRUE ) ) != NULL )
@@ -1519,7 +1519,7 @@ void do_bashdoor( CHAR_DATA *ch, char *argument )
 	    ROOM_INDEX_DATA *to_room;
 	    EXIT_DATA       *pexit_rev;
 	    int              chance;
-	    char	    *keyword;
+	    const char	    *keyword;
 
 	    if ( !IS_SET( pexit->exit_info, EX_CLOSED ) )
 	    {
@@ -1822,7 +1822,7 @@ void teleportch( CHAR_DATA *ch, ROOM_INDEX_DATA *room, bool show )
     char_to_room( ch, room );
     act( AT_ACTION, "$n arrives suddenly!", ch, NULL, NULL, TO_ROOM );
     if ( show )
-      do_look( ch, "auto" );
+      do_look( ch, const_char_to_nonconst( "auto" ) );
 }
 
 void teleport( CHAR_DATA *ch, short room, int flags )
@@ -1933,7 +1933,7 @@ void do_leave( CHAR_DATA *ch, char *argument )
 		move_char( ch, pexit, 0 );
 		return;
 	    }
-	do_leaveship( ch , "" );
+	do_leaveship( ch , const_char_to_nonconst( "" ) );
 	return;
     }
 
@@ -1943,6 +1943,6 @@ void do_leave( CHAR_DATA *ch, char *argument )
 	move_char( ch, pexit, 0 );
 	return;
     }
-    do_leaveship( ch, "" );
+    do_leaveship( ch, const_char_to_nonconst( "" ) );
     return;
 }

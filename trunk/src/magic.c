@@ -732,7 +732,7 @@ void *locate_targets( CHAR_DATA *ch, char *arg, int sn,
 /*
  * The kludgy global is for spells who want more stuff from command line.
  */
-char *target_name;
+const char *target_name;
 
 
 /*
@@ -766,7 +766,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	}
 
 	target_name = one_argument( argument, arg1 );
-	one_argument( target_name, arg2 );
+	one_argument( (char*) target_name, arg2 );
 
 	if ( arg1[0] == '\0' )
 	{

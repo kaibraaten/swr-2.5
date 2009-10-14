@@ -268,7 +268,7 @@ void found_prey( CHAR_DATA *ch, CHAR_DATA *victim )
 	case 2: sprintf( buf, "I'm going to tear %s apart!", victname );
 	  do_yell( ch, buf );
 	  break;
-	case 3: do_say( ch, "Just wait until I find you...");
+	case 3: do_say( ch, const_char_to_nonconst("Just wait until I find you..."));
 	  break;
         }
       return;
@@ -280,7 +280,7 @@ void found_prey( CHAR_DATA *ch, CHAR_DATA *victim )
 	return;
       switch( number_bits( 2 ) )
 	{
-	case 0:	do_say( ch, "C'mon out, you coward!" );
+	case 0:	do_say( ch, const_char_to_nonconst("C'mon out, you coward!" ));
 	  sprintf( buf, "%s is a bloody coward!", victname );
 	  do_yell( ch, buf );
 	  break;
@@ -324,9 +324,9 @@ void hunt_victim( CHAR_DATA *ch )
 
    if (!found)
    {
-      do_say(ch, "Damn!  My prey is gone!!" );
-      stop_hunting( ch );
-      return;
+     do_say(ch, const_char_to_nonconst("Damn! My prey is gone!!" ));
+     stop_hunting( ch );
+     return;
    }
 
    if ( ch->in_room == ch->hunting->who->in_room )
@@ -348,7 +348,7 @@ void hunt_victim( CHAR_DATA *ch )
 	   return;
         }
         else if ( !IS_SET( ch->act, ACT_DROID ) )
-           do_hide ( ch, "" );
+	  do_hide ( ch, const_char_to_nonconst("") );
    }
    
    ret = find_first_step(ch->in_room, ch->hunting->who->in_room, 5000);
@@ -369,9 +369,9 @@ void hunt_victim( CHAR_DATA *ch )
    }
    if ( ret < 0)
    {
-      do_say( ch, "Damn!  Lost my prey!" );
-      stop_hunting( ch );
-      return;
+     do_say( ch, const_char_to_nonconst("Damn! Lost my prey!" ));
+     stop_hunting( ch );
+     return;
    }
    else
    {
@@ -389,7 +389,7 @@ void hunt_victim( CHAR_DATA *ch )
           char_to_room( ch, get_room_index( ROOM_VNUM_LIMBO ) );
           return;
         } 
-	do_say( ch, "Damn!  Lost my prey!" );
+	do_say( ch, const_char_to_nonconst("Damn! Lost my prey!" ));
 	return;
       }
       if (ch->in_room == ch->hunting->who->in_room)

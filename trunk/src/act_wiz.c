@@ -10,7 +10,7 @@
 
 #define RESTORE_INTERVAL 21600
 
-char * const save_flag[] =
+const char * const save_flag[] =
 { "death", "kill", "passwd", "drop", "put", "give", "auto", "zap",
 "auction", "get", "receive", "idle", "backup", "r13", "r14", "r15", "r16",
 "r17", "r18", "r19", "r20", "r21", "r22", "r23", "r24", "r25", "r26", "r27",
@@ -215,7 +215,7 @@ void do_authorize( CHAR_DATA *ch, char *argument )
 						       victim->name );
 	to_channel( buf, CHANNEL_MONITOR, "Monitor", ch->top_level );
 	ch_printf( ch, "You have denied %s.\n\r", victim->name);
-	do_quit(victim, "");
+	do_quit(victim, const_char_to_nonconst( "" ));
      }
 
      else if ( !str_cmp( arg2, "name" ) || !str_cmp(arg2, "n" ) )
@@ -326,7 +326,7 @@ void do_deny( CHAR_DATA *ch, char *argument )
     SET_BIT(victim->act, PLR_DENY);
     send_to_char( "You are denied access!\n\r", victim );
     send_to_char( "OK.\n\r", ch );
-    do_quit( victim, "" );
+    do_quit( victim, const_char_to_nonconst( "" ) );
 
     return;
 }
@@ -413,7 +413,7 @@ void do_forceclose( CHAR_DATA *ch, char *argument )
 }
 
 
-void echo_to_all( short AT_COLOR, char *argument, short tar )
+void echo_to_all( short AT_COLOR, const char *argument, short tar )
 {
     DESCRIPTOR_DATA *d;
 
@@ -439,7 +439,7 @@ void echo_to_all( short AT_COLOR, char *argument, short tar )
     return;
 }
 
-void echo_to_area( AREA_DATA *area , short AT_COLOR, char *argument, short tar )
+void echo_to_area( AREA_DATA *area , short AT_COLOR, const char *argument, short tar )
 {
     DESCRIPTOR_DATA *d;
 
@@ -516,7 +516,7 @@ void do_echo( CHAR_DATA *ch, char *argument )
     echo_to_all ( color, argument, target );
 }
 
-void echo_to_room( short AT_COLOR, ROOM_INDEX_DATA *room, char *argument )
+void echo_to_room( short AT_COLOR, ROOM_INDEX_DATA *room, const char *argument )
 {
     CHAR_DATA *vic;
     
@@ -572,7 +572,7 @@ void do_recho( CHAR_DATA *ch, char *argument )
 }
 
 
-ROOM_INDEX_DATA *find_location( CHAR_DATA *ch, char *arg )
+ROOM_INDEX_DATA *find_location( CHAR_DATA *ch, const char *arg )
 {
     CHAR_DATA *victim;
     OBJ_DATA *obj;
@@ -675,7 +675,7 @@ void do_transfer( CHAR_DATA *ch, char *argument )
     act( AT_MAGIC, "$n arrives from a puff of smoke.", victim, NULL, NULL, TO_ROOM );
     if ( ch != victim )
     act( AT_IMMORT, "$n has transferred you.", ch, NULL, victim, TO_VICT );
-    do_look( victim, "auto" );
+    do_look( victim, const_char_to_nonconst( "auto" ) );
     send_to_char( "Ok.\n\r", ch );
 }
 
@@ -824,7 +824,7 @@ void do_rstat( CHAR_DATA *ch, char *argument )
     CHAR_DATA *rch;
     EXIT_DATA *pexit;
     int cnt;
-    static char *dir_text[] = { "n", "e", "s", "w", "u", "d", "ne", "nw", "se", "sw", "?" };
+    static const char *dir_text[] = { "n", "e", "s", "w", "u", "d", "ne", "nw", "se", "sw", "?" };
 
     one_argument( argument, arg );
     
@@ -1555,9 +1555,9 @@ void do_reboot( CHAR_DATA *ch, char *argument )
     }
 
     if ( auction->item )
-	do_auction( ch, "stop");
+      do_auction( ch, const_char_to_nonconst( "stop" ) );
 
-    do_echo( ch, "Rebooting mud... See you soon." );
+    do_echo( ch, const_char_to_nonconst( "Rebooting mud... See you soon." ) );
 
     if ( !str_cmp(argument, "and sort skill table") )
     {
@@ -1600,7 +1600,7 @@ void do_shutdown( CHAR_DATA *ch, char *argument )
     }
 
     if ( auction->item )
-	do_auction( ch, "stop");
+      do_auction( ch, const_char_to_nonconst( "stop" ) );
 
     sprintf( buf, "Shutdown by %s.", ch->name );
     append_file( ch, SHUTDOWN_FILE, buf );
@@ -2105,7 +2105,7 @@ void do_balzhur( CHAR_DATA *ch, char *argument )
 	victim->mana     = victim->max_mana;
 	victim->move     = victim->max_move;
 
-	do_help(victim, "M_BALZHUR_" );
+	do_help(victim, const_char_to_nonconst( "M_BALZHUR_" ) );
 	set_char_color( AT_WHITE, victim );
 	send_to_char( "You awake after a long period of time...\n\r", victim );
 	while ( victim->first_carrying )
@@ -2624,7 +2624,7 @@ void do_peace( CHAR_DATA *ch, char *argument )
 	if ( rch->fighting )
 	{
 	    stop_fighting( rch, TRUE );
-	    do_sit( rch, "" );
+	    do_sit( rch, const_char_to_nonconst( "" ) );
 	}
        
         /* Added by Narn, Nov 28/95 */
@@ -2700,13 +2700,13 @@ void do_ban( CHAR_DATA *ch, char *argument )
           break;
       if ( !pban )
       {
-        do_ban(ch, "");
+        do_ban(ch, const_char_to_nonconst( "" ));
         return;
       }
       argument = one_argument(argument, arg);
       if ( arg[0] == '\0' )
       {
-        do_ban( ch, "help" );
+        do_ban( ch, const_char_to_nonconst( "help" ) );
         return;
       }
       else if ( !str_cmp(arg, "newban") )
@@ -2726,7 +2726,7 @@ void do_ban( CHAR_DATA *ch, char *argument )
       }
       else
       {
-        do_ban(ch, "help");
+        do_ban(ch, const_char_to_nonconst( "help" ));
         return;
       }
       save_banlist( );
@@ -3079,10 +3079,10 @@ void do_loadup( CHAR_DATA *ch, char *argument )
 	char_to_room( d->character, ch->in_room );
 	if ( get_trust(d->character) >= get_trust( ch ) )
 	{
-	   do_say( d->character, "Do *NOT* disturb me again!" );
+	  do_say( d->character, const_char_to_nonconst( "Do *NOT* disturb me again!" ) );
 	   send_to_char( "I think you'd better leave that player alone!\n\r", ch );
 	   d->character->desc	= NULL;
-	   do_quit( d->character, "" );
+	   do_quit( d->character, const_char_to_nonconst( "" ) );
 	   return;	   
 	}
 	d->character->desc	= NULL;
@@ -3645,8 +3645,8 @@ void do_for (CHAR_DATA *ch, char *argument)
 	
 	if (!range[0] || !argument[0]) /* invalid usage? */
 	{
-		do_help (ch, "for");
-		return;
+	  do_help (ch, const_char_to_nonconst( "for" ) );
+	  return;
 	}
 	
 	if (!str_prefix("quit", argument))
@@ -3670,7 +3670,7 @@ void do_for (CHAR_DATA *ch, char *argument)
 	else if (!str_cmp (range, "everywhere"))
 		fEverywhere = TRUE;
 	else
-		do_help (ch, "for"); /* show syntax */
+	  do_help (ch, const_char_to_nonconst( "for" ) ); /* show syntax */
 
 	/* do not allow # to make it easier */		
 	if (fEverywhere && strchr (argument, '#'))
@@ -4193,7 +4193,7 @@ void do_sedit( CHAR_DATA *ch, char *argument )
     }
 
     /* display usage message */
-    do_sedit( ch, "" );
+    do_sedit( ch, const_char_to_nonconst( "" ) );
 }
 
 /*
@@ -4459,7 +4459,7 @@ void do_cedit( CHAR_DATA *ch, char *argument )
     }
 
     /* display usage message */
-    do_cedit( ch, "" );
+    do_cedit( ch, const_char_to_nonconst( "" ) );
 }
 
 void do_arrest( CHAR_DATA *ch, char *argument )
@@ -4528,7 +4528,7 @@ void do_arrest( CHAR_DATA *ch, char *argument )
     act( AT_MAGIC, "$n arrives from a puff of smoke.", victim, NULL, NULL, TO_ROOM );
     if ( ch != victim )
     act( AT_IMMORT, "$n has ordered your arrest.", ch, NULL, victim, TO_VICT );
-    do_look( victim, "auto" );
+    do_look( victim, const_char_to_nonconst( "auto" ) );
     send_to_char( "Player sent to jail. New characters temporarily banned from address.\n\r", ch );
 
     SET_BIT( victim->act, PLR_SILENCE );

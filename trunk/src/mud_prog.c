@@ -796,9 +796,9 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
 void mprog_translate( char ch, char *t, CHAR_DATA *mob, CHAR_DATA *actor,
                     OBJ_DATA *obj, void *vo, CHAR_DATA *rndm )
 {
- static char *he_she        [] = { "it",  "he",  "she" };
- static char *him_her       [] = { "it",  "him", "her" };
- static char *his_her       [] = { "its", "his", "her" };
+ static const char *he_she        [] = { "it",  "he",  "she" };
+ static const char *him_her       [] = { "it",  "him", "her" };
+ static const char *his_her       [] = { "its", "his", "her" };
  CHAR_DATA   *vict             = (CHAR_DATA *) vo;
  OBJ_DATA    *v_obj            = (OBJ_DATA  *) vo;
 
@@ -2746,7 +2746,7 @@ void rprog_hour_trigger( CHAR_DATA *ch )
 }
  
 /* Written by Jenny, Nov 29/95 */
-void progbug( char *str, CHAR_DATA *mob )
+void progbug( const char *str, CHAR_DATA *mob )
 {
   char buf[MAX_STRING_LENGTH];
 

@@ -351,7 +351,7 @@ static void nanny_get_old_password( DESCRIPTOR_DATA *d, char *argument )
   show_title(d);
 
   if ( ch->pcdata->area )
-    do_loadarea (ch , "" );
+    do_loadarea (ch , const_char_to_nonconst("") );
 }
 
 static void nanny_confirm_new_name( DESCRIPTOR_DATA *d, char *argument )
@@ -473,7 +473,7 @@ static void nanny_add_skills( DESCRIPTOR_DATA *d, char *argument )
 
   if (!str_cmp( argument, "help") )
     {
-      do_help(ch, argument);
+      do_help(ch, const_char_to_nonconst(argument));
       return;
     }
   else if ( !str_prefix( argument , "architect" ) )
@@ -647,7 +647,7 @@ static void nanny_press_enter( DESCRIPTOR_DATA *d, char *argument )
     send_to_pager( "\014", ch );
 
   send_to_pager( "\n\r&WMessage of the Day&w\n\r", ch );
-  do_help( ch, "motd" );
+  do_help( ch, const_char_to_nonconst("motd") );
   send_to_pager( "\n\r&WPress [ENTER] &Y", ch );
 
   if ( IS_IMMORTAL(ch) )
@@ -662,7 +662,7 @@ static void nanny_read_imotd( DESCRIPTOR_DATA *d, char *argument )
 {
   CHAR_DATA *ch = d->character;
   send_to_pager( "&WImmortal Message of the Day&w\n\r", ch );
-  do_help( ch, "imotd" );
+  do_help( ch, const_char_to_nonconst("imotd") );
   send_to_pager( "\n\r&WPress [ENTER] &Y", ch );
   d->connected = CON_DONE_MOTD;
 }
@@ -670,7 +670,7 @@ static void nanny_read_imotd( DESCRIPTOR_DATA *d, char *argument )
 static void nanny_read_nmotd( DESCRIPTOR_DATA *d, char *argument )
 {
   CHAR_DATA *ch = d->character;
-  do_help( ch, "nmotd" );
+  do_help( ch, const_char_to_nonconst("nmotd") );
   send_to_pager( "\n\r&WPress [ENTER] &Y", ch );
   d->connected = CON_DONE_MOTD;
 }
@@ -846,6 +846,6 @@ static void nanny_done_motd( DESCRIPTOR_DATA *d, char *argument )
     }
 
   act( AT_ACTION, "$n has entered the game.", ch, NULL, NULL, TO_ROOM );
-  do_look( ch, "auto" );
+  do_look( ch, const_char_to_nonconst("auto") );
   mail_count(ch);
 }

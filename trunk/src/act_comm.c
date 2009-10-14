@@ -16,30 +16,30 @@ void send_control_page_to_char(CHAR_DATA * ch, char page);
 /*
  * Local functions.
  */
-void	talk_channel	args( ( CHAR_DATA *ch, char *argument,
+void	talk_channel	args( ( CHAR_DATA *ch, const char *argument,
 			    int channel, const char *verb ) );
 
-char *  scramble        args( ( const char *argument, int modifier ) );			    
-char *  drunk_speech    args( ( const char *argument, CHAR_DATA *ch ) ); 
+char *  scramble        args( ( const char *argument, int modifier ) );
+const char *drunk_speech( const char *argument, CHAR_DATA *ch );
 void    channel_noise   args( ( ) );
 
 #define	MAX_NOISE	1
 
-char * noise_string[ MAX_NOISE ] =
+const char * noise_string[ MAX_NOISE ] =
 {
     "A Human: Doh.",    
 }; 
 
-void sound_to_room( ROOM_INDEX_DATA *room , char *argument )
+void sound_to_room( ROOM_INDEX_DATA *room, const char *argument )
 {
-   CHAR_DATA *vic;
+  CHAR_DATA *vic;
 
-        if ( room == NULL ) return;
-        
-        for ( vic = room->first_person; vic; vic = vic->next_in_room )
-	   if ( !IS_NPC(vic) && IS_SET( vic->act, PLR_SOUND ) )
-	     send_to_char( argument, vic );
-     
+  if ( room == NULL )
+    return;
+
+  for ( vic = room->first_person; vic; vic = vic->next_in_room )
+    if ( !IS_NPC(vic) && IS_SET( vic->act, PLR_SOUND ) )
+      send_to_char( argument, vic );
 }
 
 
@@ -219,13 +219,7 @@ char *scramble( const char *argument, int modifier )
 	return arg;	     
 }
 
-/* I'll rewrite this later if its still needed.. -- Altrag */
-char *translate( CHAR_DATA *ch, CHAR_DATA *victim, const char *argument )
-{
-	return "";
-}
-
-char *drunk_speech( const char *argument, CHAR_DATA *ch )
+const char *drunk_speech( const char *argument, CHAR_DATA *ch )
 {
   const char *arg = argument;
   static char buf[MAX_INPUT_LENGTH*2];
@@ -370,7 +364,7 @@ char *drunk_speech( const char *argument, CHAR_DATA *ch )
 /*
  * Generic channel function.
  */
-void talk_channel( CHAR_DATA *ch, char *argument, int channel, const char *verb )
+void talk_channel( CHAR_DATA *ch, const char *argument, int channel, const char *verb )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
@@ -497,7 +491,7 @@ void talk_channel( CHAR_DATA *ch, char *argument, int channel, const char *verb 
 	&&   vch != ch
 	&&  !IS_SET(och->deaf, channel) )
 	{
-            char *sbuf = argument;
+	  const char *sbuf = argument;
   	    ch_comlink = FALSE;
     
             if ( channel != CHANNEL_YELL && channel != CHANNEL_IMMTALK && channel != CHANNEL_OOC 
@@ -739,41 +733,48 @@ void do_immtalk( CHAR_DATA *ch, char *argument )
 
 void do_say( CHAR_DATA *ch, char *argument )
 {
-    CHAR_DATA *vch;
-    int actflags;
+  CHAR_DATA *vch;
+  int actflags;
 
-    if ( argument[0] == '\0' )
+  if ( argument[0] == '\0' )
     {
-	send_to_char( "Say what?\n\r", ch );
-	return;
+      send_to_char( "Say what?\n\r", ch );
+      return;
     }
 
-    actflags = ch->act;
-    if ( IS_NPC( ch ) ) REMOVE_BIT( ch->act, ACT_SECRETIVE );
-	for ( vch = ch->in_room->first_person; vch; vch = vch->next_in_room )
-	{
-		char *sbuf = argument;
+  actflags = ch->act;
 
-		if ( vch == ch )
-			continue;
- 	      sbuf = drunk_speech( sbuf, ch );
+  if ( IS_NPC( ch ) ) REMOVE_BIT( ch->act, ACT_SECRETIVE );
+  for ( vch = ch->in_room->first_person; vch; vch = vch->next_in_room )
+    {
+      const char *sbuf = argument;
 
-		MOBtrigger = FALSE;
-		act( AT_SAY, "$n says '$t'", ch, sbuf, vch, TO_VICT );
-	}
-/*    MOBtrigger = FALSE;
-    act( AT_SAY, "$n says '$T'", ch, NULL, argument, TO_ROOM );*/
-    ch->act = actflags;
-    MOBtrigger = FALSE;
-    act( AT_SAY, "You say '$T'", ch, NULL, drunk_speech( argument, ch ), TO_CHAR ); 
-    mprog_speech_trigger( argument, ch );
-    if ( char_died(ch) )
-      return;
-    oprog_speech_trigger( argument, ch ); 
-    if ( char_died(ch) )
-      return;
-    rprog_speech_trigger( argument, ch ); 
+      if ( vch == ch )
+	continue;
+
+      sbuf = drunk_speech( sbuf, ch );
+
+      MOBtrigger = FALSE;
+      act( AT_SAY, "$n says '$t'", ch, sbuf, vch, TO_VICT );
+    }
+
+  /*    MOBtrigger = FALSE;
+	act( AT_SAY, "$n says '$T'", ch, NULL, argument, TO_ROOM );*/
+  ch->act = actflags;
+  MOBtrigger = FALSE;
+  act( AT_SAY, "You say '$T'", ch, NULL, drunk_speech( argument, ch ), TO_CHAR ); 
+  mprog_speech_trigger( argument, ch );
+
+  if ( char_died(ch) )
     return;
+
+  oprog_speech_trigger( argument, ch ); 
+
+  if ( char_died(ch) )
+    return;
+
+  rprog_speech_trigger( argument, ch ); 
+  return;
 }
 
 
