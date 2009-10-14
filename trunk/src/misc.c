@@ -437,13 +437,13 @@ void do_use( CHAR_DATA *ch, char *argument )
  */
 void do_fill( CHAR_DATA *ch, char *argument )
 {
-    char arg1[MAX_INPUT_LENGTH];
-    char arg2[MAX_INPUT_LENGTH];
-    OBJ_DATA *obj;
-    OBJ_DATA *source;
-    short    dest_item, src_item1, src_item2, src_item3, src_item4;
-    int       diff;
-    bool      all = FALSE;
+  char arg1[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+  OBJ_DATA *obj = NULL;
+  OBJ_DATA *source = NULL;
+  short dest_item = 0, src_item1 = 0, src_item2 = 0, src_item3 = 0, src_item4 = 0;
+  int diff = 0;
+  bool all = FALSE;
 
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
@@ -1130,117 +1130,117 @@ void do_empty( CHAR_DATA *ch, char *argument )
  
 void actiondesc( CHAR_DATA *ch, OBJ_DATA *obj, void *vo )
 {
-    char charbuf[MAX_STRING_LENGTH];
-    char roombuf[MAX_STRING_LENGTH];
-    char *srcptr = obj->action_desc;
-    char *charptr = charbuf;
-    char *roomptr = roombuf;
-    const char *ichar;
-    const char *iroom;
+  char charbuf[MAX_STRING_LENGTH];
+  char roombuf[MAX_STRING_LENGTH];
+  char *srcptr = obj->action_desc;
+  char *charptr = charbuf;
+  char *roomptr = roombuf;
+  const char *ichar = NULL;
+  const char *iroom = NULL;
 
-while ( *srcptr != '\0' )
-{
-  if ( *srcptr == '$' ) 
-  {
-    srcptr++;
-    switch ( *srcptr )
+  while ( *srcptr != '\0' )
     {
-      case 'e':
-        ichar = "you";
-        iroom = "$e";
-        break;
+      if ( *srcptr == '$' ) 
+	{
+	  srcptr++;
+	  switch ( *srcptr )
+	    {
+	    case 'e':
+	      ichar = "you";
+	      iroom = "$e";
+	      break;
 
-      case 'm':
-        ichar = "you";
-        iroom = "$m";
-        break;
+	    case 'm':
+	      ichar = "you";
+	      iroom = "$m";
+	      break;
 
-      case 'n':
-        ichar = "you";
-        iroom = "$n";
-        break;
+	    case 'n':
+	      ichar = "you";
+	      iroom = "$n";
+	      break;
 
-      case 's':
-        ichar = "your";
-        iroom = "$s";
-        break;
+	    case 's':
+	      ichar = "your";
+	      iroom = "$s";
+	      break;
 
       /*case 'q':
         iroom = "s";
         break;*/
 
-      default: 
-        srcptr--;
-        *charptr++ = *srcptr;
-        *roomptr++ = *srcptr;
-        break;
+	    default: 
+	      srcptr--;
+	      *charptr++ = *srcptr;
+	      *roomptr++ = *srcptr;
+	      break;
+	    }
+	}
+      else if ( *srcptr == '%' && *++srcptr == 's' ) 
+	{
+	  ichar = "You";
+	  iroom = IS_NPC( ch ) ? ch->short_descr : ch->name;
+	}
+      else
+	{
+	  *charptr++ = *srcptr;
+	  *roomptr++ = *srcptr;
+	  srcptr++;
+	  continue;
+	}
+
+      while ( ( *charptr = *ichar ) != '\0' )
+	{
+	  charptr++;
+	  ichar++;
+	}
+
+      while ( ( *roomptr = *iroom ) != '\0' )
+	{
+	  roomptr++;
+	  iroom++;
+	}
+
+      srcptr++;
     }
-  }
-  else if ( *srcptr == '%' && *++srcptr == 's' ) 
-  {
-    ichar = "You";
-    iroom = IS_NPC( ch ) ? ch->short_descr : ch->name;
-  }
-  else
-  {
-    *charptr++ = *srcptr;
-    *roomptr++ = *srcptr;
-    srcptr++;
-    continue;
-  }
 
-  while ( ( *charptr = *ichar ) != '\0' )
-  {
-    charptr++;
-    ichar++;
-  }
+  *charptr = '\0';
+  *roomptr = '\0';
 
-  while ( ( *roomptr = *iroom ) != '\0' )
-  {
-    roomptr++;
-    iroom++;
-  }
-  srcptr++;
-}
+  /*
+    sprintf( buf, "Charbuf: %s", charbuf );
+    log_string_plus( buf, LOG_HIGH, LEVEL_LESSER ); 
+    sprintf( buf, "Roombuf: %s", roombuf );
+    log_string_plus( buf, LOG_HIGH, LEVEL_LESSER ); 
+  */
 
-*charptr = '\0';
-*roomptr = '\0';
+  switch( obj->item_type )
+    {
+    case ITEM_FOUNTAIN:
+      act( AT_ACTION, charbuf, ch, obj, ch, TO_CHAR );
+      act( AT_ACTION, roombuf, ch, obj, ch, TO_ROOM );
+      return;
 
-/*
-sprintf( buf, "Charbuf: %s", charbuf );
-log_string_plus( buf, LOG_HIGH, LEVEL_LESSER ); 
-sprintf( buf, "Roombuf: %s", roombuf );
-log_string_plus( buf, LOG_HIGH, LEVEL_LESSER ); 
-*/
+    case ITEM_DRINK_CON:
+      act( AT_ACTION, charbuf, ch, obj, liq_table[obj->value[2]].liq_name, TO_CHAR );
+      act( AT_ACTION, roombuf, ch, obj, liq_table[obj->value[2]].liq_name, TO_ROOM );
+      return;
 
-switch( obj->item_type )
-{
-  case ITEM_FOUNTAIN:
-    act( AT_ACTION, charbuf, ch, obj, ch, TO_CHAR );
-    act( AT_ACTION, roombuf, ch, obj, ch, TO_ROOM );
-    return;
-
-  case ITEM_DRINK_CON:
-    act( AT_ACTION, charbuf, ch, obj, liq_table[obj->value[2]].liq_name, TO_CHAR );
-    act( AT_ACTION, roombuf, ch, obj, liq_table[obj->value[2]].liq_name, TO_ROOM );
-    return;
-
-  case ITEM_ARMOR:
-  case ITEM_WEAPON:
-  case ITEM_LIGHT:
-    act( AT_ACTION, charbuf, ch, obj, ch, TO_CHAR );
-    act( AT_ACTION, roombuf, ch, obj, ch, TO_ROOM );
-    return;
+    case ITEM_ARMOR:
+    case ITEM_WEAPON:
+    case ITEM_LIGHT:
+      act( AT_ACTION, charbuf, ch, obj, ch, TO_CHAR );
+      act( AT_ACTION, roombuf, ch, obj, ch, TO_ROOM );
+      return;
  
-  case ITEM_FOOD:
-    act( AT_ACTION, charbuf, ch, obj, ch, TO_CHAR );
-    act( AT_ACTION, roombuf, ch, obj, ch, TO_ROOM );
-    return;
+    case ITEM_FOOD:
+      act( AT_ACTION, charbuf, ch, obj, ch, TO_CHAR );
+      act( AT_ACTION, roombuf, ch, obj, ch, TO_ROOM );
+      return;
 
-  default:
-    return;
-}
-return;
+    default:
+      return;
+    }
 }
 
 void do_hail( CHAR_DATA *ch , char *argument )

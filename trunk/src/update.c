@@ -204,13 +204,12 @@ int move_gain( CHAR_DATA *ch )
 
 void gain_condition( CHAR_DATA *ch, int iCond, int value )
 {
-    int condition;
-    ch_ret retcode;
+    ch_ret retcode = rNONE;
 
     if ( value == 0 || IS_NPC(ch) || IS_IMMORTAL(ch) || NOT_AUTHED(ch))
 	return;
 
-    condition	        	    = ch->pcdata->condition[iCond];
+    int condition	        	    = ch->pcdata->condition[iCond];
     ch->pcdata->condition[iCond]    = URANGE( 0, condition + value, 48 );
 
     if ( ch->pcdata->condition[iCond] == 0 )
@@ -1095,8 +1094,8 @@ void char_update( void )
  */
 void obj_update( void )
 {   
-    OBJ_DATA *obj;
-    short AT_TEMP;
+    OBJ_DATA *obj = NULL;
+    short AT_TEMP = 0;
     	        
     for ( obj = last_object; obj; obj = gobj_prev )
     {
@@ -1404,12 +1403,12 @@ void char_check( void )
  */
 void aggr_update( void )
 {
-    DESCRIPTOR_DATA *d, *dnext;
-    CHAR_DATA *wch;
-    CHAR_DATA *ch;
-    CHAR_DATA *ch_next;
-    CHAR_DATA *victim;
-    struct act_prog_data *apdtmp;
+  DESCRIPTOR_DATA *d = NULL, *dnext = NULL;
+  CHAR_DATA *wch = NULL;
+  CHAR_DATA *ch = NULL;
+  CHAR_DATA *ch_next = NULL;
+  CHAR_DATA *victim = NULL;
+  struct act_prog_data *apdtmp = NULL;
 
 #ifdef UNDEFD
   /*
@@ -1419,7 +1418,7 @@ void aggr_update( void )
         if ( IS_NPC( wch ) && wch->mpactnum > 0
 	    && last_descriptor )
         {
-            MPROG_ACT_LIST * tmp_act, *tmp2_act;
+            MPROG_ACT_LIST * tmp_act = NULL, *tmp2_act = NULL;
 	    for ( tmp_act = wch->mpact; tmp_act;
 		 tmp_act = tmp_act->next )
 	    {
@@ -1444,7 +1443,7 @@ void aggr_update( void )
 
       if ( !char_died(wch) && wch->mpactnum > 0 )
 	{
-	    MPROG_ACT_LIST * tmp_act;
+	    MPROG_ACT_LIST * tmp_act = NULL;
 
 	    while ( (tmp_act = wch->mpact) != NULL )
 	    {
@@ -1483,7 +1482,7 @@ void aggr_update( void )
 
 	for ( ch = wch->in_room->first_person; ch; ch = ch_next )
 	{
-	    int count;
+	    int count = 0;
 
 	    ch_next	= ch->next_in_room;
 
@@ -1519,7 +1518,7 @@ void aggr_update( void )
 
 	    if ( IS_NPC(ch) && IS_SET(ch->attacks, ATCK_BACKSTAB ) )
 	    {
-		OBJ_DATA *obj;
+		OBJ_DATA *obj = NULL;
 
 		if ( !ch->mount
     		&& (obj = get_eq_char( ch, WEAR_WIELD )) != NULL

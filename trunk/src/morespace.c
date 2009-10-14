@@ -1345,7 +1345,7 @@ void    make_garage( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
 
 void do_designship( CHAR_DATA * ch , char * argument )
 {
-  int hull, energy, shield, speed, manuever, lasers, missiles, chaff, smodel;
+  int hull = 0, energy = 0, shield = 0, speed = 0, manuever = 0, lasers = 0, missiles = 0, chaff = 0, smodel = 0;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   char arg3[MAX_INPUT_LENGTH];
@@ -1356,9 +1356,9 @@ void do_designship( CHAR_DATA * ch , char * argument )
   char arg8[MAX_INPUT_LENGTH];
   char arg9[MAX_INPUT_LENGTH];
   char arg0[MAX_INPUT_LENGTH];
-  long price;
-  SHIP_DATA * ship;
-  ROOM_INDEX_DATA *location;
+  long price = 0;
+  SHIP_DATA * ship = NULL;
+  ROOM_INDEX_DATA *location = NULL;
 
   if ( IS_NPC(ch) || !ch->pcdata )
     return;
@@ -1502,7 +1502,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
        smodel = CUSTOM_SHIP;
     else
     {
-        int tm;
+        int tm = 0;
         
         smodel = -1;
         
@@ -1600,7 +1600,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
        int shipreg=0;
        char filename[10];
        char shipname[MAX_STRING_LENGTH];
-       CLAN_DATA  * clan;     
+       CLAN_DATA  * clan = NULL;
         
        if ( !str_cmp( arg1, "clanship" ) )
        {

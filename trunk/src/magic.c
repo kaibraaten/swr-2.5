@@ -745,17 +745,15 @@ void do_cast( CHAR_DATA *ch, char *argument )
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
     static char staticbuf[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
-    OBJ_DATA *obj;
-    void *vo;
-    int mana;
-    int sn;
-    ch_ret retcode;
+    CHAR_DATA *victim = NULL;
+    OBJ_DATA *obj = NULL;
+    void *vo = NULL;
+    int mana = 0;
+    int sn = 0;
+    ch_ret retcode = rNONE;
     bool dont_wait = FALSE;
     SKILLTYPE *skill = NULL;
     struct timeval time_used;
-
-    retcode = rNONE;
 
     switch( ch->substate )
     {
@@ -1915,13 +1913,13 @@ ch_ret spell_attack( int sn, int level, CHAR_DATA *ch, void *vo )
  */
 ch_ret spell_area_attack( int sn, int level, CHAR_DATA *ch, void *vo )
 {
-    CHAR_DATA *vch, *vch_next;
+    CHAR_DATA *vch = NULL, *vch_next = NULL;
     SKILLTYPE *skill = get_skilltype(sn);
-    bool saved;
-    bool affects;
-    int dam;
+    bool saved = FALSE;
+    bool affects = FALSE;
+    int dam = 0;
     bool ch_died = FALSE;
-    ch_ret retcode;
+    ch_ret retcode = rNONE;
 
     send_to_char("You feel the hatred grow within you!\n\r", ch);
                  ch->alignment = ch->alignment - 100;

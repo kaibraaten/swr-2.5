@@ -1836,8 +1836,8 @@ void do_who( CHAR_DATA *ch, char *argument )
     bool fImmortalOnly;
     bool fShowHomepage;
     bool fClanMatch; /* SB who clan */
-    CLAN_DATA *pClan;
-    FILE *whoout;
+    CLAN_DATA *pClan = 0;
+    FILE *whoout = 0;
 
     WHO_DATA *cur_who = NULL;
     WHO_DATA *next_who = NULL;

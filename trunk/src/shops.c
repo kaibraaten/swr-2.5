@@ -688,9 +688,9 @@ void do_repair( CHAR_DATA *ch, char *argument )
 
 void appraise_all( CHAR_DATA *ch, CHAR_DATA *keeper, const char *fixstr )
 {
-  OBJ_DATA *obj;
-  char buf[MAX_STRING_LENGTH], *pbuf=buf;
-  int cost, total=0;
+  OBJ_DATA *obj = NULL;
+  char buf[MAX_STRING_LENGTH], *pbuf = buf;
+  int cost = 0, total = 0;
 
   for ( obj = ch->first_carrying; obj != NULL ; obj = obj->next_content )
     {

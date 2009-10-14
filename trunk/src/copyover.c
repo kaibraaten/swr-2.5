@@ -55,8 +55,8 @@ bool	write_to_descriptor	args( ( int desc, const char *txt, int length ) );
 void    init_descriptor		args( ( DESCRIPTOR_DATA *dnew, int desc) );
 
 /*  Warm reboot stuff, gotta make sure to thank Erwin for this :) */
-int port;               /* Port number to be used       */
-int control;		/* Controlling descriptor	*/
+extern int port;               /* Port number to be used       */
+extern int control;		/* Controlling descriptor	*/
 
 void do_copyover (CHAR_DATA *ch, char * argument)
 {

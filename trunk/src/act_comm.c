@@ -215,7 +215,7 @@ char *scramble( const char *argument, int modifier )
 	    else
 	    	arg[position] = argument[position];
 	}
-	arg[position] = '\0';
+	arg[position-1] = '\0';
 	return arg;	     
 }
 
@@ -370,7 +370,7 @@ void talk_channel( CHAR_DATA *ch, const char *argument, int channel, const char 
     DESCRIPTOR_DATA *d;
     int position;
     CLAN_DATA *clan = NULL;
-    PLANET_DATA * planet;        
+    PLANET_DATA * planet = NULL;
     bool  ch_comlink = FALSE;
     
     if ( channel != CHANNEL_YELL && channel != CHANNEL_IMMTALK && channel != CHANNEL_OOC 
@@ -1451,16 +1451,14 @@ char *itoa(int foo)
 void do_group( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
+    CHAR_DATA *victim = 0;
 
     one_argument( argument, arg );
 
     if ( arg[0] == '\0' )
     {
-	CHAR_DATA *gch;
-	CHAR_DATA *leader;
-
-	leader = ch->leader ? ch->leader : ch;
+	CHAR_DATA *gch = 0;
+	CHAR_DATA *leader = ch->leader ? ch->leader : ch;
 	set_char_color( AT_GREEN, ch );
 	ch_printf( ch, "%s's group:\n\r", PERS(leader, ch) );
 

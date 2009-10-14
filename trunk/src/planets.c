@@ -528,8 +528,8 @@ void do_showplanet( CHAR_DATA *ch, char *argument )
 
 void do_makeplanet( CHAR_DATA *ch, char *argument )
 {
-  AREA_DATA *pArea;
-  PLANET_DATA *planet;
+  AREA_DATA *pArea = NULL;
+  PLANET_DATA *planet = NULL;
   char arg1[MAX_STRING_LENGTH];
   char arg3[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -537,11 +537,11 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
   char pname[MAX_STRING_LENGTH];
   char * description = NULL;
   bool destok = TRUE;
-  int rnum, sector;
-  ROOM_INDEX_DATA *location;
-  ROOM_INDEX_DATA *troom;
-  EXIT_DATA * xit;
-  SPACE_DATA *starsystem;
+  int rnum = 0, sector = 0;
+  ROOM_INDEX_DATA *location = NULL;
+  ROOM_INDEX_DATA *troom = NULL;
+  EXIT_DATA * xit = NULL;
+  SPACE_DATA *starsystem = NULL;
             
   switch( ch->substate )
     {
@@ -750,7 +750,7 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
     
   if ( starsystem )
     {
-      PLANET_DATA *tp;
+      PLANET_DATA *tp = NULL;
 
       if ( starsystem == starsystem_from_name( NEWBIE_STARSYSTEM ) )
 	{

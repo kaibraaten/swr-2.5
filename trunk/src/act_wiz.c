@@ -134,8 +134,8 @@ void do_restrict( CHAR_DATA *ch, char *argument )
  */ 
 CHAR_DATA *get_waiting_desc( CHAR_DATA *ch, char *name ) 
 { 
-  DESCRIPTOR_DATA *d; 
-  CHAR_DATA       *ret_char; 
+  DESCRIPTOR_DATA *d = 0; 
+  CHAR_DATA       *ret_char = 0; 
   static unsigned int number_of_hits; 
   
   number_of_hits = 0; 

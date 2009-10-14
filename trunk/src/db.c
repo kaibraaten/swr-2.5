@@ -3821,10 +3821,8 @@ void rprog_read_programs( FILE *fp, ROOM_INDEX_DATA *pRoomIndex)
 */
 bool delete_room( ROOM_INDEX_DATA *room )
 {
-    int iHash;
-    ROOM_INDEX_DATA *tmp, *prev;
-
-    iHash = room->vnum % MAX_KEY_HASH;
+    ROOM_INDEX_DATA *tmp = NULL, *prev = NULL;
+    int iHash = room->vnum % MAX_KEY_HASH;
 
     /* Take the room index out of the hash list. */
     for( tmp = room_index_hash[iHash]; tmp && tmp != room; tmp = tmp->next )

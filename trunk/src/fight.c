@@ -558,18 +558,18 @@ short off_shld_lvl( CHAR_DATA *ch, CHAR_DATA *victim )
  */
 ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
 {
-    OBJ_DATA *wield;
-    int victim_ac;
-    int thac0;
-    int plusris;
-    int dam, x;
-    int diceroll;
-    int attacktype, cnt;
-    int	prof_bonus;
-    int	prof_gsn;
-    ch_ret retcode;
-    int chance;
-    bool fail;
+    OBJ_DATA *wield = NULL;
+    int victim_ac = 0;
+    int thac0 = 0;
+    int plusris = 0;
+    int dam = 0, x = 0;
+    int diceroll = 0;
+    int attacktype = 0, cnt = 0;
+    int	prof_bonus = 0;
+    int	prof_gsn = 0;
+    ch_ret retcode = rNONE;
+    int chance = 0;
+    bool fail = FALSE;
     AFFECT_DATA af;
                 
 

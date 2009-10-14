@@ -201,10 +201,10 @@ const char *	const		room_sents[SECT_MAX][25]	=
 
 int wherehome( CHAR_DATA *ch)
 {
-    SHIP_DATA *ship;
-    PLANET_DATA * planet;
-    CLAN_DATA *clan;
-    ROOM_INDEX_DATA *room;
+    SHIP_DATA *ship = 0;
+    PLANET_DATA * planet = 0;
+    CLAN_DATA *clan = 0;
+    ROOM_INDEX_DATA *room = 0;
         
     if( ch->plr_home )
       return ch->plr_home->vnum;
