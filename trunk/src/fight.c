@@ -674,7 +674,6 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
 	if ( prof_gsn != -1 )
 	  learn_from_failure( ch, prof_gsn );
 	damage( ch, victim, 0, dt );
-	tail_chain( );
 	return rNONE;
     }
 
@@ -1005,8 +1004,6 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
          }
      }
      
-
-    tail_chain( );
     return retcode;
 }
 
@@ -1555,7 +1552,6 @@ ch_ret damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
     if ( !npcvict && IS_SET( victim->act, PLR_FLEE ) )
       do_flee( victim, const_char_to_nonconst( "" ) );
 
-    tail_chain( );
     return rNONE;
 }
 

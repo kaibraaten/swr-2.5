@@ -1776,7 +1776,7 @@ void update_handler( void )
           etime.tv_sec, etime.tv_usec );
       timechar = NULL;
     }
-    tail_chain( );
+
     return;
 }
 
