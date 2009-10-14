@@ -6,6 +6,8 @@
 #include <time.h>
 #include "mud.h"
 
+void vector_randomize( Vector3 * const vec, int from, int to );
+
 extern int top_area;
 extern int top_r_vnum;
 void write_area_list();
@@ -102,24 +104,28 @@ void save_planet( PLANET_DATA *planet )
 	fprintf( fp, "#PLANET\n" );
 	fprintf( fp, "Name         %s~\n",	planet->name		);
 	fprintf( fp, "Filename     %s~\n",	planet->filename        );
-	fprintf( fp, "X            %d\n",	planet->x               );
-	fprintf( fp, "Y            %d\n",	planet->y               );
-	fprintf( fp, "Z            %d\n",	planet->z               );
+	fprintf( fp, "X            %.0f\n",	planet->pos.x           );
+	fprintf( fp, "Y            %.0f\n",	planet->pos.y           );
+	fprintf( fp, "Z            %.0f\n",	planet->pos.z           );
 	fprintf( fp, "Sector       %d\n",	planet->sector          );
-	fprintf( fp, "PopSupport   %d\n",	(int) (planet->pop_support)      );
+	fprintf( fp, "PopSupport   %.0f\n",	planet->pop_support     );
+
 	if ( planet->starsystem && planet->starsystem->name )
-        	fprintf( fp, "Starsystem   %s~\n",	planet->starsystem->name);
+	  fprintf( fp, "Starsystem   %s~\n",	planet->starsystem->name);
+
 	if ( planet->governed_by && planet->governed_by->name )
-        	fprintf( fp, "GovernedBy   %s~\n",	planet->governed_by->name);
+	  fprintf( fp, "GovernedBy   %s~\n",	planet->governed_by->name);
+
 	pArea = planet->area;
+
 	if (pArea->filename)
-         	fprintf( fp, "Area         %s~\n",	pArea->filename  );
+	  fprintf( fp, "Area         %s~\n",	pArea->filename  );
+
 	fprintf( fp, "End\n\n"						);
 	fprintf( fp, "#END\n"						);
     }
     fclose( fp );
     fpReserve = fopen( NULL_FILE, "r" );
-    return;
 }
 
 #if defined(KEY)
@@ -137,126 +143,124 @@ void save_planet( PLANET_DATA *planet )
 
 void fread_planet( PLANET_DATA *planet, FILE *fp )
 {
-    char buf[MAX_STRING_LENGTH];
-    const char *word;
-    bool fMatch;
+  char buf[MAX_STRING_LENGTH];
+  const char *word;
+  bool fMatch;
 
-    for ( ; ; )
+  for ( ; ; )
     {
-	word   = feof( fp ) ? "End" : fread_word( fp );
-	fMatch = FALSE;
+      word   = feof( fp ) ? "End" : fread_word( fp );
+      fMatch = FALSE;
 
-	switch ( UPPER(word[0]) )
+      switch ( UPPER(word[0]) )
 	{
 	case '*':
-	    fMatch = TRUE;
-	    fread_to_eol( fp );
-	    break;
+	  fMatch = TRUE;
+	  fread_to_eol( fp );
+	  break;
 
 	case 'A':
-	    if ( !str_cmp( word, "Area" ) )
+	  if ( !str_cmp( word, "Area" ) )
 	    {
-	        char aName[MAX_STRING_LENGTH];
-                AREA_DATA *pArea;
+	      char aName[MAX_STRING_LENGTH];
+	      AREA_DATA *pArea;
                 	        
-	     	sprintf (aName, "%s", fread_string(fp));
-		for( pArea = first_area ; pArea ; pArea = pArea->next )
-	          if (pArea->filename && !str_cmp(pArea->filename , aName ) )
+	      sprintf (aName, "%s", fread_string(fp));
+	      for( pArea = first_area ; pArea ; pArea = pArea->next )
+		if (pArea->filename && !str_cmp(pArea->filename , aName ) )
 	          {
-	             ROOM_INDEX_DATA *room;
+		    ROOM_INDEX_DATA *room;
 	             
-	             planet->size = 0;
-	             planet->citysize = 0;
-	             planet->wilderness = 0;
-	             planet->farmland = 0;
-	             planet->barracks = 0;
-	             planet->controls = 0;
-	             pArea->planet = planet; 
-	             planet->area = pArea;
-	             for( room = pArea->first_room ; room ; room = room->next_in_area )
-                     {  	       
-                       	  planet->size++;
-                          if ( room->sector_type <= SECT_CITY )
-                             planet->citysize++;    
-                          else if ( room->sector_type == SECT_FARMLAND )
-                             planet->farmland++;    
-                          else if ( room->sector_type != SECT_DUNNO )
-                             planet->wilderness++;
+		    planet->size = 0;
+		    planet->citysize = 0;
+		    planet->wilderness = 0;
+		    planet->farmland = 0;
+		    planet->barracks = 0;
+		    planet->controls = 0;
+		    pArea->planet = planet; 
+		    planet->area = pArea;
+		    for( room = pArea->first_room ; room ; room = room->next_in_area )
+		      {  	       
+			planet->size++;
+			if ( room->sector_type <= SECT_CITY )
+			  planet->citysize++;    
+			else if ( room->sector_type == SECT_FARMLAND )
+			  planet->farmland++;    
+			else if ( room->sector_type != SECT_DUNNO )
+			  planet->wilderness++;
                              
-                          if ( IS_SET( room->room_flags , ROOM_CONTROL ))
-                             planet->controls++;    
-                          if ( IS_SET( room->room_flags , ROOM_BARRACKS ))
-                             planet->barracks++;    
-                     } 	       
+			if ( IS_SET( room->room_flags , ROOM_CONTROL ))
+			  planet->controls++;    
+			if ( IS_SET( room->room_flags , ROOM_BARRACKS ))
+			  planet->barracks++;    
+		      } 	       
 	          }      
-                fMatch = TRUE;
+	      fMatch = TRUE;
 	    }
-	    break;
+	  break;
 
 	case 'E':
-	    if ( !str_cmp( word, "End" ) )
+	  if ( !str_cmp( word, "End" ) )
 	    {
-		if (!planet->name)
-		  planet->name		= STRALLOC( "" );
-		return;
+	      if (!planet->name)
+		planet->name		= STRALLOC( "" );
+	      return;
 	    }
-	    break;
+	  break;
 
 	case 'F':
-	    KEY( "Filename",	planet->filename,		fread_string_nohash( fp ) );
-	    break;
+	  KEY( "Filename",	planet->filename,		fread_string_nohash( fp ) );
+	  break;
 	
 	case 'G':
-	    if ( !str_cmp( word, "GovernedBy" ) )
+	  if ( !str_cmp( word, "GovernedBy" ) )
 	    {
-	     	planet->governed_by = get_clan ( fread_string(fp) );
-                fMatch = TRUE;
+	      planet->governed_by = get_clan ( fread_string(fp) );
+	      fMatch = TRUE;
 	    }
-	    break;
+	  break;
 	
 	case 'N':
-	    KEY( "Name",	planet->name,		fread_string( fp ) );
-	    break;
+	  KEY( "Name",	planet->name,		fread_string( fp ) );
+	  break;
 	
 	case 'P':
-	    KEY( "PopSupport",	planet->pop_support,		fread_number( fp ) );
-	    break;
+	  KEY( "PopSupport",	planet->pop_support,		fread_number( fp ) );
+	  break;
 
 	case 'S':
-	    KEY( "Sector",	planet->sector,		fread_number( fp ) );
-	    if ( !str_cmp( word, "Starsystem" ) )
+	  KEY( "Sector",	planet->sector,		fread_number( fp ) );
+	  if ( !str_cmp( word, "Starsystem" ) )
 	    {
-	     	planet->starsystem = starsystem_from_name ( fread_string(fp) );
-                if (planet->starsystem)
+	      planet->starsystem = starsystem_from_name ( fread_string(fp) );
+	      if (planet->starsystem)
                 {
-                     SPACE_DATA *starsystem = planet->starsystem;
-                     
-                     LINK( planet , starsystem->first_planet, starsystem->last_planet, next_in_system, prev_in_system );
+		  SPACE_DATA *starsystem = planet->starsystem;
+                  
+		  LINK( planet , starsystem->first_planet, starsystem->last_planet, next_in_system, prev_in_system );
                 }
-                fMatch = TRUE;
+	      fMatch = TRUE;
 	    }
-	    break;
+	  break;
 
 	case 'X':
-	    KEY( "X",	planet->x,		fread_number( fp ) );
-	    break;
+	  KEY( "X",	planet->pos.x,		fread_number( fp ) );
+	  break;
 
 	case 'Y':
-	    KEY( "Y",	planet->y,		fread_number( fp ) );
-	    break;
+	  KEY( "Y",	planet->pos.y,		fread_number( fp ) );
+	  break;
 
 	case 'Z':
-	    KEY( "Z",	planet->z,		fread_number( fp ) );
-	    break;
-    
+	  KEY( "Z",	planet->pos.z,		fread_number( fp ) );
+	  break;
 	}
 	
-	if ( !fMatch )
+      if ( !fMatch )
 	{
-	    sprintf( buf, "Fread_planet: no match: %s", word );
-	    bug( buf, 0 );
+	  sprintf( buf, "Fread_planet: no match: %s", word );
+	  bug( buf, 0 );
 	}
-	
     }
 }
 
@@ -276,18 +280,17 @@ bool load_planet_file( const char *planetfile )
     planet->area = NULL;
     planet->first_guard = NULL;
     planet->last_guard = NULL;
-    
+    vector_init( &planet->pos );
     found = FALSE;
     sprintf( filename, "%s%s", PLANET_DIR, planetfile );
 
     if ( ( fp = fopen( filename, "r" ) ) != NULL )
-    {
-
+      {
 	found = TRUE;
 	for ( ; ; )
-	{
+	  {
 	    char letter;
-	    char *word;
+	    const char *word;
 
 	    letter = fread_letter( fp );
 	    if ( letter == '*' )
@@ -852,9 +855,8 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
   planet->farmland = 0;
   planet->barracks = 0;
   planet->controls = 0;
-  planet->x      = number_range ( -10000 , 10000 );
-  planet->y      = number_range ( -10000 , 10000 );
-  planet->z      = number_range ( -10000 , 10000 );
+  vector_init( &planet->pos );
+  vector_randomize( &planet->pos, -10000, 10000 );
   
   if ( starsystem )
     {
