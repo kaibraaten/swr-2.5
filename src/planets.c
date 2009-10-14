@@ -499,16 +499,14 @@ void do_showplanet( CHAR_DATA *ch, char *argument )
 
     if ( planet->size > 0 )
     {
-       float tempf;
-       
-       tempf = planet->citysize;
-       pc = tempf / planet->size *  100;
+       float tempf = planet->citysize;
+       pc = (int)(tempf / planet->size *  100);
 
        tempf = planet->wilderness;
-       pw = tempf / planet->size *  100;
+       pw = (int)(tempf / planet->size *  100);
 
        tempf = planet->farmland;
-       pf = tempf / planet->size *  100;    
+       pf = (int)(tempf / planet->size *  100);
     }
     
     ch_printf( ch, "&W%s\n\r", planet->name);
@@ -1078,39 +1076,28 @@ void do_capture ( CHAR_DATA *ch , char *argument )
 
 long get_taxes( PLANET_DATA *planet )
 {
-      long gain;
-      int resource;
-      int bigships;
-            
-      resource = planet->wilderness;
-      resource = UMIN( resource , planet->population );
+  int resource = planet->wilderness;
+  resource = UMIN( resource , planet->population );
       
-      gain = 500*planet->population;
-      gain += 10000*resource;
-      gain += planet->pop_support*100; 
+  long gain = 500*planet->population;
+  gain += 10000*resource;
+  gain += (long)(planet->pop_support*100); 
       
-      gain -= 5000 * planet->barracks;
-      gain -= 10000 * planet->controls;
+  gain -= 5000 * planet->barracks;
+  gain -= 10000 * planet->controls;
       
-      bigships = planet->controls/5;  /* 100k for destroyers, 1 mil for battleships */
-      gain -= 50000 * bigships;
+  int bigships = planet->controls/5;  /* 100k for destroyers, 1 mil for battleships */
+  gain -= 50000 * bigships;
       
-      return gain;
+  return gain;
 }
 
 int max_population( PLANET_DATA *planet )
 {
-     int support;
-     int pmax;
-     int rmax;
-     
-     support = (planet->pop_support + 200) / 3;
-      
-     pmax = planet->citysize;
-     rmax = planet->wilderness/5 + 5*planet->farmland;
-     
-     pmax = pmax * support / 100;
-     
-     return UMIN( rmax , pmax );
-     
+  int support = (int)((planet->pop_support + 200) / 3);
+  int pmax = planet->citysize;
+  int rmax = planet->wilderness/5 + 5*planet->farmland;
+
+  pmax = pmax * support / 100;
+  return UMIN( rmax , pmax );
 }

@@ -1554,7 +1554,7 @@ bool mprog_keyword_check( const char *argu, const char *argl )
     char word[MAX_INPUT_LENGTH];
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
-    int i;
+    size_t i;
     char *arg, *arglist;
     char *start, *end;
 
@@ -1615,7 +1615,7 @@ void mprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
   char       *start;
   char       *dupl;
   char       *end;
-  int	      i;
+  size_t      i;
 
   for ( mprg = mob->pIndexData->mudprogs; mprg; mprg = mprg->next )
     if ( mprg->type & type )
@@ -2391,7 +2391,7 @@ void oprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
   char       *start;
   char       *dupl;
   char       *end;
-  int         i;
+  size_t      i;
 
   for ( mprg = iobj->pIndexData->mudprogs; mprg; mprg = mprg->next )
     if ( mprg->type & type )
@@ -2638,7 +2638,7 @@ void rprog_wordlist_check( char *arg, CHAR_DATA *mob, CHAR_DATA *actor,
   char       *start;
   char       *dupl;
   char       *end;
-  int         i;
+  size_t         i;
 
   if ( actor && !char_died(actor) && actor->in_room )
     room = actor->in_room;
@@ -2794,7 +2794,7 @@ void room_act_update( void )
   
   while ( (runner = room_act_list) != NULL )
   {
-    ROOM_INDEX_DATA *room = runner->vo;
+    ROOM_INDEX_DATA *room = (ROOM_INDEX_DATA*) runner->vo;
     
     while ( (mpact = room->mpact) != NULL )
     {
@@ -2832,7 +2832,7 @@ void obj_act_update( void )
   
   while ( (runner = obj_act_list) != NULL )
   {
-    OBJ_DATA *obj = runner->vo;
+    OBJ_DATA *obj = (OBJ_DATA*) runner->vo;
     
     while ( (mpact = obj->mpact) != NULL )
     {

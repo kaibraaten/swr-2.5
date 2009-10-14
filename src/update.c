@@ -140,7 +140,7 @@ int mana_gain( CHAR_DATA *ch )
 	switch ( ch->position )
 	{
 	case POS_SLEEPING: gain += get_curr_int(ch) * 3;	break;
-	case POS_RESTING:  gain += get_curr_int(ch) * 1.5;	break;
+	case POS_RESTING:  gain += (int)(get_curr_int(ch) * 1.5);	break;
 	}
 
 	if ( ch->pcdata->condition[COND_FULL]   == 0 )
@@ -1440,8 +1440,9 @@ void aggr_update( void )
     /* check mobprog act queue */
     while ( (apdtmp = mob_act_list) != NULL )
     {
-	wch = mob_act_list->vo;
-	if ( !char_died(wch) && wch->mpactnum > 0 )
+      wch = (CHAR_DATA*) mob_act_list->vo;
+
+      if ( !char_died(wch) && wch->mpactnum > 0 )
 	{
 	    MPROG_ACT_LIST * tmp_act;
 
@@ -1732,7 +1733,7 @@ void update_handler( void )
 
     if ( --pulse_point    <= 0 )
     {
-	pulse_point     = number_range( PULSE_TICK * 0.75, PULSE_TICK * 1.25 );
+      pulse_point     = number_range( (int)(PULSE_TICK * 0.75), (int)(PULSE_TICK * 1.25 ));
 
 	weather_update	( );
 	char_update	( );
@@ -2165,8 +2166,8 @@ void auction_update (void)
 		}
 		else
 		    obj_to_char( auction->item, auction->buyer );
-	        pay = (int)auction->bet * 0.9;
-		tax = (int)auction->bet * 0.1;
+	        pay = (int)(auction->bet * 0.9);
+		tax = (int)(auction->bet * 0.1);
                 auction->seller->gold += pay; /* give him the money, tax 10 % */
 		sprintf(buf, "The auctioneer pays you %d gold, charging an auction fee of %d.\n\r", pay, tax);
 		send_to_char(buf, auction->seller);
@@ -2199,7 +2200,7 @@ void auction_update (void)
 		}
 		else
 		    obj_to_char (auction->item,auction->seller);
-		tax = (int)auction->item->cost * 0.05;
+		tax = (int)(auction->item->cost * 0.05);
 		sprintf(buf, "The auctioneer charges you an auction fee of %d.\n\r", tax );
 		send_to_char(buf, auction->seller);
 		if ((auction->seller->gold - tax) < 0)

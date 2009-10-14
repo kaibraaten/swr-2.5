@@ -1643,7 +1643,7 @@ void do_hedit( CHAR_DATA *ch, char *argument )
 	default:
 	  break;
 	case SUB_HELP_EDIT:
-	  if ( (pHelp = ch->dest_buf) == NULL )
+	  if ( (pHelp = (HELP_DATA*) ch->dest_buf) == NULL )
 	  {
 		bug( "hedit: sub_help_edit: NULL ch->dest_buf", 0 );
 		stop_editing( ch );

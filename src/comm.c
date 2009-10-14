@@ -290,7 +290,7 @@ static void SegVio()
 /*
  * LAG alarm!							-Thoric
  */
-static void caught_alarm()
+static void caught_alarm( int foo )
 {
     char buf[MAX_STRING_LENGTH];
     bug( "ALARM CLOCK!" );
@@ -886,14 +886,13 @@ void close_socket( DESCRIPTOR_DATA *dclose, bool force )
 
 bool read_from_descriptor( DESCRIPTOR_DATA *d )
 {
-    int iStart;
-
     /* Hold horses if pending command already. */
     if ( d->incomm[0] != '\0' )
 	return TRUE;
 
     /* Check for overflow. */
-    iStart = strlen(d->inbuf);
+    size_t iStart = strlen(d->inbuf);
+
     if ( iStart >= sizeof(d->inbuf) - 10 )
     {
 	sprintf( log_buf, "%s input overflow!", d->host );
@@ -1140,7 +1139,7 @@ bool flush_buffer( DESCRIPTOR_DATA *d, bool fPrompt )
 /*
  * Append onto an output buffer.
  */
-void write_to_buffer( DESCRIPTOR_DATA *d, const char *txt, int length )
+void write_to_buffer( DESCRIPTOR_DATA *d, const char *txt, size_t length )
 {
     if ( !d )
     {
@@ -1537,12 +1536,14 @@ void send_to_char_color( const char *txt, CHAR_DATA *ch )
   return;
 }
 
-void write_to_pager( DESCRIPTOR_DATA *d, const char *txt, int length )
+void write_to_pager( DESCRIPTOR_DATA *d, const char *txt, size_t length )
 {
   if ( length <= 0 )
     length = strlen(txt);
+
   if ( length == 0 )
     return;
+
   if ( !d->pagebuf )
   {
     d->pagesize = MAX_STRING_LENGTH;
@@ -1966,7 +1967,7 @@ char *default_prompt( CHAR_DATA *ch )
 
 int getcolor(char clr)
 {
-  static const char colors[16] = "xrgObpcwzRGYBPCW";
+  static const char *colors = "xrgObpcwzRGYBPCW";
   int r;
   
   for ( r = 0; r < 16; r++ )
@@ -1983,7 +1984,7 @@ void display_prompt( DESCRIPTOR_DATA *d )
   const char *prompt;
   char buf[MAX_STRING_LENGTH];
   char *pbuf = buf;
-  int stat;
+  unsigned int stat;
 
   if ( !ch )
   {

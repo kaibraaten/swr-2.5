@@ -5,7 +5,7 @@
 #include <time.h>
 #include "mud.h"
 
-ROOM_INDEX_DATA *       room_index_hash         [MAX_KEY_HASH];
+extern ROOM_INDEX_DATA *       room_index_hash         [MAX_KEY_HASH];
 
 SHIP_DATA * make_mob_ship( PLANET_DATA *planet , int model );
 void    resetship args( ( SHIP_DATA *ship ) );
@@ -1234,7 +1234,7 @@ SHIP_DATA * make_mob_ship( PLANET_DATA *planet , int model )
     ship->copilot = STRALLOC("");
     ship->dest = NULL;
     ship->type = MOB_SHIP;
-    ship->class = 0;
+    ship->ship_class = 0;
     ship->model = model;
     ship->hyperspeed = 0;
     ship->laserstate = LASER_READY;

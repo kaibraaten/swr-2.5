@@ -439,29 +439,23 @@ EXIT_DATA *get_exit_num( ROOM_INDEX_DATA *room, short count )
  */
 short encumbrance( CHAR_DATA *ch, short move )
 {
-    int cur, max;
+  int max = can_carry_w(ch);
+  int cur = ch->carry_weight;
 
-    max = can_carry_w(ch);
-    cur = ch->carry_weight;
-    if ( cur >= max )
-      return move * 4;
-    else
-    if ( cur >= max * 0.95 )
-      return move * 3.5;
-    else
-    if ( cur >= max * 0.90 )
-      return move * 3;
-    else
-    if ( cur >= max * 0.85 )
-      return move * 2.5;
-    else
-    if ( cur >= max * 0.80 )
-      return move * 2;
-    else
-    if ( cur >= max * 0.75 )
-      return move * 1.5;
-    else
-      return move;
+  if ( cur >= max )
+    return move * 4;
+  else if ( cur >= max * 0.95 )
+    return (short)( move * 3.5 );
+  else if ( cur >= max * 0.90 )
+    return move * 3;
+  else if ( cur >= max * 0.85 )
+    return (short)(move * 2.5);
+  else if ( cur >= max * 0.80 )
+    return move * 2;
+  else if ( cur >= max * 0.75 )
+    return (short)(move * 1.5);
+  else
+    return move;
 }
 
 

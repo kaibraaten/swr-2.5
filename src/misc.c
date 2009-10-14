@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 #include "mud.h"
 
 extern int	top_exit;
@@ -1316,37 +1317,36 @@ void do_hail( CHAR_DATA *ch , char *argument )
 
 void do_suicide( CHAR_DATA *ch, char *argument )
 {
-        char  logbuf[MAX_STRING_LENGTH];
+  char  logbuf[MAX_STRING_LENGTH];
         
-        if ( IS_NPC(ch) || !ch->pcdata )
-        {
-            send_to_char( "Yeah right!\n\r", ch );
-	    return;
-        }
+  if ( IS_NPC(ch) || !ch->pcdata )
+    {
+      send_to_char( "Yeah right!\n\r", ch );
+      return;
+    }
         
-        if ( argument[0] == '\0' )
-        {
-            send_to_char( "&RIf you really want to delete this character type suicide and your password.\n\r", ch );
-	    return;
-        }
-        
-        if ( strcmp( crypt( argument, ch->pcdata->pwd ), ch->pcdata->pwd ) )
-	{
-	    send_to_char( "Sorry wrong password.\n\r", ch );
-	    sprintf( logbuf , "%s attempting to commit suicide... WRONG PASSWORD!" , ch->name );
-	    log_string( logbuf );
-	    return;
-	}
+  if ( argument[0] == '\0' )
+    {
+      send_to_char( "&RIf you really want to delete this character type suicide and your password.\n\r", ch );
+      return;
+    }
+  
+  if ( strcmp( crypt( argument, ch->pcdata->pwd ), ch->pcdata->pwd ) )
+    {
+      send_to_char( "Sorry wrong password.\n\r", ch );
+      sprintf( logbuf , "%s attempting to commit suicide... WRONG PASSWORD!" , ch->name );
+      log_string( logbuf );
+      return;
+    }
 
-       act( AT_BLOOD, "With a sad determination and trembling hands you slit your own throat!",  ch, NULL, NULL, TO_CHAR    );
-       act( AT_BLOOD, "Cold shivers run down your spine as you watch $n slit $s own throat!",  ch, NULL, NULL, TO_ROOM );
+  act( AT_BLOOD, "With a sad determination and trembling hands you slit your own throat!",  ch, NULL, NULL, TO_CHAR    );
+  act( AT_BLOOD, "Cold shivers run down your spine as you watch $n slit $s own throat!",  ch, NULL, NULL, TO_ROOM );
+  
+  sprintf( logbuf , "%s has committed suicide.." , ch->name );
+  log_string( logbuf );
 
-       sprintf( logbuf , "%s has committed suicide.." , ch->name );
-       log_string( logbuf );
-
-       set_cur_char(ch);
-       raw_kill( ch, ch );
-            
+  set_cur_char(ch);
+  raw_kill( ch, ch );
 }
 
 void do_bank( CHAR_DATA *ch, char *argument )
@@ -1505,7 +1505,7 @@ void do_dig( CHAR_DATA *ch, char *argument )
 	      bug( "do_dig: dest_buf NULL", 0 );
 	      return;
 	  }
-	  strcpy( arg, ch->dest_buf );  
+	  strcpy( arg, (const char*) ch->dest_buf );
 	  DISPOSE( ch->dest_buf );	
 	  break;
 
@@ -1642,7 +1642,7 @@ void do_search( CHAR_DATA *ch, char *argument )
 		bug( "do_search: dest_buf NULL", 0 );
 		return;
 	    }
-	    strcpy( arg, ch->dest_buf );
+	    strcpy( arg, (const char*) ch->dest_buf );
 	    DISPOSE( ch->dest_buf );
 	    break;
 	case SUB_TIMER_DO_ABORT:

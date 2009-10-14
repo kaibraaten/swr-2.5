@@ -288,7 +288,7 @@ bool can_medit( CHAR_DATA *ch, MOB_INDEX_DATA *mob )
 
 int get_otype( const char *type )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < (sizeof(o_types) / sizeof(o_types[0]) ); x++ )
       if ( !str_cmp( type, o_types[x] ) )
@@ -298,7 +298,7 @@ int get_otype( const char *type )
 
 int get_aflag( const char *flag )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < 32; x++ )
       if ( !str_cmp( flag, a_flags[x] ) )
@@ -308,7 +308,7 @@ int get_aflag( const char *flag )
 
 int get_trapflag( const char *flag )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < 32; x++ )
       if ( !str_cmp( flag, trap_flags[x] ) )
@@ -318,7 +318,7 @@ int get_trapflag( const char *flag )
 
 int get_atype( const char *type )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < MAX_APPLY_TYPE; x++ )
       if ( !str_cmp( type, a_types[x] ) )
@@ -328,7 +328,7 @@ int get_atype( const char *type )
 
 int get_wearloc( const char *type )
 {
-    int x;
+  size_t x;
     
     for ( x = 0; x < MAX_WEAR; x++ )
       if ( !str_cmp( type, wear_locs[x] ) )
@@ -338,7 +338,7 @@ int get_wearloc( const char *type )
 
 int get_exflag( const char *flag )
 {
-    int x;
+  size_t x;
     
     for ( x = 0; x <= MAX_EXFLAG; x++ )
       if ( !str_cmp( flag, ex_flags[x] ) )
@@ -348,7 +348,7 @@ int get_exflag( const char *flag )
 
 int get_rflag( const char *flag )
 {
-    int x;
+  size_t x;
     
     for ( x = 0; x < 32; x++ )
       if ( !str_cmp( flag, r_flags[x] ) )
@@ -358,27 +358,27 @@ int get_rflag( const char *flag )
 
 int get_mpflag( const char *flag )
 {
-    int x;
+  size_t x;
     
-    for ( x = 0; x < 32; x++ )
-      if ( !str_cmp( flag, mprog_flags[x] ) )
-        return x;
-    return -1;
+  for ( x = 0; x < 32; x++ )
+    if ( !str_cmp( flag, mprog_flags[x] ) )
+      return x;
+  return -1;
 }
 
 int get_oflag( const char *flag )
 {
-    int x;
+  size_t x;
 
-    for ( x = 0; x < 32; x++ )
-      if ( !str_cmp( flag, o_flags[x] ) )
-        return x;
-    return -1;
+  for ( x = 0; x < 32; x++ )
+    if ( !str_cmp( flag, o_flags[x] ) )
+      return x;
+  return -1;
 }
 
 int get_areaflag( const char *flag )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < 32; x++ )
       if ( !str_cmp( flag, area_flags[x] ) )
@@ -388,7 +388,7 @@ int get_areaflag( const char *flag )
 
 int get_wflag( const char *flag )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < 32; x++ )
       if ( !str_cmp( flag, w_flags[x] ) )
@@ -398,81 +398,81 @@ int get_wflag( const char *flag )
 
 int get_actflag( const char *flag )
 {
-    int x;
+  size_t x;
 
-    for ( x = 0; x < 32; x++ )
-      if ( !str_cmp( flag, act_flags[x] ) )
-        return x;
-    return -1;
+  for ( x = 0; x < 32; x++ )
+    if ( !str_cmp( flag, act_flags[x] ) )
+      return x;
+  return -1;
 }
 
 int get_pcflag( const char *flag )
 {
-    int x;
+  size_t x;
 
-    for ( x = 0; x < 32; x++ )
-      if ( !str_cmp( flag, pc_flags[x] ) )
-        return x;
-    return -1;
+  for ( x = 0; x < 32; x++ )
+    if ( !str_cmp( flag, pc_flags[x] ) )
+      return x;
+  return -1;
 }
 int get_plrflag( const char *flag )
 {
-    int x;
+  size_t x;
 
-    for ( x = 0; x < 32; x++ )
-      if ( !str_cmp( flag, plr_flags[x] ) )
-        return x;
-    return -1;
+  for ( x = 0; x < 32; x++ )
+    if ( !str_cmp( flag, plr_flags[x] ) )
+      return x;
+  return -1;
 }
 
 int get_risflag( const char *flag )
 {
-    int x;
+  size_t x;
 
-    for ( x = 0; x < 32; x++ )
-      if ( !str_cmp( flag, ris_flags[x] ) )
-        return x;
-    return -1;
+  for ( x = 0; x < 32; x++ )
+    if ( !str_cmp( flag, ris_flags[x] ) )
+      return x;
+  return -1;
 }
 
 int get_trigflag( const char *flag )
 {
-    int x;
+  size_t x;
 
-    for ( x = 0; x < 32; x++ )
-      if ( !str_cmp( flag, trig_flags[x] ) )
-        return x;
-    return -1;
+  for ( x = 0; x < 32; x++ )
+    if ( !str_cmp( flag, trig_flags[x] ) )
+      return x;
+  return -1;
 }
 
 int get_partflag( const char *flag )
 {
-    int x;
+  size_t x;
 
-    for ( x = 0; x < 32; x++ )
-      if ( !str_cmp( flag, part_flags[x] ) )
-        return x;
-    return -1;
+  for ( x = 0; x < 32; x++ )
+    if ( !str_cmp( flag, part_flags[x] ) )
+      return x;
+  return -1;
 }
 
 int get_attackflag( const char *flag )
 {
-    int x;
+  size_t x;
 
-    for ( x = 0; x < 32; x++ )
-      if ( !str_cmp( flag, attack_flags[x] ) )
-        return x;
-    return -1;
+  for ( x = 0; x < 32; x++ )
+    if ( !str_cmp( flag, attack_flags[x] ) )
+      return x;
+  return -1;
 }
 
 int get_defenseflag( const char *flag )
 {
-    int x;
+  size_t x;
 
-    for ( x = 0; x < 32; x++ )
-      if ( !str_cmp( flag, defense_flags[x] ) )
-        return x;
-    return -1;
+  for ( x = 0; x < 32; x++ )
+    if ( !str_cmp( flag, defense_flags[x] ) )
+      return x;
+  return -1;
 }
 
 /*
@@ -748,7 +748,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
 		ch->substate = SUB_NONE;
 		return;
 	  }
-	  victim = ch->dest_buf;
+	  victim = (CHAR_DATA*) ch->dest_buf;
 	  if ( char_died(victim) )
 	  {
 		send_to_char( "Your victim died!\n\r", ch );
@@ -773,7 +773,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
 
     if ( ch->substate == SUB_REPEATCMD )
     {
-	victim = ch->dest_buf;
+      victim = (CHAR_DATA*) ch->dest_buf;
 	if ( char_died(victim) )
 	{
 	    send_to_char( "Your victim died!\n\r", ch );
@@ -2163,10 +2163,10 @@ void do_oset( CHAR_DATA *ch, char *argument )
 	   * the object and index-object lists, searching through the
 	   * extra_descr lists for a matching pointer...
 	   */
-	  ed  = ch->dest_buf;
+	  ed  = (EXTRA_DESCR_DATA*) ch->dest_buf;
 	  STRFREE( ed->description );
 	  ed->description = copy_buffer( ch );
-	  tmpobj = ch->spare_ptr;
+	  tmpobj = (OBJ_DATA*) ch->spare_ptr;
 	  stop_editing( ch );
 	  ch->dest_buf = tmpobj;
 	  ch->substate = ch->tempnum;
@@ -2180,7 +2180,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
 		ch->substate = SUB_NONE;
 		return;
 	  }
-	  obj = ch->dest_buf;
+	  obj = (OBJ_DATA*) ch->dest_buf;
 	  if ( obj && obj_extracted(obj) )
 	  {
 		send_to_char( "Your object was extracted!\n\r", ch );
@@ -2194,7 +2194,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
 		STRFREE( obj->pIndexData->description );
 		obj->pIndexData->description = QUICKLINK( obj->description );
 	  }
-	  tmpobj = ch->spare_ptr;
+	  tmpobj = (OBJ_DATA*) ch->spare_ptr;
 	  stop_editing( ch );
 	  ch->substate = ch->tempnum;
 	  ch->dest_buf = tmpobj;
@@ -2206,7 +2206,8 @@ void do_oset( CHAR_DATA *ch, char *argument )
 
     if ( ch->substate == SUB_REPEATCMD )
     {
-	obj = ch->dest_buf;
+      obj = (OBJ_DATA*) ch->dest_buf;
+
 	if ( obj && obj_extracted(obj) )
 	{
 	    send_to_char( "Your object was extracted!\n\r", ch );
@@ -2893,12 +2894,12 @@ void do_oset( CHAR_DATA *ch, char *argument )
 	case ITEM_WEAPON:
 	    if ( !str_cmp( arg2, "weapontype" ) )
 	    {
-		int x;
+	      size_t x;
 
 		value = -1;
 		for ( x = 0; x < sizeof( weapon_table ) / sizeof( weapon_table[0] ); x++ )
 		  if ( !str_cmp( arg3, weapon_table[x] ) )
-		    value = x;
+		    value = (int) x;
 		if ( value < 0 )
 		{
 		    send_to_char( "Unknown weapon type.\n\r", ch );
@@ -3061,7 +3062,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
 	default:
 	  break;
 	case SUB_ROOM_DESC:
-	  location = ch->dest_buf;
+	  location = (ROOM_INDEX_DATA*) ch->dest_buf;
 	  if ( !location )
 	  {
 		bug( "redit: sub_room_desc: NULL ch->dest_buf", 0 );
@@ -3073,7 +3074,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
 	  ch->substate = ch->tempnum;
 	  return;
 	case SUB_ROOM_EXTRA:
-	  ed = ch->dest_buf;
+	  ed = (EXTRA_DESCR_DATA*) ch->dest_buf;
 	  if ( !ed )
 	  {
 		bug( "redit: sub_room_extra: NULL ch->dest_buf", 0 );
@@ -5084,7 +5085,7 @@ void do_mpedit( CHAR_DATA *ch, char *argument )
 		ch->substate = SUB_NONE;
 		return;
 	  }
-	  mprog	 = ch->dest_buf;
+	  mprog	 = (MPROG_DATA*) ch->dest_buf;
 	  if ( mprog->comlist )
 	    STRFREE( mprog->comlist );
 	  mprog->comlist = copy_buffer( ch );
@@ -5365,7 +5366,7 @@ void do_opedit( CHAR_DATA *ch, char *argument )
 		ch->substate = SUB_NONE;
 		return;
 	  }
-	  mprog	 = ch->dest_buf;
+	  mprog	 = (MPROG_DATA*) ch->dest_buf;
 	  if ( mprog->comlist )
 	    STRFREE( mprog->comlist );
 	  mprog->comlist = copy_buffer( ch );
@@ -5663,7 +5664,7 @@ void do_rpedit( CHAR_DATA *ch, char *argument )
 		ch->substate = SUB_NONE;
 		return;
 	  }
-	  mprog	 = ch->dest_buf;
+	  mprog	 = (MPROG_DATA*) ch->dest_buf;
 	  if ( mprog->comlist )
 	    STRFREE( mprog->comlist );
 	  mprog->comlist = copy_buffer( ch );

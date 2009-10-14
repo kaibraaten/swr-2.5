@@ -48,9 +48,9 @@ void skill_notfound( CHAR_DATA *ch, char *argument )
 }
 
 
-int get_ssave( char *name )
+int get_ssave( const char *name )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < sizeof(spell_saves) / sizeof(spell_saves[0]); x++ )
       if ( !str_cmp( name, spell_saves[x] ) )
@@ -58,9 +58,9 @@ int get_ssave( char *name )
     return -1;
 }
 
-int get_starget( char *name )
+int get_starget( const char *name )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < sizeof(target_type) / sizeof(target_type[0]); x++ )
       if ( !str_cmp( name, target_type[x] ) )
@@ -68,9 +68,9 @@ int get_starget( char *name )
     return -1;
 }
 
-int get_sflag( char *name )
+int get_sflag( const char *name )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < sizeof(spell_flag) / sizeof(spell_flag[0]); x++ )
       if ( !str_cmp( name, spell_flag[x] ) )
@@ -78,9 +78,9 @@ int get_sflag( char *name )
     return -1;
 }
 
-int get_sdamage( char *name )
+int get_sdamage( const char *name )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < sizeof(spell_damage) / sizeof(spell_damage[0]); x++ )
       if ( !str_cmp( name, spell_damage[x] ) )
@@ -88,9 +88,9 @@ int get_sdamage( char *name )
     return -1;
 }
 
-int get_saction( char *name )
+int get_saction( const char *name )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < sizeof(spell_action) / sizeof(spell_action[0]); x++ )
       if ( !str_cmp( name, spell_action[x] ) )
@@ -98,9 +98,9 @@ int get_saction( char *name )
     return -1;
 }
 
-int get_spower( char *name )
+int get_spower( const char *name )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < sizeof(spell_power) / sizeof(spell_power[0]); x++ )
       if ( !str_cmp( name, spell_power[x] ) )
@@ -108,9 +108,9 @@ int get_spower( char *name )
     return -1;
 }
 
-int get_sclass( char *name )
+int get_sclass( const char *name )
 {
-    int x;
+  size_t x;
 
     for ( x = 0; x < sizeof(spell_class) / sizeof(spell_class[0]); x++ )
       if ( !str_cmp( name, spell_class[x] ) )
@@ -270,7 +270,7 @@ bool check_skill( CHAR_DATA *ch, char *command, char *argument )
 	if ( (number_percent( ) + skill_table[sn]->difficulty * 5)
 	   > (IS_NPC(ch) ? 75 : ch->pcdata->learned[sn]) )
 	{
-	    failed_casting( skill_table[sn], ch, vo, obj );
+	  failed_casting( skill_table[sn], ch, (CHAR_DATA*) vo, obj );
 	    learn_from_failure( ch, sn );
 	    if ( mana )
 	    {
@@ -1902,7 +1902,7 @@ void do_sneak( CHAR_DATA *ch, char *argument )
     if ( IS_NPC(ch) || number_percent( ) < ch->pcdata->learned[gsn_sneak] )
     {
 	af.type      = gsn_sneak;
-	af.duration  = IS_NPC(ch) ? ch->top_level : ch->pcdata->learned[gsn_sneak]  * DUR_CONV;
+	af.duration  = IS_NPC(ch) ? ch->top_level : (short)(ch->pcdata->learned[gsn_sneak]  * DUR_CONV);
 	af.location  = APPLY_NONE;
 	af.modifier  = 0;
 	af.bitvector = AFF_SNEAK;
