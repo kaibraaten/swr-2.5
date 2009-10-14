@@ -4736,36 +4736,49 @@ void write_area_list( )
 
 void do_astat( CHAR_DATA *ch, char *argument )
 {
-    AREA_DATA *tarea;
-    bool proto, found;
+  AREA_DATA *tarea = 0;
+  bool found = FALSE;
  
-    found = FALSE; proto = FALSE;
-    for ( tarea = first_area; tarea; tarea = tarea->next )
-	if ( !str_cmp( tarea->filename, argument ) )
+  for ( tarea = first_area; tarea; tarea = tarea->next )
+    {
+      if ( !str_cmp( tarea->filename, argument ) )
 	{
 	  found = TRUE;
 	  break;
 	}
-
-    if ( !found )
-    {
-      if ( argument && argument[0] != '\0' ) 
-      {
- 	send_to_char( "Area not found.  Check 'zones'.\n\r", ch );
-	return;
-      }
-      else
-      {
-        tarea = ch->in_room->area;
-      }
     }
 
-    ch_printf( ch, "Name: %s\n\rFilename: %-20s",
-			tarea->name,
-			tarea->filename);
-    ch_printf( ch, "Area flags: %s\n\r", flag_string(tarea->flags, area_flags) );
-    ch_printf( ch, "Planet: %s\n\r", tarea->planet ?  tarea->planet->name : "" );
+  if ( !found )
+    {
+      if ( argument && argument[0] != '\0' ) 
+	{
+	  send_to_char( "Area not found.  Check 'zones'.\n\r", ch );
+	  return;
+	}
+      else
+	{
+	  tarea = ch->in_room->area;
+	}
+    }
 
+  if( tarea )
+    {
+      ch_printf( ch, "Name: %s\n\rFilename: %-20s",
+		 tarea->name,
+		 tarea->filename);
+      ch_printf( ch, "Area flags: %s\n\r", flag_string(tarea->flags, area_flags) );
+      ch_printf( ch, "Planet: %s\n\r", tarea->planet ?  tarea->planet->name : "" );
+    }
+  else if( IS_SET( ch->in_room->room_flags, ROOM_SPACECRAFT ) )
+    {
+      ch_printf( ch, "This room is a spacecraft. It has no area.\r\n" );
+    }
+  else
+    {
+      ch_printf( ch, "This room is not in an area!\r\n" );
+      bug( "%s (%s:%d) Room not in an area, and ROOM_SPACECRAFT flag not set.",
+	   __FUNCTION__, __FILE__, __LINE__ );
+    }
 }
 
 

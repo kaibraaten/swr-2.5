@@ -364,13 +364,7 @@ void accept_new( int ctrl )
 	    FD_SET( d->descriptor, &in_set  );
 	    FD_SET( d->descriptor, &out_set );
 	    FD_SET( d->descriptor, &exc_set );
-	    if (d->auth_fd != -1)
-	    {
-		maxdesc = UMAX( maxdesc, d->auth_fd );
-		FD_SET(d->auth_fd, &in_set);
-		if (IS_SET(d->auth_state, FLAG_WRAUTH))
-		  FD_SET(d->auth_fd, &out_set);
-	    }
+
 	    if ( d == last_descriptor )
 	      break;
 	}
@@ -621,10 +615,6 @@ void init_descriptor( DESCRIPTOR_DATA *dnew, int desc )
   dnew->idle = 0;
   dnew->lines = 0;
   dnew->scrlen = 24;
-  dnew->user = STRALLOC( "unknown" );
-  dnew->auth_fd = -1;
-  dnew->auth_inc = 0;
-  dnew->auth_state = 0;
   dnew->newstate = 0;
   dnew->prevcolor = 0x07;
   dnew->original = NULL;
@@ -749,9 +739,10 @@ void free_desc( DESCRIPTOR_DATA *d )
     close( d->descriptor );
     STRFREE( d->host );
     DISPOSE( d->outbuf );
-    STRFREE( d->user );    /* identd */
+
     if ( d->pagebuf )
 	DISPOSE( d->pagebuf );
+
     DISPOSE( d );
     --num_descriptors;
     return;
@@ -874,8 +865,6 @@ void close_socket( DESCRIPTOR_DATA *dclose, bool force )
 
     if ( dclose->descriptor == maxdesc )
       --maxdesc;
-    if ( dclose->auth_fd != -1 ) 
-      close( dclose->auth_fd );
 
     free_desc( dclose );
     return;
@@ -1345,7 +1334,7 @@ bool check_reconnect( DESCRIPTOR_DATA *d, const char *name, bool fConn )
 		ch->timer	 = 0;
 		send_to_char( "Reconnecting.\n\r", ch );
 		act( AT_ACTION, "$n has reconnected.", ch, NULL, NULL, TO_ROOM );
-		sprintf( log_buf, "%s@%s(%s) reconnected.", ch->name, d->host, d->user );
+		sprintf( log_buf, "%s@%s reconnected.", ch->name, d->host );
 		log_string_plus( log_buf, LOG_COMM );
 		d->connected = CON_PLAYING;
 	    }

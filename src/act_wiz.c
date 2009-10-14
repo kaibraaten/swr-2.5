@@ -1090,8 +1090,8 @@ void do_mstat( CHAR_DATA *ch, char *argument )
 	( IS_NPC( victim ) || !victim->pcdata->clan ) ? "(none)" 
 			       : victim->pcdata->clan->name );
     if( IS_IMMORTAL(ch) && !IS_NPC(victim) && victim->desc )
-	ch_printf( ch, "User: %s@%s   Descriptor: %d   Trust: %d   AuthedBy: %s\n\r",
-		victim->desc->user, victim->desc->host, victim->desc->descriptor,
+	ch_printf( ch, "Descriptor: %d   Trust: %d   AuthedBy: %s\n\r",
+		victim->desc->host, victim->desc->descriptor,
 		victim->trust, victim->pcdata->authed_by[0] != '\0'
 		? victim->pcdata->authed_by : "(unknown)" );
     if ( !IS_NPC(victim) && victim->pcdata->release_date != 0 )
@@ -2848,17 +2848,15 @@ void do_users( CHAR_DATA *ch, char *argument )
 	if (  d->character && can_see( ch, d->character ) )
 	{
 	    count++;
-	    sprintf( buf,
-	     " %3d| %2d|%4d|%6d| %s@%s ",
-		d->descriptor,
-		d->connected,
-		d->idle / 4,
-		d->port,
-		d->original  ? d->original->name  :
-		d->character ? d->character->name : "(none)",
-		d->hostip );
-	    sprintf( buf + strlen( buf ), " (%s@%s)", d->user, d->host  );
-	    strcat(buf, "\n\r");
+	    sprintf( buf, " %3d| %2d|%4d|%6d| %s@%s\r\n",
+		     d->descriptor,
+		     d->connected,
+		     d->idle / 4,
+		     d->port,
+		     d->original  ? d->original->name  :
+		     d->character ? d->character->name : "(none)",
+		     d->host );
+
 	    send_to_pager( buf, ch );
 	}
     }
