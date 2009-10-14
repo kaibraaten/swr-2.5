@@ -559,6 +559,14 @@ Log         0
 End
 
 #COMMAND
+Name        copyover~
+Code        do_copyover
+Position    0
+Level       200
+Log         1
+End
+
+#COMMAND
 Name        down~
 Code        do_down
 Position    8
