@@ -38,26 +38,99 @@ void	write_corpses	args( ( CHAR_DATA *ch, char *name ) );
 
 void save_home( CHAR_DATA *ch )
 {
-    if ( ch->plr_home )
+  if ( ch->plr_home )
     {
-       	FILE *fp;
-       	char filename[256];
-       	OBJ_DATA *contents;
+      FILE *fp;
+      char filename[256];
+      OBJ_DATA *contents;
 
+      sprintf( filename, "%s%c/%s.home", PLAYER_DIR, tolower(ch->name[0]),
+	       capitalize( ch->name ) );
 
-       	sprintf( filename, "%s%c/%s.home", PLAYER_DIR, tolower(ch->name[0]),
-				 capitalize( ch->name ) );
-    	if ( ( fp = fopen( filename, "w" ) ) == NULL )
+      if ( ( fp = fopen( filename, "w" ) ) == NULL )
     	{
     	}
-    	else
+      else
     	{
-        	contents = ch->plr_home->last_content;
-        	if (contents)
-	  	  fwrite_obj(ch, contents, fp, 0, OS_CARRY );
-		fprintf( fp, "#END\n" );
-    		fclose( fp );
+	  contents = ch->plr_home->last_content;
+
+	  if (contents)
+	    fwrite_obj(ch, contents, fp, 0, OS_CARRY );
+
+	  fprintf( fp, "#END\n" );
+	  fclose( fp );
     	}
+    }
+}
+
+void load_home( CHAR_DATA *ch )
+{
+  char filename[ 256 ];
+  FILE *fph = 0;
+  ROOM_INDEX_DATA *storeroom = ch->plr_home;
+
+  sprintf( filename, "%s%c/%s.home", PLAYER_DIR,
+	   tolower( ch->name[0] ), capitalize( ch->name ) );
+
+  if( ( fph = fopen( filename, "r" ) ) )
+    {
+      int iNest = 0;
+      OBJ_DATA *tobj = 0;
+      OBJ_DATA *tobj_next = 0;
+
+      rset_supermob( storeroom );
+
+      for( iNest = 0; iNest < MAX_NEST; ++iNest )
+	{
+	  rgObjNest[iNest] = NULL;
+	}
+
+      for( ;; )
+	{
+	  char letter = fread_letter( fph );;
+
+	  if( letter == '*' )
+	    {
+	      fread_to_eol( fph );
+	      continue;
+	    }
+
+	  if( letter != '#' )
+	    {
+	      bug( "Load_plr_home: # not found." );
+	      bug( ch->name );
+	      break;
+	    }
+
+	  const char *word = fread_word( fph );
+
+	  if( !str_cmp( word, "OBJECT" ) )
+	    {
+	      fread_obj( supermob, fph, OS_CARRY );
+	    }
+	  else if( !str_cmp( word, "END" ) )
+	    {
+	      break;
+	    }
+	  else
+	    {
+
+	      bug( "Load_plr_home: bad section." );
+	      bug( ch->name );
+	      break;
+	    }
+	}
+
+      fclose( fph );
+
+      for( tobj = supermob->first_carrying; tobj; tobj = tobj_next )
+	{
+	  tobj_next = tobj->next_content;
+	  obj_from_char( tobj );
+	  obj_to_room( tobj, storeroom );
+	}
+
+      release_supermob();
     }
 }
 

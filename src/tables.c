@@ -120,6 +120,7 @@ DO_FUN *skill_function( const char *name )
 	if ( !str_cmp( name, "do_config" ))		return do_config;
 	if ( !str_cmp( name, "do_consider" ))		return do_consider;
 	if ( !str_cmp( name, "do_construction" ))	return do_construction;
+	if ( !str_cmp( name, "do_copyover" ) )          return do_copyover;
 	if ( !str_cmp( name, "do_credits" ))		return do_credits;
 	if ( !str_cmp( name, "do_cset" ))		return do_cset;
 	break;
@@ -634,6 +635,7 @@ const char *skill_name( DO_FUN *skill )
     if ( skill == do_compare )		return "do_compare";
     if ( skill == do_config )		return "do_config";
     if ( skill == do_consider )		return "do_consider";
+    if ( skill == do_copyover )         return "do_copyover";
     if ( skill == do_credits )		return "do_credits";
     if ( skill == do_cset )		return "do_cset";
     if ( skill == do_deny )		return "do_deny";
