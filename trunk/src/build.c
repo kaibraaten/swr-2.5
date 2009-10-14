@@ -634,68 +634,79 @@ void stop_editing( CHAR_DATA *ch )
 
 void do_goto( CHAR_DATA *ch, char *argument )
 {
-    char arg[MAX_INPUT_LENGTH];
-    ROOM_INDEX_DATA *location;
-    CHAR_DATA *fch;
-    CHAR_DATA *fch_next;
-    ROOM_INDEX_DATA *in_room;
+  char arg[MAX_INPUT_LENGTH];
+  ROOM_INDEX_DATA *location;
+  CHAR_DATA *fch;
+  CHAR_DATA *fch_next;
+  ROOM_INDEX_DATA *in_room;
 
-    one_argument( argument, arg );
-    if ( arg[0] == '\0' )
+  one_argument( argument, arg );
+
+  if ( arg[0] == '\0' )
     {
-	send_to_char( "Goto where?\n\r", ch );
-	return;
-    }
-
-    if ( ( location = find_location( ch, arg ) ) == NULL )
-    {
-
-	send_to_char( "You cannot find that...\n\r", ch );
-	return;
-    
-    }
-    
-    in_room = ch->in_room;
-    if ( ch->fighting )
-	stop_fighting( ch, TRUE );
-
-    if ( !IS_SET(ch->act, PLR_WIZINVIS) )
-         if (ch->pcdata && ch->pcdata->bamfout[0] != '\0')
-               act( AT_IMMORT, "$T", ch, NULL, ch->pcdata->bamfout ,  TO_ROOM );
-          else  
-               act( AT_IMMORT, "$n $T", ch, NULL, "leaves in a swirl of the force.",  TO_ROOM );
-                                  
-                                  
-    ch->regoto = ch->in_room->vnum;
-    char_from_room( ch );
-    if ( ch->mount )
-    {
-	char_from_room( ch->mount );
-	char_to_room( ch->mount, location );
-    }
-    char_to_room( ch, location );
-
-   if ( !IS_SET(ch->act, PLR_WIZINVIS) )
-         if (ch->pcdata && ch->pcdata->bamfin[0] != '\0')
-             act( AT_IMMORT, "$T", ch, NULL, ch->pcdata->bamfin ,  TO_ROOM );
-         else  
-             act( AT_IMMORT, "$n $T", ch, NULL, "enters in a swirl of the Force.",  TO_ROOM );
-                               
-                               
-    do_look( ch, "auto" );
-
-    if ( ch->in_room == in_room )
+      send_to_char( "Goto where?\n\r", ch );
       return;
-    for ( fch = in_room->first_person; fch; fch = fch_next )
+    }
+
+  if ( ( location = find_location( ch, arg ) ) == NULL )
     {
-	fch_next = fch->next_in_room;
-	if ( fch->master == ch && IS_IMMORTAL(fch) )
+      send_to_char( "You cannot find that...\n\r", ch );
+      return;
+    }
+
+  in_room = ch->in_room;
+
+  if ( ch->fighting )
+    stop_fighting( ch, TRUE );
+
+  if ( !IS_SET(ch->act, PLR_WIZINVIS) )
+    {
+      if (ch->pcdata && ch->pcdata->bamfout[0] != '\0')
 	{
-	    act( AT_ACTION, "You follow $N.", fch, NULL, ch, TO_CHAR );
-	    do_goto( fch, argument );
+	  act( AT_IMMORT, "$T", ch, NULL, ch->pcdata->bamfout ,  TO_ROOM );
+	}
+      else  
+	{
+	  act( AT_IMMORT, "$n $T", ch, NULL, "leaves in a swirl of the force.",  TO_ROOM );
 	}
     }
+
+  ch->regoto = ch->in_room->vnum;
+  char_from_room( ch );
+
+  if ( ch->mount )
+    {
+      char_from_room( ch->mount );
+      char_to_room( ch->mount, location );
+    }
+
+  char_to_room( ch, location );
+
+  if ( !IS_SET(ch->act, PLR_WIZINVIS) )
+    {
+      if (ch->pcdata && ch->pcdata->bamfin[0] != '\0')
+	act( AT_IMMORT, "$T", ch, NULL, ch->pcdata->bamfin ,  TO_ROOM );
+      else  
+	act( AT_IMMORT, "$n $T", ch, NULL, "enters in a swirl of the Force.",  TO_ROOM );
+    }
+
+  do_look( ch, "auto" );
+
+  if ( ch->in_room == in_room )
     return;
+
+  for ( fch = in_room->first_person; fch; fch = fch_next )
+    {
+      fch_next = fch->next_in_room;
+
+      if ( fch->master == ch && IS_IMMORTAL(fch) )
+	{
+	  act( AT_ACTION, "You follow $N.", fch, NULL, ch, TO_CHAR );
+	  do_goto( fch, argument );
+	}
+    }
+
+  return;
 }
 
 void do_mset( CHAR_DATA *ch, char *argument )

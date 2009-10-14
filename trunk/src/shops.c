@@ -687,40 +687,48 @@ void do_repair( CHAR_DATA *ch, char *argument )
 
 void appraise_all( CHAR_DATA *ch, CHAR_DATA *keeper, char *fixstr )
 {
-    OBJ_DATA *obj;
-    char buf[MAX_STRING_LENGTH], *pbuf=buf;
-    int cost, total=0;
+  OBJ_DATA *obj;
+  char buf[MAX_STRING_LENGTH], *pbuf=buf;
+  int cost, total=0;
 
-    for ( obj = ch->first_carrying; obj != NULL ; obj = obj->next_content )
+  for ( obj = ch->first_carrying; obj != NULL ; obj = obj->next_content )
     {
-        if ( obj->wear_loc  == WEAR_NONE
-        &&   can_see_obj( ch, obj )
-        && ( obj->item_type == ITEM_ARMOR
-        ||   obj->item_type == ITEM_WEAPON
-        ||   obj->item_type == ITEM_DEVICE ) )
-
-            if ( !can_drop_obj( ch, obj ) )
-            ch_printf( ch, "You can't let go of %s.\n\r", obj->name );
-            else if ( ( cost = get_repaircost( keeper, obj ) ) < 0 )
-            {
-               if (cost != -2)
-               act( AT_TELL,
-                    "$n tells you, 'Sorry, I can't do anything with $p.'",
-                    keeper, obj, ch, TO_VICT );
-               else
-               act( AT_TELL, "$n tells you, '$p looks fine to me!'",
-                    keeper, obj, ch, TO_VICT );
-            }
-            else 
-            {
-            sprintf( buf,
-            "$N tells you, 'It will cost %d credit%s to %s %s'",
-            cost, cost == 1 ? "" : "s", fixstr, obj->name );
-            act( AT_TELL, buf, ch, NULL, keeper, TO_CHAR );
-            total += cost;
-            }
+      if ( obj->wear_loc  == WEAR_NONE
+	   &&   can_see_obj( ch, obj )
+	   && ( obj->item_type == ITEM_ARMOR
+		||   obj->item_type == ITEM_WEAPON
+		||   obj->item_type == ITEM_DEVICE ) )
+	{
+	  if ( !can_drop_obj( ch, obj ) )
+	    {
+	      ch_printf( ch, "You can't let go of %s.\n\r", obj->name );
+	    }
+	  else if ( ( cost = get_repaircost( keeper, obj ) ) < 0 )
+	    {
+	      if (cost != -2)
+		{
+		  act( AT_TELL,
+		       "$n tells you, 'Sorry, I can't do anything with $p.'",
+		       keeper, obj, ch, TO_VICT );
+		}
+	      else
+		{
+		  act( AT_TELL, "$n tells you, '$p looks fine to me!'",
+		       keeper, obj, ch, TO_VICT );
+		}
+	    }
+	  else 
+	    {
+	      sprintf( buf,
+		       "$N tells you, 'It will cost %d credit%s to %s %s'",
+		       cost, cost == 1 ? "" : "s", fixstr, obj->name );
+	      act( AT_TELL, buf, ch, NULL, keeper, TO_CHAR );
+	      total += cost;
+	    }
+	}
     }
-    if ( total > 0 )
+
+  if ( total > 0 )
     {
        send_to_char ("\n\r", ch);
        sprintf( buf,

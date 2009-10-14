@@ -1016,22 +1016,32 @@ bool can_dual( CHAR_DATA *ch )
  */
 bool can_layer( CHAR_DATA *ch, OBJ_DATA *obj, sh_int wear_loc )
 {
-    OBJ_DATA   *otmp;
-    sh_int	bitlayers = 0;
-    sh_int	objlayers = obj->pIndexData->layers;
+  OBJ_DATA   *otmp = 0;
+  sh_int	bitlayers = 0;
+  sh_int	objlayers = obj->pIndexData->layers;
 
-    for ( otmp = ch->first_carrying; otmp; otmp = otmp->next_content )
-	if ( otmp->wear_loc == wear_loc )
-	    if ( !otmp->pIndexData->layers )
-		return FALSE;
-	    else
-		bitlayers |= otmp->pIndexData->layers;
+  for ( otmp = ch->first_carrying; otmp; otmp = otmp->next_content )
+    {
+      if ( otmp->wear_loc == wear_loc )
+	{
+	  if ( !otmp->pIndexData->layers )
+	    {
+	      return FALSE;
+	    }
+	  else
+	    {
+	      bitlayers |= otmp->pIndexData->layers;
+	    }
+	}
+    }
 
-    if ( (bitlayers && !objlayers) || bitlayers > objlayers )
-	return FALSE;
-    if ( !bitlayers || ((bitlayers & ~objlayers) == bitlayers) )
-	return TRUE;
+  if ( (bitlayers && !objlayers) || bitlayers > objlayers )
     return FALSE;
+
+  if ( !bitlayers || ((bitlayers & ~objlayers) == bitlayers) )
+    return TRUE;
+
+  return FALSE;
 }
 
 /*
@@ -1750,282 +1760,294 @@ void do_bury( CHAR_DATA *ch, char *argument )
 /* put an item on auction, or see the stats on the current item or bet */
 void do_auction (CHAR_DATA *ch, char *argument)
 {
-    OBJ_DATA *obj;
-    char arg1[MAX_INPUT_LENGTH];
-    char arg2[MAX_INPUT_LENGTH];
-    char buf[MAX_STRING_LENGTH];
+  OBJ_DATA *obj;
+  char arg1[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+  char buf[MAX_STRING_LENGTH];
 
-    argument = one_argument (argument, arg1);
+  argument = one_argument (argument, arg1);
 
-    if (IS_NPC(ch)) /* NPC can be extracted at any time and thus can't auction! */
-	return;
+  if (IS_NPC(ch)) /* NPC can be extracted at any time and thus can't auction! */
+    return;
     
-    if ( !IS_SET( ch->in_room->room_flags , ROOM_AUCTION ) )
+  if ( !IS_SET( ch->in_room->room_flags , ROOM_AUCTION ) )
     {
-       set_char_color ( AT_LBLUE, ch );
-       send_to_char ( "\n\rYou must go to an auction hall to do that!\n\r", ch );
-       return;
+      set_char_color ( AT_LBLUE, ch );
+      send_to_char ( "\n\rYou must go to an auction hall to do that!\n\r", ch );
+      return;
     }
     
-    if ( ( time_info.hour > 18 || time_info.hour < 9 ) && auction->item == NULL )
+  if ( ( time_info.hour > 18 || time_info.hour < 9 ) && auction->item == NULL )
     {
-        set_char_color ( AT_LBLUE, ch );
-        send_to_char ( "\n\rThe auctioneer has retired for the evening...\n\r", ch );
-        return;
+      set_char_color ( AT_LBLUE, ch );
+      send_to_char ( "\n\rThe auctioneer has retired for the evening...\n\r", ch );
+      return;
     }
 
-    if (arg1[0] == '\0')
+  if (arg1[0] == '\0')
     {
-        if (auction->item != NULL)
+      if (auction->item != NULL)
         {
-	    AFFECT_DATA *paf;	    
-  	    obj = auction->item;
+	  AFFECT_DATA *paf;	    
+	  obj = auction->item;
 
-            /* show item data here */
-            if (auction->bet > 0)
-                sprintf (buf, "Current bid on this item is %d credits.\n\r",auction->bet);
-            else
-                sprintf (buf, "No bids on this item have been received.\n\r");
-	    set_char_color ( AT_BLUE, ch );
-            send_to_char (buf,ch);
-/*          spell_identify (0, LEVEL_HERO - 1, ch, auction->item); */
+	  /* show item data here */
+	  if (auction->bet > 0)
+	    sprintf (buf, "Current bid on this item is %d credits.\n\r",auction->bet);
+	  else
+	    sprintf (buf, "No bids on this item have been received.\n\r");
 
-	    sprintf( buf,
-		"Object '%s' is %s, special properties: %s %s.\n\rIts weight is %d, value is %d.\n\r",
-		obj->name,
-		aoran( item_type_name( obj ) ),
-		extra_bit_name( obj->extra_flags ),
-		magic_bit_name( obj->magic_flags ),
-		obj->weight,
-		obj->cost );
-	    set_char_color( AT_LBLUE, ch );
-	    send_to_char( buf, ch );
+	  set_char_color ( AT_BLUE, ch );
+	  send_to_char (buf,ch);
+	  /*          spell_identify (0, LEVEL_HERO - 1, ch, auction->item); */
+
+	  sprintf( buf,
+		   "Object '%s' is %s, special properties: %s %s.\n\rIts weight is %d, value is %d.\n\r",
+		   obj->name,
+		   aoran( item_type_name( obj ) ),
+		   extra_bit_name( obj->extra_flags ),
+		   magic_bit_name( obj->magic_flags ),
+		   obj->weight,
+		   obj->cost );
+	  set_char_color( AT_LBLUE, ch );
+	  send_to_char( buf, ch );
            
-            sprintf( buf, "Worn on: %s\n\r", 
-                     flag_string(obj->wear_flags -1, w_flags ) );
-            send_to_char( buf, ch );
+	  sprintf( buf, "Worn on: %s\n\r", 
+		   flag_string(obj->wear_flags -1, w_flags ) );
+	  send_to_char( buf, ch );
 
-	    set_char_color( AT_BLUE, ch );
+	  set_char_color( AT_BLUE, ch );
 
-	    switch ( obj->item_type )
+	  switch ( obj->item_type )
 	    {
-		
-		case ITEM_ARMOR:
-		  ch_printf( ch, "Current armor class is %d. ( based on current condition )\n\r", obj->value[0] );
-	          ch_printf( ch, "Maximum armor class is %d. ( based on top condition )\n\r", obj->value[1] );
-		  break;
+	    case ITEM_ARMOR:
+	      ch_printf( ch, "Current armor class is %d. ( based on current condition )\n\r", obj->value[0] );
+	      ch_printf( ch, "Maximum armor class is %d. ( based on top condition )\n\r", obj->value[1] );
+	      break;
 	    }
          
-	    for ( paf = obj->pIndexData->first_affect; paf; paf = paf->next )
-		showaffect( ch, paf );
+	  for ( paf = obj->pIndexData->first_affect; paf; paf = paf->next )
+	    showaffect( ch, paf );
         
-	    for ( paf = obj->first_affect; paf; paf = paf->next )
-		showaffect( ch, paf );
-	    if ( ( obj->item_type == ITEM_CONTAINER ) && ( obj->first_content ) )
+	  for ( paf = obj->first_affect; paf; paf = paf->next )
+	    showaffect( ch, paf );
+
+	  if ( ( obj->item_type == ITEM_CONTAINER ) && ( obj->first_content ) )
 	    {
-		set_char_color( AT_OBJECT, ch );
-		send_to_char( "Contents:\n\r", ch );
-		show_list_to_char( obj->first_content, ch, TRUE, FALSE );
+	      set_char_color( AT_OBJECT, ch );
+	      send_to_char( "Contents:\n\r", ch );
+	      show_list_to_char( obj->first_content, ch, TRUE, FALSE );
 	    }
 
-	    if (IS_IMMORTAL(ch))
+	  if (IS_IMMORTAL(ch))
 	    {
-		sprintf(buf, "Seller: %s.  Bidder: %s.  Round: %d.\n\r",
-                        auction->seller->name, auction->buyer->name,
-                        (auction->going + 1));
-		send_to_char(buf, ch);
-		sprintf(buf, "Time left in round: %d.\n\r", auction->pulse);
-		send_to_char(buf, ch);
+	      sprintf(buf, "Seller: %s.  Bidder: %s.  Round: %d.\n\r",
+		      auction->seller->name, auction->buyer->name,
+		      (auction->going + 1));
+	      send_to_char(buf, ch);
+	      sprintf(buf, "Time left in round: %d.\n\r", auction->pulse);
+	      send_to_char(buf, ch);
 	    }
-            return;
+
+	  return;
 	}
-	else
+      else
 	{
-	    set_char_color ( AT_LBLUE, ch );
-	    send_to_char ( "\n\rThere is nothing being auctioned right now.  What would you like to auction?\n\r", ch );
-	    return;
+	  set_char_color ( AT_LBLUE, ch );
+	  send_to_char ( "\n\rThere is nothing being auctioned right now.  What would you like to auction?\n\r", ch );
+	  return;
 	}
     }
 
-    if ( IS_IMMORTAL(ch) && !str_cmp(arg1,"stop"))
-    if (auction->item == NULL)
+  if ( IS_IMMORTAL(ch) && !str_cmp(arg1,"stop"))
     {
-        send_to_char ("There is no auction to stop.\n\r",ch);
-        return;
-    }
-    else /* stop the auction */
-    {
-	set_char_color ( AT_LBLUE, ch );
-        sprintf (buf,"Sale of %s has been stopped by an Immortal.",
-                        auction->item->short_descr);
-        talk_auction (buf);
-        obj_to_char (auction->item, auction->seller);
-	if ( IS_SET( sysdata.save_flags, SV_AUCTION ) )
+      if (auction->item == NULL)
+	{
+	  send_to_char ("There is no auction to stop.\n\r",ch);
+	  return;
+	}
+      else /* stop the auction */
+	{
+	  set_char_color ( AT_LBLUE, ch );
+	  sprintf (buf,"Sale of %s has been stopped by an Immortal.",
+		   auction->item->short_descr);
+	  talk_auction (buf);
+	  obj_to_char (auction->item, auction->seller);
+
+	  if ( IS_SET( sysdata.save_flags, SV_AUCTION ) )
 	    save_char_obj(auction->seller);
-        auction->item = NULL;
-        if (auction->buyer != NULL && auction->buyer != auction->seller) /* return money to the buyer */
-        {
-            auction->buyer->gold += auction->bet;
-            send_to_char ("Your money has been returned.\n\r",auction->buyer);
-        }
-        return;
+
+	  auction->item = NULL;
+
+	  if (auction->buyer != NULL && auction->buyer != auction->seller) /* return money to the buyer */
+	    {
+	      auction->buyer->gold += auction->bet;
+	      send_to_char ("Your money has been returned.\n\r",auction->buyer);
+	    }
+
+	  return;
+	}
     }
 
-    if (!str_cmp(arg1,"bid") )
-        if (auction->item != NULL)
-        {
-            int newbet;
-
-	    if ( ch == auction->seller)
-	    {
-		send_to_char("You can't bid on your own item!\n\r", ch);
-		return;
-	    }
-
-            /* make - perhaps - a bet now */
-            if (argument[0] == '\0')
-            {
-                send_to_char ("Bid how much?\n\r",ch);
-                return;
-            }
-
-            newbet = parsebet (auction->bet, argument);
-/*	    ch_printf( ch, "Bid: %d\n\r",newbet);	*/
-
-	    if (newbet < auction->starting)
-	    {
-		send_to_char("You must place a bid that is higher than the starting bet.\n\r", ch);
-		return;
-	    }
-
-	    /* to avoid slow auction, use a bigger amount than 100 if the bet
- 	       is higher up - changed to 10000 for our high economy
-            */
-
-            if (newbet < (auction->bet + 10000))
-            {
-                send_to_char ("You must at least bid 10000 credits over the current bid.\n\r",ch);
-                return;
-            }
-
-            if (newbet > ch->gold)
-            {
-                send_to_char ("You don't have that much money!\n\r",ch);
-                return;
-            }
-
-	    if (newbet > 2000000000)
-	    {
-		send_to_char("You can't bid over 2 billion credits.\n\r", ch);
-		return;
-	    }
-
-            /* the actual bet is OK! */
-
-            /* return the gold to the last buyer, if one exists */
-            if (auction->buyer != NULL && auction->buyer != auction->seller)
-                auction->buyer->gold += auction->bet;
-
-            ch->gold -= newbet; /* substract the gold - important :) */
-	    if ( IS_SET( sysdata.save_flags, SV_AUCTION ) )
-		save_char_obj(ch);
-            auction->buyer = ch;
-            auction->bet   = newbet;
-            auction->going = 0;
-            auction->pulse = PULSE_AUCTION; /* start the auction over again */
-
-            sprintf (buf,"A bid of %d credits has been received on %s.\n\r",newbet,auction->item->short_descr);
-            talk_auction (buf);
-            return;
-
-
-        }
-        else
-        {
-            send_to_char ("There isn't anything being auctioned right now.\n\r",ch);
-            return;
-        }
-
-/* finally... */
-    if ( ms_find_obj(ch) )
-	return;
-
-    obj = get_obj_carry (ch, arg1); /* does char have the item ? */
-
-    if (obj == NULL)
+  if (!str_cmp(arg1,"bid") )
     {
-        send_to_char ("You aren't carrying that.\n\r",ch);
-        return;
+      if (auction->item != NULL)
+	{
+	  int newbet;
+
+	  if ( ch == auction->seller)
+	    {
+	      send_to_char("You can't bid on your own item!\n\r", ch);
+	      return;
+	    }
+
+	  /* make - perhaps - a bet now */
+	  if (argument[0] == '\0')
+	    {
+	      send_to_char ("Bid how much?\n\r",ch);
+	      return;
+	    }
+
+	  newbet = parsebet (auction->bet, argument);
+	  /*	    ch_printf( ch, "Bid: %d\n\r",newbet);	*/
+
+	  if (newbet < auction->starting)
+	    {
+	      send_to_char("You must place a bid that is higher than the starting bet.\n\r", ch);
+	      return;
+	    }
+
+	  /* to avoid slow auction, use a bigger amount than 100 if the bet
+	     is higher up - changed to 10000 for our high economy
+	  */
+
+	  if (newbet < (auction->bet + 10000))
+	    {
+	      send_to_char ("You must at least bid 10000 credits over the current bid.\n\r",ch);
+	      return;
+	    }
+
+	  if (newbet > ch->gold)
+	    {
+	      send_to_char ("You don't have that much money!\n\r",ch);
+	      return;
+	    }
+
+	  if (newbet > 2000000000)
+	    {
+	      send_to_char("You can't bid over 2 billion credits.\n\r", ch);
+	      return;
+	    }
+
+	  /* the actual bet is OK! */
+
+	  /* return the gold to the last buyer, if one exists */
+	  if (auction->buyer != NULL && auction->buyer != auction->seller)
+	    auction->buyer->gold += auction->bet;
+
+	  ch->gold -= newbet; /* substract the gold - important :) */
+
+	  if ( IS_SET( sysdata.save_flags, SV_AUCTION ) )
+	    save_char_obj(ch);
+
+	  auction->buyer = ch;
+	  auction->bet   = newbet;
+	  auction->going = 0;
+	  auction->pulse = PULSE_AUCTION; /* start the auction over again */
+
+	  sprintf (buf,"A bid of %d credits has been received on %s.\n\r",newbet,auction->item->short_descr);
+	  talk_auction (buf);
+	  return;
+	}
+      else
+	{
+	  send_to_char ("There isn't anything being auctioned right now.\n\r",ch);
+	  return;
+	}
     }
 
-    if (obj->timer > 0)
+  /* finally... */
+  if ( ms_find_obj(ch) )
+    return;
+
+  obj = get_obj_carry (ch, arg1); /* does char have the item ? */
+
+  if (obj == NULL)
     {
-	send_to_char ("You can't auction objects that are decaying.\n\r", ch);
-	return;
+      send_to_char ("You aren't carrying that.\n\r",ch);
+      return;
     }
 
-    argument = one_argument (argument, arg2);
+  if (obj->timer > 0)
+    {
+      send_to_char ("You can't auction objects that are decaying.\n\r", ch);
+      return;
+    }
 
-    if (arg2[0] == '\0')
+  argument = one_argument (argument, arg2);
+
+  if (arg2[0] == '\0')
     {
       auction->starting = 0;
       strcpy(arg2, "0");
     }
 
-    if ( !is_number(arg2) )
+  if ( !is_number(arg2) )
     {
-	send_to_char("You must input a number at which to start the auction.\n\r", ch);
-	return;
+      send_to_char("You must input a number at which to start the auction.\n\r", ch);
+      return;
     }
 
-    if ( atoi(arg2) < 0 )
+  if ( atoi(arg2) < 0 )
     {
-	send_to_char("You can't auction something for less than 0 credits!\n\r", ch);
- 	return;
+      send_to_char("You can't auction something for less than 0 credits!\n\r", ch);
+      return;
     }
 
-    if (auction->item == NULL)
-    switch (obj->item_type)
+  if (auction->item == NULL)
     {
+      switch (obj->item_type)
+	{
+	default:
+	  act (AT_TELL, "You cannot auction $Ts.",ch, NULL, item_type_name (obj), TO_CHAR);
+	  return;
 
-    default:
-        act (AT_TELL, "You cannot auction $Ts.",ch, NULL, item_type_name (obj), TO_CHAR);
-        return;
+	  /* insert any more item types here... items with a timer MAY NOT BE 
+	     AUCTIONED! 
+	  */
+	case ITEM_LIGHT:
+	case ITEM_RARE_METAL:
+	case ITEM_CRYSTAL:
+	case ITEM_FABRIC:
+	case ITEM_ARMOR:
+	  separate_obj(obj);
+	  obj_from_char (obj);
 
-/* insert any more item types here... items with a timer MAY NOT BE 
-   AUCTIONED! 
-*/
-    case ITEM_LIGHT:
-    case ITEM_RARE_METAL:
-    case ITEM_CRYSTAL:
-    case ITEM_FABRIC:
-    case ITEM_ARMOR:
-	separate_obj(obj);
-	obj_from_char (obj);
-	if ( IS_SET( sysdata.save_flags, SV_AUCTION ) )
+	  if ( IS_SET( sysdata.save_flags, SV_AUCTION ) )
 	    save_char_obj(ch);
-	auction->item = obj;
-	auction->bet = 0;
-	auction->buyer = ch;
-	auction->seller = ch;
-	auction->pulse = PULSE_AUCTION;
-	auction->going = 0;
-	auction->starting = atoi(arg2);
 
-	if (auction->starting > 0)
-	  auction->bet = auction->starting;
+	  auction->item = obj;
+	  auction->bet = 0;
+	  auction->buyer = ch;
+	  auction->seller = ch;
+	  auction->pulse = PULSE_AUCTION;
+	  auction->going = 0;
+	  auction->starting = atoi(arg2);
 
-	sprintf (buf, "A new item is being auctioned: %s at %d credits.", obj->short_descr, auction->starting);
-	talk_auction (buf);
+	  if (auction->starting > 0)
+	    auction->bet = auction->starting;
 
-	return;
+	  sprintf (buf, "A new item is being auctioned: %s at %d credits.", obj->short_descr, auction->starting);
+	  talk_auction (buf);
 
-    } /* switch */
-    else
+	  return;
+	} /* switch */
+    }
+  else
     {
-        act (AT_TELL, "Try again later - $p is being auctioned right now!",ch,auction->item,NULL,TO_CHAR);
-	WAIT_STATE( ch, 1.5 * PULSE_VIOLENCE );
-        return;
+      act (AT_TELL, "Try again later - $p is being auctioned right now!",ch,auction->item,NULL,TO_CHAR);
+      WAIT_STATE( ch, 1.5 * PULSE_VIOLENCE );
+      return;
     }
 }
 

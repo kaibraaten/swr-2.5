@@ -868,18 +868,23 @@ int apply_ac( OBJ_DATA *obj, int iWear )
  */
 OBJ_DATA *get_eq_char( CHAR_DATA *ch, int iWear )
 {
-    OBJ_DATA *obj, *maxobj = NULL;
+  OBJ_DATA *obj, *maxobj = NULL;
 
-    for ( obj = ch->first_carrying; obj; obj = obj->next_content )
-	if ( obj->wear_loc == iWear )
-	    if ( !obj->pIndexData->layers )
-		return obj;
-	    else
-	    if ( !maxobj
-	    ||    obj->pIndexData->layers > maxobj->pIndexData->layers )
-		maxobj = obj;
+  for ( obj = ch->first_carrying; obj; obj = obj->next_content )
+    if ( obj->wear_loc == iWear )
+      {
+	if ( !obj->pIndexData->layers )
+	  {
+	    return obj;
+	  }
+	else if ( !maxobj
+		  ||    obj->pIndexData->layers > maxobj->pIndexData->layers )
+	  {
+	    maxobj = obj;
+	  }
+      }
 
-    return maxobj;
+  return maxobj;
 }
 
 
@@ -1189,117 +1194,124 @@ void extract_obj( OBJ_DATA *obj )
  */
 void extract_char( CHAR_DATA *ch, bool fPull )
 {
-    CHAR_DATA *wch;
-    OBJ_DATA *obj;
-    char buf[MAX_STRING_LENGTH];
-    ROOM_INDEX_DATA *location;
+  CHAR_DATA *wch;
+  OBJ_DATA *obj;
+  char buf[MAX_STRING_LENGTH];
+  ROOM_INDEX_DATA *location;
 
-    if ( !ch )
+  if ( !ch )
     {
-    	bug( "Extract_char: NULL ch.", 0 );
-	return;		/* who removed this line? */
+      bug( "Extract_char: NULL ch.", 0 );
+      return;		/* who removed this line? */
     }
 
-    if ( !ch->in_room )
+  if ( !ch->in_room )
     {
-	bug( "Extract_char: NULL room.", 0 );
-	return;
+      bug( "Extract_char: NULL room.", 0 );
+      return;
     }
 
-    if ( ch == supermob )
+  if ( ch == supermob )
     {
-	bug( "Extract_char: ch == supermob!", 0 );
-	return;
+      bug( "Extract_char: ch == supermob!", 0 );
+      return;
     }
 
-    if ( char_died(ch) )
+  if ( char_died(ch) )
     {
-	sprintf( buf, "extract_char: %s already died!", ch->name );
-	bug( buf, 0 );
-	return;
+      sprintf( buf, "extract_char: %s already died!", ch->name );
+      bug( buf, 0 );
+      return;
     }
 
-    if ( ch == cur_char )
-      cur_char_died = TRUE;
-    /* shove onto extraction queue */
-    queue_extracted_char( ch, fPull );
+  if ( ch == cur_char )
+    cur_char_died = TRUE;
 
-    if ( gch_prev == ch )
-      gch_prev = ch->prev;
+  /* shove onto extraction queue */
+  queue_extracted_char( ch, fPull );
 
-    if ( fPull && !IS_SET(ch->act, ACT_POLYMORPHED))
-	die_follower( ch );
+  if ( gch_prev == ch )
+    gch_prev = ch->prev;
 
-    stop_fighting( ch, TRUE );
+  if ( fPull && !IS_SET(ch->act, ACT_POLYMORPHED))
+    die_follower( ch );
 
-    if ( ch->mount )
+  stop_fighting( ch, TRUE );
+
+  if ( ch->mount )
     {
-	REMOVE_BIT( ch->mount->act, ACT_MOUNTED );
-	ch->mount = NULL;
-	ch->position = POS_STANDING;
+      REMOVE_BIT( ch->mount->act, ACT_MOUNTED );
+      ch->mount = NULL;
+      ch->position = POS_STANDING;
     }
 
-    if ( IS_NPC(ch) && IS_SET( ch->act, ACT_MOUNTED ) )
-	for ( wch = first_char; wch; wch = wch->next )
-	   if ( wch->mount == ch )
-	   {
-		wch->mount = NULL;
-		wch->position = POS_STANDING;
-	   }
-
-    REMOVE_BIT( ch->act, ACT_MOUNTED );
-
-    while ( (obj = ch->last_carrying) != NULL )
-	extract_obj( obj );
-
-    char_from_room( ch );
-
-    if ( !fPull )
+  if ( IS_NPC(ch) && IS_SET( ch->act, ACT_MOUNTED ) )
     {
-	location = NULL;
-
-	if ( !location )
-  	  location = get_room_index( wherehome( ch ) );
-
-	if ( !location )
-	  location = get_room_index( 1 );
-
-	char_to_room( ch, location );
-
-	act( AT_MAGIC, "$n appears from some strange swirling mists!", ch, NULL, NULL, TO_ROOM );
-        ch->position = POS_RESTING;
-	return;
-    }
-
-    if ( IS_NPC(ch) )
-    {
-	--ch->pIndexData->count;
-	--nummobsloaded;
-    }
-
-    if ( ch->desc && ch->desc->original && IS_SET(ch->act, ACT_POLYMORPHED))
-        do_revert( ch, "" );
-
-    if ( ch->desc && ch->desc->original )
-	do_return( ch, "" );
-
-    for ( wch = first_char; wch; wch = wch->next )
-	if ( wch->reply == ch )
-	    wch->reply = NULL;
-
-    UNLINK( ch, first_char, last_char, next, prev );
-
-    if ( ch->desc )
-	if ( ch->desc->character != ch )
-	    bug( "Extract_char: char's descriptor points to another char", 0 );
-	else
+      for ( wch = first_char; wch; wch = wch->next )
 	{
-	    ch->desc->character = NULL;
-	    close_socket( ch->desc, FALSE );
-	    ch->desc = NULL;
+	  if ( wch->mount == ch )
+	    {
+	      wch->mount = NULL;
+	      wch->position = POS_STANDING;
+	    }
 	}
+    }
 
-    return;
+  REMOVE_BIT( ch->act, ACT_MOUNTED );
+
+  while ( (obj = ch->last_carrying) != NULL )
+    extract_obj( obj );
+
+  char_from_room( ch );
+
+  if ( !fPull )
+    {
+      location = NULL;
+
+      if ( !location )
+	location = get_room_index( wherehome( ch ) );
+
+      if ( !location )
+	location = get_room_index( 1 );
+
+      char_to_room( ch, location );
+
+      act( AT_MAGIC, "$n appears from some strange swirling mists!", ch, NULL, NULL, TO_ROOM );
+      ch->position = POS_RESTING;
+      return;
+    }
+
+  if ( IS_NPC(ch) )
+    {
+      --ch->pIndexData->count;
+      --nummobsloaded;
+    }
+
+  if ( ch->desc && ch->desc->original && IS_SET(ch->act, ACT_POLYMORPHED))
+    do_revert( ch, "" );
+
+  if ( ch->desc && ch->desc->original )
+    do_return( ch, "" );
+
+  for ( wch = first_char; wch; wch = wch->next )
+    if ( wch->reply == ch )
+      wch->reply = NULL;
+
+  UNLINK( ch, first_char, last_char, next, prev );
+
+  if ( ch->desc )
+    {
+      if ( ch->desc->character != ch )
+	{
+	  bug( "Extract_char: char's descriptor points to another char", 0 );
+	}
+      else
+	{
+	  ch->desc->character = NULL;
+	  close_socket( ch->desc, FALSE );
+	  ch->desc = NULL;
+	}
+    }
 }
 
 
@@ -2356,7 +2368,7 @@ void clean_mob( MOB_INDEX_DATA *mob )
 	mob->weight	 = 0;
 }
 
-extern top_reset;
+extern int top_reset;
 
 
 /* no more silliness */
@@ -2802,33 +2814,29 @@ OBJ_DATA *group_object( OBJ_DATA *obj1, OBJ_DATA *obj2 )
 	return obj1;
 
     if ( obj1->pIndexData == obj2->pIndexData
-/*
-    &&	!obj1->pIndexData->mudprogs
-    &&  !obj2->pIndexData->mudprogs
-*/
-    &&   QUICKMATCH( obj1->name,	obj2->name )
-    &&   QUICKMATCH( obj1->short_descr,	obj2->short_descr )
-    &&   QUICKMATCH( obj1->description,	obj2->description )
-    &&   QUICKMATCH( obj1->action_desc,	obj2->action_desc )
-    &&   obj1->item_type	== obj2->item_type
-    &&   obj1->extra_flags	== obj2->extra_flags
-    &&   obj1->magic_flags	== obj2->magic_flags
-    &&   obj1->wear_flags	== obj2->wear_flags
-    &&   obj1->wear_loc		== obj2->wear_loc
-    &&	 obj1->weight		== obj2->weight
-    &&	 obj1->cost		== obj2->cost
-    &&   obj1->level		== obj2->level
-    &&   obj1->timer		== obj2->timer
-    &&	 obj1->value[0]		== obj2->value[0]
-    &&	 obj1->value[1]		== obj2->value[1]
-    &&	 obj1->value[2]		== obj2->value[2]
-    &&	 obj1->value[3]		== obj2->value[3]
-    &&	 obj1->value[4]		== obj2->value[4]
-    &&	 obj1->value[5]		== obj2->value[5]
-    &&	!obj1->first_extradesc  && !obj2->first_extradesc
-    &&  !obj1->first_affect	&& !obj2->first_affect
-    &&  !obj1->first_content	&& !obj2->first_content )
-    {
+	 && !str_cmp( obj1->name, obj2->name )
+	 && !str_cmp( obj1->short_descr, obj2->short_descr )
+	 && !str_cmp( obj1->description, obj2->description )
+	 && !str_cmp( obj1->action_desc,  obj2->action_desc )
+	 && obj1->item_type == obj2->item_type
+	 && obj1->extra_flags == obj2->extra_flags
+	 && obj1->magic_flags == obj2->magic_flags
+	 && obj1->wear_flags == obj2->wear_flags
+	 && obj1->wear_loc == obj2->wear_loc
+	 && obj1->weight == obj2->weight
+	 && obj1->cost == obj2->cost
+	 && obj1->level == obj2->level
+	 && obj1->timer	== obj2->timer
+	 && obj1->value[0] == obj2->value[0]
+	 && obj1->value[1] == obj2->value[1]
+	 && obj1->value[2] == obj2->value[2]
+	 && obj1->value[3] == obj2->value[3]
+	 && obj1->value[4] == obj2->value[4]
+	 && obj1->value[5] == obj2->value[5]
+	 && !obj1->first_extradesc && !obj2->first_extradesc
+	 && !obj1->first_affect	&& !obj2->first_affect
+	 && !obj1->first_content && !obj2->first_content )
+      {
 	obj1->count += obj2->count;
 	obj1->pIndexData->count += obj2->count;	/* to be decremented in */
 	numobjsloaded += obj2->count;		/* extract_obj */

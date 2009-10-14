@@ -32,51 +32,57 @@ void  send_auth    args( ( struct descriptor_data *d ) );
  */
 void  start_auth( struct descriptor_data *d )
 {
-   struct  sockaddr_in	 sock;
-   struct  servent	*serv;
-   int     err, tlen;
+  struct  sockaddr_in	 sock;
+  struct  servent	*serv;
+  int     err;
+  socklen_t tlen;
    
-   d->auth_fd = socket( AF_INET, SOCK_STREAM, 0 );
-   err = errno;
+  d->auth_fd = socket( AF_INET, SOCK_STREAM, 0 );
+  err = errno;
    
-   if ( d->auth_fd < 0 && err == EAGAIN )
-     bug( "Can't allocate fd for authorization check", 0 );
-   nonblock( d->auth_fd );
+  if ( d->auth_fd < 0 && err == EAGAIN )
+    bug( "Can't allocate fd for authorization check", 0 );
+
+  nonblock( d->auth_fd );
    
-   tlen = sizeof( sock );
-   getpeername( d->descriptor, ( struct sockaddr * )&sock, &tlen );
-   serv = getservbyname( "ident", "tcp" );
-   if ( !serv )
-     sock.sin_port = htons( 113 );
-   else
-     sock.sin_port = serv->s_port;
-   sock.sin_family = AF_INET;
-     
-   if ( connect( d->auth_fd, ( struct sockaddr *)&sock, sizeof(sock)) == -1
+  tlen = sizeof( sock );
+  getpeername( d->descriptor, ( struct sockaddr * )&sock, &tlen );
+  serv = getservbyname( "ident", "tcp" );
+
+  if ( !serv )
+    sock.sin_port = htons( 113 );
+  else
+    sock.sin_port = serv->s_port;
+
+  sock.sin_family = AF_INET;
+
+  if ( connect( d->auth_fd, ( struct sockaddr *)&sock, sizeof(sock)) == -1
        && errno != EINPROGRESS )
-   {
-     /* Identd Denied */
-/*     bug( "Unable to verify userid", 9 ); */
-     close( d->auth_fd );
-     d->auth_fd = -1;
-     d->auth_state = 0;
-     return;
-   }
+    {
+      /* Identd Denied */
+      /*     bug( "Unable to verify userid", 9 ); */
+      close( d->auth_fd );
+      d->auth_fd = -1;
+      d->auth_state = 0;
+      return;
+    }
    
-   d->auth_state |= ( FLAG_WRAUTH|FLAG_AUTH ); /* Successful, but not sent */
-   if ( d->auth_fd > maxdesc ) maxdesc = d->auth_fd; 
-     return;
+  d->auth_state |= ( FLAG_WRAUTH|FLAG_AUTH ); /* Successful, but not sent */
+
+  if ( d->auth_fd > maxdesc )
+    maxdesc = d->auth_fd; 
 }
 
 /* send_auth */
 
 void  send_auth( struct descriptor_data *d )
 {
-    struct  sockaddr_in  us, them;
-    char    authbuf[32];
-    int     ulen, tlen, z;
-    
-    tlen = ulen = sizeof( us );
+  struct  sockaddr_in  us, them;
+  char    authbuf[32];
+  socklen_t     ulen, tlen;
+  int z;
+
+  tlen = ulen = sizeof( us );
   
     if ( getsockname( d->descriptor, ( struct sockaddr *)&us, &ulen )
     ||   getpeername( d->descriptor, ( struct sockaddr *)&them, &tlen ) )

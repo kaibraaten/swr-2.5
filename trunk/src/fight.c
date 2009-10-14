@@ -1045,8 +1045,6 @@ ch_ret damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
     bool loot;
     OBJ_DATA *damobj;
     ch_ret retcode;
-    sh_int dampmod;
-
     int init_gold, new_gold, gold_diff;
 
     retcode = rNONE;
