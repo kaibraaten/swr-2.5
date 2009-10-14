@@ -11,16 +11,16 @@
 void	get_obj		args( ( CHAR_DATA *ch, OBJ_DATA *obj,
 			    OBJ_DATA *container ) );
 bool	remove_obj	args( ( CHAR_DATA *ch, int iWear, bool fReplace ) );
-void	wear_obj	args( ( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace, sh_int wear_bit ) );
+void	wear_obj	args( ( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace, short wear_bit ) );
 bool    job_trigger     args( ( CHAR_DATA *victim, CHAR_DATA *ch, OBJ_DATA *obj ) );                              
 
 
 /*
  * how resistant an object is to damage				-Thoric
  */
-sh_int get_obj_resistance( OBJ_DATA *obj )
+short get_obj_resistance( OBJ_DATA *obj )
 {
-    sh_int resist;
+    short resist;
 
     resist = number_fuzzy(MAX_ITEM_IMPACT);
 
@@ -124,7 +124,7 @@ void do_get( CHAR_DATA *ch, char *argument )
     OBJ_DATA *obj;
     OBJ_DATA *obj_next;
     OBJ_DATA *container;
-    sh_int number;
+    short number;
     bool found;
 
     argument = one_argument( argument, arg1 );
@@ -180,7 +180,7 @@ void do_get( CHAR_DATA *ch, char *argument )
 	}
 	else
 	{
-	    sh_int cnt = 0;
+	    short cnt = 0;
 	    bool fAll;
 	    char *chk;
 
@@ -364,7 +364,7 @@ void do_put( CHAR_DATA *ch, char *argument )
     OBJ_DATA *container;
     OBJ_DATA *obj;
     OBJ_DATA *obj_next;
-    sh_int	count;
+    short	count;
     int		number;
     bool	save_char = FALSE;
 
@@ -1006,11 +1006,11 @@ bool can_dual( CHAR_DATA *ch )
  * Check to see if there is room to wear another object on this location
  * (Layered clothing support)
  */
-bool can_layer( CHAR_DATA *ch, OBJ_DATA *obj, sh_int wear_loc )
+bool can_layer( CHAR_DATA *ch, OBJ_DATA *obj, short wear_loc )
 {
   OBJ_DATA   *otmp = 0;
-  sh_int	bitlayers = 0;
-  sh_int	objlayers = obj->pIndexData->layers;
+  short	bitlayers = 0;
+  short	objlayers = obj->pIndexData->layers;
 
   for ( otmp = ch->first_carrying; otmp; otmp = otmp->next_content )
     {
@@ -1042,11 +1042,11 @@ bool can_layer( CHAR_DATA *ch, OBJ_DATA *obj, sh_int wear_loc )
  * Big repetitive code, ick.
  * Restructured a bit to allow for specifying body location	-Thoric
  */
-void wear_obj( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace, sh_int wear_bit )
+void wear_obj( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace, short wear_bit )
 {
     char buf[MAX_STRING_LENGTH];
     OBJ_DATA *tmpobj;
-    sh_int bit, tmp;
+    short bit, tmp;
 
     separate_obj( obj );
     
@@ -1578,7 +1578,7 @@ void do_wear( CHAR_DATA *ch, char *argument )
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
-    sh_int wear_bit;
+    short wear_bit;
 
     argument = one_argument( argument, arg1 );
     argument = one_argument( argument, arg2 );
@@ -1675,7 +1675,7 @@ void do_bury( CHAR_DATA *ch, char *argument )
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
     bool shovel;
-    sh_int move;
+    short move;
 
     one_argument( argument, arg );
 

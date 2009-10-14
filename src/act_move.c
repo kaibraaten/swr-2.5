@@ -6,7 +6,7 @@
 #include "mud.h"
 
 
-const	sh_int	movement_loss	[SECT_MAX]	=
+const	short	movement_loss	[SECT_MAX]	=
 {
     1, 2, 2, 3, 4, 6, 4, 1, 6, 10, 6, 5, 7, 4, 6, 4, 2, 3, 6, 3, 3, 5, 4, 3, 2, 3, 7
 };
@@ -18,7 +18,7 @@ char *	const	dir_name	[]		=
 };
 
 
-const	sh_int	rev_dir		[]		=
+const	short	rev_dir		[]		=
 {
     2, 3, 0, 1, 5, 4, 9, 8, 7, 6, 10
 };
@@ -237,7 +237,7 @@ int wherehome( CHAR_DATA *ch)
 char *grab_word( char *argument, char *arg_first )
 {
     char cEnd;
-    sh_int count;
+    short count;
 
     count = 0;
 
@@ -265,7 +265,7 @@ char *grab_word( char *argument, char *arg_first )
     return argument;
 }
 
-char *wordwrap( char *txt, sh_int wrap )
+char *wordwrap( char *txt, short wrap )
 {
     static char buf[MAX_STRING_LENGTH];
     char *bufp;
@@ -378,7 +378,7 @@ void clear_vrooms( )
  * Function to get the equivelant exit of DIR 0-MAXDIR out of linked list.
  * Made to allow old-style diku-merc exit functions to work.	-Thoric
  */
-EXIT_DATA *get_exit( ROOM_INDEX_DATA *room, sh_int dir )
+EXIT_DATA *get_exit( ROOM_INDEX_DATA *room, short dir )
 {
     EXIT_DATA *xit;
 
@@ -397,7 +397,7 @@ EXIT_DATA *get_exit( ROOM_INDEX_DATA *room, sh_int dir )
 /*
  * Function to get an exit, leading the the specified room
  */
-EXIT_DATA *get_exit_to( ROOM_INDEX_DATA *room, sh_int dir, long vnum )
+EXIT_DATA *get_exit_to( ROOM_INDEX_DATA *room, short dir, long vnum )
 {
     EXIT_DATA *xit;
 
@@ -416,7 +416,7 @@ EXIT_DATA *get_exit_to( ROOM_INDEX_DATA *room, sh_int dir, long vnum )
 /*
  * Function to get the nth exit of a room			-Thoric
  */
-EXIT_DATA *get_exit_num( ROOM_INDEX_DATA *room, sh_int count )
+EXIT_DATA *get_exit_num( ROOM_INDEX_DATA *room, short count )
 {
     EXIT_DATA *xit;
     int cnt;
@@ -437,7 +437,7 @@ EXIT_DATA *get_exit_num( ROOM_INDEX_DATA *room, sh_int count )
 /*
  * Modify movement due to encumbrance				-Thoric
  */
-sh_int encumbrance( CHAR_DATA *ch, sh_int move )
+short encumbrance( CHAR_DATA *ch, short move )
 {
     int cur, max;
 
@@ -501,7 +501,7 @@ ch_ret move_char( CHAR_DATA *ch, EXIT_DATA *pexit, int fall )
     char *txt;
     char *dtxt;
     ch_ret retcode;
-    sh_int door, distance;
+    short door, distance;
     bool drunk = FALSE;
     bool brief = FALSE;
 
@@ -1825,7 +1825,7 @@ void teleportch( CHAR_DATA *ch, ROOM_INDEX_DATA *room, bool show )
       do_look( ch, "auto" );
 }
 
-void teleport( CHAR_DATA *ch, sh_int room, int flags )
+void teleport( CHAR_DATA *ch, short room, int flags )
 {
     CHAR_DATA *nch, *nch_next;
     ROOM_INDEX_DATA *pRoomIndex;

@@ -30,7 +30,7 @@ SOCIALTYPE *social_index[27];   /* hash table for socials   */
 /*
  * Character not in position for command?
  */
-bool check_pos( CHAR_DATA *ch, sh_int position )
+bool check_pos( CHAR_DATA *ch, short position )
 {
     if ( ch->position < position )
     {
@@ -548,7 +548,7 @@ int number_argument( char *argument, char *arg )
 char *one_argument( char *argument, char *arg_first )
 {
     char cEnd;
-    sh_int count;
+    short count;
 
     count = 0;
 
@@ -585,7 +585,7 @@ char *one_argument( char *argument, char *arg_first )
 char *one_argument2( char *argument, char *arg_first )
 {
     char cEnd;
-    sh_int count;
+    short count;
 
     count = 0;
 

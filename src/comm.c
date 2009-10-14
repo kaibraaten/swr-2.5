@@ -2447,7 +2447,7 @@ void send_to_pager_color( const char *txt, CHAR_DATA *ch )
   return;
 }
 
-void set_char_color( sh_int AType, CHAR_DATA *ch )
+void set_char_color( short AType, CHAR_DATA *ch )
 {
     char buf[16];
     CHAR_DATA *och;
@@ -2468,7 +2468,7 @@ void set_char_color( sh_int AType, CHAR_DATA *ch )
     return;
 }
 
-void set_pager_color( sh_int AType, CHAR_DATA *ch )
+void set_pager_color( short AType, CHAR_DATA *ch )
 {
     char buf[16];
     CHAR_DATA *och;
@@ -2656,7 +2656,7 @@ char *act_string(const char *format, CHAR_DATA *to, CHAR_DATA *ch,
 }
 #undef NAME
   
-void act( sh_int AType, const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2, int type )
+void act( short AType, const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2, int type )
 {
     char *txt;
     CHAR_DATA *to;

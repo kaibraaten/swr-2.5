@@ -440,7 +440,7 @@ void do_fill( CHAR_DATA *ch, char *argument )
     char arg2[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
     OBJ_DATA *source;
-    sh_int    dest_item, src_item1, src_item2, src_item3, src_item4;
+    short    dest_item, src_item1, src_item2, src_item3, src_item4;
     int       diff;
     bool      all = FALSE;
 

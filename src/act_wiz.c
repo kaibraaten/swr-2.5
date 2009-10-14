@@ -74,7 +74,7 @@ void do_restrict( CHAR_DATA *ch, char *argument )
     char arg[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
     char buf[MAX_STRING_LENGTH];
-    sh_int level, hash;
+    short level, hash;
     CMDTYPE *cmd;
     bool found;
 
@@ -413,7 +413,7 @@ void do_forceclose( CHAR_DATA *ch, char *argument )
 }
 
 
-void echo_to_all( sh_int AT_COLOR, char *argument, sh_int tar )
+void echo_to_all( short AT_COLOR, char *argument, short tar )
 {
     DESCRIPTOR_DATA *d;
 
@@ -439,7 +439,7 @@ void echo_to_all( sh_int AT_COLOR, char *argument, sh_int tar )
     return;
 }
 
-void echo_to_area( AREA_DATA *area , sh_int AT_COLOR, char *argument, sh_int tar )
+void echo_to_area( AREA_DATA *area , short AT_COLOR, char *argument, short tar )
 {
     DESCRIPTOR_DATA *d;
 
@@ -472,7 +472,7 @@ void echo_to_area( AREA_DATA *area , sh_int AT_COLOR, char *argument, sh_int tar
 void do_echo( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    sh_int color;
+    short color;
     int target;
     char *parg;
 
@@ -516,7 +516,7 @@ void do_echo( CHAR_DATA *ch, char *argument )
     echo_to_all ( color, argument, target );
 }
 
-void echo_to_room( sh_int AT_COLOR, ROOM_INDEX_DATA *room, char *argument )
+void echo_to_room( short AT_COLOR, ROOM_INDEX_DATA *room, char *argument )
 {
     CHAR_DATA *vic;
     
@@ -535,7 +535,7 @@ void echo_to_room( sh_int AT_COLOR, ROOM_INDEX_DATA *room, char *argument )
 void do_recho( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    sh_int color;
+    short color;
 
     if ( IS_SET(ch->act, PLR_NO_EMOTE) )
     {
@@ -2937,7 +2937,7 @@ void do_force( CHAR_DATA *ch, char *argument )
 void do_invis( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    sh_int level;
+    short level;
     
     /*
     if ( IS_NPC(ch))

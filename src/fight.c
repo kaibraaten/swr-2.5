@@ -548,7 +548,7 @@ int obj_hitroll( OBJ_DATA *obj )
 /*
  * Offensive shield level modifier
  */
-sh_int off_shld_lvl( CHAR_DATA *ch, CHAR_DATA *victim )
+short off_shld_lvl( CHAR_DATA *ch, CHAR_DATA *victim )
 {
 	return 0;
 }
@@ -1014,9 +1014,9 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
  * Calculate damage based on resistances, immunities and suceptibilities
  *					-Thoric
  */
-sh_int ris_damage( CHAR_DATA *ch, sh_int dam, int ris )
+short ris_damage( CHAR_DATA *ch, short dam, int ris )
 {
-   sh_int modifier;
+   short modifier;
 
    modifier = 10;
    if ( IS_SET(ch->immune, ris ) )
@@ -1039,7 +1039,7 @@ sh_int ris_damage( CHAR_DATA *ch, sh_int dam, int ris )
 ch_ret damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
 {
     char buf1[MAX_STRING_LENGTH];
-    sh_int dameq;
+    short dameq;
     bool npcvict;
     bool loot;
     OBJ_DATA *damobj;
@@ -2041,7 +2041,7 @@ void dam_message( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
     const char *vp;
     const char *attack;
     char punct;
-    sh_int dampc;
+    short dampc;
     struct skill_type *skill = NULL;
     bool gcflag = FALSE;
     bool gvflag = FALSE;
@@ -2322,7 +2322,7 @@ void do_flee( CHAR_DATA *ch, char *argument )
     ROOM_INDEX_DATA *now_in;
     char buf[MAX_STRING_LENGTH];
     int attempt;
-    sh_int door;
+    short door;
     EXIT_DATA *pexit;
 
     if ( !who_fighting( ch ) )
@@ -2390,7 +2390,7 @@ bool get_cover( CHAR_DATA *ch )
     ROOM_INDEX_DATA *was_in;
     ROOM_INDEX_DATA *now_in;
     int attempt;
-    sh_int door;
+    short door;
     EXIT_DATA *pexit;
 
     if ( !who_fighting( ch ) )

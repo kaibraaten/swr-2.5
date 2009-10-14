@@ -8,7 +8,7 @@
 /*
  * Make a fire.
  */
-void make_fire(ROOM_INDEX_DATA *in_room, sh_int timer)
+void make_fire(ROOM_INDEX_DATA *in_room, short timer)
 {
 }
 

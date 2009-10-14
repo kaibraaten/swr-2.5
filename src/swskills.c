@@ -1926,8 +1926,8 @@ void do_snipe( CHAR_DATA *ch, char *argument )
    OBJ_DATA        * wield;
    char              arg[MAX_INPUT_LENGTH];  
    char              arg2[MAX_INPUT_LENGTH];
-   sh_int            dir, dist;
-   sh_int            max_dist = 3;
+   short            dir, dist;
+   short            max_dist = 3;
    EXIT_DATA       * pexit;
    ROOM_INDEX_DATA * was_in_room;
    ROOM_INDEX_DATA * to_room;
@@ -2126,7 +2126,7 @@ void do_throw( CHAR_DATA *ch, char *argument )
    char              arg[MAX_INPUT_LENGTH];  
    char              arg2[MAX_INPUT_LENGTH];
    char              arg3[MAX_INPUT_LENGTH];
-   sh_int            dir;
+   short            dir;
    EXIT_DATA       * pexit;
    ROOM_INDEX_DATA * was_in_room;
    ROOM_INDEX_DATA * to_room;

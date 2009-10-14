@@ -237,7 +237,7 @@ void do_buy( CHAR_DATA *ch, char *argument )
 	OBJ_DATA *obj;
 	int cost;
 	int noi = 1;		/* Number of items */
-	sh_int mnoi = 20;	/* Max number of items to be bought at once */
+	short mnoi = 20;	/* Max number of items to be bought at once */
 
 	if ( ( keeper = find_keeper( ch ) ) == NULL )
 	    return;
@@ -820,7 +820,7 @@ void do_appraise( CHAR_DATA *ch, char *argument )
 void do_makeshop( CHAR_DATA *ch, char *argument )
 {
     SHOP_DATA *shop;
-    sh_int vnum;
+    short vnum;
     MOB_INDEX_DATA *mob;
 
     if ( !argument || argument[0] == '\0' )
@@ -866,7 +866,7 @@ void do_shopset( CHAR_DATA *ch, char *argument )
     MOB_INDEX_DATA *mob, *mob2;
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
-    sh_int vnum;
+    short vnum;
     int value;
     
     argument = one_argument( argument, arg1 );
@@ -1047,7 +1047,7 @@ void do_shopstat( CHAR_DATA *ch, char *argument )
 {
     SHOP_DATA *shop;
     MOB_INDEX_DATA *mob;
-    sh_int vnum;
+    short vnum;
     
     if ( argument[0] == '\0' )
     {
@@ -1114,7 +1114,7 @@ void do_shops( CHAR_DATA *ch, char *argument )
 void do_makerepair( CHAR_DATA *ch, char *argument )
 {
     REPAIR_DATA *repair;
-    sh_int vnum;
+    short vnum;
     MOB_INDEX_DATA *mob;
 
     if ( !argument || argument[0] == '\0' )
@@ -1160,7 +1160,7 @@ void do_repairset( CHAR_DATA *ch, char *argument )
     MOB_INDEX_DATA *mob, *mob2;
     char arg1[MAX_INPUT_LENGTH];
     char arg2[MAX_INPUT_LENGTH];
-    sh_int vnum;
+    short vnum;
     int value;
     
     argument = one_argument( argument, arg1 );
@@ -1313,7 +1313,7 @@ void do_repairstat( CHAR_DATA *ch, char *argument )
 {
     REPAIR_DATA *repair;
     MOB_INDEX_DATA *mob;
-    sh_int vnum;
+    short vnum;
     
     if ( argument[0] == '\0' )
     {

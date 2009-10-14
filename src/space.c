@@ -5359,7 +5359,7 @@ ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship, EXIT_DATA  *pexit , int fall 
     char *txt;
     char *dtxt;
     ch_ret retcode;
-    sh_int door, distance;
+    short door, distance;
     bool drunk = FALSE;
     CHAR_DATA * rch;
     CHAR_DATA * next_rch;

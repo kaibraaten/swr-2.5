@@ -631,7 +631,7 @@ void do_equipment( CHAR_DATA *ch, char *argument )
 	      			obj->value[1] = obj->value[0];
 	    		    if ( obj->value[1] == 0 )
 	      			obj->value[1] = 1;
-	    		    dam = (sh_int) ((obj->value[0] * 10) / obj->value[1]);
+	    		    dam = (short) ((obj->value[0] * 10) / obj->value[1]);
 			    if (dam >= 10) strcat( buf, " (superb) ");
 			    else if (dam >=  7) strcat( buf, " (good) ");
  		            else if (dam >=  5) strcat( buf, " (worn) ");

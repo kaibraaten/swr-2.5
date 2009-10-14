@@ -559,7 +559,7 @@ void do_sset( CHAR_DATA *ch, char *argument )
     && !str_cmp( arg2, "skill" )  )
     {
 	struct skill_type *skill;
-	sh_int type = SKILL_UNKNOWN;
+	short type = SKILL_UNKNOWN;
 
 	if ( top_sn >= MAX_SKILL )
 	{
@@ -1120,7 +1120,7 @@ void do_gouge( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *victim;
     AFFECT_DATA af;
-    sh_int dam;
+    short dam;
     int percent;
 
     if ( IS_NPC(ch) && IS_AFFECTED( ch, AFF_CHARM ) )
@@ -2536,7 +2536,7 @@ void do_circle( CHAR_DATA *ch, char *argument )
 /* Berserk and HitAll. -- Altrag */
 void do_berserk( CHAR_DATA *ch, char *argument )
 {
-  sh_int percent;
+  short percent;
   AFFECT_DATA af;
   
   if ( !ch->fighting )
@@ -2581,9 +2581,9 @@ void do_hitall( CHAR_DATA *ch, char *argument )
 {
   CHAR_DATA *vch;
   CHAR_DATA *vch_next;
-  sh_int nvict = 0;
-  sh_int nhit = 0;
-  sh_int percent;
+  short nvict = 0;
+  short nhit = 0;
+  short percent;
   
   if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE) )
   {
@@ -2642,9 +2642,9 @@ void do_scan( CHAR_DATA *ch, char *argument )
   ROOM_INDEX_DATA *was_in_room;
   ROOM_INDEX_DATA *to_room;
   EXIT_DATA *pexit;
-  sh_int dir = -1;
-  sh_int dist;
-  sh_int max_dist = 5;
+  short dir = -1;
+  short dist;
+  short max_dist = 5;
 
   if ( argument[0] == '\0' )
     return;
