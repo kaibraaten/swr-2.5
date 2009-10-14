@@ -4669,3 +4669,16 @@ void tail_chain( void )
 {
     return;
 }
+
+void replace_char( char *buf, char replace, char with )
+{
+  size_t i = 0;
+
+  for( i = 0; i < strlen( buf ); ++i )
+    {
+      if( buf[i] == replace )
+	{
+	  buf[i] = with;
+	}
+    }
+}
