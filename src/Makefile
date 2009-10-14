@@ -1,6 +1,6 @@
 CC = gcc
 BINARY = swr
-WFLAGS = -Werror -Wall -Wformat-security
+WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wredundant-decls
 #WFLAGS =  -Wall -Wshadow -Wformat-security -Winline -Wpointer-arith -Wcast-align -Wredundant-decls -Werror -Wconversion -Wwrite-strings
 CCFLAGS = -g3 -MD $(WFLAGS) -I.
 LFLAGS = -lcrypt -lm

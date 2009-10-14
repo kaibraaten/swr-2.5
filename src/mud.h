@@ -2861,7 +2861,6 @@ DECLARE_DO_FUN( do_setblaster );
 DECLARE_DO_FUN( do_ammo );
 DECLARE_DO_FUN( do_takedrug );
 DECLARE_DO_FUN( do_use ); 
-DECLARE_DO_FUN( do_tractorbeam );
 DECLARE_DO_FUN( do_makearmor );
 DECLARE_DO_FUN( do_makejewelry );
 DECLARE_DO_FUN( do_makelight );
@@ -4123,17 +4122,9 @@ void            init_maps();
  */
 extern	CHAR_DATA *supermob;
 
-void oprog_speech_trigger( char *txt, CHAR_DATA *ch );
-void oprog_random_trigger( OBJ_DATA *obj );
 void oprog_wear_trigger( CHAR_DATA *ch, OBJ_DATA *obj );
 bool oprog_use_trigger( CHAR_DATA *ch, OBJ_DATA *obj, 
                         CHAR_DATA *vict, OBJ_DATA *targ, void *vo );
-void oprog_remove_trigger( CHAR_DATA *ch, OBJ_DATA *obj );
-void oprog_sac_trigger( CHAR_DATA *ch, OBJ_DATA *obj );
-void oprog_damage_trigger( CHAR_DATA *ch, OBJ_DATA *obj );
-void oprog_repair_trigger( CHAR_DATA *ch, OBJ_DATA *obj );
-void oprog_drop_trigger( CHAR_DATA *ch, OBJ_DATA *obj );
-void oprog_zap_trigger( CHAR_DATA *ch, OBJ_DATA *obj );
 char *oprog_type_to_name( int type );
 
 /*
@@ -4142,7 +4133,6 @@ char *oprog_type_to_name( int type );
  */
 void oprog_greet_trigger( CHAR_DATA *ch );
 void oprog_speech_trigger( char *txt, CHAR_DATA *ch );
-void oprog_random_trigger( OBJ_DATA *obj );
 void oprog_random_trigger( OBJ_DATA *obj );
 void oprog_remove_trigger( CHAR_DATA *ch, OBJ_DATA *obj );
 void oprog_sac_trigger( CHAR_DATA *ch, OBJ_DATA *obj );

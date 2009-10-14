@@ -40,7 +40,6 @@ char *	const	where_name	[] =
 void	show_char_to_char_0	args( ( CHAR_DATA *victim, CHAR_DATA *ch ) );
 void	show_char_to_char_1	args( ( CHAR_DATA *victim, CHAR_DATA *ch ) );
 void	show_char_to_char	args( ( CHAR_DATA *list, CHAR_DATA *ch ) );
-void	show_char_to_char	args( ( CHAR_DATA *list, CHAR_DATA *ch ) );
 void	show_ships_to_char	args( ( SHIP_DATA *ship, CHAR_DATA *ch ) );
 bool	check_blind		args( ( CHAR_DATA *ch ) );
 void    show_condition          args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );

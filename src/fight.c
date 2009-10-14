@@ -20,7 +20,6 @@ void        write_ship_list args( ( void ) );
  */
 void	dam_message	args( ( CHAR_DATA *ch, CHAR_DATA *victim, int dam,
 			    int dt ) );
-void	death_cry	args( ( CHAR_DATA *ch ) );
 int	align_compute	args( ( CHAR_DATA *gch, CHAR_DATA *victim ) );
 ch_ret	one_hit		args( ( CHAR_DATA *ch, CHAR_DATA *victim, int dt ) );
 int	obj_hitroll	args( ( OBJ_DATA *obj ) );

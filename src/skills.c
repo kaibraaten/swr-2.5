@@ -30,9 +30,6 @@ char * const target_type[] =
 
 
 void show_char_to_char( CHAR_DATA *list, CHAR_DATA *ch );
-void show_list_to_char( OBJ_DATA *list, CHAR_DATA *ch, bool fShort, 
-	bool fShowN );
-
 int ris_save( CHAR_DATA *ch, int chance, int ris );
 bool check_illegal_psteal( CHAR_DATA *ch, CHAR_DATA *victim );
 
