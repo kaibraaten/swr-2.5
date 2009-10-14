@@ -34,12 +34,12 @@ static struct bfs_queue_struct	*queue_head = NULL,
 #define UNMARK(room)	(REMOVE_BIT(	(room)->room_flags, BFS_MARK) )
 #define IS_MARKED(room)	(IS_SET(	(room)->room_flags, BFS_MARK) )
 
-ROOM_INDEX_DATA *toroom( ROOM_INDEX_DATA *room, sh_int door )
+ROOM_INDEX_DATA *toroom( ROOM_INDEX_DATA *room, short door )
 {
     return (get_exit( room, door )->to_room);
 }
 
-bool valid_edge( ROOM_INDEX_DATA *room, sh_int door )
+bool valid_edge( ROOM_INDEX_DATA *room, short door )
 {
     EXIT_DATA *pexit;
     ROOM_INDEX_DATA *to_room;
@@ -312,7 +312,7 @@ void hunt_victim( CHAR_DATA *ch )
 {
    bool found;
    CHAR_DATA *tmp;
-   sh_int ret;
+   short ret;
 
    if (!ch || !ch->hunting || !ch->hunting->who )
       return;
@@ -400,8 +400,8 @@ void hunt_victim( CHAR_DATA *ch )
 
 bool mob_snipe( CHAR_DATA *ch, CHAR_DATA *victim )
 {
-   sh_int            dir, dist;
-   sh_int            max_dist = 3;
+   short            dir, dist;
+   short            max_dist = 3;
    EXIT_DATA       * pexit;
    ROOM_INDEX_DATA * was_in_room;
    ROOM_INDEX_DATA * to_room;

@@ -39,7 +39,7 @@ bool is_wizvis( CHAR_DATA *ch , CHAR_DATA *victim )
     return TRUE;
 }
 
-sh_int get_trust( CHAR_DATA *ch )
+short get_trust( CHAR_DATA *ch )
 {
     if ( !ch )
        return 0;
@@ -64,7 +64,7 @@ sh_int get_trust( CHAR_DATA *ch )
 /*
  * Retrieve a character's age.
  */
-sh_int get_age( CHAR_DATA *ch )
+short get_age( CHAR_DATA *ch )
 {
     return 17 + ( ch->played + (current_time - ch->logon) ) / 14400;
 }
@@ -74,7 +74,7 @@ sh_int get_age( CHAR_DATA *ch )
 /*
  * Retrieve character's current strength.
  */
-sh_int get_curr_str( CHAR_DATA *ch )
+short get_curr_str( CHAR_DATA *ch )
 {
     return URANGE( 3, ch->perm_str + ch->mod_str, 25 );
 }
@@ -84,7 +84,7 @@ sh_int get_curr_str( CHAR_DATA *ch )
 /*
  * Retrieve character's current intelligence.
  */
-sh_int get_curr_int( CHAR_DATA *ch )
+short get_curr_int( CHAR_DATA *ch )
 {
     return URANGE( 3, ch->perm_int + ch->mod_int, 25 );
 }
@@ -94,7 +94,7 @@ sh_int get_curr_int( CHAR_DATA *ch )
 /*
  * Retrieve character's current wisdom.
  */
-sh_int get_curr_wis( CHAR_DATA *ch )
+short get_curr_wis( CHAR_DATA *ch )
 {
     return URANGE( 3, ch->perm_wis + ch->mod_wis, 25 );
 }
@@ -104,7 +104,7 @@ sh_int get_curr_wis( CHAR_DATA *ch )
 /*
  * Retrieve character's current dexterity.
  */
-sh_int get_curr_dex( CHAR_DATA *ch )
+short get_curr_dex( CHAR_DATA *ch )
 {
     return URANGE( 3, ch->perm_dex + ch->mod_dex, 25 );
 }
@@ -114,7 +114,7 @@ sh_int get_curr_dex( CHAR_DATA *ch )
 /*
  * Retrieve character's current constitution.
  */
-sh_int get_curr_con( CHAR_DATA *ch )
+short get_curr_con( CHAR_DATA *ch )
 {
     return URANGE( 3, ch->perm_con + ch->mod_con, 25 );
 }
@@ -122,7 +122,7 @@ sh_int get_curr_con( CHAR_DATA *ch )
 /*
  * Retrieve character's current charisma.
  */
-sh_int get_curr_cha( CHAR_DATA *ch )
+short get_curr_cha( CHAR_DATA *ch )
 {
     return URANGE( 3, ch->perm_cha + ch->mod_cha, 25 );
 }
@@ -130,12 +130,12 @@ sh_int get_curr_cha( CHAR_DATA *ch )
 /*
  * Retrieve character's current luck.
  */
-sh_int get_curr_lck( CHAR_DATA *ch )
+short get_curr_lck( CHAR_DATA *ch )
 {
     return URANGE( 3, ch->perm_lck + ch->mod_lck, 25 );
 }
 
-sh_int get_curr_frc( CHAR_DATA *ch )
+short get_curr_frc( CHAR_DATA *ch )
 {
     return URANGE( 0 , ch->perm_frc + ch->mod_frc, 25 );
 }
@@ -2623,7 +2623,7 @@ void clean_char_queue()
  * Add a timer to ch						-Thoric
  * Support for "call back" time delayed commands
  */
-void add_timer( CHAR_DATA *ch, sh_int type, sh_int count, DO_FUN *fun, int value )
+void add_timer( CHAR_DATA *ch, short type, short count, DO_FUN *fun, int value )
 {
     TIMER *timer;
 
@@ -2646,7 +2646,7 @@ void add_timer( CHAR_DATA *ch, sh_int type, sh_int count, DO_FUN *fun, int value
     }
 }
 
-TIMER *get_timerptr( CHAR_DATA *ch, sh_int type )
+TIMER *get_timerptr( CHAR_DATA *ch, short type )
 {
     TIMER *timer;
 
@@ -2656,7 +2656,7 @@ TIMER *get_timerptr( CHAR_DATA *ch, sh_int type )
     return NULL;
 }
 
-sh_int get_timer( CHAR_DATA *ch, sh_int type )
+short get_timer( CHAR_DATA *ch, short type )
 {
     TIMER *timer;
 
@@ -2679,7 +2679,7 @@ void extract_timer( CHAR_DATA *ch, TIMER *timer )
     return;
 }
 
-void remove_timer( CHAR_DATA *ch, sh_int type )
+void remove_timer( CHAR_DATA *ch, short type )
 {
     TIMER *timer;
 
@@ -2695,10 +2695,10 @@ void remove_timer( CHAR_DATA *ch, sh_int type )
 /*
  * Scryn, standard luck check 2/2/96
  */
-bool chance( CHAR_DATA *ch, sh_int percent ) 
+bool chance( CHAR_DATA *ch, short percent ) 
 {
-/*  sh_int clan_factor, ms;*/
-    sh_int deity_factor, ms;
+/*  short clan_factor, ms;*/
+    short deity_factor, ms;
 
     if (!ch)
     {
@@ -2739,10 +2739,10 @@ percent )
     return FALSE;
 }
 
-bool chance_attrib( CHAR_DATA *ch, sh_int percent, sh_int attrib )
+bool chance_attrib( CHAR_DATA *ch, short percent, short attrib )
 {
 /* Scryn, standard luck check + consideration of 1 attrib 2/2/96*/ 
-  sh_int  deity_factor;
+  short  deity_factor;
 
   if (!ch)
   {
@@ -3020,7 +3020,7 @@ void worsen_mental_state( CHAR_DATA *ch, int mod )
 void add_kill( CHAR_DATA *ch, CHAR_DATA *mob )
 {
     int x;
-    sh_int vnum, track;
+    short vnum, track;
 
     if ( IS_NPC(ch) )
 	return;
@@ -3055,7 +3055,7 @@ void add_kill( CHAR_DATA *ch, CHAR_DATA *mob )
 int times_killed( CHAR_DATA *ch, CHAR_DATA *mob )
 {
     int x;
-    sh_int vnum, track;
+    short vnum, track;
 
     if ( IS_NPC(ch) )
 	return 0;

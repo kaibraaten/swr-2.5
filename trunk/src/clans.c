@@ -912,7 +912,7 @@ if (chance < number_percent( ))
 }
     if ( victim->position < POS_STANDING )
     {
-	sh_int temp;
+	short temp;
 
 	temp = victim->position;
 	victim->position = POS_DRAG;

@@ -16,7 +16,7 @@ ch_ret	spell_affectchar args( ( int sn, int level, CHAR_DATA *ch, void *vo ) );
 /*
  * Is immune to a damage type
  */
-bool is_immune( CHAR_DATA *ch, sh_int damtype )
+bool is_immune( CHAR_DATA *ch, short damtype )
 {
     switch( damtype )
     {
@@ -229,9 +229,9 @@ int slot_lookup( int slot )
 void successful_casting( SKILLTYPE *skill, CHAR_DATA *ch,
 			 CHAR_DATA *victim, OBJ_DATA *obj )
 {
-    sh_int chitroom = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_ACTION);
-    sh_int chit	    = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HIT);
-    sh_int chitme   = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HITME);
+    short chitroom = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_ACTION);
+    short chit	    = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HIT);
+    short chitme   = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HITME);
 
     if ( skill->target != TAR_CHAR_OFFENSIVE )
     {
@@ -267,9 +267,9 @@ void successful_casting( SKILLTYPE *skill, CHAR_DATA *ch,
 void failed_casting( SKILLTYPE *skill, CHAR_DATA *ch,
 		     CHAR_DATA *victim, OBJ_DATA *obj )
 {         
-    sh_int chitroom = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_ACTION);
-    sh_int chit	    = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HIT);
-    sh_int chitme   = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HITME);
+    short chitroom = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_ACTION);
+    short chit	    = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HIT);
+    short chitme   = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HITME);
 
     if ( skill->target != TAR_CHAR_OFFENSIVE )
     {
@@ -311,9 +311,9 @@ void failed_casting( SKILLTYPE *skill, CHAR_DATA *ch,
 void immune_casting( SKILLTYPE *skill, CHAR_DATA *ch,
 		     CHAR_DATA *victim, OBJ_DATA *obj )
 {
-    sh_int chitroom = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_ACTION);
-    sh_int chit	    = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HIT);
-    sh_int chitme   = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HITME);
+    short chitroom = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_ACTION);
+    short chit	    = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HIT);
+    short chitme   = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HITME);
 
     if ( skill->target != TAR_CHAR_OFFENSIVE )
     {
@@ -390,7 +390,7 @@ void say_spell( CHAR_DATA *ch, int sn )
  */
 int ris_save( CHAR_DATA *ch, int chance, int ris )
 {
-   sh_int modifier;
+   short modifier;
 
    modifier = 10;
    if ( IS_SET(ch->immune, ris ) )
@@ -1368,7 +1368,7 @@ ch_ret spell_charm_person( int sn, int level, CHAR_DATA *ch, void *vo )
 ch_ret spell_fireball( int sn, int level, CHAR_DATA *ch, void *vo )
 {
     CHAR_DATA *victim = (CHAR_DATA *) vo;
-    static const sh_int dam_each[] =
+    static const short dam_each[] =
     {
 	 1,
 	 1,  4,  7, 10, 13,	16, 19, 22, 25, 28,
@@ -1626,7 +1626,7 @@ ch_ret spell_invis( int sn, int level, CHAR_DATA *ch, void *vo )
 ch_ret spell_lightning_bolt( int sn, int level, CHAR_DATA *ch, void *vo )
 {
     CHAR_DATA *victim = (CHAR_DATA *) vo;
-    static const sh_int dam_each[] =
+    static const short dam_each[] =
     {
 	  1,
 	  2,   4,   6,   8,  10,	 12,  14,  16,  18,  20,

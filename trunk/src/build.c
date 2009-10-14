@@ -525,7 +525,7 @@ void smush_tilde( char *str )
 void start_editing( CHAR_DATA *ch, char *data )
 {
 	EDITOR_DATA *edit;
-	sh_int lines, size, lpos;
+	short lines, size, lpos;
 	char c;
 	
 	if ( !ch->desc )
@@ -586,7 +586,7 @@ char *copy_buffer( CHAR_DATA *ch )
 {
    char buf[MAX_STRING_LENGTH];
    char tmp[100];
-   sh_int x, len;
+   short x, len;
 
    if ( !ch )
    {
@@ -2408,7 +2408,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
 	     ch_printf( ch, "Unknown type: %s\n\r", arg3 );
 	     return;	
 	}
-	obj->item_type = (sh_int) value;
+	obj->item_type = (short) value;
 	if ( IS_OBJ_STAT( obj, ITEM_PROTOTYPE ) )
 	  obj->pIndexData->item_type = obj->item_type; 
 	return;	
@@ -2609,7 +2609,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
     if ( !str_cmp( arg2, "affect" ) )
     {
 	AFFECT_DATA *paf;
-	sh_int loc;
+	short loc;
 	int bitv;
 
 	argument = one_argument( argument, arg2 );
@@ -2678,7 +2678,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
     if ( !str_cmp( arg2, "rmaffect" ) )
     {
 	AFFECT_DATA *paf;
-	sh_int loc, count;
+	short loc, count;
 	
 	if ( !argument || argument[0] == '\0' )
 	{
@@ -3998,7 +3998,7 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
     EDITOR_DATA *edit;
     char cmd[MAX_INPUT_LENGTH];
     char buf[MAX_INPUT_LENGTH+1];
-    sh_int x, line, max_buf_lines;
+    short x, line, max_buf_lines;
     bool save;
 
     if ( (d = ch->desc) == NULL )

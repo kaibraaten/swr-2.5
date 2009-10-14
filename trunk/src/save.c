@@ -454,11 +454,11 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
  * Write an object and its contents.
  */
 void fwrite_obj( CHAR_DATA *ch, OBJ_DATA *obj, FILE *fp, int iNest,
-		 sh_int os_type )
+		 short os_type )
 {
   EXTRA_DESCR_DATA *ed;
   AFFECT_DATA *paf;
-  sh_int wear, wear_loc, x;
+  short wear, wear_loc, x;
 
   if ( iNest >= MAX_NEST )
     {
@@ -855,7 +855,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
     char *line;
     char *word;
     int x1, x2, x3, x4, x5, x6, x7;
-    sh_int killcnt;
+    short killcnt;
     bool fMatch;
     time_t lastplayed;
     int sn, extra;
@@ -1397,7 +1397,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
 }
 
 
-void fread_obj( CHAR_DATA *ch, FILE *fp, sh_int os_type )
+void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 {
     OBJ_DATA *obj;
     char *word;
@@ -1505,7 +1505,7 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, sh_int os_type )
 		}
 		else
 		{
-		    sh_int wear_loc = obj->wear_loc;
+		    short wear_loc = obj->wear_loc;
 
 		    if ( !obj->name )
 			obj->name = QUICKLINK( obj->pIndexData->name );

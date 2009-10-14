@@ -74,106 +74,106 @@ AUCTION_DATA    * 	auction;	/* auctions */
 FILE		*	fpLOG;
 
 /* criminals */
-sh_int   gsn_torture;
-sh_int   gsn_disguise;
-sh_int   gsn_pickshiplock;
-sh_int   gsn_hijack;
+short   gsn_torture;
+short   gsn_disguise;
+short   gsn_pickshiplock;
+short   gsn_hijack;
 
 /* soldiers and officers */
-sh_int   gsn_reinforcements;
-sh_int   gsn_postguard;
-sh_int   gsn_first_aid;
-sh_int   gsn_throw;
+short   gsn_reinforcements;
+short   gsn_postguard;
+short   gsn_first_aid;
+short   gsn_throw;
 
-sh_int   gsn_quicktalk;
-sh_int   gsn_propeganda;
+short   gsn_quicktalk;
+short   gsn_propeganda;
 
 /* pilots and smugglers */
-sh_int   gsn_spacecraft;
-sh_int   gsn_weaponsystems;
-sh_int   gsn_shipmaintenance; 
-sh_int   gsn_shipdesign; 
-sh_int   gsn_spacecombat;
+short   gsn_spacecraft;
+short   gsn_weaponsystems;
+short   gsn_shipmaintenance; 
+short   gsn_shipdesign; 
+short   gsn_spacecombat;
 
 /* player building skills */
-sh_int   gsn_lightsaber_crafting;
-sh_int   gsn_spice_refining;
-sh_int   gsn_makeblade;
-sh_int   gsn_makeblaster;
-sh_int   gsn_makelight;
-sh_int   gsn_makecomlink;
-sh_int   gsn_makearmor;
-sh_int   gsn_makeshield;
-sh_int   gsn_makecontainer;
-sh_int   gsn_makejewelry;
+short   gsn_lightsaber_crafting;
+short   gsn_spice_refining;
+short   gsn_makeblade;
+short   gsn_makeblaster;
+short   gsn_makelight;
+short   gsn_makecomlink;
+short   gsn_makearmor;
+short   gsn_makeshield;
+short   gsn_makecontainer;
+short   gsn_makejewelry;
 
-sh_int   gsn_bridge;
-sh_int   gsn_survey;
-sh_int   gsn_landscape;
-sh_int   gsn_construction;
+short   gsn_bridge;
+short   gsn_survey;
+short   gsn_landscape;
+short   gsn_construction;
  
 /* weaponry */
-sh_int			gsn_blasters;
-sh_int                  gsn_bowcasters;
-sh_int                  gsn_force_pikes;
-sh_int			gsn_lightsabers;
-sh_int			gsn_vibro_blades;
-sh_int			gsn_flexible_arms;
-sh_int			gsn_talonous_arms;
-sh_int			gsn_bludgeons;
+short			gsn_blasters;
+short                  gsn_bowcasters;
+short                  gsn_force_pikes;
+short			gsn_lightsabers;
+short			gsn_vibro_blades;
+short			gsn_flexible_arms;
+short			gsn_talonous_arms;
+short			gsn_bludgeons;
 
 /* thief */
-sh_int          	gsn_backstab;
-sh_int			gsn_circle;
-sh_int			gsn_dodge;
-sh_int			gsn_hide;
-sh_int			gsn_peek;
-sh_int			gsn_pick_lock;
-sh_int			gsn_sneak;
-sh_int			gsn_steal;
-sh_int			gsn_gouge;
-sh_int			gsn_poison_weapon;
+short          	gsn_backstab;
+short			gsn_circle;
+short			gsn_dodge;
+short			gsn_hide;
+short			gsn_peek;
+short			gsn_pick_lock;
+short			gsn_sneak;
+short			gsn_steal;
+short			gsn_gouge;
+short			gsn_poison_weapon;
 
 /* thief & warrior */
-sh_int			gsn_enhanced_damage;
-sh_int			gsn_kick;
-sh_int			gsn_parry;
-sh_int			gsn_rescue;
-sh_int			gsn_second_attack;
-sh_int			gsn_third_attack;
-sh_int			gsn_dual_wield;
-sh_int                  gsn_bashdoor;
-sh_int			gsn_grip; 
-sh_int			gsn_berserk;
-sh_int			gsn_hitall;
-sh_int			gsn_disarm;
+short			gsn_enhanced_damage;
+short			gsn_kick;
+short			gsn_parry;
+short			gsn_rescue;
+short			gsn_second_attack;
+short			gsn_third_attack;
+short			gsn_dual_wield;
+short                  gsn_bashdoor;
+short			gsn_grip; 
+short			gsn_berserk;
+short			gsn_hitall;
+short			gsn_disarm;
 
 
 /* other   */
-sh_int			gsn_aid;
-sh_int			gsn_track;
-sh_int			gsn_mount;
-sh_int			gsn_climb;
-sh_int			gsn_slice;
+short			gsn_aid;
+short			gsn_track;
+short			gsn_mount;
+short			gsn_climb;
+short			gsn_slice;
 
 /* spells */
-sh_int			gsn_aqua_breath;
-sh_int          	gsn_blindness;
-sh_int			gsn_charm_person;
-sh_int			gsn_invis;
-sh_int			gsn_mass_invis;
-sh_int			gsn_poison;
-sh_int			gsn_sleep;
-sh_int			gsn_stun;
-sh_int			gsn_possess;
-sh_int			gsn_fireball;
-sh_int			gsn_lightning_bolt;
+short			gsn_aqua_breath;
+short          	gsn_blindness;
+short			gsn_charm_person;
+short			gsn_invis;
+short			gsn_mass_invis;
+short			gsn_poison;
+short			gsn_sleep;
+short			gsn_stun;
+short			gsn_possess;
+short			gsn_fireball;
+short			gsn_lightning_bolt;
 
 /* for searching */
-sh_int			gsn_first_spell;
-sh_int			gsn_first_skill;
-sh_int			gsn_first_weapon;
-sh_int			gsn_top_sn;
+short			gsn_first_spell;
+short			gsn_first_skill;
+short			gsn_first_weapon;
+short			gsn_top_sn;
 
 
 /*
@@ -282,7 +282,7 @@ void shutdown_mud( char *reason )
  */
 void boot_db( void )
 {
-    sh_int wear, x;
+    short wear, x;
 
     show_hash( 32 );
     unlink( BOOTLOG_FILE );
@@ -1523,7 +1523,7 @@ void sort_exits( ROOM_INDEX_DATA *room )
     }
 }
 
-void randomize_exits( ROOM_INDEX_DATA *room, sh_int maxdir )
+void randomize_exits( ROOM_INDEX_DATA *room, short maxdir )
 {
     EXIT_DATA *pexit;
     int nexits, /* maxd, */ d0, d1, count, door; /* Maxd unused */
@@ -2927,7 +2927,7 @@ char *aoran( const char *str )
 /*
  * Append a string to a file.
  */
-void append_file( CHAR_DATA *ch, char *file, char *str )
+void append_file( CHAR_DATA *ch, const char *file, const char *str )
 {
     FILE *fp;
 
@@ -2953,7 +2953,7 @@ void append_file( CHAR_DATA *ch, char *file, char *str )
 /*
  * Append a string to a file.
  */
-void append_to_file( char *file, char *str )
+void append_to_file( const char *file, const char *str )
 {
     FILE *fp;
 
@@ -3102,7 +3102,7 @@ void do_dmesg( CHAR_DATA *ch, char *argument )
 /*
  * Writes a string to the log, extended version			-Thoric
  */
-void log_string_plus( const char *str, sh_int log_type )
+void log_string_plus( const char *str, short log_type )
 {
     char *strtime;
     int offset;
@@ -4152,7 +4152,7 @@ MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
  * to_room and vnum.						-Thoric
  * Exits are inserted into the linked list based on vdir.
  */
-EXIT_DATA *make_exit( ROOM_INDEX_DATA *pRoomIndex, ROOM_INDEX_DATA *to_room, sh_int door )
+EXIT_DATA *make_exit( ROOM_INDEX_DATA *pRoomIndex, ROOM_INDEX_DATA *to_room, short door )
 {
 	EXIT_DATA *pexit, *texit;
 	bool broke;

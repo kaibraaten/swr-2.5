@@ -649,7 +649,7 @@ void weather_update( void )
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
     int diff;
-    sh_int AT_TEMP = AT_PLAIN;
+    short AT_TEMP = AT_PLAIN;
 
     buf[0] = '\0';
 
@@ -822,7 +822,7 @@ void char_update( void )
 {   
     CHAR_DATA *ch;
     CHAR_DATA *ch_save;
-    sh_int save_count = 0;
+    short save_count = 0;
 
     ch_save	= NULL;
     for ( ch = last_char; ch; ch = gch_prev )
@@ -1096,7 +1096,7 @@ void char_update( void )
 void obj_update( void )
 {   
     OBJ_DATA *obj;
-    sh_int AT_TEMP;
+    short AT_TEMP;
     	        
     for ( obj = last_object; obj; obj = gobj_prev )
     {
@@ -1149,7 +1149,7 @@ void obj_update( void )
         if ( obj->item_type == ITEM_CORPSE_PC || obj->item_type == ITEM_CORPSE_NPC 
         || obj->item_type == ITEM_DROID_CORPSE )
         {
-          sh_int timerfrac = UMAX(1, obj->timer - 1);
+          short timerfrac = UMAX(1, obj->timer - 1);
           if ( obj->item_type == ITEM_CORPSE_PC )
 	    timerfrac = (int)(obj->timer / 8 + 1);
 
@@ -1558,8 +1558,8 @@ void drunk_randoms( CHAR_DATA *ch )
 {
     CHAR_DATA *rvch = NULL;
     CHAR_DATA *vch;
-    sh_int drunk;
-    sh_int position;
+    short drunk;
+    short position;
 
     if ( IS_NPC( ch ) || ch->pcdata->condition[COND_DRUNK] <= 0 )
 	return;

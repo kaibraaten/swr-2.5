@@ -694,7 +694,7 @@ void do_look
     ROOM_INDEX_DATA *original;
     char *pdesc;
     bool doexaprog; 
-    sh_int door;
+    short door;
     int number, cnt;
 
     if ( !ch->desc )
@@ -1189,7 +1189,7 @@ void do_examine( CHAR_DATA *ch, char *argument )
     char arg[MAX_INPUT_LENGTH];
     OBJ_DATA *obj;
     BOARD_DATA *board;
-    sh_int dam;
+    short dam;
 
     if ( !argument )
     {
@@ -1238,7 +1238,7 @@ void do_examine( CHAR_DATA *ch, char *argument )
 	      obj->value[1] = obj->value[0];
 	    if ( obj->value[1] == 0 )
 	      obj->value[1] = 1;
-	    dam = (sh_int) ((obj->value[0] * 10) / obj->value[1]);
+	    dam = (short) ((obj->value[0] * 10) / obj->value[1]);
 	    strcpy( buf, "As you look more closely, you notice that it is ");
 	    if (dam >= 10) strcat( buf, "in superb condition.");
        else if (dam ==  9) strcat( buf, "in very good condition.");
@@ -1320,7 +1320,7 @@ void do_examine( CHAR_DATA *ch, char *argument )
         case ITEM_CORPSE_PC:
 	case ITEM_CORPSE_NPC:
             {
-		sh_int timerfrac = obj->timer;
+		short timerfrac = obj->timer;
 		if ( obj->item_type == ITEM_CORPSE_PC )
 		timerfrac = (int)obj->timer / 8 + 1; 
 
@@ -1353,7 +1353,7 @@ void do_examine( CHAR_DATA *ch, char *argument )
 	
 	case ITEM_DROID_CORPSE:
             {
-		sh_int timerfrac = obj->timer;
+		short timerfrac = obj->timer;
 		
 		switch (timerfrac)
 		{

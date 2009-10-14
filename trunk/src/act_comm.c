@@ -171,8 +171,8 @@ void do_beep( CHAR_DATA *ch, char *argument )
 char *scramble( const char *argument, int modifier )
 {
     static char arg[MAX_INPUT_LENGTH];
-    sh_int position;
-    sh_int conversion = 0;
+    short position;
+    short conversion = 0;
     
 	modifier %= number_range( 80, 300 ); /* Bitvectors get way too large #s */
     for ( position = 0; position < MAX_INPUT_LENGTH; position++ )
@@ -230,7 +230,7 @@ char *drunk_speech( const char *argument, CHAR_DATA *ch )
   const char *arg = argument;
   static char buf[MAX_INPUT_LENGTH*2];
   char buf1[MAX_INPUT_LENGTH*2];
-  sh_int drunk;
+  short drunk;
   char *txt;
   char *txt1;  
 
@@ -281,8 +281,8 @@ char *drunk_speech( const char *argument, CHAR_DATA *ch )
     }
    else if ( number_percent() < ( drunk * 2 / 5 ) )  /* slurred letters */
     {
-      sh_int slurn = number_range( 1, 2 );
-      sh_int currslur = 0;	
+      short slurn = number_range( 1, 2 );
+      short currslur = 0;	
 
       while ( currslur < slurn )
 	*txt++ = *arg, currslur++;
@@ -329,8 +329,8 @@ char *drunk_speech( const char *argument, CHAR_DATA *ch )
 
       if ( ( number_percent() < ( 2 * drunk / 4 ) ) && *txt1 != '\0' )
       {
-	sh_int offset = number_range( 0, 2 );
-	sh_int pos = 0;
+	short offset = number_range( 0, 2 );
+	short pos = 0;
 
 	while ( *txt1 != '\0' && pos < offset )
 	  *txt++ = *txt1++, pos++;
@@ -608,7 +608,7 @@ void talk_channel( CHAR_DATA *ch, char *argument, int channel, const char *verb 
     return;
 }
 
-void to_channel( const char *argument, int channel, const char *verb, sh_int level )
+void to_channel( const char *argument, int channel, const char *verb, short level )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *d;
