@@ -391,7 +391,7 @@ void do_note( CHAR_DATA *ch, char *arg_passed, bool IS_MAIL )
 	     stop_editing( ch );
 	     return;
           }
-	  ed = ch->dest_buf;
+	  ed = (EXTRA_DESCR_DATA*) ch->dest_buf;
 	  STRFREE( ed->description );
 	  ed->description = copy_buffer( ch );
 	  stop_editing( ch );	   

@@ -771,15 +771,15 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
     if ( !IS_NPC(victim) )
     {  
        if ( get_curr_con( victim ) > 20 )
-          dam *= 0.1;
+	 dam = (int)( dam * 0.1 );
        else if ( get_curr_con( victim ) > 18 )
-          dam *= 0.15;
+	 dam = (int)( dam * 0.15 );
        else if ( get_curr_con( victim ) > 15 )
-          dam *= 0.2;
+	 dam = (int)( dam * 0.2 );
        else if ( get_curr_con( victim ) > 15 )
-          dam *= 0.25;
+	 dam = (int)( dam * 0.25 );
        else
-          dam *= 0.3;
+	 dam = (int)( dam * 0.3 );
     }
     
     /* 
@@ -800,13 +800,13 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
      	}
      	else if ( wield->blaster_setting == BLASTER_FULL && wield->value[4] >=5 )
         {
-     	    dam *=  1.5;
-     	    wield->value[4] -= 5;
+	  dam = (int)( dam * 1.5 );
+	  wield->value[4] -= 5;
      	}
      	else if ( wield->blaster_setting == BLASTER_HIGH && wield->value[4] >=4 )
         {
-     	    dam *=  1.25;
-     	    wield->value[4] -= 4;
+	  dam = (int)( dam * 1.25 );
+	  wield->value[4] -= 4;
      	}
      	else if ( wield->blaster_setting == BLASTER_NORMAL && wield->value[4] >=3 )
      	{
@@ -857,13 +857,13 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
      	}
         else if ( wield->blaster_setting == BLASTER_HALF && wield->value[4] >=2 )    
         {
-     	    dam *=  0.75;
-     	    wield->value[4] -= 2;
+	  dam = (int)( dam * 0.75 );
+	  wield->value[4] -= 2;
      	}
         else    
         {
-     	    dam *= 0.5;
-     	    wield->value[4] -= 1;
+	  dam = (int)( dam * 0.5 );
+	  wield->value[4] -= 1;
      	}
      
      }
@@ -2104,21 +2104,22 @@ void dam_message( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
 	sprintf( buf2, "You %s $N%c", vs, punct );
 	sprintf( buf3, "$n %s you%c", vp, punct );
     }
-    else
-    if ( dt > TYPE_HIT && is_wielding_poisoned( ch ) )
+    else if ( dt > TYPE_HIT && is_wielding_poisoned( ch ) )
     {
-	if ( dt < TYPE_HIT + sizeof(attack_table)/sizeof(attack_table[0]) )
-	    attack	= attack_table[dt - TYPE_HIT];
-	else
+      if ( dt < (int)(TYPE_HIT + sizeof(attack_table)/sizeof(attack_table[0])))
 	{
-	    bug( "Dam_message: bad dt %d.", dt );
-	    dt  = TYPE_HIT;
-	    attack  = attack_table[0];
+	  attack	= attack_table[dt - TYPE_HIT];
+	}
+      else
+	{
+	  bug( "Dam_message: bad dt %d.", dt );
+	  dt  = TYPE_HIT;
+	  attack  = attack_table[0];
         }
 
-	sprintf( buf1, "$n's poisoned %s %s $N%c", attack, vp, punct );
-	sprintf( buf2, "Your poisoned %s %s $N%c", attack, vp, punct );
-	sprintf( buf3, "$n's poisoned %s %s you%c", attack, vp, punct ); 
+      sprintf( buf1, "$n's poisoned %s %s $N%c", attack, vp, punct );
+      sprintf( buf2, "Your poisoned %s %s $N%c", attack, vp, punct );
+      sprintf( buf3, "$n's poisoned %s %s you%c", attack, vp, punct ); 
     }
     else
     {
@@ -2158,8 +2159,8 @@ void dam_message( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
 	    }
 	}
 	else if ( dt >= TYPE_HIT
-	&& dt < TYPE_HIT + sizeof(attack_table)/sizeof(attack_table[0]) )
-	    attack	= attack_table[dt - TYPE_HIT];
+		  && dt < (int)(TYPE_HIT + sizeof(attack_table)/sizeof(attack_table[0]) ))
+	  attack	= attack_table[dt - TYPE_HIT];
 	else
 	{
 	    bug( "Dam_message: bad dt %d.", dt );

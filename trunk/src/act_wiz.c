@@ -39,12 +39,13 @@ extern bool mud_down;
 
 int get_saveflag( char *name )
 {
-    int x;
+  size_t x;
 
-    for ( x = 0; x < sizeof(save_flag) / sizeof(save_flag[0]); x++ )
-      if ( !str_cmp( name, save_flag[x] ) )
-        return x;
-    return -1;
+  for ( x = 0; x < sizeof(save_flag) / sizeof(save_flag[0]); x++ )
+    if ( !str_cmp( name, save_flag[x] ) )
+      return x;
+
+  return -1;
 }
 
 void do_wizhelp( CHAR_DATA *ch, char *argument )

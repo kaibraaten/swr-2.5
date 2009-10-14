@@ -214,7 +214,7 @@ bool			fBootDb;
 FILE *			fpArea;
 char			strArea[MAX_INPUT_LENGTH];
 
-
+bool MOBtrigger = TRUE;
 
 /*
  * Local booting procedures.

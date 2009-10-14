@@ -16,12 +16,12 @@
 #include <arpa/telnet.h>
 #include <errno.h>
 #include <netdb.h>
+#include <unistd.h>
+
 #include "mud.h"
 
 extern int   maxdesc;
-extern int   write   args( ( int fd, char *buf, int nbyte ) );
-extern int   read    args( ( int fd, char *buf, int nbyte ) );
-extern int   close   args( ( int fd ) );
+
 void  nonblock     args( ( int s ) );
 void  start_auth   args( ( struct descriptor_data *d ) );
 void  read_auth    args( ( struct descriptor_data *d ) );
@@ -80,7 +80,7 @@ void  send_auth( struct descriptor_data *d )
   struct  sockaddr_in  us, them;
   char    authbuf[32];
   socklen_t     ulen, tlen;
-  int z;
+  ssize_t z;
 
   tlen = ulen = sizeof( us );
   
@@ -98,7 +98,7 @@ void  send_auth( struct descriptor_data *d )
   
     z = write( d->auth_fd, authbuf, strlen( authbuf ) );
   
-    if ( z != strlen( authbuf ) )
+    if ( z != (ssize_t) strlen( authbuf ) )
     {
 	if (d->atimes >= 19)
 	{

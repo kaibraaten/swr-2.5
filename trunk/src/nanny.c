@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <arpa/telnet.h> // Telnet opt codes
-
+#include <unistd.h>
 #include "mud.h"
 
 /*

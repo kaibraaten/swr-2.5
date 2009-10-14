@@ -418,7 +418,7 @@ int ris_save( CHAR_DATA *ch, int chance, int ris )
  */
 int rd_parse(CHAR_DATA *ch, int level, char *exp)
 {
-  int x, lop = 0, gop = 0, eop = 0;
+  int x = 0, lop = 0, gop = 0, eop = 0;
   char operation;
   char *sexp[2];
   int total = 0, len = 0;
@@ -455,10 +455,12 @@ int rd_parse(CHAR_DATA *ch, int level, char *exp)
   for (x = 0; x < len; ++x)
     if (!isdigit(exp[x]) && !isspace(exp[x]))
       break;
-  if (x == len) return(atoi(exp));
+
+  if (x == len)
+    return(atoi(exp));
   
   /* break it into 2 parts */
-  for (x = 0; x < strlen(exp); ++x)
+  for (x = 0; x < (int)strlen(exp); ++x)
     switch(exp[x]) {
     case '^':
       if (!total)
@@ -922,7 +924,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	    return;
 	}
         	mana = IS_NPC(ch) ? 0 : skill->min_mana;
-	strcpy( staticbuf, ch->dest_buf );
+		strcpy( staticbuf, (const char*) ch->dest_buf );
 	target_name = one_argument(staticbuf, arg2);
 	DISPOSE( ch->dest_buf );
 	ch->substate = SUB_NONE;
@@ -937,7 +939,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
 		&&   (t = get_timerptr( tmp, TIMER_DO_FUN )) != NULL
 		&&    t->count >= 1 && t->do_fun == do_cast
 		&&    tmp->tempnum == sn && tmp->dest_buf
-		&&   !str_cmp( tmp->dest_buf, staticbuf ) )
+		      &&   !str_cmp( (const char*) tmp->dest_buf, staticbuf ) )
 		  ++cnt;
 	    if ( cnt >= skill->participants )
 	    {
@@ -946,7 +948,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
 		    &&   (t = get_timerptr( tmp, TIMER_DO_FUN )) != NULL
 		    &&    t->count >= 1 && t->do_fun == do_cast
 		    &&    tmp->tempnum == sn && tmp->dest_buf
-		    &&   !str_cmp( tmp->dest_buf, staticbuf ) )
+			  &&   !str_cmp( (const char*) tmp->dest_buf, staticbuf ) )
 		{
 		    extract_timer( tmp, t );
 		    act( AT_MAGIC, "Channeling your energy into $n, you help direct the force", ch, NULL, tmp, TO_VICT );
@@ -1292,7 +1294,7 @@ ch_ret spell_blindness( int sn, int level, CHAR_DATA *ch, void *vo )
     af.type      = sn;
     af.location  = APPLY_HITROLL;
     af.modifier  = -4;
-    af.duration  = (1 + (level / 3)) * DUR_CONV;
+    af.duration  = (short)((1 + (level / 3)) * DUR_CONV);
     af.bitvector = AFF_BLIND;
     affect_to_char( victim, &af );
     set_char_color( AT_MAGIC, victim );
@@ -1347,7 +1349,7 @@ ch_ret spell_charm_person( int sn, int level, CHAR_DATA *ch, void *vo )
 	stop_follower( victim );
     add_follower( victim, ch );
     af.type      = sn;
-    af.duration  = (number_fuzzy( (level + 1) / 3 ) + 1) * DUR_CONV;
+    af.duration  = (short)((number_fuzzy( (level + 1) / 3 ) + 1) * DUR_CONV);
     af.location  = 0;
     af.modifier  = 0;
     af.bitvector = AFF_CHARM;
@@ -1386,7 +1388,7 @@ ch_ret spell_fireball( int sn, int level, CHAR_DATA *ch, void *vo )
             ch->alignment = URANGE( -1000, ch->alignment, 1000 );
                     
 
-    level	= UMIN(level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
+	    level	= UMIN((size_t)level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
     level	= UMAX(0, level);
     dam		= number_range( dam_each[level] / 2, dam_each[level] * 2 );
     if ( saves_spell_staff( level, victim ) )
@@ -1590,7 +1592,7 @@ ch_ret spell_invis( int sn, int level, CHAR_DATA *ch, void *vo )
 
 	act( AT_MAGIC, "$n fades out of existence.", victim, NULL, NULL, TO_ROOM );
 	af.type      = sn;
-	af.duration  = ((level / 4) + 12) * DUR_CONV;
+	af.duration  = (short)(((level / 4) + 12) * DUR_CONV);
 	af.location  = APPLY_NONE;
 	af.modifier  = 0;
 	af.bitvector = AFF_INVISIBLE;
@@ -1625,31 +1627,33 @@ ch_ret spell_invis( int sn, int level, CHAR_DATA *ch, void *vo )
 
 ch_ret spell_lightning_bolt( int sn, int level, CHAR_DATA *ch, void *vo )
 {
-    CHAR_DATA *victim = (CHAR_DATA *) vo;
-    static const short dam_each[] =
+  CHAR_DATA *victim = (CHAR_DATA *) vo;
+  static const short dam_each[] =
     {
-	  1,
-	  2,   4,   6,   8,  10,	 12,  14,  16,  18,  20,
-	 22,  24,  26,  28,  30,	 35,  40,  45,  50,  55,
-	 60,  65,  70,  75,  80,	 82,  84,  86,  88,  90,
-	 92,  94,  96,  98, 100,	102, 104, 106, 108, 110,
-    112, 114, 116, 118, 120,    122, 124, 126, 128, 130,
-    132, 134, 136, 138, 140,    142, 144, 146, 148, 150,
-    152, 154, 156, 158, 160,    162, 164, 166, 168, 170
+      1,
+      2,   4,   6,   8,  10,	 12,  14,  16,  18,  20,
+      22,  24,  26,  28,  30,	 35,  40,  45,  50,  55,
+      60,  65,  70,  75,  80,	 82,  84,  86,  88,  90,
+      92,  94,  96,  98, 100,	102, 104, 106, 108, 110,
+      112, 114, 116, 118, 120,    122, 124, 126, 128, 130,
+      132, 134, 136, 138, 140,    142, 144, 146, 148, 150,
+      152, 154, 156, 158, 160,    162, 164, 166, 168, 170
     };
-    
-    int dam;
+  
+  int dam;
 
-    send_to_char("You feel the hatred grow within you!\n\r", ch);
-        ch->alignment = ch->alignment - 100;
-            ch->alignment = URANGE( -1000, ch->alignment, 1000 );
+  send_to_char("You feel the hatred grow within you!\n\r", ch);
+  ch->alignment = ch->alignment - 100;
+  ch->alignment = URANGE( -1000, ch->alignment, 1000 );
                     
-    level	= UMIN(level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
-    level	= UMAX(0, level);
-    dam		= number_range( dam_each[level] / 2, dam_each[level] * 2 );
-    if ( saves_spell_staff( level, victim ) )
-	dam /= 2;
-    return damage( ch, victim, dam, sn );
+  level	= UMIN((size_t) level, sizeof(dam_each)/sizeof(dam_each[0]) - 1);
+  level	= UMAX(0, level);
+  dam		= number_range( dam_each[level] / 2, dam_each[level] * 2 );
+
+  if ( saves_spell_staff( level, victim ) )
+    dam /= 2;
+
+  return damage( ch, victim, dam, sn );
 }
 
 ch_ret spell_poison( int sn, int level, CHAR_DATA *ch, void *vo )
@@ -1669,7 +1673,7 @@ ch_ret spell_poison( int sn, int level, CHAR_DATA *ch, void *vo )
     if ( IS_AFFECTED( victim, AFF_POISON ) )
 	first = FALSE;
     af.type      = sn;
-    af.duration  = level * DUR_CONV;
+    af.duration  = (short)(level * DUR_CONV);
     af.location  = APPLY_STR;
     af.modifier  = -2;
     af.bitvector = AFF_POISON;
@@ -1737,7 +1741,7 @@ ch_ret spell_sleep( int sn, int level, CHAR_DATA *ch, void *vo )
 	}
     }
     af.type      = sn;
-    af.duration  = (4 + level) * DUR_CONV;
+    af.duration  = (short)((4 + level) * DUR_CONV);
     af.location  = APPLY_NONE;
     af.modifier  = 0;
     af.bitvector = AFF_SLEEP;
@@ -2520,7 +2524,7 @@ ch_ret spell_create_mob( int sn, int level, CHAR_DATA *ch, void *vo )
     char_to_room( mob, ch->in_room );
     add_follower( mob, ch );
     af.type      = sn;
-    af.duration  = (number_fuzzy( (level + 1) / 3 ) + 1) * DUR_CONV;
+    af.duration  = (short)((number_fuzzy( (level + 1) / 3 ) + 1) * DUR_CONV);
     af.location  = 0;
     af.modifier  = 0;
     af.bitvector = AFF_CHARM;

@@ -31,16 +31,13 @@ typedef	int				obj_ret;
  * Short scalar types.
  * Diavolo reports AIX compiler has bugs with short types.
  */
+#ifndef __cplusplus
 #if	!defined(FALSE)
 #define FALSE	 0
 #endif
 
 #if	!defined(TRUE)
 #define TRUE	 1
-#endif
-
-#if	!defined(BERR)
-#define BERR	 255
 #endif
 
 #if	defined(_AIX)
@@ -51,6 +48,14 @@ typedef int				bool;
 #define unix
 #else
 typedef unsigned char			bool;
+#endif
+#else
+#define TRUE true
+#define FALSE false
+#endif /* __cplusplus */
+
+#if     !defined(BERR)
+#define BERR     255
 #endif
 
 /*
@@ -562,7 +567,7 @@ struct	mob_prog_data
     char *	 comlist;
 };
 
-bool	MOBtrigger;
+extern bool MOBtrigger;
 
 typedef enum {PLAYER_SHIP, MOB_SHIP} ship_types;
 typedef enum {SHIP_DOCKED, SHIP_READY, SHIP_BUSY, SHIP_BUSY_2, SHIP_BUSY_3, SHIP_REFUEL,
@@ -683,7 +688,7 @@ struct ship_prototype_data
     char *      filename;
     char *      name;
     char *      description;
-    short      class;
+    short      ship_class;
     short      model;
     short      hyperspeed;
     short      realspeed;
@@ -745,7 +750,7 @@ struct ship_data
     char *      copilot;
     char *      dest;
     short      type;
-    short      class;
+    short      ship_class;
     short      model;
     short      hyperspeed;
     int         hyperdistance;
@@ -1754,7 +1759,7 @@ struct	char_data
     SPEC_FUN *		spec_2;
     MPROG_ACT_LIST *	mpact;
     int			mpactnum;
-    short		mpscriptpos;
+  size_t		mpscriptpos;
     MOB_INDEX_DATA *	pIndexData;
     DESCRIPTOR_DATA *	desc;
     AFFECT_DATA *	first_affect;
@@ -1998,7 +2003,7 @@ struct	obj_data
     char *		description;
     char *		action_desc;
     short		item_type;
-    short		mpscriptpos;
+  size_t		mpscriptpos;
     int			extra_flags;
     int			magic_flags; /*Need more bitvectors for spells - Scryn*/
     int			wear_flags; 
@@ -2117,7 +2122,7 @@ struct	room_index_data
     MPROG_ACT_LIST *	mpact;               /* mudprogs */
     int			mpactnum;            /* mudprogs */
     MPROG_DATA *	mudprogs;            /* mudprogs */
-    short		mpscriptpos;
+    size_t		mpscriptpos;
     int			progtypes;           /* mudprogs */
     short		light;
     short		sector_type;
@@ -3237,6 +3242,7 @@ DECLARE_SPELL_FUN(	spell_smaug		);
  * These are all very standard library functions,
  *   but some systems have incomplete or non-ansi header files.
  */
+#ifndef __cplusplus
 #if	defined(_AIX)
 char *	crypt		args( ( const char *key, const char *salt ) );
 #endif
@@ -3308,6 +3314,7 @@ char *	crypt		args( ( const char *key, const char *salt ) );
 #define crypt(s1, s2)	(s1)
 #endif
 
+#endif /* __cplusplus */
 
 /*
  * Data files used by the server.
@@ -3522,9 +3529,9 @@ void	     create_ship_rooms		    args( ( SHIP_DATA * ship ) );
 /* comm.c */
 void	close_socket	args( ( DESCRIPTOR_DATA *dclose, bool force ) );
 void	write_to_buffer	args( ( DESCRIPTOR_DATA *d, const char *txt,
-				int length ) );
+				size_t length ) );
 void	write_to_pager	args( ( DESCRIPTOR_DATA *d, const char *txt,
-				int length ) );
+				size_t length ) );
 void	send_to_char	args( ( const char *txt, CHAR_DATA *ch ) );
 void	send_to_char_color	args( ( const char *txt, CHAR_DATA *ch ) );
 void	send_to_pager	args( ( const char *txt, CHAR_DATA *ch ) );

@@ -58,13 +58,13 @@ long int get_prototype_value( SHIP_PROTOTYPE *prototype )
 {
      long int price;
           
-     if (prototype->class == SPACECRAFT)
+     if (prototype->ship_class == SPACECRAFT)
         price = 10000;
-     else if (prototype->class == AIRCRAFT) 
+     else if (prototype->ship_class == AIRCRAFT) 
         price = 5000;
-     else if (prototype->class == SUBMARINE) 
+     else if (prototype->ship_class == SUBMARINE) 
         price = 5000;
-     else if (prototype->class == SPACE_STATION) 
+     else if (prototype->ship_class == SPACE_STATION) 
         price = 100000;
      else 
         price = 2000;
@@ -237,7 +237,7 @@ void save_ship_prototype( SHIP_PROTOTYPE *prototype )
 	fprintf( fp, "Name         %s~\n",	prototype->name		);
 	fprintf( fp, "Filename     %s~\n",	prototype->filename		);
         fprintf( fp, "Description  %s~\n",	prototype->description	);
-	fprintf( fp, "Class        %d\n",	prototype->class	);
+	fprintf( fp, "Class        %d\n",	prototype->ship_class	);
 	fprintf( fp, "Model        %d\n",	prototype->model	);
 	fprintf( fp, "Tractorbeam  %d\n",	prototype->tractorbeam	);
 	fprintf( fp, "Lasers       %d\n",	prototype->lasers    	);
@@ -295,7 +295,7 @@ void fread_ship_prototype( SHIP_PROTOTYPE *prototype, FILE *fp )
         
         
         case 'C':
-             KEY( "Class",       prototype->class,            fread_number( fp ) );
+             KEY( "Class",       prototype->ship_class,            fread_number( fp ) );
              break;
                                 
 
@@ -487,7 +487,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
 	default:
 	  break;
 	case SUB_SHIPDESC:
-	  prototype = ch->dest_buf;
+	  prototype = (SHIP_PROTOTYPE*) ch->dest_buf;
 	  if ( !prototype )
 	  {
 		bug( "setprototype: sub_shipdesc: NULL ch->dest_buf", 0 );
@@ -569,7 +569,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
     
     if ( !str_cmp( arg2, "class" ) )
     {   
-	prototype->class = URANGE( 0, atoi(argument) , 9 );
+	prototype->ship_class = URANGE( 0, atoi(argument) , 9 );
 	send_to_char( "Done.\n\r", ch );
 	save_ship_prototype( prototype );
 	return;
@@ -675,12 +675,12 @@ void do_showprototype( CHAR_DATA *ch, char *argument )
     }
     set_char_color( AT_YELLOW, ch );
     ch_printf( ch, "%s : %s\n\rFilename: %s\n\r",
-		        prototype->class == SPACECRAFT ? model[prototype->model].name :
-		       (prototype->class == SPACE_STATION ? "Space Station" : 
-		       (prototype->class == AIRCRAFT ? "Aircraft" : 
-		       (prototype->class == BOAT ? "Boat" : 
-		       (prototype->class == SUBMARINE ? "Submatine" : 
-		       (prototype->class == LAND_VEHICLE ? "land vehicle" : "Unknown" ) ) ) ) ), 
+		        prototype->ship_class == SPACECRAFT ? model[prototype->model].name :
+		       (prototype->ship_class == SPACE_STATION ? "Space Station" : 
+		       (prototype->ship_class == AIRCRAFT ? "Aircraft" : 
+		       (prototype->ship_class == BOAT ? "Boat" : 
+		       (prototype->ship_class == SUBMARINE ? "Submatine" : 
+		       (prototype->ship_class == LAND_VEHICLE ? "land vehicle" : "Unknown" ) ) ) ) ), 
     			prototype->name,
     			prototype->filename);
     ch_printf( ch, "Description: %s\n\r",
@@ -772,7 +772,7 @@ SHIP_DATA * make_ship( SHIP_PROTOTYPE *prototype )
     ship->copilot = STRALLOC("");
     ship->dest = NULL;
     ship->type = PLAYER_SHIP;
-    ship->class = prototype->class;
+    ship->ship_class = prototype->ship_class;
     ship->model = prototype->model;
     ship->hyperspeed = prototype->hyperspeed;
     ship->realspeed = prototype->realspeed;
@@ -823,7 +823,7 @@ void do_prototypes( CHAR_DATA *ch, char *argument )
     send_to_pager( "&Y\n\rThe following ships are currently prototyped:&W\n\r", ch );
     for ( prototype = first_ship_prototype; prototype; prototype = prototype->next )
     {   
-        if ( prototype->class > SPACE_STATION )
+        if ( prototype->ship_class > SPACE_STATION )
            continue;
            
         pager_printf( ch, "%-35s    ", prototype->name );
@@ -846,7 +846,7 @@ void do_prototypes( CHAR_DATA *ch, char *argument )
         
     for ( prototype = first_ship_prototype; prototype; prototype = prototype->next )
     {   
-        if ( prototype->class <= SPACE_STATION )
+        if ( prototype->ship_class <= SPACE_STATION )
            continue;
 
         pager_printf( ch, "%-35s    ", prototype->name );
@@ -869,7 +869,7 @@ void create_ship_rooms( SHIP_DATA * ship )
     int roomnum, numrooms;
     ROOM_INDEX_DATA * room[24];
     
-    if ( ship->class != SPACECRAFT )
+    if ( ship->ship_class != SPACECRAFT )
         ship->model = 0;
     
     numrooms = UMIN( model[ship->model].rooms , MAX_SHIP_ROOMS-1 );
@@ -1398,7 +1398,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
 	default:
 	  break;
 	case SUB_ROOM_DESC:
-	  location = ch->dest_buf;
+	  location = (ROOM_INDEX_DATA*) ch->dest_buf;
 	  if ( !location )
 	  {
 		bug( "designship decorate: sub_room_desc: NULL ch->dest_buf", 0 );
@@ -1691,7 +1691,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
        ship->copilot = STRALLOC("");
        ship->dest = NULL;
        ship->type = PLAYER_SHIP;
-       ship->class = SPACECRAFT;
+       ship->ship_class = SPACECRAFT;
        ship->model = smodel;
        ship->hyperspeed = model[smodel].hyperspeed;
        ship->realspeed = speed;

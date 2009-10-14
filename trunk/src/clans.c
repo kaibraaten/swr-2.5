@@ -477,7 +477,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
 	default:
 	  break;
 	case SUB_CLANDESC:
-	  clan = ch->dest_buf;
+	  clan = (CLAN_DATA*) ch->dest_buf;
 	  if ( !clan )
 	  {
 		bug( "setclan: sub_clandesc: NULL ch->dest_buf", 0 );
@@ -614,7 +614,7 @@ void do_showclan( CHAR_DATA *ch, char *argument )
         for ( planet = first_planet ; planet ; planet = planet->next )
           if ( clan == planet->governed_by )
           {
-            support += planet->pop_support;
+            support += (int) planet->pop_support;
             pCount++;
             revenue += get_taxes(planet);
           }

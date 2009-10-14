@@ -108,7 +108,7 @@ void do_makeblade( CHAR_DATA *ch, char *argument )
     	case 1: 
     		if ( !ch->dest_buf )
     		     return;
-    		strcpy(arg, ch->dest_buf);
+    		strcpy(arg, (const char*) ch->dest_buf);
     		DISPOSE( ch->dest_buf);
     		break;
     		
@@ -321,7 +321,7 @@ void do_makeblaster( CHAR_DATA *ch, char *argument )
     	case 1: 
     		if ( !ch->dest_buf )
     		     return;
-    		strcpy(arg, ch->dest_buf);
+    		strcpy(arg, (const char*) ch->dest_buf);
     		DISPOSE( ch->dest_buf);
     		break;
     		
@@ -603,7 +603,7 @@ void do_makelightsaber( CHAR_DATA *ch, char *argument )
     	case 1: 
     		if ( !ch->dest_buf )
     		     return;
-    		strcpy(arg, ch->dest_buf);
+    		strcpy(arg, (const char*) ch->dest_buf);
     		DISPOSE( ch->dest_buf);
     		break;
     		
@@ -864,9 +864,9 @@ void do_makejewelry( CHAR_DATA *ch, char *argument )
     		     return;
     		if ( !ch->dest_buf_2 )
     		     return;
-    		strcpy(arg, ch->dest_buf);
+    		strcpy(arg, (const char*) ch->dest_buf);
     		DISPOSE( ch->dest_buf);
-    		strcpy(arg2, ch->dest_buf_2);
+    		strcpy(arg2, (const char*) ch->dest_buf_2);
     		DISPOSE( ch->dest_buf_2);
     		break;
     		
@@ -1036,9 +1036,9 @@ void do_makearmor( CHAR_DATA *ch, char *argument )
     		     return;
     		if ( !ch->dest_buf_2 )
     		     return;
-    		strcpy(arg, ch->dest_buf);
+    		strcpy(arg, (const char*) ch->dest_buf);
     		DISPOSE( ch->dest_buf);
-    		strcpy(arg2, ch->dest_buf_2);
+    		strcpy(arg2, (const char*) ch->dest_buf_2);
     		DISPOSE( ch->dest_buf_2);
     		break;
     		
@@ -1202,7 +1202,7 @@ void do_makeshield( CHAR_DATA *ch, char *argument )
     	case 1: 
     		if ( !ch->dest_buf )
     		     return;
-    		strcpy(arg, ch->dest_buf);
+    		strcpy(arg, (const char*) ch->dest_buf);
     		DISPOSE( ch->dest_buf);
     		break;
     		
@@ -1392,9 +1392,9 @@ void do_makecontainer( CHAR_DATA *ch, char *argument )
     		     return;
     		if ( !ch->dest_buf_2 )
     		     return;
-    		strcpy(arg, ch->dest_buf);
+    		strcpy(arg, (const char*) ch->dest_buf);
     		DISPOSE( ch->dest_buf);
-    		strcpy(arg2, ch->dest_buf_2);
+    		strcpy(arg2, (const char*) ch->dest_buf_2);
     		DISPOSE( ch->dest_buf_2);
     		break;
     		
@@ -1519,7 +1519,7 @@ void do_reinforcements( CHAR_DATA *ch, char *argument )
     	case 1:
     		if ( !ch->dest_buf )
     		   return;
-    		strcpy(arg, ch->dest_buf);
+    		strcpy(arg, (const char*) ch->dest_buf);
     		DISPOSE( ch->dest_buf);
     		break;
     		
@@ -1601,7 +1601,7 @@ void do_postguard( CHAR_DATA *ch, char *argument )
     	case 1:
     		if ( !ch->dest_buf )
     		   return;
-    		strcpy(arg, ch->dest_buf);
+    		strcpy(arg, (const char*) ch->dest_buf);
     		DISPOSE( ch->dest_buf);
     		break;
     		
@@ -2380,119 +2380,118 @@ void do_pickshiplock( CHAR_DATA *ch, char *argument )
 
 void do_hijack( CHAR_DATA *ch, char *argument )
 {
-    int chance; 
-    SHIP_DATA *ship;
-    char buf[MAX_STRING_LENGTH];
-    bool uhoh = FALSE;
-    CHAR_DATA *guard;
-    ROOM_INDEX_DATA *room;
+  int chance; 
+  SHIP_DATA *ship;
+  char buf[MAX_STRING_LENGTH];
+  bool uhoh = FALSE;
+  CHAR_DATA *guard;
+  ROOM_INDEX_DATA *room;
             
-    	        if ( (ship = ship_from_cockpit(ch->in_room)) == NULL )  
-    	        {
-    	            send_to_char("&RYou must be in the cockpit of a ship to do that!\n\r",ch);
-    	            return;
-    	        }
+  if ( (ship = ship_from_cockpit(ch->in_room)) == NULL )  
+    {
+      send_to_char("&RYou must be in the cockpit of a ship to do that!\n\r",ch);
+      return;
+    }
     	        
-    	        if ( ship->class > SPACE_STATION )
-    	        {
-    	            send_to_char("&RThis isn't a spacecraft!\n\r",ch);
-    	            return;
-    	        }
+  if ( ship->ship_class > SPACE_STATION )
+    {
+      send_to_char("&RThis isn't a spacecraft!\n\r",ch);
+      return;
+    }
     	        
-    	        if ( check_pilot( ch , ship ) )
-    	        {
-    	            send_to_char("&RWhat would be the point of that!\n\r",ch);
-    	            return;
-    	        }
+  if ( check_pilot( ch , ship ) )
+    {
+      send_to_char("&RWhat would be the point of that!\n\r",ch);
+      return;
+    }
     	        
-    	        if ( ship->type == MOB_SHIP && get_trust(ch) < 102 )
-    	        {
-    	            send_to_char("&RThis ship isn't pilotable by mortals at this point in time...\n\r",ch);
-    	            return;
-    	        }
+  if ( ship->type == MOB_SHIP && get_trust(ch) < 102 )
+    {
+      send_to_char("&RThis ship isn't pilotable by mortals at this point in time...\n\r",ch);
+      return;
+    }
     	        
-                if  ( ship->class == SPACE_STATION )
-                {
-                   send_to_char( "You can't do that here.\n\r" , ch );
-                   return;
-                }   
+  if  ( ship->ship_class == SPACE_STATION )
+    {
+      send_to_char( "You can't do that here.\n\r" , ch );
+      return;
+    }   
     
-    	        if ( ship->lastdoc != ship->location )
-                {
-                     send_to_char("&rYou don't seem to be docked right now.\n\r",ch);
-                     return;
-                }
+  if ( ship->lastdoc != ship->location )
+    {
+      send_to_char("&rYou don't seem to be docked right now.\n\r",ch);
+      return;
+    }
     
-    	        if ( ship->shipstate != SHIP_DOCKED && ship->shipstate != SHIP_DISABLED )
-    	        {
-    	            send_to_char("The ship is not docked right now.\n\r",ch);
-    	            return;
-    	        }
+  if ( ship->shipstate != SHIP_DOCKED && ship->shipstate != SHIP_DISABLED )
+    {
+      send_to_char("The ship is not docked right now.\n\r",ch);
+      return;
+    }
                 
-                if ( ship->shipstate == SHIP_DISABLED )
-    	        {
-    	            send_to_char("The ships drive is disabled .\n\r",ch);
-    	            return;
-    	        }
+  if ( ship->shipstate == SHIP_DISABLED )
+    {
+      send_to_char("The ships drive is disabled .\n\r",ch);
+      return;
+    }
                 
-                for ( room = ship->first_room ; room ; room = room->next_in_ship )
-		{
-		   for ( guard = room->first_person; guard ; guard = guard->next_in_room )
-		      if ( IS_NPC(guard) && guard->pIndexData && guard->pIndexData->vnum == MOB_VNUM_SHIP_GUARD 
-		      && guard->position > POS_SLEEPING && !guard->fighting )
-                      {
-                         start_hating( guard, ch );
-                         start_hunting( guard , ch );
-                         uhoh = TRUE;
+  for ( room = ship->first_room ; room ; room = room->next_in_ship )
+    {
+      for ( guard = room->first_person; guard ; guard = guard->next_in_room )
+	if ( IS_NPC(guard) && guard->pIndexData && guard->pIndexData->vnum == MOB_VNUM_SHIP_GUARD 
+	     && guard->position > POS_SLEEPING && !guard->fighting )
+	  {
+	    start_hating( guard, ch );
+	    start_hunting( guard , ch );
+	    uhoh = TRUE;
                       }   
-		}
+    }
 		
-                if ( uhoh )
-    	        {
-    	            send_to_char("Uh oh....\n\r",ch);
-    	            return;
-    	        }
-		                
-                chance = IS_NPC(ch) ? 0
-	                 : (int)  (ch->pcdata->learned[gsn_hijack]) ;
-                if ( number_percent( ) > chance )
-    		{  
-    		    send_to_char("You fail to figure out the correct launch code.\n\r",ch);
-    	            return;
-                }
+  if ( uhoh )
+    {
+      send_to_char("Uh oh....\n\r",ch);
+      return;
+    }
+
+  chance = IS_NPC(ch) ? 0 : (int)  (ch->pcdata->learned[gsn_hijack]) ;
+
+  if ( number_percent( ) > chance )
+    {  
+      send_to_char("You fail to figure out the correct launch code.\n\r",ch);
+      return;
+    }
                 
-                chance = IS_NPC(ch) ? 0
-	                 : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
-                if ( number_percent( ) < chance )
-    		{  
-                
-    		   if (ship->hatchopen)
-    		   {
-    		     ship->hatchopen = FALSE;
-    		     sprintf( buf , "The hatch on %s closes." , ship->name);  
-       	             echo_to_room( AT_YELLOW , get_room_index(ship->location) , buf );
-       	             echo_to_room( AT_YELLOW , ship->entrance , "The hatch slides shut." );
-       	           }
-    		   set_char_color( AT_GREEN, ch );
-    		   send_to_char( "Launch sequence initiated.\n\r", ch);
-    		   act( AT_PLAIN, "$n starts up the ship and begins the launch sequence.", ch,
-		        NULL, argument , TO_ROOM );
-		   echo_to_ship( AT_YELLOW , ship , "The ship hums as it lifts off the ground.");
-    		   sprintf( buf, "%s begins to launch.", ship->name );
-    		   echo_to_room( AT_YELLOW , get_room_index(ship->location) , buf );
-    		   ship->shipstate = SHIP_LAUNCH;
-    		   ship->currspeed = ship->realspeed;
-                   learn_from_success( ch, gsn_spacecraft );
-                   learn_from_success( ch, gsn_hijack );
-                   sprintf( buf, "%s has been hijacked!", ship->name );
-    		   echo_to_all( AT_RED , buf, 0 );
+  chance = IS_NPC(ch) ? 0
+    : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+  if ( number_percent( ) < chance )
+    {
+      if (ship->hatchopen)
+	{
+	  ship->hatchopen = FALSE;
+	  sprintf( buf , "The hatch on %s closes." , ship->name);  
+	  echo_to_room( AT_YELLOW , get_room_index(ship->location) , buf );
+	  echo_to_room( AT_YELLOW , ship->entrance , "The hatch slides shut." );
+	}
+      set_char_color( AT_GREEN, ch );
+      send_to_char( "Launch sequence initiated.\n\r", ch);
+      act( AT_PLAIN, "$n starts up the ship and begins the launch sequence.", ch,
+	   NULL, argument , TO_ROOM );
+      echo_to_ship( AT_YELLOW , ship , "The ship hums as it lifts off the ground.");
+      sprintf( buf, "%s begins to launch.", ship->name );
+      echo_to_room( AT_YELLOW , get_room_index(ship->location) , buf );
+      ship->shipstate = SHIP_LAUNCH;
+      ship->currspeed = ship->realspeed;
+      learn_from_success( ch, gsn_spacecraft );
+      learn_from_success( ch, gsn_hijack );
+      sprintf( buf, "%s has been hijacked!", ship->name );
+      echo_to_all( AT_RED , buf, 0 );
     		   
-                   return;   	   	
-                }
-                set_char_color( AT_RED, ch );
-	        send_to_char("You fail to work the controls properly!\n\r",ch);
-    	   	return;	
-    	
+      return;   	   	
+    }
+
+  set_char_color( AT_RED, ch );
+  send_to_char("You fail to work the controls properly!\n\r",ch);
+  return;	
 }
 
 
@@ -2686,7 +2685,7 @@ void do_landscape ( CHAR_DATA *ch , char *argument )
 	default:
 	  break;
 	case SUB_ROOM_DESC:
-	  location = ch->dest_buf;
+	  location = (ROOM_INDEX_DATA*) ch->dest_buf;
 	  if ( !location )
 	  {
 		bug( "landscape: sub_room_desc: NULL ch->dest_buf", 0 );
