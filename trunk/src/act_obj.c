@@ -5,14 +5,6 @@
 #include "mud.h"
 #include "bet.h"
 
-/*double sqrt( double x );*/
-
-/*
- * External functions
- */
-
-void    show_list_to_char  args( ( OBJ_DATA *list, CHAR_DATA *ch,
-				bool fShort, bool fShowNothing ) );
 /*
  * Local functions.
  */

@@ -21,6 +21,8 @@ OBJ_DATA *save_equipment[MAX_WEAR][8];
 CHAR_DATA *quitting_char, *loading_char, *saving_char;
 
 int file_ver;
+extern FILE *fpArea;
+extern char strArea[MAX_INPUT_LENGTH];
 
 /*
  * Array of containers read for proper re-nesting of objects.
@@ -635,8 +637,6 @@ bool load_char_obj( DESCRIPTOR_DATA *d, char *name, bool preload )
     bool found;
     struct stat fst;
     int i, x;
-    extern FILE *fpArea;
-    extern char strArea[MAX_INPUT_LENGTH];
     char buf[MAX_INPUT_LENGTH];
     
     CREATE( ch, CHAR_DATA, 1 );
@@ -1804,8 +1804,6 @@ void load_corpses( void )
 {
   DIR *dp;
   struct direct *de;
-  extern FILE *fpArea;
-  extern char strArea[MAX_INPUT_LENGTH];
   extern int falling;
   
   if ( !(dp = opendir(CORPSE_DIR)) )

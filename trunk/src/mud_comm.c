@@ -3,7 +3,6 @@
 #include <string.h>
 #include "mud.h"
 
-char *	mprog_type_to_name	args( ( int type ) );
 ch_ret	simple_damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt );
 CHAR_DATA * get_char_room_mp  args( ( CHAR_DATA *ch, char *argument ) );
 

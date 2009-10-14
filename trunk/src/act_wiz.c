@@ -23,10 +23,7 @@ bool	write_to_descriptor	args( ( int desc, char *txt, int length ) );
 /*
  * Local functions.
  */
-ROOM_INDEX_DATA * find_location	args( ( CHAR_DATA *ch, char *arg ) );
 void              save_banlist  args( ( void ) );
-void              close_area    args( ( AREA_DATA *pArea ) );
-
 int               get_color (char *argument); /* function proto */
 
 /*
@@ -38,6 +35,7 @@ time_t new_boot_time_t;
 extern struct tm new_boot_struct;
 extern OBJ_INDEX_DATA *obj_index_hash[MAX_KEY_HASH];
 extern MOB_INDEX_DATA *mob_index_hash[MAX_KEY_HASH];
+extern bool mud_down;
 
 int get_saveflag( char *name )
 {
@@ -1546,7 +1544,6 @@ void do_reboo( CHAR_DATA *ch, char *argument )
 
 void do_reboot( CHAR_DATA *ch, char *argument )
 {
-    extern bool mud_down;
     CHAR_DATA *vch;
 
     if ( str_cmp( argument, "mud now" )
@@ -1594,7 +1591,6 @@ void do_shutdow( CHAR_DATA *ch, char *argument )
 void do_shutdown( CHAR_DATA *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
-    extern bool mud_down;
     CHAR_DATA *vch;
 
     if ( str_cmp( argument, "mud now" ) && str_cmp(argument, "nosave") )
