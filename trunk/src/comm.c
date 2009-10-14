@@ -25,9 +25,6 @@
 
 const   char    go_ahead_str    [] = { IAC, GA, '\0' };
 
-void    send_auth args( ( struct descriptor_data *d ) );
-void    read_auth args( ( struct descriptor_data *d ) );
-void    start_auth args( ( struct descriptor_data *d ) );
 void    save_sysdata args( ( SYSTEM_DATA sys ) );
 
 /*  from act_info?  */
@@ -474,28 +471,6 @@ void game_loop( )
 			}
 		}
 
-		/* IDENT authentication */
-	        if ( ( d->auth_fd == -1 ) && ( d->atimes < 20 ) 
-		&& !str_cmp( d->user, "unknown" ) )
-		   start_auth( d );
-
-		if ( d->auth_fd != -1)
-		{
-		   if ( FD_ISSET( d->auth_fd, &in_set ) )
-		   {
-			read_auth( d );
-			/* if ( !d->auth_state ) 
-			    check_ban( d );*/
-		   }
-		   else
-		   if ( FD_ISSET( d->auth_fd, &out_set )
-		   && IS_SET( d->auth_state, FLAG_WRAUTH) )
-		   {
-			send_auth( d );
-			/* if ( !d->auth_state )
-			  check_ban( d );*/
-		   }
-		}
 		if ( d->character && d->character->wait > 0 )
 		{
 			--d->character->wait;
@@ -750,8 +725,6 @@ void new_descriptor( int new_desc )
 	else
 	    write_to_buffer( dnew, help_greeting  , 0 );
     }
-
-    start_auth( dnew ); /* Start username authorization */
 
     if ( ++num_descriptors > sysdata.maxplayers )
 	sysdata.maxplayers = num_descriptors;
