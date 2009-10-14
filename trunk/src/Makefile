@@ -21,10 +21,14 @@ libs:
 #		make -C esock
 
 $(BINARY):	$(OBJ)
-		$(CC) -o $@ $^ $(LFLAGS)
+		@echo "Linking" $(BINARY)
+		@$(CC) -o $@ $^ $(LFLAGS)
+		@mv $(BINARY) ../bin
+		@echo "Done."
 
 $(ODIR)/%.o:	 %.c $(DEPS)
-		$(CC) -c -o $@ $< $(CCFLAGS)
+		@$(CC) -c -o $@ $< $(CCFLAGS)
+		@echo "Compiling" $@
 
 -include *.d
 
