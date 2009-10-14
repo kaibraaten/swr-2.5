@@ -2033,9 +2033,10 @@ void do_who( CHAR_DATA *ch, char *argument )
     for ( cur_who = first_mortal; cur_who; cur_who = next_who )
     {
       if ( !ch )
-        fprintf( whoout, cur_who->text );
+        fprintf( whoout, "%s", cur_who->text );
       else
         send_to_pager( cur_who->text, ch );
+
       next_who = cur_who->next;
       DISPOSE( cur_who->text );
       DISPOSE( cur_who ); 
@@ -2044,7 +2045,7 @@ void do_who( CHAR_DATA *ch, char *argument )
     if ( first_imm )
     {
       if ( !ch )
-        fprintf( whoout, "\n\r--------------------------------[ Elected Officials ]-------------------------\n\r\n\r" );
+        fprintf( whoout, "%s", "\n\r--------------------------------[ Elected Officials ]-------------------------\n\r\n\r" );
       else
        send_to_pager(  "\n\r&R--------------------------------[ &YElected Officials&R ]-------------------------&W\n\r\n\r", ch );
     }
@@ -2052,7 +2053,7 @@ void do_who( CHAR_DATA *ch, char *argument )
     for ( cur_who = first_imm; cur_who; cur_who = next_who )
     {
       if ( !ch )
-        fprintf( whoout, cur_who->text );
+        fprintf( whoout, "%s", cur_who->text );
       else
         send_to_pager( cur_who->text, ch );
       next_who = cur_who->next;

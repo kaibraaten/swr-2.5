@@ -227,88 +227,86 @@ void do_track( CHAR_DATA *ch, char *argument )
 
 void found_prey( CHAR_DATA *ch, CHAR_DATA *victim )
 {
-     char buf[MAX_STRING_LENGTH];
-     char victname[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH];
+  char victname[MAX_STRING_LENGTH];
 
-     
+  if (victim == NULL)
+    {
+      bug("Found_prey: null victim", 0);
+      return;
+    }
 
-     if (victim == NULL)
-     {
-	bug("Found_prey: null victim", 0);
+  if (ch == NULL)
+    {
+      bug("Found_prey: null ch", 0);
+      return;
+    }
+
+  if ( victim->in_room == NULL )
+    {
+      bug( "Found_prey: null victim->in_room", 0 );
+      return;
+    }
+
+  sprintf( victname, "%s", IS_NPC( victim ) ? victim->short_descr : victim->name );
+
+  if ( !can_see(ch, victim) )
+    {
+      if ( number_percent( ) < 90 )
 	return;
-     }
-     
-     if (ch == NULL)
-     {
-	bug("Found_prey: null ch", 0);
-	return;
-     }
-
-     if ( victim->in_room == NULL )
-     {
-        bug( "Found_prey: null victim->in_room", 0 );
-        return;
-     }
-
-     sprintf( victname, IS_NPC( victim ) ? victim->short_descr : victim->name );
-
-     if ( !can_see(ch, victim) )
-     {
-        if ( number_percent( ) < 90 )
-	  return;
-	switch( number_bits( 2 ) )
+      switch( number_bits( 2 ) )
  	{
 	case 0: sprintf( buf, "Don't make me find you, %s!", victname );
-		do_say( ch, buf );
-	        break;
+	  do_say( ch, buf );
+	  break;
 	case 1: act( AT_ACTION, "$n sniffs around the room for $N.", ch, NULL, victim, TO_NOTVICT );
-		act( AT_ACTION, "You sniff around the room for $N.", ch, NULL, victim, TO_CHAR );
-		act( AT_ACTION, "$n sniffs around the room for you.", ch, NULL, victim, TO_VICT );
-		sprintf( buf, "I can smell your blood!" );
-		do_say( ch, buf );
-		break;
+	  act( AT_ACTION, "You sniff around the room for $N.", ch, NULL, victim, TO_CHAR );
+	  act( AT_ACTION, "$n sniffs around the room for you.", ch, NULL, victim, TO_VICT );
+	  sprintf( buf, "I can smell your blood!" );
+	  do_say( ch, buf );
+	  break;
 	case 2: sprintf( buf, "I'm going to tear %s apart!", victname );
-		do_yell( ch, buf );
-		break;
+	  do_yell( ch, buf );
+	  break;
 	case 3: do_say( ch, "Just wait until I find you...");
-		break;
+	  break;
         }
-	return;
-     }
+      return;
+    }
 
-     if ( IS_SET( ch->in_room->room_flags, ROOM_SAFE ) )
-     {
-	if ( number_percent( ) < 90 )
-	  return;
-	switch( number_bits( 2 ) )
+  if ( IS_SET( ch->in_room->room_flags, ROOM_SAFE ) )
+    {
+      if ( number_percent( ) < 90 )
+	return;
+      switch( number_bits( 2 ) )
 	{
 	case 0:	do_say( ch, "C'mon out, you coward!" );
-		sprintf( buf, "%s is a bloody coward!", victname );
-		do_yell( ch, buf );
-		break;
+	  sprintf( buf, "%s is a bloody coward!", victname );
+	  do_yell( ch, buf );
+	  break;
 	case 1: sprintf( buf, "Let's take this outside, %s", victname );
-		do_say( ch, buf );
-		break;
+	  do_say( ch, buf );
+	  break;
 	case 2: sprintf( buf, "%s is a yellow-bellied wimp!", victname );
-		do_yell( ch, buf );
-		break;
+	  do_yell( ch, buf );
+	  break;
 	case 3: act( AT_ACTION, "$n takes a few swipes at $N.", ch, NULL, victim, TO_NOTVICT );
-		act( AT_ACTION, "You try to take a few swipes $N.", ch, NULL, victim, TO_CHAR );
-		act( AT_ACTION, "$n takes a few swipes at you.", ch, NULL, victim, TO_VICT );
-		break;
+	  act( AT_ACTION, "You try to take a few swipes $N.", ch, NULL, victim, TO_CHAR );
+	  act( AT_ACTION, "$n takes a few swipes at you.", ch, NULL, victim, TO_VICT );
+	  break;
 	}
-	return;
-     }
+      return;
+    }
 
-     act( AT_ACTION, "$n lunges at $N from out of nowhere!", ch, NULL, victim, TO_NOTVICT );
-     act( AT_ACTION, "You lunge at $N catching $M off guard!", ch, NULL, victim, TO_CHAR );
-     act( AT_ACTION, "$n lunges at you from out of nowhere!", ch, NULL, victim, TO_VICT );
+  act( AT_ACTION, "$n lunges at $N from out of nowhere!", ch, NULL, victim, TO_NOTVICT );
+  act( AT_ACTION, "You lunge at $N catching $M off guard!", ch, NULL, victim, TO_CHAR );
+  act( AT_ACTION, "$n lunges at you from out of nowhere!", ch, NULL, victim, TO_VICT );
 
-     stop_hunting( ch );
-     set_fighting( ch, victim );
-     multi_hit(ch, victim, TYPE_UNDEFINED);
-     return;
-} 
+  stop_hunting( ch );
+  set_fighting( ch, victim );
+  multi_hit(ch, victim, TYPE_UNDEFINED);
+  return;
+}
 
 void hunt_victim( CHAR_DATA *ch )
 {
