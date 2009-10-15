@@ -87,3 +87,10 @@ void vector_init( Vector3 * const v )
   v->y = 0.0;
   v->z = 0.0;
 }
+
+void vector_set( Vector3 * const vec, double x, double y, double z )
+{
+  vec->x = x;
+  vec->y = y;
+  vec->z = z;
+}
