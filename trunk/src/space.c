@@ -563,6 +563,211 @@ static void spacestation_regenerate_missiles( SHIP_DATA *ship )
     }
 }
 
+static void ship_respawn_mob_ship( SHIP_DATA *ship )
+{
+  if( ( ship->ship_class == SPACE_STATION
+	|| ship->type == MOB_SHIP ) && ship->home )
+    {
+      // 4% chance of respawning mob ship or space station.
+      if ( number_range(1, 25) == 25 )
+	{
+	  ship_to_starsystem(ship, starsystem_from_name(ship->home) );
+	  vector_init( &ship->pos );
+	  vector_randomize( &ship->pos, -5000, 5000 );
+	  vector_set( &ship->head, 1, 1, 1 );
+	  ship->autopilot = TRUE;
+	}
+    }
+}
+
+static void ship_handle_autoflying_clanship( SHIP_DATA *ship, CLAN_DATA *clan )
+{
+  SHIP_DATA *target = NULL;
+
+  for ( target = ship->starsystem->first_ship; target;
+	target = target->next_in_starsystem )
+    {
+      int targetok = 0;
+      ROOM_INDEX_DATA *room = NULL;
+
+      if( autofly(target) && !str_cmp( ship->owner , target->owner ) )
+	{
+	  targetok = 1;
+	}
+
+      for( room = target->first_room; room;
+	   room = room->next_in_ship )
+	{
+	  CHAR_DATA *passenger = NULL;
+
+	  for ( passenger = room->first_person; passenger;
+		passenger = passenger->next_in_room )
+	    {
+	      if ( !IS_NPC(passenger) && passenger->pcdata )
+		{
+		  if ( passenger->pcdata->clan == clan )
+		    {
+		      targetok = 1;
+		    }
+		  else if( passenger->pcdata->clan
+			   && passenger->pcdata->clan != clan
+			   && targetok == 0 )
+		    {
+		      if ( nifty_is_name(passenger->pcdata->clan->name,
+					 clan->atwar ) )
+			{
+			  targetok = -1;
+			}
+		    }
+		}
+	    }
+	}
+
+      if ( targetok == 1 && target->target )
+	{
+	  char buf[MAX_STRING_LENGTH];
+	  ship->target = target->target;
+	  sprintf( buf , "You are being targetted by %s.",
+		   ship->name);
+	  echo_to_cockpit( AT_BLOOD , target->target , buf );
+	  break;
+	}
+
+      if ( targetok == 0 && target->target )
+	{
+	  if (!str_cmp( target->target->owner, clan->name ) )
+	    {
+	      targetok = -1;
+	    }
+	  else if( nifty_is_name( target->owner, clan->atwar ) )
+	    {
+	      targetok = -1;
+	    }
+	  else
+	    {
+	      for( room = target->target->first_room; room;
+		   room = room->next_in_ship )
+		{
+		  CHAR_DATA *passenger = NULL;
+
+		  for( passenger = room->first_person;
+		       passenger; passenger = passenger->next_in_room )
+		    {
+		      if( !IS_NPC(passenger)
+			  && passenger->pcdata
+			  && passenger->pcdata->clan == clan )
+			{
+			  targetok = -1;
+			}
+		    }
+		}
+	    }
+	}
+
+      if ( targetok >= 0 )
+	continue;
+
+      char buf[MAX_STRING_LENGTH];
+      ship->target = target;
+      sprintf( buf , "You are being scanned by %s.",
+	       ship->name);
+      echo_to_cockpit( AT_WHITE , target , buf );
+      sprintf( buf , "You are being targetted by %s.",
+	       ship->name);
+      echo_to_cockpit( AT_BLOOD , target , buf );
+
+      break;
+    }
+}
+
+static void ship_handle_autoflying_has_target( SHIP_DATA *ship )
+{
+  SHIP_DATA *target = ship->target;
+  ship->autotrack = TRUE;
+
+  if( ship->ship_class != SPACE_STATION )
+    ship->currspeed = ship->realspeed;
+
+  if ( ship->energy >200  )
+    ship->autorecharge=TRUE;
+
+  if (ship->shipstate != SHIP_HYPERSPACE
+                  && ship->energy > 200
+                  && ship->hyperspeed > 0
+                  && ship->target->starsystem == ship->starsystem
+      && ship_distance_to_ship( ship, target ) > 5000
+      && number_bits(2) == 0 )
+    {
+      char buf[MAX_STRING_LENGTH];
+      ship->currjump = ship->starsystem;
+      ship->hyperdistance = 1;
+
+      sprintf( buf ,"%s disappears from your scanner.",
+	       ship->name );
+      echo_to_system( AT_YELLOW, ship, buf , NULL );
+
+      ship_from_starsystem( ship , ship->starsystem );
+      ship->shipstate = SHIP_HYPERSPACE;
+
+      ship->energy -= 100;
+      vector_copy( &ship->jump, &target->pos );
+    }
+
+  if (ship->shipstate != SHIP_HYPERSPACE && ship->energy > 25
+                  && ship->missilestate == MISSILE_READY
+                  && ship->target->starsystem == ship->starsystem
+      && ship_distance_to_ship( ship, target ) <= 1200
+      && ship->missiles > 0 )
+    {
+      if ( ship->ship_class == SPACE_STATION
+	   || ship_is_facing_ship( ship, target ) )
+	{
+	  int chance = 100 - target->manuever/5;
+	  chance -= target->currspeed/20;
+	  chance += target->model*target->model*2;
+	  chance -= ( abs((int)(target->pos.x
+				- ship->pos.x))/100 );
+	  chance -= ( abs((int)(target->pos.y
+				- ship->pos.y))/100 );
+	  chance -= ( abs((int)(target->pos.z
+				- ship->pos.z))/100 );
+	  chance += ( 30 );
+	  chance = URANGE( 10, chance, 90 );
+
+	  if ( number_percent( ) > chance )
+	    {
+
+	    }
+	  else
+	    {
+	      char buf[MAX_STRING_LENGTH];
+	      new_missile( ship , target , NULL );
+	      ship->missiles-- ;
+	      sprintf( buf , "Incoming missile from %s." ,
+		       ship->name);
+	      echo_to_cockpit( AT_BLOOD , target , buf );
+	      sprintf( buf, "%s fires a missile towards %s.",
+		       ship->name, target->name );
+	      echo_to_system( AT_ORANGE , target , buf , NULL);
+
+	      if ( ship->ship_class == SPACE_STATION )
+		ship->missilestate = MISSILE_RELOAD_2;
+	      else
+		ship->missilestate = MISSILE_FIRED;
+	    }
+	}
+    }
+
+  if( ship->missilestate ==  MISSILE_DAMAGED )
+    ship->missilestate =  MISSILE_READY;
+
+  if( ship->laserstate ==  LASER_DAMAGED )
+    ship->laserstate =  LASER_READY;
+
+  if( ship->shipstate ==  SHIP_DISABLED )
+    ship->shipstate =  SHIP_READY;
+}
+
 static void ship_handle_autoflying( SHIP_DATA *ship )
 {
   if( autofly( ship ) )
@@ -571,90 +776,7 @@ static void ship_handle_autoflying( SHIP_DATA *ship )
 	{
 	  if( ship->target )
 	    {
-	      SHIP_DATA *target = ship->target;
-	      ship->autotrack = TRUE;
-
-	      if( ship->ship_class != SPACE_STATION )
-		ship->currspeed = ship->realspeed;
-
-	      if ( ship->energy >200  )
-		ship->autorecharge=TRUE;
-
-	      if (ship->shipstate != SHIP_HYPERSPACE
-		  && ship->energy > 200
-		  && ship->hyperspeed > 0
-		  && ship->target->starsystem == ship->starsystem
-		  && ship_distance_to_ship( ship, target ) > 5000
-		  && number_bits(2) == 0 )
-		{
-		  char buf[MAX_STRING_LENGTH];
-		  ship->currjump = ship->starsystem;
-		  ship->hyperdistance = 1;
-
-		  sprintf( buf ,"%s disappears from your scanner.",
-			   ship->name );
-		  echo_to_system( AT_YELLOW, ship, buf , NULL );
-
-		  ship_from_starsystem( ship , ship->starsystem );
-		  ship->shipstate = SHIP_HYPERSPACE;
-
-		  ship->energy -= 100;
-		  vector_copy( &ship->jump, &target->pos );
-		}
-
-	      if (ship->shipstate != SHIP_HYPERSPACE && ship->energy > 25
-		  && ship->missilestate == MISSILE_READY
-		  && ship->target->starsystem == ship->starsystem
-		  && ship_distance_to_ship( ship, target ) <= 1200
-		  && ship->missiles > 0 )
-		{
-		  if ( ship->ship_class == SPACE_STATION
-		       || ship_is_facing_ship( ship, target ) )
-		    {
-		      int chance = 100 - target->manuever/5;
-		      chance -= target->currspeed/20;
-		      chance += target->model*target->model*2;
-		      chance -= ( abs((int)(target->pos.x
-					    - ship->pos.x))/100 );
-		      chance -= ( abs((int)(target->pos.y
-					    - ship->pos.y))/100 );
-		      chance -= ( abs((int)(target->pos.z
-					    - ship->pos.z))/100 );
-		      chance += ( 30 );
-		      chance = URANGE( 10, chance, 90 );
-
-		      if ( number_percent( ) > chance )
-			{
-
-			}
-		      else
-			{
-			  char buf[MAX_STRING_LENGTH];
-			  new_missile( ship , target , NULL );
-			  ship->missiles-- ;
-			  sprintf( buf , "Incoming missile from %s." ,
-				   ship->name);
-			  echo_to_cockpit( AT_BLOOD , target , buf );
-			  sprintf( buf, "%s fires a missile towards %s.",
-				   ship->name, target->name );
-			  echo_to_system( AT_ORANGE , target , buf , NULL);
-
-			  if ( ship->ship_class == SPACE_STATION )
-			    ship->missilestate = MISSILE_RELOAD_2;
-			  else
-			    ship->missilestate = MISSILE_FIRED;
-			}
-		    }
-		}
-
-	      if( ship->missilestate ==  MISSILE_DAMAGED )
-		ship->missilestate =  MISSILE_READY;
-
-	      if( ship->laserstate ==  LASER_DAMAGED )
-		ship->laserstate =  LASER_READY;
-
-	      if( ship->shipstate ==  SHIP_DISABLED )
-		ship->shipstate =  SHIP_READY;
+	      ship_handle_autoflying_has_target( ship );
 	    }
 	  else // if( ship->target )
 	    {
@@ -669,112 +791,13 @@ static void ship_handle_autoflying( SHIP_DATA *ship )
 
 	      if( shipclan )
 		{
-		  SHIP_DATA *target = NULL;
-
-		  for ( target = ship->starsystem->first_ship; target;
-			target = target->next_in_starsystem )
-		    {
-		      int targetok = 0;
-		      ROOM_INDEX_DATA *room = NULL;
-
-		      if( autofly(target)
-			  && !str_cmp( ship->owner , target->owner ) )
-			{
-			  targetok = 1;
-			}
-
-		      for( room = target->first_room; room;
-			   room = room->next_in_ship )
-			{
-			  CHAR_DATA *passenger = NULL;
-
-			  for ( passenger = room->first_person; passenger;
-				passenger = passenger->next_in_room )
-			    if ( !IS_NPC(passenger) && passenger->pcdata )
-			      {
-				if ( passenger->pcdata->clan == shipclan )
-				  targetok = 1;
-				else if( passenger->pcdata->clan
-					 && passenger->pcdata->clan
-					 != shipclan
-					 && targetok == 0 )
-				  if ( nifty_is_name(passenger->pcdata->clan->name , shipclan->atwar ) )
-				    targetok = -1;
-			      }
-			}
-
-		      if ( targetok == 1 && target->target )
-			{
-			  char buf[MAX_STRING_LENGTH];
-			  ship->target = target->target;
-			  sprintf( buf , "You are being targetted by %s.",
-				   ship->name);
-			  echo_to_cockpit( AT_BLOOD , target->target , buf );
-			  break;
-			}
-
-		      if ( targetok == 0 && target->target )
-			{
-			  if (!str_cmp( target->target->owner,
-					shipclan->name ) )
-			    {
-			      targetok = -1;
-			    }
-			  else if( nifty_is_name( target->owner,
-						  shipclan->atwar ) )
-			    {
-			      targetok = -1;
-			    }
-			  else
-			    {
-			      for( room = target->target->first_room; room;
-				   room = room->next_in_ship )
-				{
-				  CHAR_DATA *passenger = NULL;
-
-				  for( passenger = room->first_person;
-				       passenger;
-				       passenger = passenger->next_in_room )
-				    {
-				      if( !IS_NPC(passenger)
-					  && passenger->pcdata
-					  && passenger->pcdata->clan == shipclan )
-					{
-					  targetok = -1;
-					}
-				    }
-				}
-			    }
-			}
-
-		      if ( targetok >= 0 )
-			continue;
-
-		      char buf[MAX_STRING_LENGTH];
-		      ship->target = target;
-		      sprintf( buf , "You are being scanned by %s.",
-			       ship->name);
-		      echo_to_cockpit( AT_WHITE , target , buf );
-		      sprintf( buf , "You are being targetted by %s.",
-			       ship->name);
-		      echo_to_cockpit( AT_BLOOD , target , buf );
-
-		      break;
-		    }
-		}
+		  ship_handle_autoflying_clanship( ship, shipclan );
+		} // if shipclan
 	    }
-	}
-      else if( ( ship->ship_class == SPACE_STATION
-		 || ship->type == MOB_SHIP ) && ship->home )
+	} // if( ship->starsystem )
+      else
 	{
-	  if ( number_range(1, 25) == 25 )
-	    {
-	      ship_to_starsystem(ship, starsystem_from_name(ship->home) );
-	      vector_init( &ship->pos );
-	      vector_randomize( &ship->pos, -5000, 5000 );
-	      vector_set( &ship->head, 1, 1, 1 );
-	      ship->autopilot = TRUE;
-	    }
+	  ship_respawn_mob_ship( ship );
 	}
     }
 }
