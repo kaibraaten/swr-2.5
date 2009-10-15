@@ -2,7 +2,7 @@ CC = gcc
 BINARY = swr
 WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wredundant-decls -Wwrite-strings
 #WFLAGS =  -Wall -Wshadow -Wformat-security -Winline -Wpointer-arith -Wcast-align -Wredundant-decls -Werror -Wconversion -Wwrite-strings
-CCFLAGS = -g3 -MD $(WFLAGS) -I.
+CCFLAGS = -g3 -MMD $(WFLAGS) -I.
 LFLAGS = -lcrypt -lm
 DEPS = 
 ODIR = obj
@@ -30,7 +30,7 @@ $(ODIR)/%.o:	 %.c $(DEPS)
 		@echo "Compiling" $@
 		@$(CC) -c -o $@ $< $(CCFLAGS)
 
--include *.d
+-include $(ODIR)/*.d
 
 clean :
 		-rm -f $(BINARY) *~ $(ODIR)/*.o core*
