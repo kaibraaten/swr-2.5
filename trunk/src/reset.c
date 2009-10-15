@@ -463,7 +463,7 @@ void reset_all( )
                    SET_BIT(mob->affected_by, AFF_INFRARED);
             if ( pRoomIndex->area->planet->governed_by )
             {
-                sprintf( tmpbuf , "A soldier patrols the area. (%s)\n\r" , pRoomIndex->area->planet->governed_by->name );
+                sprintf( tmpbuf , "A soldier patrols the area. (%s)\r\n" , pRoomIndex->area->planet->governed_by->name );
                 STRFREE( mob->long_descr );
                 mob->long_descr = STRALLOC( tmpbuf );
                 mob->mob_clan  = pRoomIndex->area->planet->governed_by;
@@ -506,7 +506,7 @@ void reset_all( )
                    SET_BIT(mob->affected_by, AFF_INFRARED);
             if ( pRoomIndex->area->planet->governed_by )
             {
-                sprintf( tmpbuf , "A Platform Security Guard stands alert and ready for trouble. (%s)\n\r" , pRoomIndex->area->planet->governed_by->name );
+                sprintf( tmpbuf , "A Platform Security Guard stands alert and ready for trouble. (%s)\r\n" , pRoomIndex->area->planet->governed_by->name );
                 STRFREE( mob->long_descr );
                 mob->long_descr = STRALLOC( tmpbuf );
                 mob->mob_clan  = pRoomIndex->area->planet->governed_by;
@@ -717,30 +717,30 @@ void reset_all( )
               switch( number_bits( 4 ) )
               {
                 default:
-                  mob->long_descr = STRALLOC( "A colonist is going about her daily business.\n\r" );
+                  mob->long_descr = STRALLOC( "A colonist is going about her daily business.\r\n" );
                   break;
 
                 case 0:
-                  mob->long_descr = STRALLOC( "A wealthy colonist is dressed in fine silks.\n\r" );
+                  mob->long_descr = STRALLOC( "A wealthy colonist is dressed in fine silks.\r\n" );
                   mob->gold = number_range( 1 , 100 );
                   break;
 
                 case 1:
-                  mob->long_descr = STRALLOC( "A young colonist smiles at you as she walks by.\n\r" );
+                  mob->long_descr = STRALLOC( "A young colonist smiles at you as she walks by.\r\n" );
                   break;
 
                 case 2:
-                  mob->long_descr = STRALLOC( "A young schoolgirl is skipping.\n\r" );
+                  mob->long_descr = STRALLOC( "A young schoolgirl is skipping.\r\n" );
                   break;
 
 
                 case 3:
-                  mob->long_descr = STRALLOC( "A colonist is dressed in formal business attire.\n\r" );
+                  mob->long_descr = STRALLOC( "A colonist is dressed in formal business attire.\r\n" );
                   mob->gold = number_range( 20 , 50 );
                   break;
                   
                 case 4:
-                  mob->long_descr = STRALLOC( "An elderly colonist strolls by.\n\r" );
+                  mob->long_descr = STRALLOC( "An elderly colonist strolls by.\r\n" );
                   mob->gold = number_range( 20 , 50 );
                   break;
               }
@@ -748,29 +748,29 @@ void reset_all( )
               switch( number_bits( 3 ) )
               {
                 default:
-                  mob->long_descr = STRALLOC( "A colonist is going about his daily business.\n\r" );
+                  mob->long_descr = STRALLOC( "A colonist is going about his daily business.\r\n" );
                   break;
 
                 case 0:
-                  mob->long_descr = STRALLOC( "A wealthy colonist is dressed in fine silk robes.\n\r" );
+                  mob->long_descr = STRALLOC( "A wealthy colonist is dressed in fine silk robes.\r\n" );
                   mob->gold = number_range( 1 , 100 );
                   break;
 
                 case 1:
-                  mob->long_descr = STRALLOC( "A young colonist is just hanging out.\n\r" );
+                  mob->long_descr = STRALLOC( "A young colonist is just hanging out.\r\n" );
                   break;
 
                 case 2:
-                  mob->long_descr = STRALLOC( "A young boy is kicking a small stone around.\n\r" );
+                  mob->long_descr = STRALLOC( "A young boy is kicking a small stone around.\r\n" );
                   break;
 
                 case 3:
-                  mob->long_descr = STRALLOC( "A businessman looks to be in a hurry.\n\r" );
+                  mob->long_descr = STRALLOC( "A businessman looks to be in a hurry.\r\n" );
                   mob->gold = number_range( 20 , 50 );
                   break;
 
                 case 4:
-                  mob->long_descr = STRALLOC( "An elderly colonist strolls by.\n\r" );
+                  mob->long_descr = STRALLOC( "An elderly colonist strolls by.\r\n" );
                   mob->gold = number_range( 20 , 50 );
                   break;
               }

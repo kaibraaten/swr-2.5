@@ -62,7 +62,7 @@ void write_planet_list( )
     fpout = fopen( filename, "w" );
     if ( !fpout )
     {
-	bug( "FATAL: cannot open planet.lst for writing!\n\r", 0 );
+	bug( "FATAL: cannot open planet.lst for writing!\r\n", 0 );
  	return;
     }	  
     for ( tplanet = first_planet; tplanet; tplanet = tplanet->next )
@@ -351,7 +351,7 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
 
     if ( IS_NPC( ch ) )
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
@@ -360,16 +360,16 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
 
     if ( arg1[0] == '\0' )
     {
-	send_to_char( "Usage: setplanet <planet> <field> [value]\n\r", ch );
-	send_to_char( "\n\rField being one of:\n\r", ch );
-	send_to_char( " name filename starsystem governed_by\n\r", ch );
+	send_to_char( "Usage: setplanet <planet> <field> [value]\r\n", ch );
+	send_to_char( "\r\nField being one of:\r\n", ch );
+	send_to_char( " name filename starsystem governed_by\r\n", ch );
 	return;
     }
 
     planet = get_planet( arg1 );
     if ( !planet )
     {
-	send_to_char( "No such planet.\n\r", ch );
+	send_to_char( "No such planet.\r\n", ch );
 	return;
     }
 
@@ -378,7 +378,7 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
     {
 	STRFREE( planet->name );
 	planet->name = STRALLOC( argument );
-	send_to_char( "Done.\n\r", ch );
+	send_to_char( "Done.\r\n", ch );
 	save_planet( planet );
 	return;
     }
@@ -386,7 +386,7 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
     if ( !strcmp( arg2, "sector" ) )
     {
 	planet->sector = atoi(argument);
-	send_to_char( "Done.\n\r", ch );
+	send_to_char( "Done.\r\n", ch );
 	save_planet( planet );
 	return;
     }
@@ -398,11 +398,11 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
         if ( clan )
         { 
            planet->governed_by = clan;
-           send_to_char( "Done.\n\r", ch ); 
+           send_to_char( "Done.\r\n", ch ); 
        	   save_planet( planet );
         }
         else
-           send_to_char( "No such clan.\n\r", ch ); 
+           send_to_char( "No such clan.\r\n", ch ); 
 	return;
     }
 
@@ -416,10 +416,10 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
         {
            starsystem = planet->starsystem;
            LINK(planet, starsystem->first_planet, starsystem->last_planet, next_in_system, prev_in_system);	
-           send_to_char( "Done.\n\r", ch );
+           send_to_char( "Done.\r\n", ch );
 	}
 	else 
-	       	send_to_char( "No such starsystem.\n\r", ch );
+	       	send_to_char( "No such starsystem.\r\n", ch );
 	save_planet( planet );
 	return;
     }
@@ -428,7 +428,7 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
     {
 	DISPOSE( planet->filename );
 	planet->filename = str_dup( argument );
-	send_to_char( "Done.\n\r", ch );
+	send_to_char( "Done.\r\n", ch );
 	save_planet( planet );
 	write_planet_list( );
 	return;
@@ -450,20 +450,20 @@ void do_showplanet( CHAR_DATA *ch, char *argument )
     
     if ( IS_NPC( ch ) )
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
     if ( argument[0] == '\0' )
     {
-	send_to_char( "Usage: showplanet <planet>\n\r", ch );
+	send_to_char( "Usage: showplanet <planet>\r\n", ch );
 	return;
     }
 
     planet = get_planet( argument );
     if ( !planet )
     {
-	send_to_char( "No such planet.\n\r", ch );
+	send_to_char( "No such planet.\r\n", ch );
 	return;
     }
 
@@ -482,31 +482,31 @@ void do_showplanet( CHAR_DATA *ch, char *argument )
        pf = (int)(tempf / planet->size *  100);
     }
     
-    ch_printf( ch, "&W%s\n\r", planet->name);
+    ch_printf( ch, "&W%s\r\n", planet->name);
     if ( IS_IMMORTAL(ch) )
-          ch_printf( ch, "&WFilename: &G%s\n\r", planet->filename);
+          ch_printf( ch, "&WFilename: &G%s\r\n", planet->filename);
         
-    ch_printf( ch, "&WTerrain: &G%s\n\r", 
+    ch_printf( ch, "&WTerrain: &G%s\r\n", 
                    sector_name[planet->sector]  );
-    ch_printf( ch, "&WGoverned by: &G%s\n\r", 
+    ch_printf( ch, "&WGoverned by: &G%s\r\n", 
                    planet->governed_by ? planet->governed_by->name : "" );
-    ch_printf( ch, "&WPlanet Size: &G%d\n\r", 
+    ch_printf( ch, "&WPlanet Size: &G%d\r\n", 
                    planet->size );
-    ch_printf( ch, "&WPercent Civilized: &G%d\n\r", pc ) ;
-    ch_printf( ch, "&WPercent Wilderness: &G%d\n\r", pw ) ;
-    ch_printf( ch, "&WPercent Farmland: &G%d\n\r", pf ) ;
-    ch_printf( ch, "&WBarracks: &G%d\n\r", planet->barracks );
-    ch_printf( ch, "&WControl Towers: &G%d\n\r", planet->controls );
-    ch_printf( ch, "&WPatrols: &G%d&W/%d\n\r", num_guards , planet->barracks*5 );
-    ch_printf( ch, "&WPopulation: &G%d&W/%d\n\r", planet->population , max_population( planet ) );
-    ch_printf( ch, "&WPopular Support: &G%.2f\n\r", 
+    ch_printf( ch, "&WPercent Civilized: &G%d\r\n", pc ) ;
+    ch_printf( ch, "&WPercent Wilderness: &G%d\r\n", pw ) ;
+    ch_printf( ch, "&WPercent Farmland: &G%d\r\n", pf ) ;
+    ch_printf( ch, "&WBarracks: &G%d\r\n", planet->barracks );
+    ch_printf( ch, "&WControl Towers: &G%d\r\n", planet->controls );
+    ch_printf( ch, "&WPatrols: &G%d&W/%d\r\n", num_guards , planet->barracks*5 );
+    ch_printf( ch, "&WPopulation: &G%d&W/%d\r\n", planet->population , max_population( planet ) );
+    ch_printf( ch, "&WPopular Support: &G%.2f\r\n", 
                    planet->pop_support );
-    ch_printf( ch, "&WCurrent Monthly Revenue: &G%ld\n\r", 
+    ch_printf( ch, "&WCurrent Monthly Revenue: &G%ld\r\n", 
                    get_taxes( planet) );
     if ( IS_IMMORTAL(ch) && !planet->area )
     {
           ch_printf( ch, "&RWarning - this planet is not attached to an area!&G");
-          ch_printf( ch, "\n\r" );
+          ch_printf( ch, "\r\n" );
     }         
     
     return;
@@ -571,14 +571,14 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
 	  if ( rnum == 12 )
 	    {
 	      location->name = STRALLOC( "Supply Shop" );
-	      strcpy( buf , "This visible part of this shop consists of a long desk with a couple\n\r" );
-	      strcat( buf , "of computer terminals located along its length. A large set of sliding\n\r" );
-	      strcat( buf , "doors conceals the supply room behind. In front of the main desk a\n\r" );
-	      strcat( buf , "smaller circular desk houses several mail terminals as the shop also\n\r" );
-	      strcat( buf , "doubles as a post office. This shop stocks an assortment of basic\n\r" );
-	      strcat( buf , "supplies useful to both travellers and settlers. The shopkeeper will\n\r" );
-	      strcat( buf , "also purchase some items that might have some later resale or trade\n\r" );
-	      strcat( buf , "value.\n\r" );
+	      strcpy( buf , "This visible part of this shop consists of a long desk with a couple\r\n" );
+	      strcat( buf , "of computer terminals located along its length. A large set of sliding\r\n" );
+	      strcat( buf , "doors conceals the supply room behind. In front of the main desk a\r\n" );
+	      strcat( buf , "smaller circular desk houses several mail terminals as the shop also\r\n" );
+	      strcat( buf , "doubles as a post office. This shop stocks an assortment of basic\r\n" );
+	      strcat( buf , "supplies useful to both travellers and settlers. The shopkeeper will\r\n" );
+	      strcat( buf , "also purchase some items that might have some later resale or trade\r\n" );
+	      strcat( buf , "value.\r\n" );
 	      location->description = STRALLOC(buf);
 	      location->sector_type = SECT_INSIDE;
 	      SET_BIT( location->room_flags , ROOM_INDOORS );
@@ -595,17 +595,17 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
 	      strcpy( buf , planet->name );
 	      strcat( buf , ": Colonization Center" );
 	      location->name = STRALLOC( buf );
-	      strcpy( buf , "You stand in the main foyer of the colonization center. This is one of\n\r" );
-	      strcat( buf , "many similar buildings scattered on planets throughout the galaxy. It and\n\r" );
-	      strcat( buf , "the others like it serve two main purposes. The first is as an initial\n\r" );
-	      strcat( buf , "living and working space for early settlers to the planet. It provides\n\r" );
-	      strcat( buf , "a center of operations during the early stages of a colony while the\n\r" );
-	      strcat( buf , "surrounding area is being developed. Its second purpose after the\n\r" );
-	      strcat( buf , "initial community has been settled is to provide an information center\n\r" );
-	      strcat( buf , "for new citizens and for tourists. Food, transportation, shelter, \n\r" );
-	      strcat( buf , "supplies, and information are all contained in one area making it easy\n\r" );
-	      strcat( buf , "for those unfamiliar with the planet to adjust. This also makes it a\n\r" );
-	      strcat( buf , "very crowded place at times.\n\r" );
+	      strcpy( buf , "You stand in the main foyer of the colonization center. This is one of\r\n" );
+	      strcat( buf , "many similar buildings scattered on planets throughout the galaxy. It and\r\n" );
+	      strcat( buf , "the others like it serve two main purposes. The first is as an initial\r\n" );
+	      strcat( buf , "living and working space for early settlers to the planet. It provides\r\n" );
+	      strcat( buf , "a center of operations during the early stages of a colony while the\r\n" );
+	      strcat( buf , "surrounding area is being developed. Its second purpose after the\r\n" );
+	      strcat( buf , "initial community has been settled is to provide an information center\r\n" );
+	      strcat( buf , "for new citizens and for tourists. Food, transportation, shelter, \r\n" );
+	      strcat( buf , "supplies, and information are all contained in one area making it easy\r\n" );
+	      strcat( buf , "for those unfamiliar with the planet to adjust. This also makes it a\r\n" );
+	      strcat( buf , "very crowded place at times.\r\n" );
 	      location->description = STRALLOC(buf);
 	      location->sector_type = SECT_INSIDE;
 	      SET_BIT( location->room_flags , ROOM_INDOORS );
@@ -618,14 +618,14 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
 	  else if ( rnum == 14 ) 
 	    {
 	      location->name = STRALLOC( "Community Shuttle Platform" );
-	      strcpy( buf , "This platform is large enough for several spacecraft to land and take off\n\r" );
-	      strcat( buf , "from. Its surface is a hard glossy substance that is mostly smooth except\n\r" );
-	      strcat( buf , "a few ripples and impressions that suggest its liquid origin. Power boxes\n\r" );
-	      strcat( buf , "are scattered about the platform strung together by long strands of thick\n\r" );
-	      strcat( buf , "power cables and fuel hoses. Glowing strips divide the platform into\n\r" );
-	      strcat( buf , "multiple landing areas. Hard rubber pathways mark pathways for pilots and\n\r" );
-	      strcat( buf , "passengers, leading from the various landing areas to the Colonization\n\r" );
-	      strcat( buf , "Center.\n\r" );
+	      strcpy( buf , "This platform is large enough for several spacecraft to land and take off\r\n" );
+	      strcat( buf , "from. Its surface is a hard glossy substance that is mostly smooth except\r\n" );
+	      strcat( buf , "a few ripples and impressions that suggest its liquid origin. Power boxes\r\n" );
+	      strcat( buf , "are scattered about the platform strung together by long strands of thick\r\n" );
+	      strcat( buf , "power cables and fuel hoses. Glowing strips divide the platform into\r\n" );
+	      strcat( buf , "multiple landing areas. Hard rubber pathways mark pathways for pilots and\r\n" );
+	      strcat( buf , "passengers, leading from the various landing areas to the Colonization\r\n" );
+	      strcat( buf , "Center.\r\n" );
 	      location->description = STRALLOC(buf);
 	      location->sector_type = SECT_CITY;
 	      SET_BIT( location->room_flags , ROOM_SHIPYARD );
@@ -639,12 +639,12 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
 	      strcpy( buf , planet->name );
 	      strcat( buf , ": Center Hotel" );
 	      location->name = STRALLOC( buf );
-	      strcpy( buf , "This part of the center serves as a temporary home for new settlers\n\r" );
-	      strcat( buf , "until a more permanent residence is found. It is also used as a hotel\n\r" );
-	      strcat( buf , "for tourists and visitors. the shape of the hotel is circular with rooms\n\r" );
-	      strcat( buf , "located around the perimeter extending several floors above ground level.\n\r" );
-	      strcat( buf , "\n\rThis is a good place to rest. You may safely leave and reenter the\n\r" );
-	      strcat( buf , "game from here.\n\r" );
+	      strcpy( buf , "This part of the center serves as a temporary home for new settlers\r\n" );
+	      strcat( buf , "until a more permanent residence is found. It is also used as a hotel\r\n" );
+	      strcat( buf , "for tourists and visitors. the shape of the hotel is circular with rooms\r\n" );
+	      strcat( buf , "located around the perimeter extending several floors above ground level.\r\n" );
+	      strcat( buf , "\r\nThis is a good place to rest. You may safely leave and reenter the\r\n" );
+	      strcat( buf , "game from here.\r\n" );
 	      location->description = STRALLOC(buf);
 	      location->sector_type = SECT_INSIDE;
 	      SET_BIT( location->room_flags , ROOM_INDOORS );
@@ -713,21 +713,21 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
 
   if (!ch->in_room || !IS_SET( ch->in_room->room_flags, ROOM_SHIPYARD ) )
     {
-      send_to_char( "Exploration probes can only be launched from a shipyard.\n\r", ch );
+      send_to_char( "Exploration probes can only be launched from a shipyard.\r\n", ch );
       return;
     }    
 
   if ( ch->gold < 100000 )
     {
-      send_to_char( "It costs 100000 credits to launch an exploration probe.\n\r", ch );
+      send_to_char( "It costs 100000 credits to launch an exploration probe.\r\n", ch );
       return;
     }    
 
   if ( !argument || argument[0] == '\0' )
     {
-      send_to_char( "Would you like to explore an existing star system or a new one?\n\r\n\r", ch );
-      send_to_char( "Usage: explore <starsystem> <planet name>\n\r", ch );
-      send_to_char( " Note: The first word in the planets name MUST be original.\n\r", ch );
+      send_to_char( "Would you like to explore an existing star system or a new one?\r\n\r\n", ch );
+      send_to_char( "Usage: explore <starsystem> <planet name>\r\n", ch );
+      send_to_char( " Note: The first word in the planets name MUST be original.\r\n", ch );
       return;
     }
 
@@ -741,7 +741,7 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
 
       if ( starsystem == starsystem_from_name( NEWBIE_STARSYSTEM ) )
 	{
-	  ch_printf( ch, "You cannot explore in that system.\n\r", tp->governed_by->name );
+	  ch_printf( ch, "You cannot explore in that system.\r\n", tp->governed_by->name );
 	  return;
 	}            
          
@@ -749,16 +749,16 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
 	if ( tp->governed_by && 
 	     ( !ch->pcdata->clan || ch->pcdata->clan != tp->governed_by ) )
 	  {
-	    ch_printf( ch, "You cannot explore in that system without permission from %s.\n\r", tp->governed_by->name );
+	    ch_printf( ch, "You cannot explore in that system without permission from %s.\r\n", tp->governed_by->name );
 	    return;
 	  } 
     }
 
   if ( !argument || argument[0] == '\0' )
     {
-      send_to_char( "What would you call the new planet if you found it?\n\r\n\r", ch );
-      send_to_char( "Usage: explore <starsystem> <planet name>\n\r", ch );
-      send_to_char( " Note: The first word in the planets name MUST be original.\n\r", ch );
+      send_to_char( "What would you call the new planet if you found it?\r\n\r\n", ch );
+      send_to_char( "Usage: explore <starsystem> <planet name>\r\n", ch );
+      send_to_char( " Note: The first word in the planets name MUST be original.\r\n", ch );
       return;
     }
     
@@ -775,7 +775,7 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
     {
       if ( !str_cmp( pArea->filename, capitalize(arg3) ) )
 	{  
-	  send_to_char( "Sorry, the first word in the planets name must be original.\n\r", ch );	
+	  send_to_char( "Sorry, the first word in the planets name must be original.\r\n", ch );	
 	  return;
         }
     }
@@ -787,15 +787,15 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
     {
       if ( !str_cmp( planet->filename, buf ) )
 	{  
-	  send_to_char( "A planet with that filename already exists.\n\r", ch );	
-	  send_to_char( "The first word in the planets name must be original.\n\r", ch );	
+	  send_to_char( "A planet with that filename already exists.\r\n", ch );	
+	  send_to_char( "The first word in the planets name must be original.\r\n", ch );	
 	  return;
         }
     }
 
   ch->gold -= 100000;
 	  
-  send_to_char( "You spend 100000 credits to launch an explorer probe.\n\r", ch );	
+  send_to_char( "You spend 100000 credits to launch an explorer probe.\r\n", ch );	
   echo_to_room( AT_WHITE , ch->in_room, "A small probe lifts off into space." );
 
   if (  number_percent() < 20 )
@@ -856,13 +856,13 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
   replace_char( filename, ' ', '-' );
   planet->filename = str_dup( filename );
 
-  send_to_char( "\n\r&YYour probe has discovered a new planet.\n\r", ch );
+  send_to_char( "\r\n&YYour probe has discovered a new planet.\r\n", ch );
   send_to_char( "The terrain apears to be mostly &W", ch );
   send_to_char( sector_name[sector], ch );
-  send_to_char( "&Y.\n\r", ch );
-  send_to_char( "\n\rPlease enter a description of your planet.\n\r", ch );
-  send_to_char( "It should be a short paragraph of 5 or more lines.\n\r", ch );
-  send_to_char( "It will be used as the planet's default room descriptions.\n\r\n\r", ch );
+  send_to_char( "&Y.\r\n", ch );
+  send_to_char( "\r\nPlease enter a description of your planet.\r\n", ch );
+  send_to_char( "It should be a short paragraph of 5 or more lines.\r\n", ch );
+  send_to_char( "It will be used as the planet's default room descriptions.\r\n\r\n", ch );
        
   description = STRALLOC( "" );
 
@@ -891,7 +891,7 @@ void do_planets( CHAR_DATA *ch, char *argument )
     SPACE_DATA *starsystem;
     
     set_char_color( AT_WHITE, ch );
-    send_to_char( "Planet          Starsystem    Governed By                  Popular Support\n\r" , ch );
+    send_to_char( "Planet          Starsystem    Governed By                  Popular Support\r\n" , ch );
     
     for ( starsystem = first_starsystem ; starsystem; starsystem = starsystem->next )    
      for ( planet = starsystem->first_planet; planet; planet = planet->next_in_system )
@@ -899,11 +899,11 @@ void do_planets( CHAR_DATA *ch, char *argument )
         ch_printf( ch, "&G%-15s %-12s  %-25s    ", 
                    planet->name , starsystem->name , 
                    planet->governed_by ? planet->governed_by->name : "" );
-        ch_printf( ch, "%.1f\n\r", planet->pop_support );
+        ch_printf( ch, "%.1f\r\n", planet->pop_support );
         if ( IS_IMMORTAL(ch) && !planet->area )
         {
           ch_printf( ch, "&RWarning - this planet is not attached to an area!&G");
-          ch_printf( ch, "\n\r" );
+          ch_printf( ch, "\r\n" );
         }         
         
         count++;
@@ -917,11 +917,11 @@ void do_planets( CHAR_DATA *ch, char *argument )
         ch_printf( ch, "&G%-15s %-12s  %-25s    ", 
                    planet->name , "", 
                    planet->governed_by ? planet->governed_by->name : "" );
-        ch_printf( ch, "%.1f\n\r", planet->pop_support );
+        ch_printf( ch, "%.1f\r\n", planet->pop_support );
         if ( IS_IMMORTAL(ch) && !planet->area )
         {
           ch_printf( ch, "&RWarning - this planet is not attached to an area!&G");
-          ch_printf( ch, "\n\r" );
+          ch_printf( ch, "\r\n" );
         }         
         
         count++;
@@ -930,9 +930,9 @@ void do_planets( CHAR_DATA *ch, char *argument )
     if ( !count )
     {
 	set_char_color( AT_BLOOD, ch);
-        send_to_char( "There are no planets currently formed.\n\r", ch );
+        send_to_char( "There are no planets currently formed.\r\n", ch );
     }
-    send_to_char( "&WUse SHOWPLANET for more information.\n\r", ch );
+    send_to_char( "&WUse SHOWPLANET for more information.\r\n", ch );
     
 }
 
@@ -950,13 +950,13 @@ void do_capture ( CHAR_DATA *ch , char *argument )
 
    if ( IS_NPC(ch) || !ch->pcdata )
    {
-       send_to_char ( "huh?\n\r" , ch );
+       send_to_char ( "huh?\r\n" , ch );
        return;
    }
    
    if ( !ch->pcdata->clan )
    {
-       send_to_char ( "You need to be a member of an organization to do that!\n\r" , ch );
+       send_to_char ( "You need to be a member of an organization to do that!\r\n" , ch );
        return;
    }
    
@@ -964,13 +964,13 @@ void do_capture ( CHAR_DATA *ch , char *argument )
       
    if ( ( planet = ch->in_room->area->planet ) == NULL )
    {
-       send_to_char ( "You must be on a planet to capture it.\n\r" , ch );
+       send_to_char ( "You must be on a planet to capture it.\r\n" , ch );
        return;
    }   
    
    if ( clan == planet->governed_by )
    {
-       send_to_char ( "Your organization already controls this planet.\n\r" , ch );
+       send_to_char ( "Your organization already controls this planet.\r\n" , ch );
        return;
    }
    
@@ -986,7 +986,7 @@ void do_capture ( CHAR_DATA *ch , char *argument )
              continue;
           if ( sClan == planet->governed_by )
           {
-             send_to_char ( "A planet cannot be captured while protected by orbiting spacecraft.\n\r" , ch );
+             send_to_char ( "A planet cannot be captured while protected by orbiting spacecraft.\r\n" , ch );
              return;
           }
        }
@@ -994,14 +994,14 @@ void do_capture ( CHAR_DATA *ch , char *argument )
    
    if ( planet->first_guard )
    {
-       send_to_char ( "This planet is protected by soldiers.\n\r" , ch );
-       send_to_char ( "You will have to eliminate all enemy forces before you can capture it.\n\r" , ch );
+       send_to_char ( "This planet is protected by soldiers.\r\n" , ch );
+       send_to_char ( "You will have to eliminate all enemy forces before you can capture it.\r\n" , ch );
        return;
    }
       
    if ( planet->pop_support > 0 )
    {
-       send_to_char ( "The population is not in favour of changing leaders right now.\n\r" , ch );
+       send_to_char ( "The population is not in favour of changing leaders right now.\r\n" , ch );
        return;
    }
    
@@ -1014,7 +1014,7 @@ void do_capture ( CHAR_DATA *ch , char *argument )
    
    if ( support < 0 )
    {
-       send_to_char ( "There is not enough popular support for your organization!\n\rTry improving loyalty on the planets that you already control.\n\r" , ch );
+       send_to_char ( "There is not enough popular support for your organization!\r\nTry improving loyalty on the planets that you already control.\r\n" , ch );
        return;
    }
    

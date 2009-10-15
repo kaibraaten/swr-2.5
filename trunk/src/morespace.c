@@ -217,7 +217,7 @@ void write_prototype_list( )
 
   if ( !fpout )
     {
-      bug( "FATAL: cannot open protoytpe.lst for writing!\n\r", 0 );
+      bug( "FATAL: cannot open protoytpe.lst for writing!\r\n", 0 );
       return;
     }
 
@@ -547,7 +547,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
 	  bug( "setprototype: sub_shipdesc: NULL ch->dest_buf", 0 );
 	  stop_editing( ch );
 	  ch->substate = ch->tempnum;
-	  send_to_char( "&RError: prototype lost.\n\r" , ch);
+	  send_to_char( "&RError: prototype lost.\r\n" , ch);
 	  return;
 	}
 
@@ -564,11 +564,11 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
 
   if ( arg1[0] == '\0' || arg2[0] == '\0' || arg1[0] == '\0' )
     {
-      send_to_char( "Usage: setprototype <prototype> <field> <values>\n\r", ch );
-      send_to_char( "\n\rField being one of:\n\r", ch );
-      send_to_char( "filename name description class model\n\r", ch );
-      send_to_char( "manuever speed hyperspeed tractorbeam\n\r", ch );
-      send_to_char( "lasers missiles shield hull energy chaff\n\r", ch );
+      send_to_char( "Usage: setprototype <prototype> <field> <values>\r\n", ch );
+      send_to_char( "\r\nField being one of:\r\n", ch );
+      send_to_char( "filename name description class model\r\n", ch );
+      send_to_char( "manuever speed hyperspeed tractorbeam\r\n", ch );
+      send_to_char( "lasers missiles shield hull energy chaff\r\n", ch );
       return;
     }
 
@@ -576,7 +576,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
 
   if ( !prototype )
     {
-      send_to_char( "No such ship prototype.\n\r", ch );
+      send_to_char( "No such ship prototype.\r\n", ch );
       return;
     }
 
@@ -584,7 +584,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
     {
       STRFREE( prototype->name );
       prototype->name = STRALLOC( argument );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -593,7 +593,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
     {
       DISPOSE( prototype->filename );
       prototype->filename = str_dup( argument );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       write_prototype_list( );
       return;
@@ -610,7 +610,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "manuever" ) )
     {   
       prototype->manuever = URANGE( 0, atoi(argument) , 120 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -618,7 +618,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "lasers" ) )
     {   
       prototype->lasers = URANGE( 0, atoi(argument) , 10 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -626,7 +626,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "class" ) )
     {   
       prototype->ship_class = URANGE( 0, atoi(argument) , 9 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -634,7 +634,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "model" ) )
     {   
       prototype->model = URANGE( 0, atoi(argument) , 9 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -642,7 +642,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "missiles" ) )
     {   
       prototype->maxmissiles = URANGE( 0, atoi(argument) , 255 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -650,7 +650,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "speed" ) )
     {   
       prototype->realspeed = URANGE( 0, atoi(argument) , 150 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -658,7 +658,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "tractorbeam" ) )
     {   
       prototype->tractorbeam = URANGE( 0, atoi(argument) , 255 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -666,7 +666,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "hyperspeed" ) )
     {   
       prototype->hyperspeed = URANGE( 0, atoi(argument) , 255 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -674,7 +674,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "shield" ) )
     {   
       prototype->maxshield = URANGE( 0, atoi(argument) , 1000 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -682,7 +682,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "hull" ) )
     {   
       prototype->maxhull = URANGE( 1, atoi(argument) , 20000 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -690,7 +690,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "energy" ) )
     {   
       prototype->maxenergy = URANGE( 1, atoi(argument) , 30000 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -698,7 +698,7 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
   if ( !str_cmp( arg2, "chaff" ) )
     {   
       prototype->maxchaff = URANGE( 0, atoi(argument) , 25 );
-      send_to_char( "Done.\n\r", ch );
+      send_to_char( "Done.\r\n", ch );
       save_ship_prototype( prototype );
       return;
     }
@@ -712,13 +712,13 @@ void do_showprototype( CHAR_DATA *ch, char *argument )
 
   if ( IS_NPC( ch ) )
     {
-      send_to_char( "Huh?\n\r", ch );
+      send_to_char( "Huh?\r\n", ch );
       return;
     }
 
   if ( argument[0] == '\0' )
     {
-      send_to_char( "Usage: showprototype <prototype>\n\r", ch );
+      send_to_char( "Usage: showprototype <prototype>\r\n", ch );
       return;
     }
 
@@ -726,12 +726,12 @@ void do_showprototype( CHAR_DATA *ch, char *argument )
 
   if ( !prototype )
     {
-      send_to_char( "No such prototype.\n\r", ch );
+      send_to_char( "No such prototype.\r\n", ch );
       return;
     }
 
   set_char_color( AT_YELLOW, ch );
-  ch_printf( ch, "%s : %s\n\rFilename: %s\n\r",
+  ch_printf( ch, "%s : %s\r\nFilename: %s\r\n",
 	     prototype->ship_class == SPACECRAFT ? model[prototype->model].name :
 	     (prototype->ship_class == SPACE_STATION ? "Space Station" : 
 	      (prototype->ship_class == AIRCRAFT ? "Aircraft" : 
@@ -740,21 +740,21 @@ void do_showprototype( CHAR_DATA *ch, char *argument )
 		 (prototype->ship_class == LAND_VEHICLE ? "land vehicle" : "Unknown" ) ) ) ) ), 
 	     prototype->name,
 	     prototype->filename);
-  ch_printf( ch, "Description: %s\n\r",
+  ch_printf( ch, "Description: %s\r\n",
 	     prototype->description);
   ch_printf( ch, "Tractor Beam: %d  ",
 	     prototype->tractorbeam);
   ch_printf( ch, "Lasers: %d     ",
 	     prototype->lasers );		
-  ch_printf( ch, "Missiles: %d\n\r",
+  ch_printf( ch, "Missiles: %d\r\n",
 	     prototype->maxmissiles);
   ch_printf( ch, "Hull: %d     ",
 	     prototype->maxhull);	
-  ch_printf( ch, "Shields: %d   Energy(fuel): %d   Chaff: %d\n\r",
+  ch_printf( ch, "Shields: %d   Energy(fuel): %d   Chaff: %d\r\n",
 	     prototype->maxshield,
 	     prototype->maxenergy,
 	     prototype->maxchaff);
-  ch_printf( ch, "Speed: %d    Hyperspeed: %d   Manueverability: %d\n\r",
+  ch_printf( ch, "Speed: %d    Hyperspeed: %d   Manueverability: %d\r\n",
 	     prototype->realspeed, prototype->hyperspeed , prototype->manuever );                    
 }
 
@@ -766,7 +766,7 @@ void do_makeship( CHAR_DATA *ch, char *argument )
 
   if ( !argument || argument[0] == '\0' )
     {
-      send_to_char( "Usage: makeship <filename> <prototype name>\n\r", ch );
+      send_to_char( "Usage: makeship <filename> <prototype name>\r\n", ch );
 	return;
     }
 
@@ -846,21 +846,21 @@ void do_prototypes( CHAR_DATA *ch, char *argument )
     {  
       int count = 0;
       SHIP_PROTOTYPE *prototype = NULL;
-      send_to_pager( "&Y\n\rThe following ships are currently prototyped:&W\n\r", ch );
+      send_to_pager( "&Y\r\nThe following ships are currently prototyped:&W\r\n", ch );
       for ( prototype = first_ship_prototype; prototype; prototype = prototype->next )
 	{   
 	  if ( prototype->ship_class > SPACE_STATION )
 	    continue;
 
 	  pager_printf( ch, "%-35s    ", prototype->name );
-	  pager_printf( ch, "%ld to buy.\n\r",
+	  pager_printf( ch, "%ld to buy.\r\n",
 			get_prototype_value(prototype) ); 
 	  count++;
 	}
 
       if ( !count )
 	{
-	  send_to_pager( "There are no ship prototypes currently formed.\n\r", ch );
+	  send_to_pager( "There are no ship prototypes currently formed.\r\n", ch );
 	  return;
 	}
     }   
@@ -869,7 +869,7 @@ void do_prototypes( CHAR_DATA *ch, char *argument )
     {  
       int count = 0;
       SHIP_PROTOTYPE *prototype = NULL;
-      send_to_pager( "&Y\n\rThe following vehicles are currently prototyped:&W\n\r", ch );
+      send_to_pager( "&Y\r\nThe following vehicles are currently prototyped:&W\r\n", ch );
 
       for ( prototype = first_ship_prototype; prototype; prototype = prototype->next )
 	{   
@@ -877,13 +877,13 @@ void do_prototypes( CHAR_DATA *ch, char *argument )
 	    continue;
 
 	  pager_printf( ch, "%-35s    ", prototype->name );
-	  pager_printf( ch, "%ld to buy.\n\r", get_prototype_value(prototype) ); 
+	  pager_printf( ch, "%ld to buy.\r\n", get_prototype_value(prototype) ); 
 	  count++;
 	}
 
       if ( !count )
 	{
-	  send_to_pager( "There are no vehicle prototypes currently formed.\n\r", ch );
+	  send_to_pager( "There are no vehicle prototypes currently formed.\r\n", ch );
 	  return;
 	}
     }
@@ -1213,8 +1213,8 @@ void make_cockpit( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "The Cockpit" );
 
-  strcpy( buf , "This small cockpit houses the pilot controls as well as the ships main\n\r" );
-  strcat( buf , "offensive and defensive systems.\n\r" );
+  strcpy( buf , "This small cockpit houses the pilot controls as well as the ships main\r\n" );
+  strcat( buf , "offensive and defensive systems.\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 }
@@ -1229,9 +1229,9 @@ void make_turret( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "A Laser Turret" );
 
-  strcpy( buf , "This turbo laser turret extends from the outter hull of the ship.\n\r" );
-  strcat( buf , "It is more powerful than the ships main laser batteries and must\n\r" );
-  strcat( buf , "be operated manually by a trained gunner.\n\r" );
+  strcpy( buf , "This turbo laser turret extends from the outter hull of the ship.\r\n" );
+  strcat( buf , "It is more powerful than the ships main laser batteries and must\r\n" );
+  strcat( buf , "be operated manually by a trained gunner.\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 
@@ -1254,10 +1254,10 @@ void make_bridge( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "The Bridge" );
 
-  strcpy( buf , "A large panoramic viewscreen gives you a good view of everything\n\r" );
-  strcat( buf , "outside of the ship. Several computer terminals provide information\n\r" );
-  strcat( buf , "and status readouts. There are also consoles dedicated to scanning\n\r" );
-  strcat( buf , "communications and navigation.\n\r" );
+  strcpy( buf , "A large panoramic viewscreen gives you a good view of everything\r\n" );
+  strcat( buf , "outside of the ship. Several computer terminals provide information\r\n" );
+  strcat( buf , "and status readouts. There are also consoles dedicated to scanning\r\n" );
+  strcat( buf , "communications and navigation.\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 }
@@ -1272,9 +1272,9 @@ void make_pilot( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "The Pilots Chair" );
 
-  strcpy( buf , "The console in front of you contains the spacecrafts primary flight\n\r" );
-  strcat( buf , "controls. All of the ships propulsion and directional controls are located\n\r" );
-  strcat( buf , "here including the hyperdrive controls.\n\r" );
+  strcpy( buf , "The console in front of you contains the spacecrafts primary flight\r\n" );
+  strcat( buf , "controls. All of the ships propulsion and directional controls are located\r\n" );
+  strcat( buf , "here including the hyperdrive controls.\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 }
@@ -1289,9 +1289,9 @@ void make_copilot( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "The Gunners Chair" );
 
-  strcpy( buf , "This is where the action is. All of the systems main offensive and defensive\n\r" );
-  strcat( buf , "controls are located here. There are targetting computers for the main laser\n\r" );
-  strcat( buf , "batteries and missile launchers as well as shield controls.\n\r" );
+  strcpy( buf , "This is where the action is. All of the systems main offensive and defensive\r\n" );
+  strcat( buf , "controls are located here. There are targetting computers for the main laser\r\n" );
+  strcat( buf , "batteries and missile launchers as well as shield controls.\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 }
@@ -1305,10 +1305,10 @@ void make_engine( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "The Engine Room" );
 
-  strcpy( buf , "Many large mechanical parts litter this room. Throughout the room dozens\n\r" );
-  strcat( buf , "of small glowing readouts and computer terminals monitor and provide information\n\r" );
-  strcat( buf , "about all of the ships systems. Engineering is the heart of the ship. If\n\r" );
-  strcat( buf , "something is damaged fixing it will almost always start here.\n\r" );
+  strcpy( buf , "Many large mechanical parts litter this room. Throughout the room dozens\r\n" );
+  strcat( buf , "of small glowing readouts and computer terminals monitor and provide information\r\n" );
+  strcat( buf , "about all of the ships systems. Engineering is the heart of the ship. If\r\n" );
+  strcat( buf , "something is damaged fixing it will almost always start here.\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 }
@@ -1320,16 +1320,16 @@ void make_elevator( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "Entrance / Lift" );
 
-  strcpy( buf , "This spacious lift provides access to all of the ships decks as well\n\r" );
-  strcpy( buf , "as doubling as the main exit.\n\r\n\r" );
-  strcpy( buf , "A sign on the wall lists several lift destinations:\n\r" );
-  strcat( buf , "\n\r" );
-  strcat( buf , "Navigation\n\r" );
-  strcat( buf , "Turrets\n\r" );
-  strcat( buf , "Lounge\n\r" );
-  strcat( buf , "Medical\n\r" );
-  strcat( buf , "Engineering\n\r" );
-  strcat( buf , "Hangers\n\r" );
+  strcpy( buf , "This spacious lift provides access to all of the ships decks as well\r\n" );
+  strcpy( buf , "as doubling as the main exit.\r\n\r\n" );
+  strcpy( buf , "A sign on the wall lists several lift destinations:\r\n" );
+  strcat( buf , "\r\n" );
+  strcat( buf , "Navigation\r\n" );
+  strcat( buf , "Turrets\r\n" );
+  strcat( buf , "Lounge\r\n" );
+  strcat( buf , "Medical\r\n" );
+  strcat( buf , "Engineering\r\n" );
+  strcat( buf , "Hangers\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 }
@@ -1341,9 +1341,9 @@ void make_medical( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "Medical Bay " );
 
-  strcpy( buf , "\n\r" );
-  strcat( buf , "This medical bay is out of order.\n\r" );
-  strcat( buf , "\n\r" );
+  strcpy( buf , "\r\n" );
+  strcat( buf , "This medical bay is out of order.\r\n" );
+  strcat( buf , "\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 }
@@ -1355,9 +1355,9 @@ void make_lounge( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "Crew Lounge" );
 
-  strcpy( buf , "\n\r" );
-  strcat( buf , "The crew lounge needs to be furnished still.\n\r" );
-  strcat( buf , "\n\r" );
+  strcpy( buf , "\r\n" );
+  strcat( buf , "The crew lounge needs to be furnished still.\r\n" );
+  strcat( buf , "\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 }
@@ -1371,9 +1371,9 @@ void make_entrance( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "The Entrance Ramp" );
 
-  strcpy( buf , "\n\r" );
-  strcat( buf , "Don't you wish durga would finish his descriptions.\n\r" );
-  strcat( buf , "\n\r" );
+  strcpy( buf , "\r\n" );
+  strcat( buf , "Don't you wish durga would finish his descriptions.\r\n" );
+  strcat( buf , "\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 }
@@ -1385,9 +1385,9 @@ void make_hanger( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "A Hanger" );
 
-  strcpy( buf , "\n\r" );
-  strcat( buf , "This hanger is out of order.\n\r" );
-  strcat( buf , "\n\r" );
+  strcpy( buf , "\r\n" );
+  strcat( buf , "This hanger is out of order.\r\n" );
+  strcat( buf , "\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 }
@@ -1399,9 +1399,9 @@ void make_garage( ROOM_INDEX_DATA *room , SHIP_DATA *ship )
   STRFREE( room->name );
   room->name = STRALLOC( "Vehicle Garage" );
 
-  strcpy( buf , "\n\r" );
-  strcat( buf , "This garage is out of order.\n\r" );
-  strcat( buf , "\n\r" );
+  strcpy( buf , "\r\n" );
+  strcat( buf , "This garage is out of order.\r\n" );
+  strcat( buf , "\r\n" );
   STRFREE ( room->description );
   room->description = STRALLOC(buf);
 }
@@ -1459,34 +1459,34 @@ void do_designship( CHAR_DATA * ch , char * argument )
 
   if ( ch->pcdata->learned[gsn_shipdesign] <= 0 )
     {
-      send_to_char( "You have no idea how to do that..\n\r" , ch);
+      send_to_char( "You have no idea how to do that..\r\n" , ch);
       return;
     }
 
   if ( argument[0] == '\0' )
     {
-      send_to_char( "This skill may be used in one of the following ways:\n\r" , ch);
-      send_to_char( "\n\r" , ch);
-      send_to_char( "DESIGNSHIP DECORATE\n\r" , ch);
-      send_to_char( "DESIGNSHIP TEST      <shipstats> 'model' <prototype_name>\n\r" , ch);
-      send_to_char( "DESIGNSHIP PROTOTYPE <shipstats> 'model' <prototype_name>\n\r" , ch);
-      send_to_char( "DESIGNSHIP CLANSHIP  <shipstats> 'model' <ship_name>\n\r" , ch);
-      send_to_char( "DESIGNSHIP PERSONAL  <shipstats> 'model' <ship_name>\n\r" , ch);
-      send_to_char( "DESIGNSHIP CUSTOM    <custom design info>\n\r" , ch);
-      send_to_char( "\n\r" , ch);
-      send_to_char( "Shipstats are a list of numbers separated by spaces representing:\n\r" , ch);
-      send_to_char( "hull energy shield speed manuever lasers missiles chaff\n\r" , ch);
-      send_to_char( "\n\r" , ch);
-      send_to_char( "Model may be one of the following:\n\r" , ch);
-      send_to_char( "'short range fighter'   'shuttle'           'transport'\n\r" , ch);
-      send_to_char( "'long range fighter'    'assault shuttle'   'assault transport'\n\r" , ch);
-      send_to_char( "'corvette'              'frigate'           'destroyer'\n\r" , ch);
-      send_to_char( "'cruiser'               'battlecruiser'     'flagship'\n\r" , ch);
-      send_to_char( "\n\r" , ch);
-      send_to_char( "For example:\n\r" , ch);
-      send_to_char( "designship personal 100 1000 50 100 100 2 0 0 'shuttle' Durgas Shuttle\n\r" , ch);
-      send_to_char( "\n\r" , ch);
-      send_to_char( "type 'designship custom' for details on custom design.\n\r" , ch);
+      send_to_char( "This skill may be used in one of the following ways:\r\n" , ch);
+      send_to_char( "\r\n" , ch);
+      send_to_char( "DESIGNSHIP DECORATE\r\n" , ch);
+      send_to_char( "DESIGNSHIP TEST      <shipstats> 'model' <prototype_name>\r\n" , ch);
+      send_to_char( "DESIGNSHIP PROTOTYPE <shipstats> 'model' <prototype_name>\r\n" , ch);
+      send_to_char( "DESIGNSHIP CLANSHIP  <shipstats> 'model' <ship_name>\r\n" , ch);
+      send_to_char( "DESIGNSHIP PERSONAL  <shipstats> 'model' <ship_name>\r\n" , ch);
+      send_to_char( "DESIGNSHIP CUSTOM    <custom design info>\r\n" , ch);
+      send_to_char( "\r\n" , ch);
+      send_to_char( "Shipstats are a list of numbers separated by spaces representing:\r\n" , ch);
+      send_to_char( "hull energy shield speed manuever lasers missiles chaff\r\n" , ch);
+      send_to_char( "\r\n" , ch);
+      send_to_char( "Model may be one of the following:\r\n" , ch);
+      send_to_char( "'short range fighter'   'shuttle'           'transport'\r\n" , ch);
+      send_to_char( "'long range fighter'    'assault shuttle'   'assault transport'\r\n" , ch);
+      send_to_char( "'corvette'              'frigate'           'destroyer'\r\n" , ch);
+      send_to_char( "'cruiser'               'battlecruiser'     'flagship'\r\n" , ch);
+      send_to_char( "\r\n" , ch);
+      send_to_char( "For example:\r\n" , ch);
+      send_to_char( "designship personal 100 1000 50 100 100 2 0 0 'shuttle' Durgas Shuttle\r\n" , ch);
+      send_to_char( "\r\n" , ch);
+      send_to_char( "type 'designship custom' for details on custom design.\r\n" , ch);
       return;
     }
 
@@ -1510,13 +1510,13 @@ void do_designship( CHAR_DATA * ch , char * argument )
 
       if ( !ship )
 	{
-      	  send_to_char( "&RYou must be inside a ship to do that.\n\r" ,ch );
+      	  send_to_char( "&RYou must be inside a ship to do that.\r\n" ,ch );
    	  return;
 	}
 
       if ( !check_pilot( ch , ship ) )     
 	{
-      	  send_to_char( "&RThis isn't your ship to decorate.\n\r" ,ch );
+      	  send_to_char( "&RThis isn't your ship to decorate.\r\n" ,ch );
    	  return;
 	}
 
@@ -1528,7 +1528,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
 
   if ( !ch->in_room || !IS_SET(ch->in_room->room_flags, ROOM_SHIPYARD) )
     {
-      send_to_char( "&RYou must be in a shipyard to do that.\n\r" ,ch );
+      send_to_char( "&RYou must be in a shipyard to do that.\r\n" ,ch );
       return;
     }
 
@@ -1536,27 +1536,27 @@ void do_designship( CHAR_DATA * ch , char * argument )
     {
       if ( !str_cmp( arg1, "custom" ) )
 	{
-	  send_to_char( "Rules for custom design:\n\r" , ch);
-	  send_to_char( "\n\r" , ch);
-	  send_to_char( "DESIGNSHIP CUSTOM <shipstats> <layout> <ship_name>\n\r" , ch);
-	  send_to_char( "\n\r" , ch);
-	  send_to_char( "Shipstats are a list of numbers separated by spaces representing:\n\r" , ch);
-	  send_to_char( "hull energy shield speed manuever lasers missiles chaff\n\r" , ch);
-	  send_to_char( "\n\r" , ch);
-	  send_to_char( "Layout is a string of letters that a robot uses as commands to build your\n\r" , ch);
-	  send_to_char( "ship. The robot starts at the entrance and uses the following commands:\n\r" , ch);
-	  send_to_char( "\n\r" , ch);
-	  send_to_char( "n, e, w, s, u, d - move robot that direction and create a new room if needed\n\r" , ch);
-	  send_to_char( "c - make current room cockpit,          b - make current room bridge\n\r" , ch);
-	  send_to_char( "p - make current room pilot chair,      2 - make current room copilot chair\n\r" , ch);
-	  send_to_char( "m - make current room engin room,       + - make current room medical bay\n\r" , ch);
-	  send_to_char( "l - make current room crew lounge,      t - make current room turret\n\r" , ch);
-	  send_to_char( "h - make current room hanger,           v - make current room vehicle garage\n\r" , ch);
-	  send_to_char( "\n\r" , ch);
-	  send_to_char( "For example:\n\r" , ch);
-	  send_to_char( "designship custom 100 1000 50 100 100 2 0 0 endtunwncswsdtusw Durgas Shuttle\n\r" , ch);
-	  send_to_char( "\n\r" , ch);
-	  send_to_char( "(would make a square shuttle, with a rear entrance, a cockpit at the front\n\rand belly turrets on the sides)\n\r" , ch);
+	  send_to_char( "Rules for custom design:\r\n" , ch);
+	  send_to_char( "\r\n" , ch);
+	  send_to_char( "DESIGNSHIP CUSTOM <shipstats> <layout> <ship_name>\r\n" , ch);
+	  send_to_char( "\r\n" , ch);
+	  send_to_char( "Shipstats are a list of numbers separated by spaces representing:\r\n" , ch);
+	  send_to_char( "hull energy shield speed manuever lasers missiles chaff\r\n" , ch);
+	  send_to_char( "\r\n" , ch);
+	  send_to_char( "Layout is a string of letters that a robot uses as commands to build your\r\n" , ch);
+	  send_to_char( "ship. The robot starts at the entrance and uses the following commands:\r\n" , ch);
+	  send_to_char( "\r\n" , ch);
+	  send_to_char( "n, e, w, s, u, d - move robot that direction and create a new room if needed\r\n" , ch);
+	  send_to_char( "c - make current room cockpit,          b - make current room bridge\r\n" , ch);
+	  send_to_char( "p - make current room pilot chair,      2 - make current room copilot chair\r\n" , ch);
+	  send_to_char( "m - make current room engin room,       + - make current room medical bay\r\n" , ch);
+	  send_to_char( "l - make current room crew lounge,      t - make current room turret\r\n" , ch);
+	  send_to_char( "h - make current room hanger,           v - make current room vehicle garage\r\n" , ch);
+	  send_to_char( "\r\n" , ch);
+	  send_to_char( "For example:\r\n" , ch);
+	  send_to_char( "designship custom 100 1000 50 100 100 2 0 0 endtunwncswsdtusw Durgas Shuttle\r\n" , ch);
+	  send_to_char( "\r\n" , ch);
+	  send_to_char( "(would make a square shuttle, with a rear entrance, a cockpit at the front\r\nand belly turrets on the sides)\r\n" , ch);
 	  return;
 	}
       else
@@ -1597,7 +1597,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
 
   if ( hull < 50 || hull > model[smodel].hull )
     {
-      ch_printf( ch, "&R%s hull values must be between 50 and %d.\n\r" ,
+      ch_printf( ch, "&R%s hull values must be between 50 and %d.\r\n" ,
 		 model[smodel].name , model[smodel].hull );
 
       return;
@@ -1605,7 +1605,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
 
   if ( energy < 500 || energy > model[smodel].energy )
     {
-      ch_printf( ch, "&R%s energy values must be between 500 and %d.\n\r" ,
+      ch_printf( ch, "&R%s energy values must be between 500 and %d.\r\n" ,
 		 model[smodel].name , model[smodel].energy );
 
       return;
@@ -1613,42 +1613,42 @@ void do_designship( CHAR_DATA * ch , char * argument )
 
   if ( shield < 0 || shield > model[smodel].shield )
     {
-      ch_printf( ch, "&R%s shield values must be between 0 and %d.\n\r" ,
+      ch_printf( ch, "&R%s shield values must be between 0 and %d.\r\n" ,
 		 model[smodel].name , model[smodel].shield );
       return;
     }
 
   if ( speed < 10 || speed > model[smodel].realspeed )
     {
-      ch_printf( ch, "&R%s speed values must be between 10 and %d.\n\r" ,
+      ch_printf( ch, "&R%s speed values must be between 10 and %d.\r\n" ,
 		 model[smodel].name , model[smodel].realspeed );
       return;
     }
 
   if ( manuever < 10 || manuever > model[smodel].manuever )
     {
-      ch_printf( ch, "&R%s manuever values must be between 10 and %d.\n\r" ,
+      ch_printf( ch, "&R%s manuever values must be between 10 and %d.\r\n" ,
 		 model[smodel].name , model[smodel].manuever );
       return;
     }
 
   if ( lasers < 0 || lasers > model[smodel].lasers )
     {
-      ch_printf( ch, "&R%s lasers must be between 0 and %d.\n\r" ,
+      ch_printf( ch, "&R%s lasers must be between 0 and %d.\r\n" ,
 		 model[smodel].name , model[smodel].lasers );
       return;
     }
 
   if ( missiles < 0 || missiles > model[smodel].missiles )
     {
-      ch_printf( ch, "&R%s missiles must be between 0 and %d.\n\r" ,
+      ch_printf( ch, "&R%s missiles must be between 0 and %d.\r\n" ,
 		 model[smodel].name , model[smodel].missiles );
       return;
     }
 
   if ( chaff < 0 || chaff > 20 )
     {
-      ch_printf( ch, "&R%s chaff must be between 0 and 20.\n\r" ,
+      ch_printf( ch, "&R%s chaff must be between 0 and 20.\r\n" ,
 		 model[smodel].name );
       return;
     }
@@ -1657,19 +1657,19 @@ void do_designship( CHAR_DATA * ch , char * argument )
 
   if ( !str_cmp( arg1, "test" ) )
     {
-      ch_printf( ch, "&YName:     &W%s\n\r" , argument );
-      ch_printf( ch, "&YModel:    &W%s\n\r" , model[smodel].name );
-      ch_printf( ch, "\n\r"  );
-      ch_printf( ch, "&YHull:     &W%d\n\r" , hull );
-      ch_printf( ch, "&YEnergy:   &W%d\n\r" , energy );
-      ch_printf( ch, "&YShield:   &W%d\n\r" , shield );
-      ch_printf( ch, "&YSpeed:    &W%d\n\r" , speed );
-      ch_printf( ch, "&YManuever: &W%d\n\r" , manuever );
-      ch_printf( ch, "&YLasers:   &W%d\n\r" , lasers );
-      ch_printf( ch, "&YMissiles: &W%d\n\r" , missiles );
-      ch_printf( ch, "&YChaff:    &W%d\n\r" , chaff );
-      ch_printf( ch, "\n\r"  );
-      ch_printf( ch, "&YThis ship would cost &W%d&Y credits.\n\r" ,price );
+      ch_printf( ch, "&YName:     &W%s\r\n" , argument );
+      ch_printf( ch, "&YModel:    &W%s\r\n" , model[smodel].name );
+      ch_printf( ch, "\r\n"  );
+      ch_printf( ch, "&YHull:     &W%d\r\n" , hull );
+      ch_printf( ch, "&YEnergy:   &W%d\r\n" , energy );
+      ch_printf( ch, "&YShield:   &W%d\r\n" , shield );
+      ch_printf( ch, "&YSpeed:    &W%d\r\n" , speed );
+      ch_printf( ch, "&YManuever: &W%d\r\n" , manuever );
+      ch_printf( ch, "&YLasers:   &W%d\r\n" , lasers );
+      ch_printf( ch, "&YMissiles: &W%d\r\n" , missiles );
+      ch_printf( ch, "&YChaff:    &W%d\r\n" , chaff );
+      ch_printf( ch, "\r\n"  );
+      ch_printf( ch, "&YThis ship would cost &W%d&Y credits.\r\n" ,price );
       return;        
     }
 
@@ -1684,7 +1684,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
 	{
           if ( !ch->pcdata || !ch->pcdata->clan )
 	    {
-	      ch_printf( ch, "&RYou don't belong to a clan....\n\r" );
+	      ch_printf( ch, "&RYou don't belong to a clan....\r\n" );
 	      return;
 	    }
 
@@ -1692,7 +1692,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
 
           if ( price > clan->funds )
 	    {
-	      ch_printf( ch, "&RThat ship would cost %d. Your organization doesn't have enough.\n\r" ,price );
+	      ch_printf( ch, "&RThat ship would cost %d. Your organization doesn't have enough.\r\n" ,price );
 	      return;
 	    }
 	}
@@ -1700,7 +1700,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
 	{
 	  if ( price > ch->gold )
 	    {
-	      ch_printf( ch, "&RThat ship would cost %d. You don't have enough.\n\r" ,price );
+	      ch_printf( ch, "&RThat ship would cost %d. You don't have enough.\r\n" ,price );
 	      return;
 	    }
 	}
@@ -1748,12 +1748,12 @@ void do_designship( CHAR_DATA * ch , char * argument )
       if ( !str_cmp( arg1, "clanship" ) )
 	{     			
 	  clan->funds -= price;
-	  ch_printf(ch, "&G%s pays %ld credits for the ship.\n\r", clan->name , price );   
+	  ch_printf(ch, "&G%s pays %ld credits for the ship.\r\n", clan->name , price );   
 	}
       else
 	{     			
 	  ch->gold -= price;
-	  ch_printf(ch, "&GYou pay %ld credits to design the ship.\n\r" , price );   
+	  ch_printf(ch, "&GYou pay %ld credits to design the ship.\r\n" , price );   
 	}
 
       act( AT_PLAIN, "$n walks over to a terminal and makes a credit transaction.",ch,
@@ -1773,7 +1773,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
       return;
     }
 
-  send_to_char( "Unfortunately this skill isn't finished yet....\n\r" , ch);
+  send_to_char( "Unfortunately this skill isn't finished yet....\r\n" , ch);
 }
 
 void post_ship_guard( ROOM_INDEX_DATA * pRoomIndex )
@@ -1811,7 +1811,7 @@ void post_ship_guard( ROOM_INDEX_DATA * pRoomIndex )
   if ( room_is_dark(pRoomIndex) )
     SET_BIT(mob->affected_by, AFF_INFRARED);
 
-  sprintf( tmpbuf , "A Security Guard stands alert and ready for trouble.\n\r" );
+  sprintf( tmpbuf , "A Security Guard stands alert and ready for trouble.\r\n" );
   STRFREE( mob->long_descr );
   mob->long_descr = STRALLOC( tmpbuf );
   mob->mob_clan  = NULL;

@@ -126,7 +126,7 @@ static void nanny_get_name( DESCRIPTOR_DATA *d, char *argument )
 
   if ( !check_parse_name( argument ) )
     {
-      write_to_buffer( d, "Illegal name, try another.\n\rName: ", 0 );
+      write_to_buffer( d, "Illegal name, try another.\r\nName: ", 0 );
       return;
     }
 
@@ -138,11 +138,11 @@ static void nanny_get_name( DESCRIPTOR_DATA *d, char *argument )
 	  /* Don't allow new players if DENY_NEW_PLAYERS is true */
 	  if (sysdata.DENY_NEW_PLAYERS == TRUE)
 	    {
-	      sprintf( buf, "The mud is currently preparing for a reboot.\n\r" );
+	      sprintf( buf, "The mud is currently preparing for a reboot.\r\n" );
 	      write_to_buffer( d, buf, 0 );
-	      sprintf( buf, "New players are not accepted during this time.\n\r" );
+	      sprintf( buf, "New players are not accepted during this time.\r\n" );
 	      write_to_buffer( d, buf, 0 );
-	      sprintf( buf, "Please try again in a few minutes.\n\r" );
+	      sprintf( buf, "Please try again in a few minutes.\r\n" );
 	      write_to_buffer( d, buf, 0 );
 	      close_socket( d, FALSE );
 	    }
@@ -154,7 +154,7 @@ static void nanny_get_name( DESCRIPTOR_DATA *d, char *argument )
 		    || !str_suffix( pban->name, d->host ) ) )
 		{
 		  write_to_buffer( d,
-                                       "Your site has been banned from this Mud.\n\r", 0 );
+                                       "Your site has been banned from this Mud.\r\n", 0 );
 		  close_socket( d, FALSE );
 		  return;
 		}
@@ -167,18 +167,18 @@ static void nanny_get_name( DESCRIPTOR_DATA *d, char *argument )
 		    || !str_suffix( pban->name, d->host ) ) )
 		{
 		  write_to_buffer( d,
-				   "New players have been temporarily banned from your IP.\n\r", 0 );
+				   "New players have been temporarily banned from your IP.\r\n", 0 );
 		  close_socket( d, FALSE );
 		  return;
 		}
 	    }
 
-	  sprintf( buf, "\n\rChoosing a name is one of the most important p\
-arts of this game...\n\r"
-                       "Make sure to pick a name appropriate to the character you are going\n\r"
-                       "to role play, and be sure that it suits our theme.\n\r"
-                       "If the name you select is not acceptable, you will be asked to choose\n\r"
-                       "another one.\n\r\n\rPlease choose a name for your character: ");
+	  sprintf( buf, "\r\nChoosing a name is one of the most important p\
+arts of this game...\r\n"
+                       "Make sure to pick a name appropriate to the character you are going\r\n"
+                       "to role play, and be sure that it suits our theme.\r\n"
+                       "If the name you select is not acceptable, you will be asked to choose\r\n"
+                       "another one.\r\n\r\nPlease choose a name for your character: ");
 	  write_to_buffer( d, buf, 0 );
 	  d->newstate++;
 	  d->connected = CON_GET_NAME;
@@ -186,7 +186,7 @@ arts of this game...\n\r"
 	}
       else
 	{
-	  write_to_buffer(d, "Illegal name, try another.\n\rName: ", 0);
+	  write_to_buffer(d, "Illegal name, try another.\r\nName: ", 0);
 	  return;
 	}
     }
@@ -203,7 +203,7 @@ arts of this game...\n\r"
     {
       sprintf( log_buf, "Bad player file %s@%s.", argument, d->host );
       log_string( log_buf );
-      write_to_buffer( d, "Your playerfile is corrupt...Please notify Thoric@mud.compulink.com.\n\r", 0 );
+      write_to_buffer( d, "Your playerfile is corrupt...Please notify Thoric@mud.compulink.com.\r\n", 0 );
       close_socket( d, FALSE );
       return;
     }
@@ -218,7 +218,7 @@ arts of this game...\n\r"
 	  && pban->level >= ch->top_level )
 	{
 	  write_to_buffer( d,
-			   "Your site has been banned from this Mud.\n\r", 0 );
+			   "Your site has been banned from this Mud.\r\n", 0 );
 	  close_socket( d, FALSE );
 	  return;
 	}
@@ -235,7 +235,7 @@ arts of this game...\n\r"
 	  return;
 	}
 
-      write_to_buffer( d, "You are denied access.\n\r", 0 );
+      write_to_buffer( d, "You are denied access.\r\n", 0 );
       close_socket( d, FALSE );
       return;
     }
@@ -248,7 +248,7 @@ arts of this game...\n\r"
 	  && ch->top_level == 0 )
 	{
 	  write_to_buffer( d,
-                               "You have been temporarily banned from creating new characters.\n\r", 0 );
+                               "You have been temporarily banned from creating new characters.\r\n", 0 );
 	  close_socket( d, FALSE );
 	  return;
 	}
@@ -267,8 +267,8 @@ arts of this game...\n\r"
     {
       if ( wizlock && !IS_IMMORTAL(ch) )
 	{
-	  write_to_buffer( d, "The game is wizlocked.  Only immortals can connect now.\n\r", 0 );
-	  write_to_buffer( d, "Please try back later.\n\r", 0 );
+	  write_to_buffer( d, "The game is wizlocked.  Only immortals can connect now.\r\n", 0 );
+	  write_to_buffer( d, "Please try back later.\r\n", 0 );
 	  close_socket( d, FALSE );
 	  return;
 	}
@@ -291,7 +291,7 @@ arts of this game...\n\r"
     }
   else
     {
-      write_to_buffer( d, "\n\rI don't recognize your name, you must be new here.\n\r\n\r", 0 );
+      write_to_buffer( d, "\r\nI don't recognize your name, you must be new here.\r\n\r\n", 0 );
       sprintf( buf, "Did I get that right, %s (Y/N)? ", argument );
       write_to_buffer( d, buf, 0 );
       d->connected = CON_CONFIRM_NEW_NAME;
@@ -304,11 +304,11 @@ static void nanny_get_old_password( DESCRIPTOR_DATA *d, char *argument )
   CHAR_DATA *ch = d->character;
   char buf[MAX_STRING_LENGTH];
   bool fOld, chk;
-  write_to_buffer( d, "\n\r", 2 );
+  write_to_buffer( d, "\r\n", 2 );
 
   if ( strcmp( crypt( argument, ch->pcdata->pwd ), ch->pcdata->pwd ) )
     {
-      write_to_buffer( d, "Wrong password.\n\r", 0 );
+      write_to_buffer( d, "Wrong password.\r\n", 0 );
       /* clear descriptor pointer to get rid of bug message in log */
       d->character->desc = NULL;
       close_socket( d, FALSE );
@@ -361,8 +361,8 @@ static void nanny_confirm_new_name( DESCRIPTOR_DATA *d, char *argument )
   switch ( *argument )
     {
     case 'y': case 'Y':
-      sprintf( buf, "\n\rMake sure to use a password that won't be easily guessed by someone else."
-	       "\n\rPick a good password for %s: %s",
+      sprintf( buf, "\r\nMake sure to use a password that won't be easily guessed by someone else."
+	       "\r\nPick a good password for %s: %s",
 	       ch->name, echo_off_str );
       write_to_buffer( d, buf, 0 );
       d->connected = CON_GET_NEW_PASSWORD;
@@ -387,11 +387,11 @@ static void nanny_get_new_password( DESCRIPTOR_DATA *d, char *argument )
 {
   CHAR_DATA *ch = d->character;
 
-  write_to_buffer( d, "\n\r", 2 );
+  write_to_buffer( d, "\r\n", 2 );
 
   if ( strlen(argument) < 5 )
     {
-      write_to_buffer( d, "Password must be at least five characters long.\n\rPassword: ", 0 );
+      write_to_buffer( d, "Password must be at least five characters long.\r\nPassword: ", 0 );
       return;
     }
 
@@ -402,14 +402,14 @@ static void nanny_get_new_password( DESCRIPTOR_DATA *d, char *argument )
     {
       if ( *p == '~' )
 	{
-	  write_to_buffer( d, "New password not acceptable, try again.\n\rPassword: ", 0 );
+	  write_to_buffer( d, "New password not acceptable, try again.\r\nPassword: ", 0 );
 	  return;
 	}
     }
 
   DISPOSE( ch->pcdata->pwd );
   ch->pcdata->pwd   = str_dup( pwdnew );
-  write_to_buffer( d, "\n\rPlease retype the password to confirm: ", 0 );
+  write_to_buffer( d, "\r\nPlease retype the password to confirm: ", 0 );
   d->connected = CON_CONFIRM_NEW_PASSWORD;
 }
 
@@ -417,17 +417,17 @@ static void nanny_confirm_new_password( DESCRIPTOR_DATA *d, char *argument )
 {
   CHAR_DATA *ch = d->character;
 
-  write_to_buffer( d, "\n\r", 2 );
+  write_to_buffer( d, "\r\n", 2 );
 
   if ( strcmp( crypt( argument, ch->pcdata->pwd ), ch->pcdata->pwd ) )
     {
-      write_to_buffer( d, "Passwords don't match.\n\rRetype password: ", 0 );
+      write_to_buffer( d, "Passwords don't match.\r\nRetype password: ", 0 );
       d->connected = CON_GET_NEW_PASSWORD;
       return;
     }
 
   write_to_buffer( d, echo_on_str, 0 );
-  write_to_buffer( d, "\n\rWhat is your sex (M/F/N)? ", 0 );
+  write_to_buffer( d, "\r\nWhat is your sex (M/F/N)? ", 0 );
   d->connected = CON_GET_NEW_SEX;
 }
 
@@ -441,17 +441,17 @@ static void nanny_get_new_sex( DESCRIPTOR_DATA *d, char *argument )
     case 'f': case 'F': ch->sex = SEX_FEMALE;  break;
     case 'n': case 'N': ch->sex = SEX_NEUTRAL; break;
     default:
-      write_to_buffer( d, "That's not a sex.\n\rWhat IS your sex? ", 0 );
+      write_to_buffer( d, "That's not a sex.\r\nWhat IS your sex? ", 0 );
       return;
     }
 
-  write_to_buffer( d, "\n\rYou may choose one of the following skill packages to start with.\n\r", 0 );
-  write_to_buffer( d, "You may learn a limited number of skills from other professions later.\n\r\n\r", 0 );
+  write_to_buffer( d, "\r\nYou may choose one of the following skill packages to start with.\r\n", 0 );
+  write_to_buffer( d, "You may learn a limited number of skills from other professions later.\r\n\r\n", 0 );
 
-  write_to_buffer( d, "Architect            Tailor              Weaponsmith\n\r", 0 );
-  write_to_buffer( d, "Soldier              Medic               Assassin\n\r", 0 );
-  write_to_buffer( d, "Pilot                Senator             Spy\n\r", 0 );
-  write_to_buffer( d, "Thief                Pirate\n\r\n\r", 0 );
+  write_to_buffer( d, "Architect            Tailor              Weaponsmith\r\n", 0 );
+  write_to_buffer( d, "Soldier              Medic               Assassin\r\n", 0 );
+  write_to_buffer( d, "Pilot                Senator             Spy\r\n", 0 );
+  write_to_buffer( d, "Thief                Pirate\r\n\r\n", 0 );
 
   d->connected = CON_ADD_SKILLS;
   ch->pcdata->num_skills = 0;
@@ -609,7 +609,7 @@ static void nanny_add_skills( DESCRIPTOR_DATA *d, char *argument )
   ch->perm_con = 10;
   ch->perm_cha = 10;
 
-  write_to_buffer( d, "\n\rWould you like ANSI or no graphic/color support, (R/A/N)? ", 0 );
+  write_to_buffer( d, "\r\nWould you like ANSI or no graphic/color support, (R/A/N)? ", 0 );
   d->connected = CON_GET_WANT_RIPANSI;
 }
 
@@ -622,7 +622,7 @@ static void nanny_get_want_ripansi( DESCRIPTOR_DATA *d, char *argument )
     case 'a': case 'A': SET_BIT(ch->act,PLR_ANSI);  break;
     case 'n': case 'N': break;
     default:
-      write_to_buffer( d, "Invalid selection.\n\rANSI or NONE? ", 0 );
+      write_to_buffer( d, "Invalid selection.\r\nANSI or NONE? ", 0 );
       return;
     }
 
@@ -645,9 +645,9 @@ static void nanny_press_enter( DESCRIPTOR_DATA *d, char *argument )
   else
     send_to_pager( "\014", ch );
 
-  send_to_pager( "\n\r&WMessage of the Day&w\n\r", ch );
+  send_to_pager( "\r\n&WMessage of the Day&w\r\n", ch );
   do_help( ch, const_char_to_nonconst("motd") );
-  send_to_pager( "\n\r&WPress [ENTER] &Y", ch );
+  send_to_pager( "\r\n&WPress [ENTER] &Y", ch );
 
   if ( IS_IMMORTAL(ch) )
     d->connected = CON_READ_IMOTD;
@@ -660,9 +660,9 @@ static void nanny_press_enter( DESCRIPTOR_DATA *d, char *argument )
 static void nanny_read_imotd( DESCRIPTOR_DATA *d, char *argument )
 {
   CHAR_DATA *ch = d->character;
-  send_to_pager( "&WImmortal Message of the Day&w\n\r", ch );
+  send_to_pager( "&WImmortal Message of the Day&w\r\n", ch );
   do_help( ch, const_char_to_nonconst("imotd") );
-  send_to_pager( "\n\r&WPress [ENTER] &Y", ch );
+  send_to_pager( "\r\n&WPress [ENTER] &Y", ch );
   d->connected = CON_DONE_MOTD;
 }
 
@@ -670,7 +670,7 @@ static void nanny_read_nmotd( DESCRIPTOR_DATA *d, char *argument )
 {
   CHAR_DATA *ch = d->character;
   do_help( ch, const_char_to_nonconst("nmotd") );
-  send_to_pager( "\n\r&WPress [ENTER] &Y", ch );
+  send_to_pager( "\r\n&WPress [ENTER] &Y", ch );
   d->connected = CON_DONE_MOTD;
 }
 
@@ -678,7 +678,7 @@ static void nanny_done_motd( DESCRIPTOR_DATA *d, char *argument )
 {
   CHAR_DATA *ch = d->character;
 
-  write_to_buffer( d, "\n\rWelcome...\n\r\n\r", 0 );
+  write_to_buffer( d, "\r\nWelcome...\r\n\r\n", 0 );
   add_char( ch );
   d->connected      = CON_PLAYING;
 

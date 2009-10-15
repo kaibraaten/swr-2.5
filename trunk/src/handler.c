@@ -1732,26 +1732,26 @@ bool ms_find_obj( CHAR_DATA *ch )
 	switch( number_range( UMAX(1, (ms/5-15)), (ms+4) / 5 ) )
 	{
 	    default:
-	    case  1: t="As you reach for it, you forgot what it was...\n\r";					break;
-	    case  2: t="As you reach for it, something inside stops you...\n\r";				break;
-	    case  3: t="As you reach for it, it seems to move out of the way...\n\r";				break;
-	    case  4: t="You grab frantically for it, but can't seem to get a hold of it...\n\r";		break;
-	    case  5: t="It disappears as soon as you touch it!\n\r";						break;
-	    case  6: t="You would if it would stay still!\n\r";							break;
-	    case  7: t="Whoa!  It's covered in blood!  Ack!  Ick!\n\r";						break;
-	    case  8: t="Wow... trails!\n\r";									break;
-	    case  9: t="You reach for it, then notice the back of your hand is growing something!\n\r";		break;
-	    case 10: t="As you grasp it, it shatters into tiny shards which bite into your flesh!\n\r";		break;
-	    case 11: t="What about that huge dragon flying over your head?!?!?\n\r";				break;
-	    case 12: t="You stratch yourself instead...\n\r";							break;
-	    case 13: t="You hold the universe in the palm of your hand!\n\r";					break;
-	    case 14: t="You're too scared.\n\r";								break;
-	    case 15: t="Your mother smacks your hand... 'NO!'\n\r";						break;
-	    case 16: t="Your hand grasps the worse pile of revoltingness than you could ever imagine!\n\r";	break;
-	    case 17: t="You stop reaching for it as it screams out at you in pain!\n\r";			break;
-	    case 18: t="What about the millions of burrow-maggots feasting on your arm?!?!\n\r";		break;
-	    case 19: t="That doesn't matter anymore... you've found the true answer to everything!\n\r";	break;
-	    case 20: t="A supreme entity has no need for that.\n\r";						break;
+	    case  1: t="As you reach for it, you forgot what it was...\r\n";					break;
+	    case  2: t="As you reach for it, something inside stops you...\r\n";				break;
+	    case  3: t="As you reach for it, it seems to move out of the way...\r\n";				break;
+	    case  4: t="You grab frantically for it, but can't seem to get a hold of it...\r\n";		break;
+	    case  5: t="It disappears as soon as you touch it!\r\n";						break;
+	    case  6: t="You would if it would stay still!\r\n";							break;
+	    case  7: t="Whoa!  It's covered in blood!  Ack!  Ick!\r\n";						break;
+	    case  8: t="Wow... trails!\r\n";									break;
+	    case  9: t="You reach for it, then notice the back of your hand is growing something!\r\n";		break;
+	    case 10: t="As you grasp it, it shatters into tiny shards which bite into your flesh!\r\n";		break;
+	    case 11: t="What about that huge dragon flying over your head?!?!?\r\n";				break;
+	    case 12: t="You stratch yourself instead...\r\n";							break;
+	    case 13: t="You hold the universe in the palm of your hand!\r\n";					break;
+	    case 14: t="You're too scared.\r\n";								break;
+	    case 15: t="Your mother smacks your hand... 'NO!'\r\n";						break;
+	    case 16: t="Your hand grasps the worse pile of revoltingness than you could ever imagine!\r\n";	break;
+	    case 17: t="You stop reaching for it as it screams out at you in pain!\r\n";			break;
+	    case 18: t="What about the millions of burrow-maggots feasting on your arm?!?!\r\n";		break;
+	    case 19: t="That doesn't matter anymore... you've found the true answer to everything!\r\n";	break;
+	    case 20: t="A supreme entity has no need for that.\r\n";						break;
 	}
     else
     {
@@ -1759,12 +1759,12 @@ bool ms_find_obj( CHAR_DATA *ch )
 	switch( number_range( 1, sub/10 ) )
 	{
 	    default:
-	    case  1: t="In just a second...\n\r";				break;
-	    case  2: t="You can't find that...\n\r";					break;
-	    case  3: t="It's just beyond your grasp...\n\r";				break;
-	    case  4: t="...but it's under a pile of other stuff...\n\r";		break;
-	    case  5: t="You go to reach for it, but pick your nose instead.\n\r";	break;
-	    case  6: t="Which one?!?  I see two... no three...\n\r";			break;
+	    case  1: t="In just a second...\r\n";				break;
+	    case  2: t="You can't find that...\r\n";					break;
+	    case  3: t="It's just beyond your grasp...\r\n";				break;
+	    case  4: t="...but it's under a pile of other stuff...\r\n";		break;
+	    case  5: t="You go to reach for it, but pick your nose instead.\r\n";	break;
+	    case  6: t="Which one?!?  I see two... no three...\r\n";			break;
 	}
     }
     send_to_char( t, ch );
@@ -1793,7 +1793,7 @@ OBJ_DATA *find_obj( CHAR_DATA *ch, char *argument, bool carryonly )
     {
 	if ( carryonly && ( obj = get_obj_carry( ch, arg1 ) ) == NULL )
 	{
-	    send_to_char( "You do not have that item.\n\r", ch );
+	    send_to_char( "You do not have that item.\r\n", ch );
 	    return NULL;
 	}
 	else
@@ -1812,7 +1812,7 @@ OBJ_DATA *find_obj( CHAR_DATA *ch, char *argument, bool carryonly )
 	&& ( container = get_obj_carry( ch, arg2 ) ) == NULL
 	&& ( container = get_obj_wear( ch, arg2 ) ) == NULL )
 	{
-	    send_to_char( "You do not have that item.\n\r", ch );
+	    send_to_char( "You do not have that item.\r\n", ch );
 	    return NULL;
 	}
 	if ( !carryonly && ( container = get_obj_here( ch, arg2 ) ) == NULL )
@@ -2522,7 +2522,7 @@ void showaffect( CHAR_DATA *ch, AFFECT_DATA *paf )
 	    switch( paf->location )
 	    {
 	      default:
-		sprintf( buf, "Affects %s by %d.\n\r",
+		sprintf( buf, "Affects %s by %d.\r\n",
 		  affect_loc_name( paf->location ), paf->modifier );
 		break;
 	      case APPLY_AFFECT:
@@ -2534,12 +2534,12 @@ void showaffect( CHAR_DATA *ch, AFFECT_DATA *paf )
 		  strcat( buf, " " );
 		  strcat( buf, a_flags[x] );
 		}
-		strcat( buf, "\n\r" );
+		strcat( buf, "\r\n" );
 		break;
 	      case APPLY_WEAPONSPELL:
 	      case APPLY_WEARSPELL:
 	      case APPLY_REMOVESPELL:
-		sprintf( buf, "Casts spell '%s'\n\r",
+		sprintf( buf, "Casts spell '%s'\r\n",
 			IS_VALID_SN(paf->modifier) ? skill_table[paf->modifier]->name
 						   : "unknown" );
 		break;
@@ -2554,7 +2554,7 @@ void showaffect( CHAR_DATA *ch, AFFECT_DATA *paf )
 		  strcat( buf, " " );
 		  strcat( buf, ris_flags[x] );
 		}
-		strcat( buf, "\n\r" );
+		strcat( buf, "\r\n" );
 		break;
 	    }
 	    send_to_char( buf, ch );

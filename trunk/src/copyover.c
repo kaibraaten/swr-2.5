@@ -66,13 +66,13 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 
   if (!fp)
     {
-      send_to_char ("Copyover file not writeable, aborted.\n\r",ch);
+      send_to_char ("Copyover file not writeable, aborted.\r\n",ch);
       log_printf ("Could not write to copyover file: %s", COPYOVER_FILE);
       perror ("do_copyover:fopen");
       return;
     }
 
-  strcpy(buf, "\n\rA Blinding Flash of light starts heading towards you, before you can think it engulfs you!\n\r" );
+  strcpy(buf, "\r\nA Blinding Flash of light starts heading towards you, before you can think it engulfs you!\r\n" );
 
   /* For each playing descriptor, save its state */
   for (d = first_descriptor; d ; d = d_next)
@@ -82,8 +82,8 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 
       if (!d->character || d->connected != CON_PLAYING) /* drop those logging on */
 	{
-	  write_to_descriptor (d->descriptor, "\n\rSorry, we are rebooting."
-			       " Come back in a few minutes.\n\r", 0);
+	  write_to_descriptor (d->descriptor, "\r\nSorry, we are rebooting."
+			       " Come back in a few minutes.\r\n", 0);
 	  close_socket (d, FALSE); /* throw'em out */
 	}
       else
@@ -111,7 +111,7 @@ void do_copyover (CHAR_DATA *ch, char * argument)
   /* Failed - sucessful exec will not return */
 
   perror ("do_copyover: execl");
-  send_to_char ("Copyover FAILED!\n\r",ch);
+  send_to_char ("Copyover FAILED!\r\n",ch);
 
   /* Here you might want to reopen fpReserve */
   /* Since I'm a neophyte type guy, I'll assume this is
@@ -147,7 +147,7 @@ void copyover_recover( void )
   if (!fp) /* there are some descriptors open which will hang forever then ? */
         {
           perror ("copyover_recover:fopen");
-          log_string("Copyover file not found. Exitting.\n\r");
+          log_string("Copyover file not found. Exitting.\r\n");
            exit (1);
         }
 
@@ -160,7 +160,7 @@ void copyover_recover( void )
        break;
 
         /* Write something, and check if it goes error-free */
-     if (!write_to_descriptor (desc, "\n\rThe surge of Light passes leaving you unscathed and your world reshaped anew\n\r", 0))
+     if (!write_to_descriptor (desc, "\r\nThe surge of Light passes leaving you unscathed and your world reshaped anew\r\n", 0))
        {
          close (desc); /* nope */
          continue;
@@ -181,12 +181,12 @@ void copyover_recover( void )
 
       if (!fOld) /* Player file not found?! */
        {
-          write_to_descriptor (desc, "\n\rSomehow, your character was lost in the copyover sorry.\n\r", 0);
+          write_to_descriptor (desc, "\r\nSomehow, your character was lost in the copyover sorry.\r\n", 0);
           close_socket (d, FALSE);
        }
       else /* ok! */
        {
-          write_to_descriptor (desc, "\n\rWarmboot recovery complete.\n\r",0);
+          write_to_descriptor (desc, "\r\nWarmboot recovery complete.\r\n",0);
 
            /* Just In Case,  Someone said this isn't necassary, but _why_
               do we want to dump someone in limbo? */
