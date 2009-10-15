@@ -67,4 +67,10 @@ double vector_dot( const Vector3 * const a, const Vector3 * const b );
  */
 void vector_init( Vector3 * const v );
 
+/*
+ * Set the coordinates.
+ */
+
+void vector_set( Vector3 * const vec, double x, double y, double z );
+
 #endif

@@ -1719,8 +1719,9 @@ void update_handler( void )
     if ( --pulse_ship   <= 0 )
     {
        pulse_ship  = PULSE_SPACE/10;
-       move_ships  ( );
-    }                        
+       move_missiles();
+       move_ships();
+    }
     
     if ( --pulse_violence <= 0 )
     {

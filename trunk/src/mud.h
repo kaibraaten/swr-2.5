@@ -3511,14 +3511,15 @@ SHIP_DATA  * get_ship_here          args( ( const char *name , SPACE_DATA *stars
 void         showstarsystem         args( ( CHAR_DATA *ch , SPACE_DATA *starsystem ) );
 void         update_space           args( ( void ) );
 void         recharge_ships         args( ( void ) );
+void move_missiles( void );
 void         move_ships             args( ( void ) );
 void         update_bus             args( ( void ) );
 void         update_traffic         args( ( void ) );
 bool         check_pilot            args( ( CHAR_DATA *ch , SHIP_DATA *ship ) );
 bool         is_rental              args( ( CHAR_DATA *ch , SHIP_DATA *ship ) );
-void         echo_to_ship           args( ( int color , SHIP_DATA *ship , const char *argument ) );
-void         echo_to_cockpit        args( ( int color , SHIP_DATA *ship , const char *argument ) );
-void         echo_to_system         args( ( int color , SHIP_DATA *ship , const char *argument , SHIP_DATA *ignore ) );
+void         echo_to_ship           args( ( int color , const SHIP_DATA *ship , const char *argument ) );
+void         echo_to_cockpit        args( ( int color , const SHIP_DATA *ship , const char *argument ) );
+void         echo_to_system         args( ( int color , const SHIP_DATA *ship , const char *argument , const SHIP_DATA *ignore ) );
 bool         extract_ship           args( ( SHIP_DATA *ship ) );
 bool         ship_to_room           args( ( SHIP_DATA *ship , long vnum ) );
 long         get_ship_value         args( ( SHIP_DATA *ship ) );
