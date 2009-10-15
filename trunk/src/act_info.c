@@ -6,7 +6,6 @@
 #include <unistd.h>
 #include "mud.h"
 
-
 const char *	const	where_name	[] =
 {
     "<used as light>     ",
@@ -33,7 +32,6 @@ const char *	const	where_name	[] =
     "<missile wielded>   "
 };
 
-
 /*
  * Local functions.
  */
@@ -45,47 +43,59 @@ bool	check_blind		args( ( CHAR_DATA *ch ) );
 void    show_condition          args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 bool 	is_online		args( ( char * argument ) );
 
-
 char *format_obj_to_char( OBJ_DATA *obj, CHAR_DATA *ch, bool fShort )
 {
-    static char buf[MAX_STRING_LENGTH];
+  static char buf[MAX_STRING_LENGTH];
 
-    buf[0] = '\0';
-    if ( IS_OBJ_STAT(obj, ITEM_INVIS)     )   strcat( buf, "(Invis) "     );
-    if ( ( IS_AFFECTED(ch, AFF_DETECT_MAGIC) || IS_IMMORTAL(ch) )
-	 && IS_OBJ_STAT(obj, ITEM_MAGIC)  )   strcat( buf, "&B(Blue Aura)&w "   );
-    if ( IS_OBJ_STAT(obj, ITEM_GLOW)      )   strcat( buf, "(Glowing) "   );
-    if ( IS_OBJ_STAT(obj, ITEM_HUM)       )   strcat( buf, "(Humming) "   );
-    if ( IS_OBJ_STAT(obj, ITEM_HIDDEN)	  )   strcat( buf, "(Hidden) "	  );
-    if ( IS_OBJ_STAT(obj, ITEM_BURRIED)	  )   strcat( buf, "(Burried) "	  );
-    if ( IS_IMMORTAL(ch)
-	 && IS_OBJ_STAT(obj, ITEM_PROTOTYPE) ) strcat( buf, "(PROTO) "	  );
+  buf[0] = '\0';
 
-    if ( fShort )
+  if( IS_OBJ_STAT(obj, ITEM_INVIS) )
+    strcat( buf, "(Invis) " );
+
+  if ( ( IS_AFFECTED(ch, AFF_DETECT_MAGIC) || IS_IMMORTAL(ch) )
+       && IS_OBJ_STAT(obj, ITEM_MAGIC) )
+    strcat( buf, "&B(Blue Aura)&w " );
+
+  if ( IS_OBJ_STAT(obj, ITEM_GLOW) )
+    strcat( buf, "(Glowing) " );
+
+  if ( IS_OBJ_STAT(obj, ITEM_HUM) )
+    strcat( buf, "(Humming) " );
+
+  if ( IS_OBJ_STAT(obj, ITEM_HIDDEN) )
+    strcat( buf, "(Hidden) " );
+
+  if ( IS_OBJ_STAT(obj, ITEM_BURRIED) )
+    strcat( buf, "(Burried) " );
+
+  if ( IS_IMMORTAL(ch) && IS_OBJ_STAT(obj, ITEM_PROTOTYPE) )
+    strcat( buf, "(PROTO) " );
+
+  if ( fShort )
     {
-	if ( obj->short_descr )
-	    strcat( buf, obj->short_descr );
+      if ( obj->short_descr )
+	strcat( buf, obj->short_descr );
     }
-    else
+  else
     {
-	if ( obj->description )
-	    strcat( buf, obj->description );
+      if ( obj->description )
+	strcat( buf, obj->description );
     }
 
-    return buf;
+  return buf;
 }
-
 
 /*
  * Some increasingly freaky halucinated objects		-Thoric
  */
 const char *halucinated_object( int ms, bool fShort )
 {
-    int sms = URANGE( 1, (ms+10)/5, 20 );
+  int sms = URANGE( 1, (ms+10)/5, 20 );
 
-    if ( fShort )
-    switch( number_range( 6-URANGE(1,sms/2,5), sms ) )
+  if ( fShort )
     {
+      switch( number_range( 6-URANGE(1,sms/2,5), sms ) )
+	{
 	case  1: return "a sword";
 	case  2: return "a stick";
 	case  3: return "something shiny";
@@ -106,218 +116,235 @@ const char *halucinated_object( int ms, bool fShort )
 	case 18: return "the meaning of it all";
 	case 19: return "the answer";
 	case 20: return "the key to life, the universe and everything";
+	}
     }
-    switch( number_range( 6-URANGE(1,sms/2,5), sms ) )
-    {
-	case  1: return "A nice looking sword catches your eye.";
-	case  2: return "The ground is covered in small sticks.";
-	case  3: return "Something shiny catches your eye.";
-	case  4: return "Something catches your attention.";
-	case  5: return "Something interesting catches your eye.";
-	case  6: return "Something colorful flows by.";
-	case  7: return "Something that looks cool calls out to you.";
-	case  8: return "A nifty thing of great importance stands here.";
-	case  9: return "A cloak of flowing colors asks you to wear it.";
-	case 10: return "A mystical flaming sword awaits your grasp.";
-	case 11: return "A swarm of insects buzzes in your face!";
-	case 12: return "The extremely rare Deathbane lies at your feet.";
-	case 13: return "A figment of your imagination is at your command.";
-	case 14: return "You notice a gravestone here... upon closer examination, it reads your name.";
-	case 15: return "The long lost boots of Ranger Thoric lie off to the side.";
-	case 16: return "A glowing tome of arcane knowledge hovers in the air before you.";
-	case 17: return "A long sought secret of all mankind is now clear to you.";
-	case 18: return "The meaning of it all, so simple, so clear... of course!";
-	case 19: return "The answer.  One.  It's always been One.";
-	case 20: return "The key to life, the universe and everything awaits your hand.";
-    }
-    return "Whoa!!!";
-}
 
+  switch( number_range( 6-URANGE(1,sms/2,5), sms ) )
+    {
+    case  1: return "A nice looking sword catches your eye.";
+    case  2: return "The ground is covered in small sticks.";
+    case  3: return "Something shiny catches your eye.";
+    case  4: return "Something catches your attention.";
+    case  5: return "Something interesting catches your eye.";
+    case  6: return "Something colorful flows by.";
+    case  7: return "Something that looks cool calls out to you.";
+    case  8: return "A nifty thing of great importance stands here.";
+    case  9: return "A cloak of flowing colors asks you to wear it.";
+    case 10: return "A mystical flaming sword awaits your grasp.";
+    case 11: return "A swarm of insects buzzes in your face!";
+    case 12: return "The extremely rare Deathbane lies at your feet.";
+    case 13: return "A figment of your imagination is at your command.";
+    case 14: return "You notice a gravestone here... upon closer examination, it reads your name.";
+    case 15: return "The long lost boots of Ranger Thoric lie off to the side.";
+    case 16: return "A glowing tome of arcane knowledge hovers in the air before you.";
+    case 17: return "A long sought secret of all mankind is now clear to you.";
+    case 18: return "The meaning of it all, so simple, so clear... of course!";
+    case 19: return "The answer.  One.  It's always been One.";
+    case 20: return "The key to life, the universe and everything awaits your hand.";
+    }
+
+  return "Whoa!!!";
+}
 
 /*
  * Show a list to a character.
  * Can coalesce duplicated items.
  */
-void show_list_to_char( OBJ_DATA *list, CHAR_DATA *ch, bool fShort, bool fShowNothing )
+void show_list_to_char( OBJ_DATA *list, CHAR_DATA *ch,
+			bool fShort, bool fShowNothing )
 {
-    char **prgpstrShow;
-    int *prgnShow;
-    int *pitShow;
-    char *pstrShow;
-    OBJ_DATA *obj;
-    int nShow;
-    int iShow;
-    int count, offcount, tmp, ms, cnt;
-    bool fCombine;
+  char **prgpstrShow;
+  int *prgnShow;
+  int *pitShow;
+  char *pstrShow;
+  OBJ_DATA *obj;
+  int nShow;
+  int iShow;
+  int count, offcount, tmp, ms, cnt;
+  bool fCombine;
 
-    if ( !ch->desc )
-	return;
+  if ( !ch->desc )
+    return;
 
-    /*
-     * if there's no list... then don't do all this crap!  -Thoric
-     */
-    if ( !list )
+  /*
+   * if there's no list... then don't do all this crap!  -Thoric
+   */
+  if ( !list )
     {
-    	if ( fShowNothing )
+      if ( fShowNothing )
     	{
-	   if ( IS_NPC(ch) || IS_SET(ch->act, PLR_COMBINE) )
-	      send_to_char( "     ", ch );
-	   send_to_char( "Nothing.\n\r", ch );
+	  if ( IS_NPC(ch) || IS_SET(ch->act, PLR_COMBINE) )
+	    send_to_char( "     ", ch );
+	  send_to_char( "Nothing.\n\r", ch );
 	}
-	return;
+
+      return;
     }
+
     /*
      * Alloc space for output lines.
      */
-    count = 0;
-    for ( obj = list; obj; obj = obj->next_content )
-	count++;
+  count = 0;
+  for ( obj = list; obj; obj = obj->next_content )
+    count++;
 
-    ms  = (ch->mental_state ? ch->mental_state : 1)
-	* (IS_NPC(ch) ? 1 : (ch->pcdata->condition[COND_DRUNK] ? (ch->pcdata->condition[COND_DRUNK]/12) : 1));
+  ms  = (ch->mental_state ? ch->mental_state : 1)
+    * (IS_NPC(ch) ? 1 : (ch->pcdata->condition[COND_DRUNK] ? (ch->pcdata->condition[COND_DRUNK]/12) : 1));
 
-    /*
-     * If not mentally stable...
-     */
-    if ( abs(ms) > 40 )
+  /*
+   * If not mentally stable...
+   */
+  if ( abs(ms) > 40 )
     {
-	offcount = URANGE( -(count), (count * ms) / 100, count*2 );
-	if ( offcount < 0 )
-	  offcount += number_range(0, abs(offcount));
-	else
-	if ( offcount > 0 )
+      offcount = URANGE( -(count), (count * ms) / 100, count*2 );
+
+      if ( offcount < 0 )
+	offcount += number_range(0, abs(offcount));
+      else if ( offcount > 0 )
 	  offcount -= number_range(0, offcount);
     }
-    else
-	offcount = 0;
+  else
+    offcount = 0;
 
-    if ( count + offcount <= 0 )
+  if ( count + offcount <= 0 )
     {
-    	if ( fShowNothing )
+      if ( fShowNothing )
     	{
-	   if ( IS_NPC(ch) || IS_SET(ch->act, PLR_COMBINE) )
-	      send_to_char( "     ", ch );
-	   send_to_char( "Nothing.\n\r", ch );
+	  if ( IS_NPC(ch) || IS_SET(ch->act, PLR_COMBINE) )
+	    send_to_char( "     ", ch );
+
+	  send_to_char( "Nothing.\n\r", ch );
 	}
-	return;
+
+      return;
     }
 
-    CREATE( prgpstrShow,	char*,	count + ((offcount > 0) ? offcount : 0) );
-    CREATE( prgnShow,		int,	count + ((offcount > 0) ? offcount : 0) );
-    CREATE( pitShow,		int,	count + ((offcount > 0) ? offcount : 0) );
-    nShow	= 0;
-    tmp		= (offcount > 0) ? offcount : 0;
-    cnt		= 0;
+  CREATE( prgpstrShow, char*, count + ((offcount > 0) ? offcount : 0) );
+  CREATE( prgnShow, int, count + ((offcount > 0) ? offcount : 0) );
+  CREATE( pitShow, int, count + ((offcount > 0) ? offcount : 0) );
+  nShow	= 0;
+  tmp = (offcount > 0) ? offcount : 0;
+  cnt = 0;
 
-    /*
-     * Format the list of objects.
-     */
-    for ( obj = list; obj; obj = obj->next_content )
+  /*
+   * Format the list of objects.
+   */
+  for ( obj = list; obj; obj = obj->next_content )
     {
-	if ( offcount < 0 && ++cnt > (count + offcount) )
-	    break;
-	if ( tmp > 0 && number_bits(1) == 0 )
-	{
-	    prgpstrShow [nShow] = str_dup( halucinated_object(ms, fShort) );
-	    prgnShow	[nShow] = 1;
-	    pitShow	[nShow] = number_range( 0, MAX_ITEM_TYPE );
-	    nShow++;
-	    --tmp;
-	}
-	if ( obj->wear_loc == WEAR_NONE
-	&& can_see_obj( ch, obj ) )
-	{
-	    pstrShow = format_obj_to_char( obj, ch, fShort );
-	    fCombine = FALSE;
+      if ( offcount < 0 && ++cnt > (count + offcount) )
+	break;
 
-	    if ( IS_NPC(ch) || IS_SET(ch->act, PLR_COMBINE) )
+      if ( tmp > 0 && number_bits(1) == 0 )
+	{
+	  prgpstrShow [nShow] = str_dup( halucinated_object(ms, fShort) );
+	  prgnShow	[nShow] = 1;
+	  pitShow	[nShow] = number_range( 0, MAX_ITEM_TYPE );
+	  nShow++;
+	  --tmp;
+	}
+
+      if ( obj->wear_loc == WEAR_NONE
+	   && can_see_obj( ch, obj ) )
+	{
+	  pstrShow = format_obj_to_char( obj, ch, fShort );
+	  fCombine = FALSE;
+
+	  if ( IS_NPC(ch) || IS_SET(ch->act, PLR_COMBINE) )
 	    {
-		/*
-		 * Look for duplicates, case sensitive.
-		 * Matches tend to be near end so run loop backwords.
-		 */
-		for ( iShow = nShow - 1; iShow >= 0; iShow-- )
+	      /*
+	       * Look for duplicates, case sensitive.
+	       * Matches tend to be near end so run loop backwords.
+	       */
+	      for ( iShow = nShow - 1; iShow >= 0; iShow-- )
 		{
-		    if ( !strcmp( prgpstrShow[iShow], pstrShow ) )
+		  if ( !strcmp( prgpstrShow[iShow], pstrShow ) )
 		    {
-			prgnShow[iShow] += obj->count;
-			fCombine = TRUE;
-			break;
+		      prgnShow[iShow] += obj->count;
+		      fCombine = TRUE;
+		      break;
 		    }
 		}
 	    }
 
-	    pitShow[nShow] = obj->item_type;
-	    /*
-	     * Couldn't combine, or didn't want to.
-	     */
-	    if ( !fCombine )
+	  pitShow[nShow] = obj->item_type;
+	  /*
+	   * Couldn't combine, or didn't want to.
+	   */
+	  if ( !fCombine )
 	    {
-		prgpstrShow [nShow] = str_dup( pstrShow );
-		prgnShow    [nShow] = obj->count;
-		nShow++;
+	      prgpstrShow [nShow] = str_dup( pstrShow );
+	      prgnShow    [nShow] = obj->count;
+	      nShow++;
 	    }
 	}
     }
-    if ( tmp > 0 )
+
+  if ( tmp > 0 )
     {
-	int x;
-	for ( x = 0; x < tmp; x++ )
+      int x = 0;
+
+      for ( x = 0; x < tmp; x++ )
 	{
-	    prgpstrShow [nShow] = str_dup( halucinated_object(ms, fShort) );
-	    prgnShow	[nShow] = 1;
-	    pitShow	[nShow] = number_range( 0, MAX_ITEM_TYPE );
-	    nShow++;
+	  prgpstrShow [nShow] = str_dup( halucinated_object(ms, fShort) );
+	  prgnShow	[nShow] = 1;
+	  pitShow	[nShow] = number_range( 0, MAX_ITEM_TYPE );
+	  nShow++;
 	}
     }
 
-    /*
-     * Output the formatted list.		-Color support by Thoric
-     */
-    for ( iShow = 0; iShow < nShow; iShow++ )
+  /*
+   * Output the formatted list.		-Color support by Thoric
+   */
+  for ( iShow = 0; iShow < nShow; iShow++ )
     {
-	switch(pitShow[iShow]) {
+      switch(pitShow[iShow])
+	{
 	default:
 	  set_char_color( AT_OBJECT, ch );
 	  break;
+
 	case ITEM_MONEY:
 	  set_char_color( AT_YELLOW, ch );
 	  break;
+
 	case ITEM_FOOD:
 	  set_char_color( AT_HUNGRY, ch );
 	  break;
+
 	case ITEM_DRINK_CON:
 	case ITEM_FOUNTAIN:
 	  set_char_color( AT_THIRSTY, ch );
 	  break;
 	}
-	if ( fShowNothing )
-	    send_to_char( "     ", ch );
-	send_to_char( prgpstrShow[iShow], ch );
-/*	if ( IS_NPC(ch) || IS_SET(ch->act, PLR_COMBINE) ) */
-	{
-	    if ( prgnShow[iShow] != 1 )
-		ch_printf( ch, " (%d)", prgnShow[iShow] );
-	}
 
-	send_to_char( "\n\r", ch );
-	DISPOSE( prgpstrShow[iShow] );
+      if ( fShowNothing )
+	send_to_char( "     ", ch );
+
+      send_to_char( prgpstrShow[iShow], ch );
+      /*	if ( IS_NPC(ch) || IS_SET(ch->act, PLR_COMBINE) ) */
+      {
+	if ( prgnShow[iShow] != 1 )
+	  ch_printf( ch, " (%d)", prgnShow[iShow] );
+      }
+
+      send_to_char( "\n\r", ch );
+      DISPOSE( prgpstrShow[iShow] );
     }
 
-    if ( fShowNothing && nShow == 0 )
+  if ( fShowNothing && nShow == 0 )
     {
-	if ( IS_NPC(ch) || IS_SET(ch->act, PLR_COMBINE) )
-	    send_to_char( "     ", ch );
-	send_to_char( "Nothing.\n\r", ch );
+      if ( IS_NPC(ch) || IS_SET(ch->act, PLR_COMBINE) )
+	send_to_char( "     ", ch );
+
+      send_to_char( "Nothing.\n\r", ch );
     }
 
-    /*
-     * Clean up.
-     */
-    DISPOSE( prgpstrShow );
-    DISPOSE( prgnShow	 );
-    DISPOSE( pitShow	 );
-    return;
+  /*
+   * Clean up.
+   */
+  DISPOSE( prgpstrShow );
+  DISPOSE( prgnShow );
+  DISPOSE( pitShow );
 }
 
 
