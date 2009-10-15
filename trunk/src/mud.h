@@ -2331,8 +2331,8 @@ extern  short  gsn_grip;
 #define UMIN(a, b)		((a) < (b) ? (a) : (b))
 #define UMAX(a, b)		((a) > (b) ? (a) : (b))
 #define URANGE(a, b, c)		((b) < (a) ? (a) : ((b) > (c) ? (c) : (b)))
-#define LOWER(c)		((c) >= 'A' && (c) <= 'Z' ? (c)+'a'-'A' : (c))
-#define UPPER(c)		((c) >= 'a' && (c) <= 'z' ? (c)+'A'-'a' : (c))
+#define LOWER(c)		((char) tolower((c)))
+#define UPPER(c)		((char) toupper((c)))
 #define IS_SET(flag, bit)	((flag) & (bit))
 #define SET_BIT(var, bit)	((var) |= (bit))
 #define REMOVE_BIT(var, bit)	((var) &= ~(bit))
@@ -2568,7 +2568,7 @@ do								\
 #define IS_CLANNED(ch)		(!IS_NPC((ch))				    \
 				&& (ch)->pcdata->clan			    )
 
-#define WAIT_STATE(ch, npulse)	((ch)->wait = UMAX((ch)->wait, (npulse)))
+#define WAIT_STATE(ch, npulse)	((ch)->wait = (short)(UMAX((ch)->wait, (npulse))))
 
 
 #define EXIT(ch, door)		( get_exit( (ch)->in_room, door ) )
@@ -3400,6 +3400,7 @@ char *	crypt		args( ( const char *key, const char *salt ) );
 #define SH      SHIP_DATA
 
 /* act_comm.c */
+bool character_has_comlink( const CHAR_DATA *ch );
 void    sound_to_room( ROOM_INDEX_DATA *room , const char *argument );
 bool	circle_follow	args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 void	add_follower	args( ( CHAR_DATA *ch, CHAR_DATA *master ) );
