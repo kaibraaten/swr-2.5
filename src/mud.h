@@ -2525,18 +2525,16 @@ do								\
 {								\
     if ( (ch)->substate == SUB_RESTRICTED )			\
     {								\
-	send_to_char( "You cannot use this command from within another command.\n\r", ch );	\
+	send_to_char( "You cannot use this command from within another command.\r\n", ch );	\
 	return;							\
     }								\
 } while(0)
-
-#define IMMORTAL_NAME "kai"
 
 /*
  * Character macros.
  */
 #define IS_NPC(ch)		(IS_SET((ch)->act, ACT_IS_NPC))
-#define IS_IMMORTAL(ch)		(!str_cmp((ch)->name,IMMORTAL_NAME))
+#define IS_IMMORTAL(ch)		((ch)->top_level == 200 )
 #define IS_OFFICIAL(ch)		(is_name((ch)->name,sysdata.officials))
 #define IS_AFFECTED(ch, sn)	(IS_SET((ch)->affected_by, (sn)))
 #define HAS_BODYPART(ch, part)	((ch)->xflags == 0 || IS_SET((ch)->xflags, (part)))
@@ -3886,10 +3884,6 @@ bool	saves_spell_staff	args( ( int level, CHAR_DATA *victim ) );
 ch_ret	obj_cast_spell	args( ( int sn, int level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj ) );
 int	dice_parse	args( (CHAR_DATA *ch, int level, char *exp) );
 SK *	get_skilltype	args( ( int sn ) );
-
-/* request.c */
-void	init_request_pipe	args( ( void ) );
-void	check_requests		args( ( void ) );
 
 /* save.c */
 /* object saving defines for fread/write_obj. -- Altrag */

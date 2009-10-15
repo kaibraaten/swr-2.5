@@ -1033,7 +1033,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
 		&&   ch->pcdata->clan_name[0] != '\0'
 		&& ( ch->pcdata->clan = get_clan( ch->pcdata->clan_name )) == NULL )
 		{
-		  sprintf( buf, "Warning: the organization %s no longer exists, and therefore you no longer\n\rbelong to that organization.\n\r",
+		  sprintf( buf, "Warning: the organization %s no longer exists, and therefore you no longer\r\nbelong to that organization.\r\n",
 		           ch->pcdata->clan_name );
 		  send_to_char( buf, ch );
 		  STRFREE( ch->pcdata->clan_name );
@@ -1094,7 +1094,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
 		&&   ch->pcdata->clan_name[0] != '\0'
 		&& ( ch->pcdata->clan = get_clan( ch->pcdata->clan_name )) == NULL )
 		{
-		  sprintf( buf, "Warning: the organization %s no longer exists, and therefore you no longer\n\rbelong to that organization.\n\r",
+		  sprintf( buf, "Warning: the organization %s no longer exists, and therefore you no longer\r\nbelong to that organization.\r\n",
 		           ch->pcdata->clan_name );
 		  send_to_char( buf, ch );
 		  STRFREE( ch->pcdata->clan_name );
@@ -1271,7 +1271,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
 	    {
 		if ( !preload )
 		{
-		  sprintf( buf, "Last connected from: %s\n\r", fread_word( fp ) );
+		  sprintf( buf, "Last connected from: %s\r\n", fread_word( fp ) );
 		  send_to_char( buf, ch );
 		}
 		else
@@ -1793,15 +1793,15 @@ void do_last( CHAR_DATA *ch, char *argument )
     one_argument( argument, arg );
     if ( arg[0] == '\0' )
     {
-	send_to_char( "Usage: last <playername>\n\r", ch );
+	send_to_char( "Usage: last <playername>\r\n", ch );
 	return;
     }
     strcpy( name, capitalize(arg) );
     sprintf( buf, "%s%c/%s", PLAYER_DIR, tolower(arg[0]), name );
     if ( stat( buf, &fst ) != -1 )
-      sprintf( buf, "%s was last on: %s\r", name, ctime( &fst.st_mtime ) );
+      sprintf( buf, "%s was last on: %s\r\n", name, ctime( &fst.st_mtime ) );
     else
-      sprintf( buf, "%s was not found.\n\r", name );
+      sprintf( buf, "%s was not found.\r\n", name );
    send_to_char( buf, ch );
 }
 

@@ -628,7 +628,7 @@ void *locate_targets( CHAR_DATA *ch, char *arg, int sn,
 	  {
 		if ( ( *victim = who_fighting( ch ) ) == NULL )
 		{
-		    send_to_char( "Cast the spell on whom?\n\r", ch );
+		    send_to_char( "Cast the spell on whom?\r\n", ch );
 		    return &pAbort;
 		}
 	  }
@@ -636,7 +636,7 @@ void *locate_targets( CHAR_DATA *ch, char *arg, int sn,
 	  {
 		if ( ( *victim = get_char_room( ch, arg ) ) == NULL )
 		{
-		    send_to_char( "They aren't here.\n\r", ch );
+		    send_to_char( "They aren't here.\r\n", ch );
 		    return &pAbort;
 		}
 	  }
@@ -646,9 +646,9 @@ void *locate_targets( CHAR_DATA *ch, char *arg, int sn,
 
 	  if ( ch == *victim )
 	  {
-		send_to_char( "Cast this on yourself?  Okay...\n\r", ch );
+		send_to_char( "Cast this on yourself?  Okay...\r\n", ch );
 		/*
-		send_to_char( "You can't do that to yourself.\n\r", ch );
+		send_to_char( "You can't do that to yourself.\r\n", ch );
 		return &pAbort;
 		*/
 	  }
@@ -658,19 +658,19 @@ void *locate_targets( CHAR_DATA *ch, char *arg, int sn,
 		if ( !IS_NPC(*victim) )
 		{
 		    /*  Sheesh! can't do anything
-		    send_to_char( "You can't do that on a player.\n\r", ch );
+		    send_to_char( "You can't do that on a player.\r\n", ch );
 		    return &pAbort;
 	            */	
 
 		    if ( get_timer( ch, TIMER_PKILLED ) > 0 )
 		    {
-			send_to_char( "You have been killed in the last 5 minutes.\n\r", ch);
+			send_to_char( "You have been killed in the last 5 minutes.\r\n", ch);
 			return &pAbort;
 		    }
 
 		    if ( get_timer( *victim, TIMER_PKILLED ) > 0 )
 		    {
-			send_to_char( "This player has been killed in the last 5 minutes.\n\r", ch );
+			send_to_char( "This player has been killed in the last 5 minutes.\r\n", ch );
 			return &pAbort;
 		    }	
 
@@ -678,7 +678,7 @@ void *locate_targets( CHAR_DATA *ch, char *arg, int sn,
 
 		if ( IS_AFFECTED(ch, AFF_CHARM) && ch->master == *victim )
 		{
-		    send_to_char( "You can't do that on your own follower.\n\r", ch );
+		    send_to_char( "You can't do that on your own follower.\r\n", ch );
 		    return &pAbort;
 		}
 	  }
@@ -693,7 +693,7 @@ void *locate_targets( CHAR_DATA *ch, char *arg, int sn,
 	  {
 		if ( ( *victim = get_char_room( ch, arg ) ) == NULL )
 		{
-		    send_to_char( "They aren't here.\n\r", ch );
+		    send_to_char( "They aren't here.\r\n", ch );
 		    return &pAbort;
 		}
 	  }
@@ -703,7 +703,7 @@ void *locate_targets( CHAR_DATA *ch, char *arg, int sn,
 	case TAR_CHAR_SELF:
 	  if ( arg[0] != '\0' && !nifty_is_name( arg, ch->name ) )
 	  {
-		send_to_char( "You cannot cast this spell on another.\n\r", ch );
+		send_to_char( "You cannot cast this spell on another.\r\n", ch );
 		return &pAbort;
 	  }
 
@@ -713,13 +713,13 @@ void *locate_targets( CHAR_DATA *ch, char *arg, int sn,
 	case TAR_OBJ_INV:
 	  if ( arg[0] == '\0' )
 	  {
-		send_to_char( "What should the spell be cast upon?\n\r", ch );
+		send_to_char( "What should the spell be cast upon?\r\n", ch );
 		return &pAbort;
 	  }
 
 	  if ( ( *obj = get_obj_carry( ch, arg ) ) == NULL )
 	  {
-		send_to_char( "You are not carrying that.\n\r", ch );
+		send_to_char( "You are not carrying that.\r\n", ch );
 		return &pAbort;
 	  }
 
@@ -761,7 +761,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	/* no ordering charmed mobs to cast spells */
 	if ( IS_NPC(ch) && IS_AFFECTED( ch, AFF_CHARM ) )
 	{
-	    send_to_char( "You can't seem to do that right now...\n\r", ch );
+	    send_to_char( "You can't seem to do that right now...\r\n", ch );
 	    return;
 	}
 
@@ -770,7 +770,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
 
 	if ( arg1[0] == '\0' )
 	{
-	    send_to_char( "Cast which what where?\n\r", ch );
+	    send_to_char( "Cast which what where?\r\n", ch );
 	    return;
 	}
 
@@ -779,12 +779,12 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	    if ( ( sn = find_spell( ch, arg1, TRUE ) ) < 0
 	    || ( !IS_NPC(ch) &&  ch->pcdata->learned[sn] <= 0  ) )
 	    {
-		send_to_char( "You can't do that.\n\r", ch );
+		send_to_char( "You can't do that.\r\n", ch );
 		return;
 	    }
 	    if ( (skill=get_skilltype(sn)) == NULL )
 	    {
-		send_to_char( "You can't do that right now...\n\r", ch );
+		send_to_char( "You can't do that right now...\r\n", ch );
 		return;
 	    }
 	}
@@ -792,27 +792,27 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	{
 	    if ( (sn=skill_lookup(arg1)) < 0 )
 	    {
-		send_to_char( "We didn't create that yet...\n\r", ch );
+		send_to_char( "We didn't create that yet...\r\n", ch );
 		return;
 	    }
 	    if ( sn >= MAX_SKILL )
 	    {
-		send_to_char( "Hmm... that might hurt.\n\r", ch );
+		send_to_char( "Hmm... that might hurt.\r\n", ch );
 		return;
 	    }
 	    if ( (skill=get_skilltype(sn)) == NULL )
 	    {
-		send_to_char( "Somethis is severely wrong with that one...\n\r", ch );
+		send_to_char( "Somethis is severely wrong with that one...\r\n", ch );
 		return;
 	    }
 	    if ( skill->type != SKILL_SPELL )
 	    {
-		send_to_char( "That isn't a force power.\n\r", ch );
+		send_to_char( "That isn't a force power.\r\n", ch );
 		return;
 	    }
 	    if ( !skill->spell_fun )
 	    {
-		send_to_char( "We didn't finish that one yet...\n\r", ch );
+		send_to_char( "We didn't finish that one yet...\r\n", ch );
 		return;
 	    }
 	}
@@ -825,19 +825,19 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	    switch( ch->position )
 	    {
 	      default:
-		send_to_char( "You can't concentrate enough.\n\r", ch );
+		send_to_char( "You can't concentrate enough.\r\n", ch );
 		break;
 	      case POS_SITTING:
-		send_to_char( "You can't summon enough energy sitting down.\n\r", ch );
+		send_to_char( "You can't summon enough energy sitting down.\r\n", ch );
 		break;
 	      case POS_RESTING:
-		send_to_char( "You're too relaxed to cast that spell.\n\r", ch );
+		send_to_char( "You're too relaxed to cast that spell.\r\n", ch );
 		break;
 	      case POS_FIGHTING:
-		send_to_char( "You can't concentrate enough while fighting!\n\r", ch );
+		send_to_char( "You can't concentrate enough while fighting!\r\n", ch );
 		break;
 	      case POS_SLEEPING:
-		send_to_char( "You dream about great feats of magic.\n\r", ch );
+		send_to_char( "You dream about great feats of magic.\r\n", ch );
 		break;
 	    }
 	    return;
@@ -845,13 +845,13 @@ void do_cast( CHAR_DATA *ch, char *argument )
 
 	if ( skill->spell_fun == spell_null )
 	{
-	    send_to_char( "That's not a spell!\n\r", ch );
+	    send_to_char( "That's not a spell!\r\n", ch );
 	    return;
 	}
 
 	if ( !skill->spell_fun )
 	{
-	    send_to_char( "You cannot cast that... yet.\n\r", ch );
+	    send_to_char( "You cannot cast that... yet.\r\n", ch );
 	    return;
 	}
 
@@ -867,14 +867,14 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	if  ( is_safe(ch, victim) )
 	{
           set_char_color( AT_MAGIC, ch );
-          send_to_char( "You cannot do that to them.\n\r", ch );
+          send_to_char( "You cannot do that to them.\r\n", ch );
           return;
 	}
 
 	
 	if ( !IS_NPC(ch) && ch->mana < mana )
 	{
-	    send_to_char( "The force is not strong enough within you.\n\r", ch );
+	    send_to_char( "The force is not strong enough within you.\r\n", ch );
 	    return;
 	}
 	if ( skill->participants <= 1 )
@@ -894,7 +894,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	{
 	    if ( (skill=get_skilltype(sn)) == NULL )
 	    {
-		send_to_char( "Something went wrong...\n\r", ch );
+		send_to_char( "Something went wrong...\r\n", ch );
 		bug( "do_cast: SUB_TIMER_DO_ABORT: bad sn %d", sn );
 		return;
 	    }
@@ -904,20 +904,20 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	      ch->mana -= mana / 3;
 	}
 	set_char_color( AT_MAGIC, ch );
-	send_to_char( "You stop your concentration\n\r", ch );
+	send_to_char( "You stop your concentration\r\n", ch );
 	/* should add chance of backfire here */
         return;
       case 1:
 	sn = ch->tempnum;
 	if ( (skill=get_skilltype(sn)) == NULL )
 	{
-	    send_to_char( "Something went wrong...\n\r", ch );
+	    send_to_char( "Something went wrong...\r\n", ch );
 	    bug( "do_cast: substate 1: bad sn %d", sn );
 	    return;
 	}
 	if ( !ch->dest_buf || !IS_VALID_SN(sn) || skill->type != SKILL_SPELL )
 	{
-	    send_to_char( "Something negates the powers of the force.\n\r", ch );
+	    send_to_char( "Something negates the powers of the force.\r\n", ch );
 	    bug( "do_cast: ch->dest_buf NULL or bad sn (%d)", sn );
 	    return;
 	}
@@ -960,7 +960,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
 		    DISPOSE( tmp->dest_buf );
 		}
 		dont_wait = TRUE;
-		send_to_char( "You concentrate all the energy into a burst of force!\n\r", ch );
+		send_to_char( "You concentrate all the energy into a burst of force!\r\n", ch );
 		vo = locate_targets( ch, arg2, sn, &victim, &obj );
 		if ( vo == &pAbort )
 		  return;
@@ -968,7 +968,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	    else
 	    {
 		set_char_color( AT_MAGIC, ch );
-		send_to_char( "There was not enough power for that to succeed...\n\r", ch );
+		send_to_char( "There was not enough power for that to succeed...\r\n", ch );
 		
 		if ( !IS_IMMORTAL(ch) )    /* so imms dont lose mana */
 		  ch->mana -= mana / 2;
@@ -1000,14 +1000,14 @@ void do_cast( CHAR_DATA *ch, char *argument )
     { 
       if ( ch->alignment > skill->alignment  )
       {
-          send_to_char( "You do not have enough anger in you.\n\r", ch );
+          send_to_char( "You do not have enough anger in you.\r\n", ch );
 	  if ( !IS_IMMORTAL(ch) )    /* so imms dont lose mana */
 	        ch->mana -= mana / 2;
 	  return;	
       }
       if (  ch->alignment < skill->alignment )
       {
-          send_to_char( "Your anger and hatred prevent you from focusing.\n\r", ch );
+          send_to_char( "Your anger and hatred prevent you from focusing.\r\n", ch );
 	  if ( !IS_IMMORTAL(ch) )    /* so imms dont lose mana */
 	        ch->mana -= mana / 2;
 	  return;	
@@ -1021,32 +1021,32 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	{
 	    case 0:	/* too busy */
 		if ( ch->fighting )
-		  send_to_char( "This round of battle is too hectic to concentrate properly.\n\r", ch );
+		  send_to_char( "This round of battle is too hectic to concentrate properly.\r\n", ch );
 		else
-		  send_to_char( "You lost your concentration.\n\r", ch );
+		  send_to_char( "You lost your concentration.\r\n", ch );
 		break;
 	    case 1:	/* irritation */
 		if ( number_bits(2) == 0 )
 		{
 		  switch( number_bits(2) )
 		  {
-		     case 0: send_to_char( "A tickle in your nose prevents you from keeping your concentration.\n\r", ch ); break;
-		     case 1: send_to_char( "An itch on your leg keeps you from properly using the force.\n\r", ch ); break;
-		     case 2: send_to_char( "A nagging though prevents you from focusing on the force.\n\r", ch ); break;
-		     case 3: send_to_char( "A twitch in your eye disrupts your concentration for a moment.\n\r", ch ); break;
+		     case 0: send_to_char( "A tickle in your nose prevents you from keeping your concentration.\r\n", ch ); break;
+		     case 1: send_to_char( "An itch on your leg keeps you from properly using the force.\r\n", ch ); break;
+		     case 2: send_to_char( "A nagging though prevents you from focusing on the force.\r\n", ch ); break;
+		     case 3: send_to_char( "A twitch in your eye disrupts your concentration for a moment.\r\n", ch ); break;
 		  }
 		}
 		else
-		  send_to_char( "Something distracts you, and you lose your concentration.\n\r", ch );
+		  send_to_char( "Something distracts you, and you lose your concentration.\r\n", ch );
 		break;
 	    case 2:	/* not enough time */
 		if ( ch->fighting )
-		  send_to_char( "There wasn't enough time this round to complete your concentration.\n\r", ch );
+		  send_to_char( "There wasn't enough time this round to complete your concentration.\r\n", ch );
 		else
-		  send_to_char( "You lost your concentration.\n\r", ch );
+		  send_to_char( "You lost your concentration.\r\n", ch );
 		break;
 	    case 3:
-		send_to_char( "A disturbance in the force muddles your concentration.\n\r", ch );
+		send_to_char( "A disturbance in the force muddles your concentration.\r\n", ch );
 		break;
 	}
 	
@@ -1186,7 +1186,7 @@ ch_ret obj_cast_spell( int sn, int level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_
 	      victim = who_fighting( ch );
 	  if ( !victim || !IS_NPC(victim) )
 	  {
-	      send_to_char( "You can't do that.\n\r", ch );
+	      send_to_char( "You can't do that.\r\n", ch );
 	      return rNONE;
 	  }
 	}
@@ -1218,7 +1218,7 @@ ch_ret obj_cast_spell( int sn, int level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_
     case TAR_OBJ_INV:
 	if ( obj == NULL )
 	{
-	    send_to_char( "You can't do that.\n\r", ch );
+	    send_to_char( "You can't do that.\r\n", ch );
 	    return rNONE;
 	}
 	vo = (void *) obj;
@@ -1296,9 +1296,9 @@ ch_ret spell_blindness( int sn, int level, CHAR_DATA *ch, void *vo )
     af.bitvector = AFF_BLIND;
     affect_to_char( victim, &af );
     set_char_color( AT_MAGIC, victim );
-    send_to_char( "You are blinded!\n\r", victim );
+    send_to_char( "You are blinded!\r\n", victim );
     if ( ch != victim )
-	send_to_char( "Ok.\n\r", ch );
+	send_to_char( "Ok.\r\n", ch );
     return rNONE;
 }
 
@@ -1312,7 +1312,7 @@ ch_ret spell_charm_person( int sn, int level, CHAR_DATA *ch, void *vo )
 
     if ( victim == ch )
     {
-	send_to_char( "You like yourself even better!\n\r", ch );
+	send_to_char( "You like yourself even better!\r\n", ch );
 	return rSPELL_FAILED;
     }
 
@@ -1325,8 +1325,8 @@ ch_ret spell_charm_person( int sn, int level, CHAR_DATA *ch, void *vo )
 
     if ( !IS_NPC( victim ) && !IS_NPC( ch ) )
     {
-	send_to_char( "I don't think so...\n\r", ch );
-	send_to_char( "You feel as if someone tried to enter your mind but failed..\n\r", victim );
+	send_to_char( "I don't think so...\r\n", ch );
+	send_to_char( "You feel as if someone tried to enter your mind but failed..\r\n", victim );
 	return rSPELL_FAILED;
     }
 
@@ -1355,7 +1355,7 @@ ch_ret spell_charm_person( int sn, int level, CHAR_DATA *ch, void *vo )
     act( AT_MAGIC, "Isn't $n just so nice?", ch, NULL, victim, TO_VICT );
     act( AT_MAGIC, "$N's eyes glaze over...", ch, NULL, victim, TO_ROOM );
     if ( ch != victim )
-	send_to_char( "Ok.\n\r", ch );
+	send_to_char( "Ok.\r\n", ch );
 
     sprintf( buf, "%s has charmed %s.", ch->name, victim->name);
     log_string_plus( buf, LOG_NORMAL );
@@ -1381,7 +1381,7 @@ ch_ret spell_fireball( int sn, int level, CHAR_DATA *ch, void *vo )
     };
     int dam;
 
-    send_to_char("You feel the hatred grow within you!\n\r", ch);
+    send_to_char("You feel the hatred grow within you!\r\n", ch);
         ch->alignment = ch->alignment - 100;
             ch->alignment = URANGE( -1000, ch->alignment, 1000 );
                     
@@ -1405,7 +1405,7 @@ ch_ret spell_identify( int sn, int level, CHAR_DATA *ch, void *vo )
 
     if ( target_name[0] == '\0' )
     {
-      send_to_char( "What would you like identified?\n\r", ch );
+      send_to_char( "What would you like identified?\r\n", ch );
       return rSPELL_FAILED;
     }
 
@@ -1413,7 +1413,7 @@ ch_ret spell_identify( int sn, int level, CHAR_DATA *ch, void *vo )
     {
 	set_char_color( AT_LBLUE, ch );
 	ch_printf( ch,
-	"Object '%s' is %s, special properties: %s %s.\n\rIts weight is %d, value is %d.\n\r",
+	"Object '%s' is %s, special properties: %s %s.\r\nIts weight is %d, value is %d.\r\n",
 	obj->name,
 	aoran( item_type_name( obj ) ),
 	extra_bit_name( obj->extra_flags ),
@@ -1437,52 +1437,52 @@ ch_ret spell_identify( int sn, int level, CHAR_DATA *ch, void *vo )
 	    send_to_char( "'", ch );
 	}
 
-	send_to_char( ".\n\r", ch );
+	send_to_char( ".\r\n", ch );
 	break;
 
     case ITEM_WEAPON:
-	ch_printf( ch, "Damage is %d to %d (average %d).\n\r",
+	ch_printf( ch, "Damage is %d to %d (average %d).\r\n",
 	    obj->value[1], obj->value[2],
 	    ( obj->value[1] + obj->value[2] ) / 2 );
 	if ( obj->value[3] == WEAPON_BLASTER )
 	{
 	  if (obj->blaster_setting == BLASTER_FULL)
-	    ch_printf( ch, "It is set on FULL power.\n\r");
+	    ch_printf( ch, "It is set on FULL power.\r\n");
 	  else if (obj->blaster_setting == BLASTER_HIGH)
-	    ch_printf( ch, "It is set on HIGH power.\n\r");
+	    ch_printf( ch, "It is set on HIGH power.\r\n");
 	  else if (obj->blaster_setting == BLASTER_NORMAL)
-	    ch_printf( ch, "It is set on NORMAL power.\n\r");
+	    ch_printf( ch, "It is set on NORMAL power.\r\n");
 	  else if (obj->blaster_setting == BLASTER_HALF)
-	    ch_printf( ch, "It is set on HALF power.\n\r");
+	    ch_printf( ch, "It is set on HALF power.\r\n");
 	  else if (obj->blaster_setting == BLASTER_LOW)
-	    ch_printf( ch, "It is set on LOW power.\n\r");
+	    ch_printf( ch, "It is set on LOW power.\r\n");
 	  else if (obj->blaster_setting == BLASTER_STUN)
-	    ch_printf( ch, "It is set on STUN.\n\r");
-	  ch_printf( ch, "It has %d out of %d charges.\n\r",
+	    ch_printf( ch, "It is set on STUN.\r\n");
+	  ch_printf( ch, "It has %d out of %d charges.\r\n",
 	    obj->value[4], obj->value[5] );
 	}
 	else if ( obj->value[3] == WEAPON_LIGHTSABER ||
 	          obj->value[3] == WEAPON_VIBRO_BLADE )
 	{
-	   ch_printf( ch, "It has %d out of %d units of charge remaining.\n\r",
+	   ch_printf( ch, "It has %d out of %d units of charge remaining.\r\n",
 	     obj->value[4], obj->value[5] );
 	}
 	break;
     
     case ITEM_AMMO:
-        ch_printf( ch, "It has %d charges.\n\r",
+        ch_printf( ch, "It has %d charges.\r\n",
 	    obj->value[0] );
 	break;
     
     case ITEM_BATTERY:
-        ch_printf( ch, "It has %d units of charge.\n\r",
+        ch_printf( ch, "It has %d units of charge.\r\n",
 	    obj->value[0] );
 	break;
     
     case ITEM_ARMOR:
-	ch_printf( ch, "Current armor class is %d. ( based on current condition )\n\r", obj->value[0] );
-	ch_printf( ch, "Maximum armor class is %d. ( based on top condition )\n\r", obj->value[1] );
-	ch_printf( ch, "Applied armor class is %d. ( based condition and location worn )\n\r", apply_ac(obj, obj->wear_loc) );
+	ch_printf( ch, "Current armor class is %d. ( based on current condition )\r\n", obj->value[0] );
+	ch_printf( ch, "Maximum armor class is %d. ( based on top condition )\r\n", obj->value[1] );
+	ch_printf( ch, "Applied armor class is %d. ( based condition and location worn )\r\n", apply_ac(obj, obj->wear_loc) );
 	break;
     }
 
@@ -1506,14 +1506,14 @@ ch_ret spell_identify( int sn, int level, CHAR_DATA *ch, void *vo )
 
     if ( IS_NPC(victim) )
     {
-      ch_printf(ch, "%s appears to be between level %d and %d.\n\r",
+      ch_printf(ch, "%s appears to be between level %d and %d.\r\n",
  	victim->name,
 	victim->top_level - (victim->top_level % 5), 
         victim->top_level - (victim->top_level % 5) + 5);
     }
     else
     {
-      ch_printf(ch, "%s appears to be level %d.\n\r", victim->name, victim->top_level);
+      ch_printf(ch, "%s appears to be level %d.\r\n", victim->name, victim->top_level);
     }
 
     if ( (chance(ch, 50) && ch->top_level >= victim->top_level + 10 )
@@ -1523,7 +1523,7 @@ ch_ret spell_identify( int sn, int level, CHAR_DATA *ch, void *vo )
 
     if (!victim->first_affect)
     {
-      send_to_char( "nothing.\n\r", ch );
+      send_to_char( "nothing.\r\n", ch );
       return rNONE;
     }
 
@@ -1536,16 +1536,16 @@ ch_ret spell_identify( int sn, int level, CHAR_DATA *ch, void *vo )
 
 	  if( paf == victim->last_affect && (sktmp=get_skilltype(paf->type)) != NULL )
 	  {
-	    ch_printf( ch, "and %s.\n\r", sktmp->name );
+	    ch_printf( ch, "and %s.\r\n", sktmp->name );
 	    return rNONE;
 	  }
         }
         else
 	{
 	  if ( (sktmp=get_skilltype(paf->type)) != NULL )
-	    ch_printf( ch, "%s.\n\r", sktmp->name );
+	    ch_printf( ch, "%s.\r\n", sktmp->name );
 	  else
-	    send_to_char( "\n\r", ch );
+	    send_to_char( "\r\n", ch );
 	  return rNONE;
 	}
       }
@@ -1554,7 +1554,7 @@ ch_ret spell_identify( int sn, int level, CHAR_DATA *ch, void *vo )
   
   else
   {
-    ch_printf(ch, "You can't find %s!\n\r", target_name );
+    ch_printf(ch, "You can't find %s!\r\n", target_name );
     return rSPELL_FAILED;
   }
   return rNONE;
@@ -1618,7 +1618,7 @@ ch_ret spell_invis( int sn, int level, CHAR_DATA *ch, void *vo )
 	    return rNONE;
 	}
     }
-    ch_printf(ch, "You can't find %s!\n\r", target_name);
+    ch_printf(ch, "You can't find %s!\r\n", target_name);
     return rSPELL_FAILED;
 }
 
@@ -1640,7 +1640,7 @@ ch_ret spell_lightning_bolt( int sn, int level, CHAR_DATA *ch, void *vo )
   
   int dam;
 
-  send_to_char("You feel the hatred grow within you!\n\r", ch);
+  send_to_char("You feel the hatred grow within you!\r\n", ch);
   ch->alignment = ch->alignment - 100;
   ch->alignment = URANGE( -1000, ch->alignment, 1000 );
                     
@@ -1661,7 +1661,7 @@ ch_ret spell_poison( int sn, int level, CHAR_DATA *ch, void *vo )
     int chance;
     bool first = TRUE;
 
-    send_to_char("You feel the hatred grow within you!\n\r", ch);
+    send_to_char("You feel the hatred grow within you!\r\n", ch);
         ch->alignment = ch->alignment - 100;
             ch->alignment = URANGE( -1000, ch->alignment, 1000 );
                     
@@ -1677,11 +1677,11 @@ ch_ret spell_poison( int sn, int level, CHAR_DATA *ch, void *vo )
     af.bitvector = AFF_POISON;
     affect_join( victim, &af );
     set_char_color( AT_MAGIC, victim );
-    send_to_char( "You feel very sick.\n\r", victim );
+    send_to_char( "You feel very sick.\r\n", victim );
     victim->mental_state = URANGE( 20, victim->mental_state
 			 + (first ? 5 : 0), 100 );
     if ( ch != victim )
-	send_to_char( "Ok.\n\r", ch );
+	send_to_char( "Ok.\r\n", ch );
     return rNONE;
 }
 
@@ -1696,13 +1696,13 @@ ch_ret spell_sleep( int sn, int level, CHAR_DATA *ch, void *vo )
 
     if ( ( victim = get_char_room( ch, target_name ) ) == NULL )
     {
-	send_to_char( "They aren't here.\n\r", ch );
+	send_to_char( "They aren't here.\r\n", ch );
 	return rSPELL_FAILED;
     }
 
     if ( !IS_NPC(victim) && victim->fighting )
     {
-	send_to_char( "You cannot sleep a fighting player.\n\r", ch );
+	send_to_char( "You cannot sleep a fighting player.\r\n", ch );
 	return rSPELL_FAILED;
     }
 
@@ -1774,31 +1774,31 @@ ch_ret spell_possess( int sn, int level, CHAR_DATA *ch, void *vo )
 
     if (ch->desc->original)
     {
-	send_to_char("You are not in your original state.\n\r", ch);
+	send_to_char("You are not in your original state.\r\n", ch);
 	return rSPELL_FAILED;
     }
 
     if ( (victim = get_char_room( ch, target_name ) ) == NULL)
     {
-	send_to_char("They aren't here!\n\r", ch);
+	send_to_char("They aren't here!\r\n", ch);
 	return rSPELL_FAILED;
     }
 
     if (victim == ch)
     {
-	send_to_char("You can't possess yourself!\n\r", ch);
+	send_to_char("You can't possess yourself!\r\n", ch);
 	return rSPELL_FAILED;
     }
 
     if (!IS_NPC(victim))
     {
-	send_to_char("You can't possess another player!\n\r", ch);
+	send_to_char("You can't possess another player!\r\n", ch);
 	return rSPELL_FAILED;
     }
 
     if (victim->desc)
     {
-	ch_printf(ch, "%s is already possessed.\n\r", victim->short_descr);
+	ch_printf(ch, "%s is already possessed.\r\n", victim->short_descr);
 	return rSPELL_FAILED;
     }
 
@@ -1817,7 +1817,7 @@ ch_ret spell_possess( int sn, int level, CHAR_DATA *ch, void *vo )
 	return rSPELL_FAILED;
     }
 
-    send_to_char("You feel the hatred grow within you as you twist your victims mind!\n\r", ch);
+    send_to_char("You feel the hatred grow within you as you twist your victims mind!\r\n", ch);
         ch->alignment = ch->alignment - 50;
             ch->alignment = URANGE( -1000, ch->alignment, 1000 );
                     
@@ -1829,7 +1829,7 @@ ch_ret spell_possess( int sn, int level, CHAR_DATA *ch, void *vo )
     af.bitvector = AFF_POSSESS;
     affect_to_char( victim, &af );
 
-    sprintf(buf, "You have possessed %s!\n\r", victim->short_descr);
+    sprintf(buf, "You have possessed %s!\r\n", victim->short_descr);
 
     ch->desc->character = victim;
     ch->desc->original  = ch;
@@ -1886,7 +1886,7 @@ ch_ret spell_attack( int sn, int level, CHAR_DATA *ch, void *vo )
     int dam;
     ch_ret retcode;
 
-    send_to_char("You feel the hatred grow within you!\n\r", ch);
+    send_to_char("You feel the hatred grow within you!\r\n", ch);
     ch->alignment = ch->alignment - 100;
     ch->alignment = URANGE( -1000, ch->alignment, 1000 );
                                         
@@ -1921,7 +1921,7 @@ ch_ret spell_area_attack( int sn, int level, CHAR_DATA *ch, void *vo )
     bool ch_died = FALSE;
     ch_ret retcode = rNONE;
 
-    send_to_char("You feel the hatred grow within you!\n\r", ch);
+    send_to_char("You feel the hatred grow within you!\r\n", ch);
                  ch->alignment = ch->alignment - 100;
                 ch->alignment = URANGE( -1000, ch->alignment, 1000 );
                         
@@ -2004,7 +2004,7 @@ ch_ret spell_affectchar( int sn, int level, CHAR_DATA *ch, void *vo )
 	    default:		af.type = sn;			break;
 	    case AFF_POISON:	af.type = gsn_poison;
                
-               send_to_char("You feel the hatred grow within you!\n\r", ch);
+               send_to_char("You feel the hatred grow within you!\r\n", ch);
                 ch->alignment = ch->alignment - 100;
                 ch->alignment = URANGE( -1000, ch->alignment, 1000 );
                         
@@ -2059,7 +2059,7 @@ ch_ret spell_affectchar( int sn, int level, CHAR_DATA *ch, void *vo )
 		case APPLY_HIT:
                    if ( ch != victim && victim->hit < victim->max_hit && af.modifier > 0 )
                    {
-                         send_to_char("The nobel Jedi use their powers to help others!\n\r", ch);
+                         send_to_char("The nobel Jedi use their powers to help others!\r\n", ch);
                          ch->alignment = ch->alignment +20 ;
                          ch->alignment = URANGE( -1000, ch->alignment, 1000 );
                     }
@@ -2077,7 +2077,7 @@ ch_ret spell_affectchar( int sn, int level, CHAR_DATA *ch, void *vo )
                     }                   
 		    if ( ch != victim )
                     {
-                         send_to_char("The nobel Jedi use their powers to help others!\n\r", ch);
+                         send_to_char("The nobel Jedi use their powers to help others!\r\n", ch);
                          ch->alignment = ch->alignment +25 ;
                          ch->alignment = URANGE( -1000, ch->alignment, 1000 );
                      }            		
@@ -2284,13 +2284,13 @@ ch_ret spell_obj_inv( int sn, int level, CHAR_DATA *ch, void *vo )
 
 	    if ( obj->item_type != ITEM_DRINK_CON )
 	    {
-		send_to_char( "It is unable to hold water.\n\r", ch );
+		send_to_char( "It is unable to hold water.\r\n", ch );
 		return rSPELL_FAILED;
 	    }
 
 	    if ( obj->value[2] != LIQ_WATER && obj->value[1] != 0 )
 	    {
-		send_to_char( "It contains some other liquid.\n\r", ch );
+		send_to_char( "It contains some other liquid.\r\n", ch );
 		return rSPELL_FAILED;
 	    }
 
@@ -2412,12 +2412,12 @@ ch_ret spell_obj_inv( int sn, int level, CHAR_DATA *ch, void *vo )
 	     ||   obj->item_type == ITEM_FOOD )
 	     {
 		if ( obj->value[3] != 0 )
-		    send_to_char( "You smell poisonous fumes.\n\r", ch );
+		    send_to_char( "You smell poisonous fumes.\r\n", ch );
 		else
-		    send_to_char( "It looks very delicious.\n\r", ch );
+		    send_to_char( "It looks very delicious.\r\n", ch );
 	     }
 	     else
-		send_to_char( "It doesn't look poisoned.\n\r", ch );
+		send_to_char( "It doesn't look poisoned.\r\n", ch );
 	     return rNONE;
 	  }
 	  return rNONE;
@@ -2623,14 +2623,14 @@ ch_ret spell_smaug( int sn, int level, CHAR_DATA *ch, void *vo )
 
 ch_ret spell_null( int sn, int level, CHAR_DATA *ch, void *vo )
 {
-    send_to_char( "That's not a spell!\n\r", ch );
+    send_to_char( "That's not a spell!\r\n", ch );
     return rNONE;
 }
 
 /* don't remove, may look redundant, but is important */
 ch_ret spell_notfound( int sn, int level, CHAR_DATA *ch, void *vo )
 {
-    send_to_char( "That's not a spell!\n\r", ch );
+    send_to_char( "That's not a spell!\r\n", ch );
     return rNONE;
 }
 

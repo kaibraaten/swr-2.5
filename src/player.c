@@ -13,7 +13,7 @@ const char *tiny_affect_loc_name(int location);
 void do_gold(CHAR_DATA * ch, char *argument)
 {
    set_char_color( AT_GOLD, ch );
-   ch_printf( ch,  "You have %d credits.\n\r", ch->gold );
+   ch_printf( ch,  "You have %d credits.\r\n", ch->gold );
    return;
 }
 
@@ -24,15 +24,15 @@ void do_score(CHAR_DATA * ch, char *argument)
     
     if ( IS_AFFECTED(ch, AFF_POSSESS) )
     {   
-       send_to_char("You can't do that in your current state of mind!\n\r", ch);
+       send_to_char("You can't do that in your current state of mind!\r\n", ch);
        return;
     }
 
-    ch_printf( ch, "&G%s\n\r", ch->pcdata->title );
-    ch_printf( ch, "&W------------------------------------------------------------------------\n\r" );
+    ch_printf( ch, "&G%s\r\n", ch->pcdata->title );
+    ch_printf( ch, "&W------------------------------------------------------------------------\r\n" );
 
     ch_printf( ch,
-	"&WName: &G%s   &WAge: &G%d\n\r",
+	"&WName: &G%s   &WAge: &G%d\r\n",
 	ch->name, get_age(ch) );
 
     send_to_char( "&WStrength: &G", ch );
@@ -75,7 +75,7 @@ void do_score(CHAR_DATA * ch, char *argument)
     else                       send_to_char( "pathetic", ch );
     }
     
-    send_to_char( "\n\r", ch );
+    send_to_char( "\r\n", ch );
     send_to_char( "&WIntelligence: &G", ch );
     {
          int score = get_curr_int( ch );
@@ -116,9 +116,9 @@ void do_score(CHAR_DATA * ch, char *argument)
     else                    send_to_char( "go hide", ch );
     }
     
-    send_to_char( "\n\r", ch );
+    send_to_char( "\r\n", ch );
 
-    ch_printf( ch, "&W------------------------------------------------------------------------\n\r" );
+    ch_printf( ch, "&W------------------------------------------------------------------------\r\n" );
     
     send_to_char( "&WHealth &G ", ch );
 	 if ( ch->hit >= 100 ) send_to_char( "healthy", ch );
@@ -168,7 +168,7 @@ void do_score(CHAR_DATA * ch, char *argument)
         case   9:
         case  10:  send_to_char( "psychotic", ch ); break;
     }
-    send_to_char( "\n\r", ch );
+    send_to_char( "\r\n", ch );
 
     send_to_char( "&WArmor: &G", ch );
     if      ( GET_AC(ch) >=   80 ) send_to_char( "naked",            ch );
@@ -195,20 +195,20 @@ void do_score(CHAR_DATA * ch, char *argument)
     else                             send_to_char( "satanic", ch );
 
     ch_printf( ch,
-	"   &WCredits: &G%ld\n\r" , ch->gold );
+	"   &WCredits: &G%ld\r\n" , ch->gold );
 
-    ch_printf( ch, "&W------------------------------------------------------------------------\n\r" );
+    ch_printf( ch, "&W------------------------------------------------------------------------\r\n" );
 
     ch_printf( ch,
-	"&WAutoexit: &G%s   &WAutoloot: &G%s   &WAutosac: &G%s   &WAutocred: &G%s\n\r",
+	"&WAutoexit: &G%s   &WAutoloot: &G%s   &WAutosac: &G%s   &WAutocred: &G%s\r\n",
 	(!IS_NPC(ch) && IS_SET(ch->act, PLR_AUTOEXIT)) ? "yes" : "no",
 	(!IS_NPC(ch) && IS_SET(ch->act, PLR_AUTOLOOT)) ? "yes" : "no",
 	(!IS_NPC(ch) && IS_SET(ch->act, PLR_AUTOSAC) ) ? "yes" : "no",
   	(!IS_NPC(ch) && IS_SET(ch->act, PLR_AUTOGOLD)) ? "yes" : "no" );
 
-    ch_printf( ch, "&WWimpy set to &G%d &Wpercent.\n\r", ch->wimpy );
+    ch_printf( ch, "&WWimpy set to &G%d &Wpercent.\r\n", ch->wimpy );
     
-    ch_printf( ch, "&W------------------------------------------------------------------------\n\r" );
+    ch_printf( ch, "&W------------------------------------------------------------------------\r\n" );
     
     if ( !IS_NPC(ch) && ch->pcdata )
     {
@@ -218,21 +218,21 @@ void do_score(CHAR_DATA * ch, char *argument)
     	for ( sn = 0; sn < top_sn ; sn++ )
     	   if ( ch->pcdata->learned[sn] > 0 && ch->pcdata->learned[sn] < 100 )
                ch_printf( ch,  "%s  ", skill_table[sn]->name );    	     	 
-        send_to_char( "\n\r" , ch );
+        send_to_char( "\r\n" , ch );
     
         send_to_char( "&WAdept at: &G" , ch );
     	for ( sn = 0; sn < top_sn ; sn++ )
     	   if ( ch->pcdata->learned[sn] >= 100 )
                ch_printf( ch,  "%s  ", skill_table[sn]->name );    	     	 
-        send_to_char( "\n\r" , ch );
+        send_to_char( "\r\n" , ch );
     
     }           
 
-    ch_printf( ch, "&W------------------------------------------------------------------------\n\r" );
+    ch_printf( ch, "&W------------------------------------------------------------------------\r\n" );
     
     if ( !IS_NPC( ch ) && IS_IMMORTAL( ch ) )
     {
-	ch_printf( ch, "&WWizInvis level: &G%d   &WWizInvis is &G%s\n\r",
+	ch_printf( ch, "&WWizInvis level: &G%d   &WWizInvis is &G%s\r\n",
 			ch->pcdata->wizinvis,
 			IS_SET( ch->act, PLR_WIZINVIS ) ? "ON" : "OFF" );
     }
@@ -282,7 +282,7 @@ void do_score(CHAR_DATA * ch, char *argument)
     if ( !IS_NPC(ch) && ch->pcdata->condition[COND_FULL]   ==  0 )
 	send_to_char( "&GYou are hungry.   ",  ch );
     
-    send_to_char( "\n\r",		ch );
+    send_to_char( "\r\n",		ch );
 
 
     return;
@@ -374,13 +374,13 @@ void do_oldscore( CHAR_DATA *ch, char *argument )
 {
     if ( IS_AFFECTED(ch, AFF_POSSESS) )
     {   
-       send_to_char("You can't do that in your current state of mind!\n\r", ch);
+       send_to_char("You can't do that in your current state of mind!\r\n", ch);
        return;
     }
 
     set_char_color( AT_SCORE, ch );
     ch_printf( ch,
-	"You are %s, the %d year old.\n\r",
+	"You are %s, the %d year old.\r\n",
 	IS_NPC(ch) ? ch->name : ch->pcdata->title,
 	get_age(ch));
     
@@ -397,19 +397,19 @@ void do_oldscore( CHAR_DATA *ch, char *argument )
 
 
     send_to_char( "   You are ", ch );
-	 if ( ch->move > 500 ) send_to_char( "energetic.\n\r", ch );
-    else if ( ch->move > 100 ) send_to_char( "rested.\n\r", ch );
-    else if ( ch->move > 50 ) send_to_char( "worn out.\n\r",    ch );
-    else if ( ch->move > 0 ) send_to_char( "exhausted.\n\r", ch );
-    else                        send_to_char( "to tired to move.\n\r", ch );
+	 if ( ch->move > 500 ) send_to_char( "energetic.\r\n", ch );
+    else if ( ch->move > 100 ) send_to_char( "rested.\r\n", ch );
+    else if ( ch->move > 50 ) send_to_char( "worn out.\r\n",    ch );
+    else if ( ch->move > 0 ) send_to_char( "exhausted.\r\n", ch );
+    else                        send_to_char( "to tired to move.\r\n", ch );
 
 
     if ( !IS_NPC(ch) && ch->pcdata->condition[COND_DRUNK]   > 10 )
-	send_to_char( "You are drunk.\n\r",   ch );
+	send_to_char( "You are drunk.\r\n",   ch );
     if ( !IS_NPC(ch) && ch->pcdata->condition[COND_THIRST] ==  0 )
-	send_to_char( "You are thirsty.\n\r", ch );
+	send_to_char( "You are thirsty.\r\n", ch );
     if ( !IS_NPC(ch) && ch->pcdata->condition[COND_FULL]   ==  0 )
-	send_to_char( "You are hungry.\n\r",  ch );
+	send_to_char( "You are hungry.\r\n",  ch );
 
     switch( ch->mental_state / 10 )
     {
@@ -440,40 +440,40 @@ void do_oldscore( CHAR_DATA *ch, char *argument )
     switch ( ch->position )
     {
     case POS_DEAD:
-	send_to_char( "   You are DEAD!!\n\r",		ch );
+	send_to_char( "   You are DEAD!!\r\n",		ch );
 	break;
     case POS_MORTAL:
-	send_to_char( "   You are mortally wounded.\n\r",	ch );
+	send_to_char( "   You are mortally wounded.\r\n",	ch );
 	break;
     case POS_INCAP:
-	send_to_char( "   You are incapacitated.\n\r",	ch );
+	send_to_char( "   You are incapacitated.\r\n",	ch );
 	break;
     case POS_STUNNED:
-	send_to_char( "   You are stunned.\n\r",		ch );
+	send_to_char( "   You are stunned.\r\n",		ch );
 	break;
     case POS_SLEEPING:
-	send_to_char( "   You are sleeping.\n\r",		ch );
+	send_to_char( "   You are sleeping.\r\n",		ch );
 	break;
     case POS_RESTING:
-	send_to_char( "   You are resting.\n\r",		ch );
+	send_to_char( "   You are resting.\r\n",		ch );
 	break;
     case POS_STANDING:
-	send_to_char( "   You are standing.\n\r",		ch );
+	send_to_char( "   You are standing.\r\n",		ch );
 	break;
     case POS_FIGHTING:
-	send_to_char( "   You are fighting.\n\r",		ch );
+	send_to_char( "   You are fighting.\r\n",		ch );
 	break;
     case POS_MOUNTED:
-	send_to_char( "   Mounted.\n\r",			ch );
+	send_to_char( "   Mounted.\r\n",			ch );
 	break;
     case POS_SHOVE:
-	send_to_char( "   Being shoved.\n\r",		ch );
+	send_to_char( "   Being shoved.\r\n",		ch );
 	break;
     case POS_DRAG:
-	send_to_char( "   Being dragged.\n\r",		ch );
+	send_to_char( "   Being dragged.\r\n",		ch );
 	break;
     default:
-    	send_to_char( "\n\r",		ch );
+    	send_to_char( "\r\n",		ch );
 	break;
     }
 
@@ -492,27 +492,27 @@ void do_oldscore( CHAR_DATA *ch, char *argument )
     else                           send_to_char( "invincible!",       ch );
 
     send_to_char( "   You are ", ch );
-	 if ( ch->alignment >  900 ) send_to_char( "angelic.\n\r", ch );
-    else if ( ch->alignment >  700 ) send_to_char( "saintly.\n\r", ch );
-    else if ( ch->alignment >  350 ) send_to_char( "good.\n\r",    ch );
-    else if ( ch->alignment >  100 ) send_to_char( "kind.\n\r",    ch );
-    else if ( ch->alignment > -100 ) send_to_char( "neutral.\n\r", ch );
-    else if ( ch->alignment > -350 ) send_to_char( "mean.\n\r",    ch );
-    else if ( ch->alignment > -700 ) send_to_char( "evil.\n\r",    ch );
-    else if ( ch->alignment > -900 ) send_to_char( "demonic.\n\r", ch );
-    else                             send_to_char( "satanic.\n\r", ch );
+	 if ( ch->alignment >  900 ) send_to_char( "angelic.\r\n", ch );
+    else if ( ch->alignment >  700 ) send_to_char( "saintly.\r\n", ch );
+    else if ( ch->alignment >  350 ) send_to_char( "good.\r\n",    ch );
+    else if ( ch->alignment >  100 ) send_to_char( "kind.\r\n",    ch );
+    else if ( ch->alignment > -100 ) send_to_char( "neutral.\r\n", ch );
+    else if ( ch->alignment > -350 ) send_to_char( "mean.\r\n",    ch );
+    else if ( ch->alignment > -700 ) send_to_char( "evil.\r\n",    ch );
+    else if ( ch->alignment > -900 ) send_to_char( "demonic.\r\n", ch );
+    else                             send_to_char( "satanic.\r\n", ch );
 
     ch_printf( ch,
-	"You have have %d credits.\n\r" , ch->gold );
+	"You have have %d credits.\r\n" , ch->gold );
 
     ch_printf( ch,
-	"Autoexit: %s   Autoloot: %s   Autosac: %s   Autocred: %s\n\r",
+	"Autoexit: %s   Autoloot: %s   Autosac: %s   Autocred: %s\r\n",
 	(!IS_NPC(ch) && IS_SET(ch->act, PLR_AUTOEXIT)) ? "yes" : "no",
 	(!IS_NPC(ch) && IS_SET(ch->act, PLR_AUTOLOOT)) ? "yes" : "no",
 	(!IS_NPC(ch) && IS_SET(ch->act, PLR_AUTOSAC) ) ? "yes" : "no",
   	(!IS_NPC(ch) && IS_SET(ch->act, PLR_AUTOGOLD)) ? "yes" : "no" );
 
-    ch_printf( ch, "Wimpy set to %d percent.\n\r", ch->wimpy );
+    ch_printf( ch, "Wimpy set to %d percent.\r\n", ch->wimpy );
     
     if ( !IS_NPC(ch) && ch->pcdata )
     {
@@ -522,19 +522,19 @@ void do_oldscore( CHAR_DATA *ch, char *argument )
     	for ( sn = 0; sn < top_sn ; sn++ )
     	   if ( ch->pcdata->learned[sn] > 0 && ch->pcdata->learned[sn] < 100 )
                ch_printf( ch,  "%s  ", skill_table[sn]->name );    	     	 
-        send_to_char( "\n\r" , ch );
+        send_to_char( "\r\n" , ch );
     
         send_to_char( "You are an adept of: " , ch );
     	for ( sn = 0; sn < top_sn ; sn++ )
     	   if ( ch->pcdata->learned[sn] >= 100 )
                ch_printf( ch,  "%s  ", skill_table[sn]->name );    	     	 
-        send_to_char( "\n\r" , ch );
+        send_to_char( "\r\n" , ch );
     
     }           
     
     if ( !IS_NPC( ch ) && IS_IMMORTAL( ch ) )
     {
-	ch_printf( ch, "WizInvis level: %d   WizInvis is %s\n\r",
+	ch_printf( ch, "WizInvis level: %d   WizInvis is %s\r\n",
 			ch->pcdata->wizinvis,
 			IS_SET( ch->act, PLR_WIZINVIS ) ? "ON" : "OFF" );
     }
@@ -564,27 +564,27 @@ void do_affected ( CHAR_DATA *ch, char *argument )
     if ( !str_cmp( arg, "by" ) )
     {
         set_char_color( AT_BLUE, ch );
-        send_to_char( "\n\rImbued with:\n\r", ch );
+        send_to_char( "\r\nImbued with:\r\n", ch );
 	set_char_color( AT_SCORE, ch );
-	ch_printf( ch, "%s\n\r", affect_bit_name( ch->affected_by ) );
+	ch_printf( ch, "%s\r\n", affect_bit_name( ch->affected_by ) );
 	return;      
     }
 
     if ( !ch->first_affect )
     {
         set_char_color( AT_SCORE, ch );
-        send_to_char( "\n\rNo skill affects you.\n\r", ch );
+        send_to_char( "\r\nNo skill affects you.\r\n", ch );
     }
     else
     {
-	send_to_char( "\n\r", ch );
+	send_to_char( "\r\n", ch );
         for (paf = ch->first_affect; paf; paf = paf->next)
 	    if ( (skill=get_skilltype(paf->type)) != NULL )
         {
             set_char_color( AT_BLUE, ch );
             send_to_char( "Affected:  ", ch );
             set_char_color( AT_SCORE, ch );
-            ch_printf( ch, "%-18s\n\r", skill->name );
+            ch_printf( ch, "%-18s\r\n", skill->name );
         }
     }
     return;
@@ -593,7 +593,7 @@ void do_affected ( CHAR_DATA *ch, char *argument )
 void do_inventory( CHAR_DATA *ch, char *argument )
 {
     set_char_color( AT_RED, ch );
-    send_to_char( "You are carrying:\n\r", ch );
+    send_to_char( "You are carrying:\r\n", ch );
     show_list_to_char( ch->first_carrying, ch, TRUE, TRUE );
     return;
 }
@@ -607,7 +607,7 @@ void do_equipment( CHAR_DATA *ch, char *argument )
     char buf[MAX_STRING_LENGTH];
     
     set_char_color( AT_RED, ch );
-    send_to_char( "You are using:\n\r", ch );
+    send_to_char( "You are using:\r\n", ch );
     found = FALSE;
     set_char_color( AT_OBJECT, ch );
     for ( iWear = 0; iWear < MAX_WEAR; iWear++ )
@@ -672,16 +672,16 @@ void do_equipment( CHAR_DATA *ch, char *argument )
 	                   }        
 	                   break;
                     }   
-		    send_to_char( "\n\r", ch );
+		    send_to_char( "\r\n", ch );
 		}
 		else
-		    send_to_char( "something.\n\r", ch );
+		    send_to_char( "something.\r\n", ch );
 		found = TRUE;
 	   }
     }
 
     if ( !found )
-	send_to_char( "Nothing.\n\r", ch );
+	send_to_char( "Nothing.\r\n", ch );
 
     return;
 }
@@ -720,14 +720,14 @@ void do_title( CHAR_DATA *ch, char *argument )
 
     if ( IS_SET( ch->pcdata->flags, PCFLAG_NOTITLE ))
     {
-        send_to_char( "You try but the Force resists you.\n\r", ch );
+        send_to_char( "You try but the Force resists you.\r\n", ch );
         return;
     }
  
 
     if ( argument[0] == '\0' )
     {
-	send_to_char( "Change your title to what?\n\r", ch );
+	send_to_char( "Change your title to what?\r\n", ch );
 	return;
     }
 
@@ -739,7 +739,7 @@ void do_title( CHAR_DATA *ch, char *argument )
  
     smash_tilde( argument );
     set_title( ch, argument );
-    send_to_char( "Ok.\n\r", ch );
+    send_to_char( "Ok.\r\n", ch );
 }
 
 
@@ -754,7 +754,7 @@ void do_homepage( CHAR_DATA *ch, char *argument )
     {
 	if ( !ch->pcdata->homepage )
 	  ch->pcdata->homepage = str_dup( "" );
-	ch_printf( ch, "Your homepage is: %s\n\r",
+	ch_printf( ch, "Your homepage is: %s\r\n",
 		show_tilde( ch->pcdata->homepage ) );
 	return;
     }
@@ -764,7 +764,7 @@ void do_homepage( CHAR_DATA *ch, char *argument )
 	if ( ch->pcdata->homepage )
 	  DISPOSE(ch->pcdata->homepage);
 	ch->pcdata->homepage = str_dup("");
-	send_to_char( "Homepage cleared.\n\r", ch );
+	send_to_char( "Homepage cleared.\r\n", ch );
 	return;
     }
 
@@ -779,7 +779,7 @@ void do_homepage( CHAR_DATA *ch, char *argument )
     if ( ch->pcdata->homepage )
       DISPOSE(ch->pcdata->homepage);
     ch->pcdata->homepage = str_dup(buf);
-    send_to_char( "Homepage set.\n\r", ch );
+    send_to_char( "Homepage set.\r\n", ch );
 }
 
 
@@ -791,7 +791,7 @@ void do_description( CHAR_DATA *ch, char *argument )
 {
     if ( IS_NPC( ch ) )
     {
-	send_to_char( "Monsters are too dumb to do that!\n\r", ch );
+	send_to_char( "Monsters are too dumb to do that!\r\n", ch );
 	return;	  
     }
 
@@ -808,7 +808,7 @@ void do_description( CHAR_DATA *ch, char *argument )
 	   return;
 
 	case SUB_RESTRICTED:
-	   send_to_char( "You cannot use this command from within another command.\n\r", ch );
+	   send_to_char( "You cannot use this command from within another command.\r\n", ch );
 	   return;
 
 	case SUB_NONE:
@@ -830,7 +830,7 @@ void do_bio( CHAR_DATA *ch, char *argument )
 {
     if ( IS_NPC( ch ) )
     {
-	send_to_char( "Mobs can't set bio's!\n\r", ch );
+	send_to_char( "Mobs can't set bio's!\r\n", ch );
 	return;	  
     }
 
@@ -847,7 +847,7 @@ void do_bio( CHAR_DATA *ch, char *argument )
 	   return;
 	  	   
 	case SUB_RESTRICTED:
-	   send_to_char( "You cannot use this command from within another command.\n\r", ch );
+	   send_to_char( "You cannot use this command from within another command.\r\n", ch );
 	   return;
 
 	case SUB_NONE:
@@ -876,14 +876,14 @@ void do_prompt( CHAR_DATA *ch, char *argument )
   
   if ( IS_NPC(ch) )
   {
-    send_to_char( "NPC's can't change their prompt..\n\r", ch );
+    send_to_char( "NPC's can't change their prompt..\r\n", ch );
     return;
   }
   smash_tilde( argument );
   one_argument( argument, arg );
   if ( !*arg )
   {
-    send_to_char( "Set prompt to what? (try help prompt)\n\r", ch );
+    send_to_char( "Set prompt to what? (try help prompt)\r\n", ch );
     return;
   }
   if (ch->pcdata->prompt)
@@ -898,6 +898,6 @@ void do_prompt( CHAR_DATA *ch, char *argument )
     ch->pcdata->prompt = STRALLOC("");
   else
     ch->pcdata->prompt = STRALLOC(argument);
-  send_to_char( "Ok.\n\r", ch );
+  send_to_char( "Ok.\r\n", ch );
   return;
 }

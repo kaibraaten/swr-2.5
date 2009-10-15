@@ -310,7 +310,7 @@ static void caught_alarm( int foo )
 {
     char buf[MAX_STRING_LENGTH];
     bug( "ALARM CLOCK!" );
-    strcpy( buf, "Alas, the hideous malevalent entity known only as 'Lag' rises once more!\n\r" );
+    strcpy( buf, "Alas, the hideous malevalent entity known only as 'Lag' rises once more!\r\n" );
     echo_to_all( AT_IMMORT, buf, ECHOTAR_ALL );
     if ( newdesc )
     {
@@ -438,7 +438,7 @@ void game_loop( )
 	    ||     d->idle > 28800 )				  /* 2 hrs  */
 	    {
 		write_to_descriptor( d->descriptor,
-		 "Idle timeout... disconnecting.\n\r", 0 );
+		 "Idle timeout... disconnecting.\r\n", 0 );
 		d->outtop	= 0;
 		close_socket( d, TRUE );
 		continue;
@@ -508,11 +508,6 @@ void game_loop( )
 	 * Autonomous game motion.
 	 */
 	update_handler( );
-
-	/*
-	 * Check REQUESTS pipe
-	 */
-        check_requests( );
 
 	/*
 	 * Output.
@@ -761,7 +756,7 @@ void close_socket( DESCRIPTOR_DATA *dclose, bool force )
     /* say bye to whoever's snooping this descriptor */
     if ( dclose->snoop_by )
 	write_to_buffer( dclose->snoop_by,
-	    "Your victim has left the game.\n\r", 0 );
+	    "Your victim has left the game.\r\n", 0 );
 
     /* stop snooping everyone else */
     for ( d = first_descriptor; d; d = d->next )
@@ -885,7 +880,7 @@ bool read_from_descriptor( DESCRIPTOR_DATA *d )
 	sprintf( log_buf, "%s input overflow!", d->host );
 	log_string( log_buf );
 	write_to_descriptor( d->descriptor,
-	    "\n\r*** PUT A LID ON IT!!! ***\n\r", 0 );
+	    "\r\n*** PUT A LID ON IT!!! ***\r\n", 0 );
 	return FALSE;
     }
 
@@ -951,7 +946,7 @@ void read_from_buffer( DESCRIPTOR_DATA *d )
     {
 	if ( k >= 254 )
 	{
-	    write_to_descriptor( d->descriptor, "Line too long.\n\r", 0 );
+	    write_to_descriptor( d->descriptor, "Line too long.\r\n", 0 );
 
 	    /* skip the rest of the line */
 	    /*
@@ -996,7 +991,7 @@ void read_from_buffer( DESCRIPTOR_DATA *d )
 		log_string( log_buf );
 */
 		write_to_descriptor( d->descriptor,
-		    "\n\r*** PUT A LID ON IT!!! ***\n\r", 0 );
+		    "\r\n*** PUT A LID ON IT!!! ***\r\n", 0 );
 	    }
 	}
     }
@@ -1073,7 +1068,7 @@ bool flush_buffer( DESCRIPTOR_DATA *d, bool fPrompt )
     {
 	ch = d->original ? d->original : d->character;
 	if ( IS_SET(ch->act, PLR_BLANK) )
-	    write_to_buffer( d, "\n\r", 2 );
+	    write_to_buffer( d, "\r\n", 2 );
 
 	if ( IS_SET(ch->act, PLR_PROMPT) )
 	    display_prompt(d);
@@ -1155,7 +1150,7 @@ void write_to_buffer( DESCRIPTOR_DATA *d, const char *txt, size_t length )
 */
 
     /*
-     * Initial \n\r if needed.
+     * Initial \r\n if needed.
      */
     if ( d->outtop == 0 && !d->fcommand )
     {
@@ -1233,7 +1228,7 @@ void show_title( DESCRIPTOR_DATA *d )
     }
     else
     {
-      write_to_buffer( d, "Press enter...\n\r", 0 );
+      write_to_buffer( d, "Press enter...\r\n", 0 );
     }
     d->connected = CON_PRESS_ENTER;
 }
@@ -1308,7 +1303,7 @@ bool check_reconnect( DESCRIPTOR_DATA *d, const char *name, bool fConn )
 	{
 	    if ( fConn && ch->switched )
 	    {
-	      write_to_buffer( d, "Already playing.\n\rName: ", 0 );
+	      write_to_buffer( d, "Already playing.\r\nName: ", 0 );
 	      d->connected = CON_GET_NAME;
 	      if ( d->character )
 	      {
@@ -1332,7 +1327,7 @@ bool check_reconnect( DESCRIPTOR_DATA *d, const char *name, bool fConn )
 		d->character = ch;
 		ch->desc	 = d;
 		ch->timer	 = 0;
-		send_to_char( "Reconnecting.\n\r", ch );
+		send_to_char( "Reconnecting.\r\n", ch );
 		act( AT_ACTION, "$n has reconnected.", ch, NULL, NULL, TO_ROOM );
 		sprintf( log_buf, "%s@%s reconnected.", ch->name, d->host );
 		log_string_plus( log_buf, LOG_COMM );
@@ -1381,7 +1376,7 @@ bool check_multi( DESCRIPTOR_DATA *d , const char *name )
 	        }
 	        if ( iloop >= 10 )
 	           return FALSE; 
-		write_to_buffer( d, "Sorry multi-playing is not allowed ... have you other character quit first.\n\r", 0 );
+		write_to_buffer( d, "Sorry multi-playing is not allowed ... have you other character quit first.\r\n", 0 );
 		sprintf( log_buf, "%s attempting to multiplay with %s.", dold->original ? dold->original->name : dold->character->name , d->character->name );
 		log_string_plus( log_buf, LOG_COMM );	
 	        d->character = NULL;
@@ -1413,15 +1408,15 @@ bool check_playing( DESCRIPTOR_DATA *d, const char *name, bool kick )
 	    if ( !ch->name
 	    || ( cstate != CON_PLAYING && cstate != CON_EDITING ) )
 	    {
-		write_to_buffer( d, "Already connected - try again.\n\r", 0 );
+		write_to_buffer( d, "Already connected - try again.\r\n", 0 );
 		sprintf( log_buf, "%s already connected.", ch->name );
 		log_string_plus( log_buf, LOG_COMM );
 		return BERR;
 	    }
 	    if ( !kick )
 	      return TRUE;
-	    write_to_buffer( d, "Already playing... Kicking off old connection.\n\r", 0 );
-	    write_to_buffer( dold, "Kicking off old connection... bye!\n\r", 0 );
+	    write_to_buffer( d, "Already playing... Kicking off old connection.\r\n", 0 );
+	    write_to_buffer( dold, "Kicking off old connection... bye!\r\n", 0 );
 	    close_socket( dold, FALSE );
 	    /* clear descriptor pointer to get rid of bug message in log */
 	    d->character->desc = NULL;
@@ -1432,7 +1427,7 @@ bool check_playing( DESCRIPTOR_DATA *d, const char *name, bool kick )
 	    if ( ch->switched )
 	      do_return( ch->switched, const_char_to_nonconst("") );
 	    ch->switched = NULL;
-	    send_to_char( "Reconnecting.\n\r", ch );
+	    send_to_char( "Reconnecting.\r\n", ch );
 	    act( AT_ACTION, "$n has reconnected, kicking off old link.",
 	         ch, NULL, NULL, TO_ROOM );
 	    sprintf( log_buf, "%s@%s reconnected, kicking off old link.",
@@ -1552,7 +1547,7 @@ void write_to_pager( DESCRIPTOR_DATA *d, const char *txt, size_t length )
   {
     if ( d->pagesize > 32000 )
     {
-      bug( "Pager overflow.  Ignoring.\n\r" );
+      bug( "Pager overflow.  Ignoring.\r\n" );
       d->pagetop = 0;
       d->pagepoint = NULL;
       DISPOSE(d->pagebuf);
@@ -1850,7 +1845,7 @@ char *act_string(const char *format, CHAR_DATA *to, CHAR_DATA *ch,
     while ( (*point = *i) != '\0' )
       ++point, ++i;
   }
-  strcpy(point, "\n\r");
+  strcpy(point, "\r\n");
   buf[0] = UPPER(buf[0]);
   return buf;
 }

@@ -214,100 +214,103 @@ static void handle_ship_collision( void )
 
 void recharge_ships()
 {
-   SHIP_DATA *ship;
-   SHIP_DATA *nextship;
-   char buf[MAX_STRING_LENGTH];
-   TURRET_DATA *turret;
+  SHIP_DATA *ship = NULL;
+  SHIP_DATA *nextship = NULL;
+  char buf[MAX_STRING_LENGTH];
+  TURRET_DATA *turret = NULL;
    
-   for ( ship = first_ship; ship; ship = nextship )
-   {                
-        nextship = ship->next;
+  for ( ship = first_ship; ship; ship = nextship )
+    {                
+      nextship = ship->next;
    
-        for( turret = ship->first_turret ; turret ; turret = turret->next )
-          if (turret->laserstate > 0)
+      for( turret = ship->first_turret ; turret ; turret = turret->next )
+	if (turret->laserstate > 0)
           {
-             ship->energy -= turret->laserstate;
-             turret->laserstate = 0;
+	    ship->energy -= turret->laserstate;
+	    turret->laserstate = 0;
           }
            
-        if (ship->laserstate > 0)
+      if (ship->laserstate > 0)
         {
-           ship->energy -= ship->laserstate;
-           ship->laserstate = 0;
+	  ship->energy -= ship->laserstate;
+	  ship->laserstate = 0;
         }
         
-        if (ship->missilestate == MISSILE_RELOAD_2)
+      if (ship->missilestate == MISSILE_RELOAD_2)
         {
-           ship->missilestate = MISSILE_READY;
-           if ( ship->missiles > 0 )
-               echo_to_room( AT_YELLOW, ship->gunseat, "Missile launcher reloaded.");
+	  ship->missilestate = MISSILE_READY;
+	  if ( ship->missiles > 0 )
+	    echo_to_room( AT_YELLOW, ship->gunseat,
+			  "Missile launcher reloaded.");
         }
         
-        if (ship->missilestate == MISSILE_RELOAD )
+      if (ship->missilestate == MISSILE_RELOAD )
         {
-           ship->missilestate = MISSILE_RELOAD_2;
+	  ship->missilestate = MISSILE_RELOAD_2;
         }
         
-        if (ship->missilestate == MISSILE_FIRED )
-           ship->missilestate = MISSILE_RELOAD;
+      if (ship->missilestate == MISSILE_FIRED )
+	ship->missilestate = MISSILE_RELOAD;
         
-       if ( autofly(ship) )
-       {
-          if ( ship->starsystem )
-          {
-             if (ship->target && ship->laserstate != LASER_DAMAGED )
-             {
-                 int chance = 100;
-                 SHIP_DATA * target = ship->target;
-                 int shots;
+      if ( autofly(ship) && ship->starsystem
+	   && ship->target && ship->laserstate != LASER_DAMAGED )
+	{
+	  int chance = 100;
+	  SHIP_DATA * target = ship->target;
+	  int shots = 0;
                  
-                for ( shots=0 ; shots <= ship->lasers ; shots++ ) 
-                {   
-                  if ( !ship->target )
-                     break;
+	  for ( shots=0 ; shots <= ship->lasers ; shots++ ) 
+	    {   
+	      if ( !ship->target )
+		break;
                 
-                  if (ship->shipstate != SHIP_HYPERSPACE && ship->energy > 25 
-		      && ship->target->starsystem == ship->starsystem
-		      && ship_distance_to_ship( ship, target ) <= 1000
-		      && ship->laserstate < ship->lasers )
-                  {
-                    if ( ship->ship_class == SPACE_STATION
-			 || ship_is_facing_ship( ship , target ) )
-                    {
-             		chance += target->model*10;
-             		chance -= target->manuever/10;
-             		chance -= target->currspeed/20;
-             		chance -= ( abs((int)(target->pos.x - ship->pos.x))/70 );
-             		chance -= ( abs((int)(target->pos.y - ship->pos.y))/70 );
-             		chance -= ( abs((int)(target->pos.z - ship->pos.z))/70 );
-             		chance = URANGE( 10 , chance , 90 );
+	      if (ship->shipstate != SHIP_HYPERSPACE && ship->energy > 25 
+		  && ship->target->starsystem == ship->starsystem
+		  && ship_distance_to_ship( ship, target ) <= 1000
+		  && ship->laserstate < ship->lasers )
+		{
+		  if ( ship->ship_class == SPACE_STATION
+		       || ship_is_facing_ship( ship , target ) )
+		    {
+		      chance += target->model*10;
+		      chance -= target->manuever/10;
+		      chance -= target->currspeed/20;
+		      chance -= ( abs((int)(target->pos.x - ship->pos.x))/70 );
+		      chance -= ( abs((int)(target->pos.y - ship->pos.y))/70 );
+		      chance -= ( abs((int)(target->pos.z - ship->pos.z))/70 );
+		      chance = URANGE( 10 , chance , 90 );
+		      
+		      if ( number_percent( ) > chance )
+			{	  
+			  sprintf( buf, "%s fires at you but misses.",
+				   ship->name);  
+			  echo_to_cockpit( AT_ORANGE , target , buf );
+			  sprintf( buf, "Laserfire from %s barely misses %s.",
+				   ship->name , target->name );
+			  echo_to_system( AT_ORANGE , target , buf , NULL );
+			} 
+		      else
+			{
+			  sprintf( buf, "Laserfire from %s hits %s.",
+				   ship->name, target->name );
+			  echo_to_system( AT_ORANGE , target , buf , NULL );
+			  sprintf( buf , "You are hit by lasers from %s!",
+				   ship->name);  
+			  echo_to_cockpit( AT_BLOOD , target , buf );
+			  echo_to_ship( AT_RED, target,
+					"A small explosion vibrates through the ship." );           
+			  if ( autofly( target ) )
+			    target->target = ship;
 
-             		if ( number_percent( ) > chance )
-             		{	  
-           		    sprintf( buf , "%s fires at you but misses." , ship->name);  
-             		    echo_to_cockpit( AT_ORANGE , target , buf );
-      	                    sprintf( buf, "Laserfire from %s barely misses %s.", ship->name , target->name );
-                            echo_to_system( AT_ORANGE , target , buf , NULL );
-             		} 
-             		else
-             		{
-             		    sprintf( buf, "Laserfire from %s hits %s." , ship->name, target->name );
-             		    echo_to_system( AT_ORANGE , target , buf , NULL );
-                            sprintf( buf , "You are hit by lasers from %s!" , ship->name);  
-                            echo_to_cockpit( AT_BLOOD , target , buf );           
-                            echo_to_ship( AT_RED , target , "A small explosion vibrates through the ship." );           
-                            if ( autofly( target ) )
-                               target->target = ship;
-                            damage_ship( target , 5 , 10 );
-                        }
-                        ship->laserstate++;
-                    }
-                  }
-                }
-             }
-          }
-       }
-   }
+			  damage_ship( target , 5 , 10 );
+			}
+
+		      ship->laserstate++;
+		    }
+		}
+	    }
+	}
+    }
 }
 
 static void ship_update_energy( SHIP_DATA *ship )

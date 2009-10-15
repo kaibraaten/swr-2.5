@@ -55,7 +55,7 @@ void write_clan_list( )
     fpout = fopen( filename, "w" );
     if ( !fpout )
     {
-	bug( "FATAL: cannot open clan.lst for writing!\n\r", 0 );
+	bug( "FATAL: cannot open clan.lst for writing!\r\n", 0 );
  	return;
     }	  
     for ( tclan = first_clan; tclan; tclan = tclan->next )
@@ -295,7 +295,7 @@ void load_clans( )
 	}
     }
     fclose( fpList );
-    log_string(" Done clans\n\r" );
+    log_string(" Done clans\r\n" );
     fpReserve = fopen( NULL_FILE, "r" );
     
     return;
@@ -303,7 +303,7 @@ void load_clans( )
 
 void do_make( CHAR_DATA *ch, char *argument )
 {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
 }
 
@@ -315,7 +315,7 @@ void do_induct( CHAR_DATA *ch, char *argument )
 
     if ( IS_NPC( ch ) || !ch->pcdata->clan )
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
@@ -327,7 +327,7 @@ void do_induct( CHAR_DATA *ch, char *argument )
 	;
     else
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
@@ -335,28 +335,28 @@ void do_induct( CHAR_DATA *ch, char *argument )
 
     if ( arg[0] == '\0' )
     {
-	send_to_char( "Induct whom?\n\r", ch );
+	send_to_char( "Induct whom?\r\n", ch );
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == NULL )
     {
-	send_to_char( "That player is not here.\n\r", ch);
+	send_to_char( "That player is not here.\r\n", ch);
 	return;
     }
 
     if ( IS_NPC(victim) )
     {
-	send_to_char( "Not on NPC's.\n\r", ch );
+	send_to_char( "Not on NPC's.\r\n", ch );
 	return;
     }
 
     if ( victim->pcdata->clan )
     {
 	if ( victim->pcdata->clan == clan )
-	  send_to_char( "This player already belongs to your organization!\n\r", ch );
+	  send_to_char( "This player already belongs to your organization!\r\n", ch );
 	else
-	  send_to_char( "This player already belongs to an organization!\n\r", ch );
+	  send_to_char( "This player already belongs to an organization!\r\n", ch );
 	return;
     }
     
@@ -381,7 +381,7 @@ void do_outcast( CHAR_DATA *ch, char *argument )
 
     if ( IS_NPC( ch ) || !ch->pcdata->clan )
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
@@ -393,7 +393,7 @@ void do_outcast( CHAR_DATA *ch, char *argument )
 	;
     else
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
@@ -402,31 +402,31 @@ void do_outcast( CHAR_DATA *ch, char *argument )
 
     if ( arg[0] == '\0' )
     {
-	send_to_char( "Outcast whom?\n\r", ch );
+	send_to_char( "Outcast whom?\r\n", ch );
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == NULL )
     {
-	send_to_char( "That player is not here.\n\r", ch);
+	send_to_char( "That player is not here.\r\n", ch);
 	return;
     }
 
     if ( IS_NPC(victim) )
     {
-	send_to_char( "Not on NPC's.\n\r", ch );
+	send_to_char( "Not on NPC's.\r\n", ch );
 	return;
     }
 
     if ( victim == ch )
     {
-	    send_to_char( "Kick yourself out of your own clan?\n\r", ch );
+	    send_to_char( "Kick yourself out of your own clan?\r\n", ch );
 	    return;
     }
  
     if ( victim->pcdata->clan != ch->pcdata->clan )
     {
-	    send_to_char( "This player does not belong to your clan!\n\r", ch );
+	    send_to_char( "This player does not belong to your clan!\r\n", ch );
 	    return;
     }
 
@@ -471,7 +471,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
 		bug( "setclan: sub_clandesc: NULL ch->dest_buf", 0 );
 		stop_editing( ch );
      	        ch->substate = ch->tempnum;
-		send_to_char( "&RError: clan lost.\n\r" , ch );
+		send_to_char( "&RError: clan lost.\r\n" , ch );
 		return;
 	  }
 	  STRFREE( clan->description );
@@ -487,24 +487,24 @@ void do_setclan( CHAR_DATA *ch, char *argument )
 
     if ( arg1[0] == '\0' )
     {
-	send_to_char( "Usage: setclan <clan> <field> <player>\n\r", ch );
-	send_to_char( "\n\rField being one of:\n\r", ch );
-	send_to_char( "members funds\n\r", ch );	
-	send_to_char( "leaders name filename desc atwar\n\r", ch );
+	send_to_char( "Usage: setclan <clan> <field> <player>\r\n", ch );
+	send_to_char( "\r\nField being one of:\r\n", ch );
+	send_to_char( "members funds\r\n", ch );	
+	send_to_char( "leaders name filename desc atwar\r\n", ch );
 	return;
     }
 
     clan = get_clan( arg1 );
     if ( !clan )
     {
-	send_to_char( "No such clan.\n\r", ch );
+	send_to_char( "No such clan.\r\n", ch );
 	return;
     }
 
     if ( !strcmp( arg2, "members" ) )
     {
 	clan->members = atoi( argument );
-	send_to_char( "Done.\n\r", ch );
+	send_to_char( "Done.\r\n", ch );
 	save_clan( clan );
 	return;
     }
@@ -512,7 +512,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
     if ( !strcmp( arg2, "funds" ) )
     {
 	clan->funds = atoi( argument );
-	send_to_char( "Done.\n\r", ch );
+	send_to_char( "Done.\r\n", ch );
 	save_clan( clan );
 	return;
     }
@@ -522,7 +522,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
     {
 	STRFREE( clan->leaders );
 	clan->leaders = STRALLOC( argument );
-	send_to_char( "Done.\n\r", ch );
+	send_to_char( "Done.\r\n", ch );
 	save_clan( clan );
 	return;
     }
@@ -531,7 +531,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
     {
 	STRFREE( clan->atwar );
 	clan->atwar = STRALLOC( argument );
-	send_to_char( "Done.\n\r", ch );
+	send_to_char( "Done.\r\n", ch );
 	save_clan( clan );
 	return;
     }
@@ -541,7 +541,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
     {
 	STRFREE( clan->name );
 	clan->name = STRALLOC( argument );
-	send_to_char( "Done.\n\r", ch );
+	send_to_char( "Done.\r\n", ch );
 	save_clan( clan );
 	return;
     }
@@ -550,7 +550,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
     {
 	DISPOSE( clan->filename );
 	clan->filename = str_dup( argument );
-	send_to_char( "Done.\n\r", ch );
+	send_to_char( "Done.\r\n", ch );
 	save_clan( clan );
 	write_clan_list( );
 	return;
@@ -578,20 +578,20 @@ void do_showclan( CHAR_DATA *ch, char *argument )
 
     if ( IS_NPC( ch ) )
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
     if ( argument[0] == '\0' )
     {
-	send_to_char( "Usage: showclan <clan>\n\r", ch );
+	send_to_char( "Usage: showclan <clan>\r\n", ch );
 	return;
     }
 
     clan = get_clan( argument );
     if ( !clan )
     {
-	send_to_char( "No such clan.\n\r", ch );
+	send_to_char( "No such clan.\r\n", ch );
 	return;
     }
         
@@ -611,28 +611,28 @@ void do_showclan( CHAR_DATA *ch, char *argument )
            support /= pCount;
 
 
-    ch_printf( ch, "&W%s      %s\n\r",
+    ch_printf( ch, "&W%s      %s\r\n",
     			clan->name,
     			IS_IMMORTAL(ch) ? clan->filename : "" );
-    ch_printf( ch, "&WDescription:&G\n\r%s\n\r&WLeaders: &G%s\n\r&WAt War With: &G%s\n\r",
+    ch_printf( ch, "&WDescription:&G\r\n%s\r\n&WLeaders: &G%s\r\n&WAt War With: &G%s\r\n",
     			clan->description,
     			clan->leaders,
     			clan->atwar );
-    ch_printf( ch, "&WMembers: &G%d\n\r",
+    ch_printf( ch, "&WMembers: &G%d\r\n",
     			clan->members);
-    ch_printf( ch, "&WSpacecraft: &G%d\n\r",
+    ch_printf( ch, "&WSpacecraft: &G%d\r\n",
     			clan->spacecraft);
-    ch_printf( ch, "&WVehicles: &G%d\n\r",
+    ch_printf( ch, "&WVehicles: &G%d\r\n",
     			clan->vehicles);
-    ch_printf( ch, "&WPlanets Controlled: &G%d\n\r",
+    ch_printf( ch, "&WPlanets Controlled: &G%d\r\n",
     			pCount);
-    ch_printf( ch, "&WAverage Popular Support: &G%d\n\r",
+    ch_printf( ch, "&WAverage Popular Support: &G%d\r\n",
     			support);
-    ch_printf( ch, "&WMonthly Revenue: &G%ld\n\r",
+    ch_printf( ch, "&WMonthly Revenue: &G%ld\r\n",
     			revenue);
-    ch_printf( ch, "&WHourly Wages: &G%d\n\r",
+    ch_printf( ch, "&WHourly Wages: &G%d\r\n",
     			clan->salary);
-    ch_printf( ch, "&WTotal Funds: &G%ld\n\r",
+    ch_printf( ch, "&WTotal Funds: &G%ld\r\n",
     			clan->funds );
 
     return;
@@ -646,7 +646,7 @@ void do_makeclan( CHAR_DATA *ch, char *argument )
 
     if ( !argument || argument[0] == '\0' )
     {
-	send_to_char( "Usage: makeclan <clan name>\n\r", ch );
+	send_to_char( "Usage: makeclan <clan name>\r\n", ch );
 	return;
     }
 
@@ -672,7 +672,7 @@ void do_clans( CHAR_DATA *ch, char *argument )
     int count = 0;
     int pCount, revenue;
     
-    ch_printf( ch, "&WOrganization                                       Planets   Score\n\r");
+    ch_printf( ch, "&WOrganization                                       Planets   Score\r\n");
     for ( clan = first_clan; clan; clan = clan->next )
     {
         pCount = 0;
@@ -685,7 +685,7 @@ void do_clans( CHAR_DATA *ch, char *argument )
             revenue += get_taxes(planet)/720;
           }
           
-        ch_printf( ch, "&Y%-50s %-3d       %d\n\r",
+        ch_printf( ch, "&Y%-50s %-3d       %d\r\n",
                   clan->name,  pCount, revenue );
         count++;
     }
@@ -693,12 +693,12 @@ void do_clans( CHAR_DATA *ch, char *argument )
     if ( !count )
     {
 	set_char_color( AT_BLOOD, ch);
-        send_to_char( "There are no organizations currently formed.\n\r", ch );
+        send_to_char( "There are no organizations currently formed.\r\n", ch );
     }
 
     set_char_color( AT_WHITE, ch );
-    send_to_char( "\n\rFor more information use: SHOWCLAN\n\r", ch );
-    send_to_char( "See also: PLANETS\n\r", ch );
+    send_to_char( "\r\nFor more information use: SHOWCLAN\r\n", ch );
+    send_to_char( "See also: PLANETS\r\n", ch );
     
 }
 
@@ -719,19 +719,19 @@ void do_shove( CHAR_DATA *ch, char *argument )
     
     if ( arg[0] == '\0' )
     {
-	send_to_char( "Shove whom?\n\r", ch);
+	send_to_char( "Shove whom?\r\n", ch);
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == NULL )
     {
-	send_to_char( "They aren't here.\n\r", ch);
+	send_to_char( "They aren't here.\r\n", ch);
 	return;
     }
 
     if (victim == ch)
     {
-	send_to_char("You shove yourself around, to no avail.\n\r", ch);
+	send_to_char("You shove yourself around, to no avail.\r\n", ch);
 	return;
     }
     
@@ -743,7 +743,7 @@ void do_shove( CHAR_DATA *ch, char *argument )
 
     if ( arg2[0] == '\0' )
     {
-	send_to_char( "Shove them in which direction?\n\r", ch);
+	send_to_char( "Shove them in which direction?\r\n", ch);
 	return;
     }
 
@@ -751,7 +751,7 @@ void do_shove( CHAR_DATA *ch, char *argument )
     if ( IS_SET(victim->in_room->room_flags, ROOM_SAFE)
     &&  get_timer(victim, TIMER_SHOVEDRAG) <= 0)
     {
-	send_to_char("That character cannot be shoved right now.\n\r", ch);
+	send_to_char("That character cannot be shoved right now.\r\n", ch);
 	return;
     }
     victim->position = POS_SHOVE;
@@ -765,7 +765,7 @@ void do_shove( CHAR_DATA *ch, char *argument )
       nogo = TRUE;
     if ( nogo )
     {
-	send_to_char( "There's no exit in that direction.\n\r", ch );
+	send_to_char( "There's no exit in that direction.\r\n", ch );
         victim->position = POS_STANDING;
 	return;
     }
@@ -773,7 +773,7 @@ void do_shove( CHAR_DATA *ch, char *argument )
 
     if ( IS_NPC(victim) )
     {
-	send_to_char("You can only shove player characters.\n\r", ch);
+	send_to_char("You can only shove player characters.\r\n", ch);
 	return;
     }
     
@@ -794,7 +794,7 @@ act( AT_ACTION, buf, ch, NULL, NULL, TO_ROOM );
 
 if (chance < number_percent( ))
 {
-  send_to_char("You failed.\n\r", ch);
+  send_to_char("You failed.\r\n", ch);
   victim->position = POS_STANDING;
   return;
 }
@@ -826,37 +826,37 @@ void do_drag( CHAR_DATA *ch, char *argument )
 
     if ( arg[0] == '\0' )
     {
-	send_to_char( "Drag whom?\n\r", ch);
+	send_to_char( "Drag whom?\r\n", ch);
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == NULL )
     {
-	send_to_char( "They aren't here.\n\r", ch);
+	send_to_char( "They aren't here.\r\n", ch);
 	return;
     }
 
     if ( victim == ch )
     {
-	send_to_char("You take yourself by the scruff of your neck, but go nowhere.\n\r", ch);
+	send_to_char("You take yourself by the scruff of your neck, but go nowhere.\r\n", ch);
 	return; 
     }
 
     if ( IS_NPC(victim) )
     {
-	send_to_char("You can only drag player characters.\n\r", ch);
+	send_to_char("You can only drag player characters.\r\n", ch);
 	return;
     }
 
     if ( victim->fighting )
     {
-        send_to_char( "You try, but can't get close enough.\n\r", ch);
+        send_to_char( "You try, but can't get close enough.\r\n", ch);
         return;
     }
           
     if ( arg2[0] == '\0' )
     {
-	send_to_char( "Drag them in which direction?\n\r", ch);
+	send_to_char( "Drag them in which direction?\r\n", ch);
 	return;
     }
 
@@ -865,7 +865,7 @@ void do_drag( CHAR_DATA *ch, char *argument )
     if ( IS_SET(victim->in_room->room_flags, ROOM_SAFE)
     &&   get_timer( victim, TIMER_SHOVEDRAG ) <= 0)
     {
-	send_to_char("That character cannot be dragged right now.\n\r", ch);
+	send_to_char("That character cannot be dragged right now.\r\n", ch);
 	return;
     }
 
@@ -879,7 +879,7 @@ void do_drag( CHAR_DATA *ch, char *argument )
       nogo = TRUE;
     if ( nogo )
     {
-	send_to_char( "There's no exit in that direction.\n\r", ch );
+	send_to_char( "There's no exit in that direction.\r\n", ch );
 	return;
     }
 
@@ -894,7 +894,7 @@ act( AT_ACTION, buf, ch, NULL, NULL, TO_ROOM );
 */
 if (chance < number_percent( ))
 {
-  send_to_char("You failed.\n\r", ch);
+  send_to_char("You failed.\r\n", ch);
   victim->position = POS_STANDING;
   return;
 }
@@ -914,7 +914,7 @@ if (chance < number_percent( ))
 	WAIT_STATE(ch, 12);
 	return;
     }
-    send_to_char("You cannot do that to someone who is standing.\n\r", ch);
+    send_to_char("You cannot do that to someone who is standing.\r\n", ch);
     return;
 }
 
@@ -927,7 +927,7 @@ void do_resign( CHAR_DATA *ch, char *argument )
             
         if ( IS_NPC(ch) || !ch->pcdata )
 	{
-	    send_to_char( "You can't do that.\n\r", ch );
+	    send_to_char( "You can't do that.\r\n", ch );
 	    return;
 	}
         
@@ -935,13 +935,13 @@ void do_resign( CHAR_DATA *ch, char *argument )
         
         if ( clan == NULL )
         {
-	    send_to_char( "You have to join an organization before you can quit it.\n\r", ch );
+	    send_to_char( "You have to join an organization before you can quit it.\r\n", ch );
 	    return;
 	}
 
        if ( nifty_is_name( ch->name, ch->pcdata->clan->leaders ) )
        {
-           ch_printf( ch, "You can't resign from %s ... you are one of the leaders!\n\r", clan->name );
+           ch_printf( ch, "You can't resign from %s ... you are one of the leaders!\r\n", clan->name );
            return;
        }
        
@@ -969,13 +969,13 @@ void do_clan_withdraw( CHAR_DATA *ch, char *argument )
     
     if ( IS_NPC( ch ) || !ch->pcdata->clan )
     {
-	send_to_char( "You don't seem to belong to an organization to withdraw funds from...\n\r", ch );
+	send_to_char( "You don't seem to belong to an organization to withdraw funds from...\r\n", ch );
 	return;
     }
 
     if (!ch->in_room || !IS_SET(ch->in_room->room_flags, ROOM_BANK) )
     {
-       send_to_char( "You must be in a bank to do that!\n\r", ch );
+       send_to_char( "You must be in a bank to do that!\r\n", ch );
        return;
     }
     
@@ -995,23 +995,23 @@ void do_clan_withdraw( CHAR_DATA *ch, char *argument )
     
     if ( !amount )
     {
-	send_to_char( "How much would you like to withdraw?\n\r", ch );
+	send_to_char( "How much would you like to withdraw?\r\n", ch );
 	return;
     }
     
     if ( amount > clan->funds )
     {
-	ch_printf( ch,  "%s doesn't have that much!\n\r", clan->name );
+	ch_printf( ch,  "%s doesn't have that much!\r\n", clan->name );
 	return;
     }
     
     if ( amount < 0 )
     {
-	ch_printf( ch,  "Nice try...\n\r" );
+	ch_printf( ch,  "Nice try...\r\n" );
 	return;
     }
     
-    ch_printf( ch,  "You withdraw %ld credits from %s's funds.\n\r", amount, clan->name );
+    ch_printf( ch,  "You withdraw %ld credits from %s's funds.\r\n", amount, clan->name );
     
     clan->funds -= amount;
     ch->gold += amount;
@@ -1027,13 +1027,13 @@ void do_clan_donate( CHAR_DATA *ch, char *argument )
 
     if ( IS_NPC( ch ) || !ch->pcdata->clan )
     {
-	send_to_char( "You don't seem to belong to an organization to donate to...\n\r", ch );
+	send_to_char( "You don't seem to belong to an organization to donate to...\r\n", ch );
 	return;
     }
 
     if (!ch->in_room || !IS_SET(ch->in_room->room_flags, ROOM_BANK) )
     {
-       send_to_char( "You must be in a bank to do that!\n\r", ch );
+       send_to_char( "You must be in a bank to do that!\r\n", ch );
        return;
     }
 
@@ -1043,23 +1043,23 @@ void do_clan_donate( CHAR_DATA *ch, char *argument )
     
     if ( !amount )
     {
-	send_to_char( "How much would you like to donate?\n\r", ch );
+	send_to_char( "How much would you like to donate?\r\n", ch );
 	return;
     }
 
     if ( amount < 0 )
     {
-	ch_printf( ch,  "Nice try...\n\r" );
+	ch_printf( ch,  "Nice try...\r\n" );
 	return;
     }
     
     if ( amount > ch->gold )
     {
-	send_to_char( "You don't have that much!\n\r", ch );
+	send_to_char( "You don't have that much!\r\n", ch );
 	return;
     }
     
-    ch_printf( ch,  "You donate %ld credits to %s's funds.\n\r", amount, clan->name );
+    ch_printf( ch,  "You donate %ld credits to %s's funds.\r\n", amount, clan->name );
     
     clan->funds += amount;
     ch->gold -= amount;
@@ -1081,19 +1081,19 @@ void do_appoint ( CHAR_DATA *ch , char *argument )
 
     if ( !ch->pcdata->clan )
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
     if (  !nifty_is_name( ch->name, ch->pcdata->clan->leaders  )  )
     {
-	send_to_char( "Only your leaders can do that!\n\r", ch );
+	send_to_char( "Only your leaders can do that!\r\n", ch );
 	return;
     }
 
     if ( argument[0] == '\0' )
     {
-	send_to_char( "Useage: appoint name\n\r", ch );
+	send_to_char( "Useage: appoint name\r\n", ch );
 	return;
     }
 
@@ -1106,7 +1106,7 @@ void do_appoint ( CHAR_DATA *ch , char *argument )
     
     if ( stat( fname, &fst ) == -1 )
     {
-	send_to_char( "No such player...\n\r", ch );
+	send_to_char( "No such player...\r\n", ch );
 	return;
     }
     
@@ -1133,19 +1133,19 @@ void do_demote ( CHAR_DATA *ch , char *argument )
 
     if ( !ch->pcdata->clan )
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
     if (  !nifty_is_name( ch->name, ch->pcdata->clan->leaders  )  )
     {
-	send_to_char( "Only your leaders can do that!\n\r", ch );
+	send_to_char( "Only your leaders can do that!\r\n", ch );
 	return;
     }
 
     if ( argument[0] == '\0' )
     {
-	send_to_char( "Demote who?\n\r", ch );
+	send_to_char( "Demote who?\r\n", ch );
 	return;
     }
     
@@ -1163,7 +1163,7 @@ void do_empower ( CHAR_DATA *ch , char *argument )
 
     if ( IS_NPC( ch ) || !ch->pcdata->clan )
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
@@ -1175,7 +1175,7 @@ void do_empower ( CHAR_DATA *ch , char *argument )
 	;
     else
     {
-	send_to_char( "You clan hasn't seen fit to bestow that ability to you!\n\r", ch );
+	send_to_char( "You clan hasn't seen fit to bestow that ability to you!\r\n", ch );
 	return;
     }
 
@@ -1184,31 +1184,31 @@ void do_empower ( CHAR_DATA *ch , char *argument )
 
     if ( arg[0] == '\0' )
     {
-	send_to_char( "Empower whom to do what?\n\r", ch );
+	send_to_char( "Empower whom to do what?\r\n", ch );
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == NULL )
     {
-	send_to_char( "That player is not here.\n\r", ch);
+	send_to_char( "That player is not here.\r\n", ch);
 	return;
     }
 
     if ( IS_NPC(victim) )
     {
-	send_to_char( "Not on NPC's.\n\r", ch );
+	send_to_char( "Not on NPC's.\r\n", ch );
 	return;
     }
 
     if ( victim == ch )
     {
-	    send_to_char( "Nice try.\n\r", ch );
+	    send_to_char( "Nice try.\r\n", ch );
 	    return;
     }
  
     if ( victim->pcdata->clan != ch->pcdata->clan )
     {
-	    send_to_char( "This player does not belong to your clan!\n\r", ch );
+	    send_to_char( "This player does not belong to your clan!\r\n", ch );
 	    return;
     }
 
@@ -1220,7 +1220,7 @@ void do_empower ( CHAR_DATA *ch , char *argument )
     
     if ( !str_cmp( arg2, "list" ) )
     {
-        ch_printf( ch, "Current bestowed commands on %s: %s.\n\r",
+        ch_printf( ch, "Current bestowed commands on %s: %s.\r\n",
                       victim->name, victim->pcdata->bestowments );
         return;
     }
@@ -1229,8 +1229,8 @@ void do_empower ( CHAR_DATA *ch , char *argument )
     {
         DISPOSE( victim->pcdata->bestowments );
 	victim->pcdata->bestowments = str_dup("");
-        ch_printf( ch, "Bestowments removed from %s.\n\r", victim->name );
-        ch_printf( victim, "%s has removed your bestowed clan abilities.\n\r", ch->name );
+        ch_printf( ch, "Bestowments removed from %s.\r\n", victim->name );
+        ch_printf( victim, "%s has removed your bestowed clan abilities.\r\n", ch->name );
         return;
     }
     else if ( !str_cmp( arg2, "pilot" ) )
@@ -1238,66 +1238,66 @@ void do_empower ( CHAR_DATA *ch , char *argument )
       sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
       DISPOSE( victim->pcdata->bestowments );
       victim->pcdata->bestowments = str_dup( buf );
-      ch_printf( victim, "%s has given you permission to fly clan ships.\n\r", 
+      ch_printf( victim, "%s has given you permission to fly clan ships.\r\n", 
              ch->name );
-      send_to_char( "Ok, they now have the ability to fly clan ships.\n\r", ch );
+      send_to_char( "Ok, they now have the ability to fly clan ships.\r\n", ch );
     }
     else if ( !str_cmp( arg2, "withdraw" ) )
     {
       sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
       DISPOSE( victim->pcdata->bestowments );
       victim->pcdata->bestowments = str_dup( buf );
-      ch_printf( victim, "%s has given you permission to withdraw clan funds.\n\r", 
+      ch_printf( victim, "%s has given you permission to withdraw clan funds.\r\n", 
              ch->name );
-      send_to_char( "Ok, they now have the ablitity to withdraw clan funds.\n\r", ch );
+      send_to_char( "Ok, they now have the ablitity to withdraw clan funds.\r\n", ch );
     }
     else if ( !str_cmp( arg2, "clanbuyship" ) )
     {
       sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
       DISPOSE( victim->pcdata->bestowments );
       victim->pcdata->bestowments = str_dup( buf );
-      ch_printf( victim, "%s has given you permission to buy clan ships.\n\r", 
+      ch_printf( victim, "%s has given you permission to buy clan ships.\r\n", 
              ch->name );
-      send_to_char( "Ok, they now have the ablitity to use clanbuyship.\n\r", ch );
+      send_to_char( "Ok, they now have the ablitity to use clanbuyship.\r\n", ch );
     }
     else if ( !str_cmp( arg2, "induct" ) )
     {
       sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
       DISPOSE( victim->pcdata->bestowments );
       victim->pcdata->bestowments = str_dup( buf );
-      ch_printf( victim, "%s has given you permission to induct new members.\n\r", 
+      ch_printf( victim, "%s has given you permission to induct new members.\r\n", 
              ch->name );
-      send_to_char( "Ok, they now have the ablitity to induct new members.\n\r", ch );
+      send_to_char( "Ok, they now have the ablitity to induct new members.\r\n", ch );
     }
     else if ( !str_cmp( arg2, "empower" ) )
     {
       sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
       DISPOSE( victim->pcdata->bestowments );
       victim->pcdata->bestowments = str_dup( buf );
-      ch_printf( victim, "%s has given you the ability to empower others.\n\r", 
+      ch_printf( victim, "%s has given you the ability to empower others.\r\n", 
              ch->name );
-      send_to_char( "Ok, they now have the ablitity to empower others.\n\r", ch );
+      send_to_char( "Ok, they now have the ablitity to empower others.\r\n", ch );
     }
     else if ( !str_cmp( arg2, "build" ) )
     {
       sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
       DISPOSE( victim->pcdata->bestowments );
       victim->pcdata->bestowments = str_dup( buf );
-      ch_printf( victim, "%s has given you permission to build and modify areas.\n\r", 
+      ch_printf( victim, "%s has given you permission to build and modify areas.\r\n", 
              ch->name );
-      send_to_char( "Ok, they now have the ablitity to modify and build areas.\n\r", ch );
+      send_to_char( "Ok, they now have the ablitity to modify and build areas.\r\n", ch );
     }
     else
     {
-      send_to_char( "Currently you may empower members with only the following:\n\r", ch ); 
-      send_to_char( "\n\rpilot:        ability to fly clan ships\n\r", ch );
-      send_to_char(     "withdraw:     ability to withdraw clan funds\n\r", ch );
-      send_to_char(     "clanbuyship:  ability to buy clan ships\n\r", ch );    
-      send_to_char(     "induct:       ability to induct new members\n\r", ch );    
-      send_to_char(     "build:        ability to create and edit rooms\n\r", ch );    
-      send_to_char(     "bestow:       ability to bestow other members (use with caution)\n\r", ch );    
-      send_to_char(     "none:         removes bestowed abilities\n\r", ch );    
-      send_to_char(     "list:         shows bestowed abilities\n\r", ch );    
+      send_to_char( "Currently you may empower members with only the following:\r\n", ch ); 
+      send_to_char( "\r\npilot:        ability to fly clan ships\r\n", ch );
+      send_to_char(     "withdraw:     ability to withdraw clan funds\r\n", ch );
+      send_to_char(     "clanbuyship:  ability to buy clan ships\r\n", ch );    
+      send_to_char(     "induct:       ability to induct new members\r\n", ch );    
+      send_to_char(     "build:        ability to create and edit rooms\r\n", ch );    
+      send_to_char(     "bestow:       ability to bestow other members (use with caution)\r\n", ch );    
+      send_to_char(     "none:         removes bestowed abilities\r\n", ch );    
+      send_to_char(     "list:         shows bestowed abilities\r\n", ch );    
     }
     
     save_char_obj( victim );	/* clan gets saved when pfile is saved */
@@ -1313,17 +1313,17 @@ void do_overthrow( CHAR_DATA *ch , char * argument )
        
     if ( !ch->pcdata || !ch->pcdata->clan )
     {
-       send_to_char( "You have to be part of an organization before you can claim leadership.\n\r", ch );
+       send_to_char( "You have to be part of an organization before you can claim leadership.\r\n", ch );
        return;
     }
 
     if ( ch->pcdata->clan->leaders && ch->pcdata->clan->leaders[0] != '\0' )
     {
-       send_to_char( "Your organization already has strong leadership...\n\r", ch );
+       send_to_char( "Your organization already has strong leadership...\r\n", ch );
        return;
     }
 
-    ch_printf( ch, "OK. You are now a leader of %s.\n\r", ch->pcdata->clan->name );
+    ch_printf( ch, "OK. You are now a leader of %s.\r\n", ch->pcdata->clan->name );
     
     STRFREE ( ch->pcdata->clan->leaders );
     ch->pcdata->clan->leaders = STRALLOC ( ch->name );
@@ -1340,7 +1340,7 @@ void do_war ( CHAR_DATA *ch , char *argument )
 
     if ( IS_NPC( ch ) || !ch->pcdata || !ch->pcdata->clan )
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
@@ -1352,26 +1352,26 @@ void do_war ( CHAR_DATA *ch , char *argument )
 	;
     else
     {
-	send_to_char( "You clan hasn't empowered you to declare war!\n\r", ch );
+	send_to_char( "You clan hasn't empowered you to declare war!\r\n", ch );
 	return;
     }
 
 
     if ( argument[0] == '\0' )
     {
-	send_to_char( "Declare war on who?\n\r", ch );
+	send_to_char( "Declare war on who?\r\n", ch );
 	return;
     }
 
     if ( ( wclan = get_clan( argument ) ) == NULL )
     {
-	send_to_char( "No such clan.\n\r", ch);
+	send_to_char( "No such clan.\r\n", ch);
 	return;
     }
 
     if ( wclan == clan )
     {
-	send_to_char( "Declare war on yourself?!\n\r", ch);
+	send_to_char( "Declare war on yourself?!\r\n", ch);
 	return;
     }
 
@@ -1383,7 +1383,7 @@ void do_war ( CHAR_DATA *ch , char *argument )
         for ( tclan = first_clan ; tclan ; tclan = tclan->next )
             if ( nifty_is_name( tclan->name , clan->atwar ) && tclan != wclan )
             {
-                 strcat ( buf, "\n\r " );
+                 strcat ( buf, "\r\n " );
                  strcat ( buf, tclan->name );
                  strcat ( buf, " " );
             }
@@ -1400,7 +1400,7 @@ void do_war ( CHAR_DATA *ch , char *argument )
     }
     
     strcpy ( buf, clan->atwar );
-    strcat ( buf, "\n\r " );
+    strcat ( buf, "\r\n " );
     strcat ( buf, wclan->name );
     strcat ( buf, " " );
     
@@ -1420,7 +1420,7 @@ void do_setwages ( CHAR_DATA *ch , char *argument )
 
     if ( IS_NPC( ch ) || !ch->pcdata || !ch->pcdata->clan )
     {
-	send_to_char( "Huh?\n\r", ch );
+	send_to_char( "Huh?\r\n", ch );
 	return;
     }
 
@@ -1432,20 +1432,20 @@ void do_setwages ( CHAR_DATA *ch , char *argument )
 	;
     else
     {
-	send_to_char( "You clan hasn't empowered you to set wages!\n\r", ch );
+	send_to_char( "You clan hasn't empowered you to set wages!\r\n", ch );
 	return;
     }
 
 
     if ( argument[0] == '\0' )
     {
-	send_to_char( "Set clan wages to what?\n\r", ch );
+	send_to_char( "Set clan wages to what?\r\n", ch );
 	return;
     }
 
     clan->salary = atoi( argument );
     
-    ch_printf( ch , "Clan wages set to %d credits per hour\n\r" , clan->salary );
+    ch_printf( ch , "Clan wages set to %d credits per hour\r\n" , clan->salary );
 
     save_char_obj( ch );	/* clan gets saved when pfile is saved */
     

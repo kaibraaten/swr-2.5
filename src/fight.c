@@ -268,7 +268,7 @@ void violence_update( void )
 		      {
                           set_char_color( AT_WEAROFF, ch );
 			  send_to_char( skill->msg_off, ch );
-			  send_to_char( "\n\r", ch );
+			  send_to_char( "\r\n", ch );
 		      }
 		  }
 		  if (paf->type == gsn_possess)
@@ -1357,7 +1357,7 @@ ch_ret damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
 	   act( AT_DEAD, "$n EXPLODES into many small pieces!", victim, 0, 0, TO_ROOM );
 	else
 	   act( AT_DEAD, "$n is DEAD!", victim, 0, 0, TO_ROOM );
-	   send_to_char( "&WYou have been KILLED!\n\r", victim);
+	   send_to_char( "&WYou have been KILLED!\r\n", victim);
 	break;
 
     default:
@@ -1567,7 +1567,7 @@ bool is_safe( CHAR_DATA *ch, CHAR_DATA *victim )
     if ( IS_SET( victim->in_room->room_flags, ROOM_SAFE ) )
     {
 	set_char_color( AT_MAGIC, ch );
-	send_to_char( "You'll have to do that elswhere.\n\r", ch );
+	send_to_char( "You'll have to do that elswhere.\r\n", ch );
 	return TRUE;
     }
 
@@ -1677,7 +1677,7 @@ void set_fighting( CHAR_DATA *ch, CHAR_DATA *victim )
     /* Limit attackers -Thoric */
     if ( victim->num_fighting > max_fight(victim) )
     {
-	send_to_char( "There are too many people fighting for you to join in.\n\r", ch );
+	send_to_char( "There are too many people fighting for you to join in.\r\n", ch );
 	return;
     }
 
@@ -1692,7 +1692,7 @@ void set_fighting( CHAR_DATA *ch, CHAR_DATA *victim )
     victim->num_fighting++;
     if ( victim->switched && IS_AFFECTED(victim->switched, AFF_POSSESS) )
     {
-	send_to_char( "You are disturbed!\n\r", victim->switched );
+	send_to_char( "You are disturbed!\r\n", victim->switched );
 	do_return( victim->switched, const_char_to_nonconst( "" ) );
     }
     return;
@@ -1735,7 +1735,7 @@ void free_fight( CHAR_DATA *ch )
      affect_strip(ch, gsn_berserk);
      set_char_color(AT_WEAROFF, ch);
      send_to_char(skill_table[gsn_berserk]->msg_off, ch);
-     send_to_char("\n\r", ch);
+     send_to_char("\r\n", ch);
    }
    return;
 }
@@ -2186,19 +2186,19 @@ void do_kill( CHAR_DATA *ch, char *argument )
 
     if ( arg[0] == '\0' )
     {
-	send_to_char( "Kill whom?\n\r", ch );
+	send_to_char( "Kill whom?\r\n", ch );
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == NULL )
     {
-	send_to_char( "They aren't here.\n\r", ch );
+	send_to_char( "They aren't here.\r\n", ch );
 	return;
     }
 
     if ( !IS_NPC(victim) )
     {
-	    send_to_char( "You must MURDER a player.\n\r", ch );
+	    send_to_char( "You must MURDER a player.\r\n", ch );
 	    return;
     }
 
@@ -2208,7 +2208,7 @@ void do_kill( CHAR_DATA *ch, char *argument )
     {
 	if ( IS_AFFECTED(victim, AFF_CHARM) && victim->master != NULL )
 	{
-	    send_to_char( "You must MURDER a charmed creature.\n\r", ch );
+	    send_to_char( "You must MURDER a charmed creature.\r\n", ch );
 	    return;
 	}
     }
@@ -2217,7 +2217,7 @@ void do_kill( CHAR_DATA *ch, char *argument )
 
     if ( victim == ch )
     {
-	send_to_char( "You hit yourself.  Ouch!\n\r", ch );
+	send_to_char( "You hit yourself.  Ouch!\r\n", ch );
 	multi_hit( ch, ch, TYPE_UNDEFINED );
 	return;
     }
@@ -2233,7 +2233,7 @@ void do_kill( CHAR_DATA *ch, char *argument )
 
     if ( ch->position == POS_FIGHTING )
     {
-	send_to_char( "You do the best you can!\n\r", ch );
+	send_to_char( "You do the best you can!\r\n", ch );
 	return;
     }
 
@@ -2246,7 +2246,7 @@ void do_kill( CHAR_DATA *ch, char *argument )
 
 void do_murde( CHAR_DATA *ch, char *argument )
 {
-    send_to_char( "If you want to MURDER, spell it out.\n\r", ch );
+    send_to_char( "If you want to MURDER, spell it out.\r\n", ch );
     return;
 }
 
@@ -2261,19 +2261,19 @@ void do_murder( CHAR_DATA *ch, char *argument )
 
     if ( arg[0] == '\0' )
     {
-	send_to_char( "Murder whom?\n\r", ch );
+	send_to_char( "Murder whom?\r\n", ch );
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == NULL )
     {
-	send_to_char( "They aren't here.\n\r", ch );
+	send_to_char( "They aren't here.\r\n", ch );
 	return;
     }
 
     if ( victim == ch )
     {
-	send_to_char( "Suicide is a mortal sin.\n\r", ch );
+	send_to_char( "Suicide is a mortal sin.\r\n", ch );
 	return;
     }
 
@@ -2291,13 +2291,13 @@ void do_murder( CHAR_DATA *ch, char *argument )
 
     if ( ch->position == POS_FIGHTING )
     {
-	send_to_char( "You do the best you can!\n\r", ch );
+	send_to_char( "You do the best you can!\r\n", ch );
 	return;
     }
 
     if ( !IS_NPC( victim ) && IS_SET( ch->act, PLR_NICE ) )
     {
-      send_to_char( "You feel too nice to do that!\n\r", ch );
+      send_to_char( "You feel too nice to do that!\r\n", ch );
       return;
     }
 
@@ -2332,13 +2332,13 @@ void do_flee( CHAR_DATA *ch, char *argument )
 	  else
 	    ch->position = POS_STANDING;
 	}
-	send_to_char( "You aren't fighting anyone.\n\r", ch );
+	send_to_char( "You aren't fighting anyone.\r\n", ch );
 	return;
     }
 
     if ( ch->move <= 0 )
     {
-	send_to_char( "You're too exhausted to flee from combat!\n\r", ch );
+	send_to_char( "You're too exhausted to flee from combat!\r\n", ch );
 	return;
     }
 
@@ -2435,7 +2435,7 @@ bool get_cover( CHAR_DATA *ch )
 
 void do_sla( CHAR_DATA *ch, char *argument )
 {
-    send_to_char( "If you want to SLAY, spell it out.\n\r", ch );
+    send_to_char( "If you want to SLAY, spell it out.\r\n", ch );
     return;
 }
 
@@ -2451,26 +2451,26 @@ void do_slay( CHAR_DATA *ch, char *argument )
     one_argument( argument, arg2 );
     if ( arg[0] == '\0' )
     {
-	send_to_char( "Slay whom?\n\r", ch );
+	send_to_char( "Slay whom?\r\n", ch );
 	return;
     }
 
     if ( ( victim = get_char_room( ch, arg ) ) == NULL )
     {
-	send_to_char( "They aren't here.\n\r", ch );
+	send_to_char( "They aren't here.\r\n", ch );
 	return;
     }
 
     if ( ch == victim )
     {
-	send_to_char( "Suicide is a mortal sin.\n\r", ch );
+	send_to_char( "Suicide is a mortal sin.\r\n", ch );
 	return;
     }
 
     if ( !IS_NPC(victim) 
     && ( get_trust( victim ) == 103 || get_trust( ch ) < 103) )
     {
-	send_to_char( "You failed.\n\r", ch );
+	send_to_char( "You failed.\r\n", ch );
 	return;
     }
 

@@ -112,24 +112,24 @@ void init_supermob()
 #undef RID
 
 
-/* Used to get sequential lines of a multi line string (separated by "\n\r")
+/* Used to get sequential lines of a multi line string (separated by "\r\n")
  * Thus its like one_argument(), but a trifle different. It is destructive
  * to the multi line string argument, and thus clist must not be shared.
  */
 char *mprog_next_command( char *clist )
 {
-
   char *pointer = clist;
 
   while ( *pointer != '\n' && *pointer != '\0' )
     pointer++;
-  if ( *pointer == '\n' )
-    *pointer++ = '\0';
+
   if ( *pointer == '\r' )
     *pointer++ = '\0';
 
-  return ( pointer );
+  if ( *pointer == '\n' )
+    *pointer++ = '\0';
 
+  return ( pointer );
 }
 
 /* These two functions do the basic evaluation of ifcheck operators.

@@ -26,7 +26,7 @@ void write_poll_list( )
     fpout = fopen( player, "w" );
     if ( !fpout )
     {
-	bug( "FATAL: cannot open vote.lst for writing!\n\r", 0 );
+	bug( "FATAL: cannot open vote.lst for writing!\r\n", 0 );
  	return;
     }	  
     for ( tpoll = first_poll; tpoll; tpoll = tpoll->next )
@@ -253,7 +253,7 @@ void load_polls( )
 	}
     }
     fclose( fpList );
-    log_string(" Done polls\n\r" );
+    log_string(" Done polls\r\n" );
     fpReserve = fopen( NULL_FILE, "r" );
     
     return;

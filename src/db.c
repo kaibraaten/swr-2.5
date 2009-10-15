@@ -313,9 +313,6 @@ void boot_db( bool fCopyOver )
 	if ( !gsn_first_weapon && skill_table[x]->type == SKILL_WEAPON )
 	    gsn_first_weapon = x;
 
-    log_string("Initializing request pipe");
-    init_request_pipe();
-
     fBootDb		= TRUE;
     
     top_r_vnum 		= 0;
@@ -2062,7 +2059,7 @@ char fread_letter( FILE *fp )
     {
         if ( feof(fp) )
         {
-          bug("fread_letter: EOF encountered on read.\n\r");
+          bug("fread_letter: EOF encountered on read.\r\n");
           if ( fBootDb )
             exit(1);
           return '\0';
@@ -2089,7 +2086,7 @@ int fread_number( FILE *fp )
     {
         if ( feof(fp) )
         {
-          bug("fread_number: EOF encountered on read.\n\r");
+          bug("fread_number: EOF encountered on read.\r\n");
           if ( fBootDb )
             exit(1);
           return 0;
@@ -2123,7 +2120,7 @@ int fread_number( FILE *fp )
     {
         if ( feof(fp) )
         {
-          bug("fread_number: EOF encountered on read.\n\r");
+          bug("fread_number: EOF encountered on read.\r\n");
           if ( fBootDb )
             exit(1);
           return number;
@@ -2184,7 +2181,7 @@ char *fread_string( FILE *fp )
     {
 	if ( feof(fp) )
 	{
-	    bug("fread_string: EOF encountered on read.\n\r");
+	    bug("fread_string: EOF encountered on read.\r\n");
 	    if ( fBootDb )
 		exit(1);
 	    return STRALLOC("");
@@ -2255,7 +2252,7 @@ char *fread_string_nohash( FILE *fp )
     {
 	if ( feof(fp) )
 	{
-	    bug("fread_string_no_hash: EOF encountered on read.\n\r");
+	    bug("fread_string_no_hash: EOF encountered on read.\r\n");
 	    if ( fBootDb )
 		exit(1);
 	    return str_dup("");
@@ -2317,7 +2314,7 @@ void fread_to_eol( FILE *fp )
     {
 	if ( feof(fp) )
 	{
-	    bug("fread_to_eol: EOF encountered on read.\n\r");
+	    bug("fread_to_eol: EOF encountered on read.\r\n");
 	    if ( fBootDb )
 		exit(1);
 	    return;
@@ -2358,7 +2355,7 @@ char *fread_line( FILE *fp )
     {
 	if ( feof(fp) )
 	{
-	    bug("fread_line: EOF encountered on read.\n\r");
+	    bug("fread_line: EOF encountered on read.\r\n");
 	    if ( fBootDb )
 		exit(1);
 	    strcpy(line, "");
@@ -2373,7 +2370,7 @@ char *fread_line( FILE *fp )
     {
 	if ( feof(fp) )
 	{
-	    bug("fread_line: EOF encountered on read.\n\r");
+	    bug("fread_line: EOF encountered on read.\r\n");
 	    if ( fBootDb )
 		exit(1);
 	    *pline = '\0';
@@ -2415,7 +2412,7 @@ char *fread_word( FILE *fp )
     {
 	if ( feof(fp) )
 	{
-	    bug("fread_word: EOF encountered on read.\n\r");
+	    bug("fread_word: EOF encountered on read.\r\n");
 	    if ( fBootDb )
 		exit(1);
 	    word[0] = '\0';
@@ -2440,7 +2437,7 @@ char *fread_word( FILE *fp )
     {
 	if ( feof(fp) )
 	{
-	    bug("fread_word: EOF encountered on read.\n\r");
+	    bug("fread_word: EOF encountered on read.\r\n");
 	    if ( fBootDb )
 		exit(1);
 	    *pword = '\0';
@@ -2468,23 +2465,23 @@ void do_memory( CHAR_DATA *ch, char *argument )
     int hash;
 
     argument = one_argument( argument, arg );
-    ch_printf( ch, "Affects %5d    Areas   %5d\n\r",  top_affect, top_area   );
-    ch_printf( ch, "ExtDes  %5d    Exits   %5d\n\r", top_ed,	 top_exit   );
-    ch_printf( ch, "Helps   %5d\n\r", top_help  );
-    ch_printf( ch, "IdxMobs %5d    Mobs    %5d\n\r", top_mob_index, nummobsloaded );
-    ch_printf( ch, "IdxObjs %5d    Objs    %5d (%d)\n\r", top_obj_index, numobjsloaded, physicalobjects );
-    ch_printf( ch, "Rooms   %5d    VRooms  %5d\n\r", top_room,   top_vroom   );
-    ch_printf( ch, "Shops   %5d    RepShps %5d\n\r", top_shop,   top_repair );
-    ch_printf( ch, "CurOq's %5d    CurCq's %5d\n\r", cur_qobjs,  cur_qchars );
-    ch_printf( ch, "Players %5d    Maxplrs %5d\n\r", num_descriptors, sysdata.maxplayers );
-    ch_printf( ch, "MaxEver %5d    Topsn   %5d (%d)\n\r", sysdata.alltimemax, top_sn, MAX_SKILL );
-    ch_printf( ch, "MaxEver time recorded at:   %s\n\r", sysdata.time_of_max );
+    ch_printf( ch, "Affects %5d    Areas   %5d\r\n",  top_affect, top_area   );
+    ch_printf( ch, "ExtDes  %5d    Exits   %5d\r\n", top_ed,	 top_exit   );
+    ch_printf( ch, "Helps   %5d\r\n", top_help  );
+    ch_printf( ch, "IdxMobs %5d    Mobs    %5d\r\n", top_mob_index, nummobsloaded );
+    ch_printf( ch, "IdxObjs %5d    Objs    %5d (%d)\r\n", top_obj_index, numobjsloaded, physicalobjects );
+    ch_printf( ch, "Rooms   %5d    VRooms  %5d\r\n", top_room,   top_vroom   );
+    ch_printf( ch, "Shops   %5d    RepShps %5d\r\n", top_shop,   top_repair );
+    ch_printf( ch, "CurOq's %5d    CurCq's %5d\r\n", cur_qobjs,  cur_qchars );
+    ch_printf( ch, "Players %5d    Maxplrs %5d\r\n", num_descriptors, sysdata.maxplayers );
+    ch_printf( ch, "MaxEver %5d    Topsn   %5d (%d)\r\n", sysdata.alltimemax, top_sn, MAX_SKILL );
+    ch_printf( ch, "MaxEver time recorded at:   %s\r\n", sysdata.time_of_max );
     if ( !str_cmp( arg, "check" ) )
     {
 #ifdef HASHSTR
 	send_to_char( check_hash(argument), ch );
 #else
-	send_to_char( "Hash strings not enabled.\n\r", ch );
+	send_to_char( "Hash strings not enabled.\r\n", ch );
 #endif
 	return;
     }
@@ -2493,7 +2490,7 @@ void do_memory( CHAR_DATA *ch, char *argument )
 #ifdef HASHSTR
 	show_high_hash( atoi(argument) );
 #else
-	send_to_char( "Hash strings not enabled.\n\r", ch );
+	send_to_char( "Hash strings not enabled.\r\n", ch );
 #endif
 	return;
     }
@@ -2504,11 +2501,11 @@ void do_memory( CHAR_DATA *ch, char *argument )
     if ( !str_cmp( arg, "hash" ) )
     {
 #ifdef HASHSTR
-	ch_printf( ch, "Hash statistics:\n\r%s", hash_stats() );
+	ch_printf( ch, "Hash statistics:\r\n%s", hash_stats() );
 	if ( hash != -1 )
 	  hash_dump( hash );
 #else
-	send_to_char( "Hash strings not enabled.\n\r", ch );
+	send_to_char( "Hash strings not enabled.\r\n", ch );
 #endif
     }
     return;
@@ -2930,7 +2927,7 @@ void append_file( CHAR_DATA *ch, const char *file, const char *str )
     fclose( fpLOG );
     if ( ( fp = fopen( file, "a" ) ) == NULL )
     {
-	send_to_char( "Could not open the file!\n\r", ch );
+	send_to_char( "Could not open the file!\r\n", ch );
     }
     else
     {
@@ -4043,7 +4040,7 @@ MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
 	{
 	  sprintf( buf, "A newly created %s", name );
 	  pMobIndex->short_descr	= STRALLOC( buf  );
-	  sprintf( buf, "Some god abandoned a newly created %s here.\n\r", name );
+	  sprintf( buf, "Some god abandoned a newly created %s here.\r\n", name );
 	  pMobIndex->long_descr		= STRALLOC( buf );
 	  pMobIndex->description	= STRALLOC( "" );
 	  pMobIndex->short_descr[0]	= LOWER(pMobIndex->short_descr[0]);
@@ -4430,13 +4427,13 @@ void do_zones( CHAR_DATA *ch, char *argument )
 
     set_pager_color( AT_PLAIN, ch );
 
-    pager_printf(ch, "Zones\n\r" );
-    pager_printf(ch, "----------------------------------------------\n\r" );    
+    pager_printf(ch, "Zones\r\n" );
+    pager_printf(ch, "----------------------------------------------\r\n" );    
     
     for ( pArea = first_area; pArea; pArea = pArea->next )
-	pager_printf(ch, "%s\n\r", pArea->filename );
+	pager_printf(ch, "%s\r\n", pArea->filename );
 
-    pager_printf(ch, "----------------------------------------------\n\r" );	
+    pager_printf(ch, "----------------------------------------------\r\n" );	
     return;
 
 }
