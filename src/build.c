@@ -6197,15 +6197,14 @@ void save_objects()
 
 void save_some_areas( )
 {
-     AREA_DATA * area;
+  AREA_DATA * area;
      
-     for ( area = first_area ; area ; area = area->next )
-     {
-         if ( IS_SET( area->flags , AFLAG_MODIFIED ) )
-         {
-              REMOVE_BIT( area->flags , AFLAG_MODIFIED );
-              fold_area( area , area->filename, FALSE );
-         }
-     }     
-
+  for ( area = first_area ; area ; area = area->next )
+    {
+      if ( IS_SET( area->flags , AFLAG_MODIFIED ) )
+	{
+	  REMOVE_BIT( area->flags , AFLAG_MODIFIED );
+	  fold_area( area , area->filename, FALSE );
+	}
+    }
 }

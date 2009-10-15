@@ -2497,133 +2497,132 @@ void do_hijack( CHAR_DATA *ch, char *argument )
 
 void do_propeganda ( CHAR_DATA *ch , char *argument )
 {
-    char buf  [MAX_STRING_LENGTH];
-    char arg1 [MAX_INPUT_LENGTH];
-    CHAR_DATA *victim = NULL;
-    PLANET_DATA *planet = NULL;
-    CLAN_DATA   *clan = NULL;
-    int percent = 0;
+  char buf  [MAX_STRING_LENGTH];
+  char arg1 [MAX_INPUT_LENGTH];
+  CHAR_DATA *victim = NULL;
+  PLANET_DATA *planet = NULL;
+  CLAN_DATA   *clan = NULL;
+  int percent = 0;
     
-   if ( IS_NPC(ch) || !ch->pcdata || !ch->pcdata->clan || !ch->in_room->area || !ch->in_room->area->planet )
-   {
-       send_to_char( "What would be the point of that.\n\r", ch );
-       return;
-   }
-    
-    argument = one_argument( argument, arg1 );
-
-    if ( ch->mount )
+  if ( IS_NPC(ch) || !ch->pcdata || !ch->pcdata->clan || !ch->in_room->area || !ch->in_room->area->planet )
     {
-	send_to_char( "You can't do that while mounted.\n\r", ch );
-	return;
-    }
-
-    if ( arg1[0] == '\0' )
-    {
-	send_to_char( "Spread propeganda to who?\n\r", ch );
-	return;
-    }
-
-    if ( ( victim = get_char_room( ch, arg1 ) ) == NULL )
-    {
-	send_to_char( "They aren't here.\n\r", ch );
-	return;
-    }
-
-    if ( victim == ch )
-    {
-	send_to_char( "That's pointless.\n\r", ch );
-	return;
-    }
-
-    if ( !IS_SET( victim->act , ACT_CITIZEN ) )
-    {
-        send_to_char( "I don't think diplomacy will work on them...\n\r" , ch );
-        return;    
+      send_to_char( "What would be the point of that.\n\r", ch );
+      return;
     }
     
-    if ( IS_SET( ch->in_room->room_flags, ROOM_SAFE ) )
+  argument = one_argument( argument, arg1 );
+
+  if ( ch->mount )
     {
-	set_char_color( AT_MAGIC, ch );
-	send_to_char( "This isn't a good place to do that.\n\r", ch );
-	return;
+      send_to_char( "You can't do that while mounted.\n\r", ch );
+      return;
     }
 
-    if ( ch->position == POS_FIGHTING )
+  if ( arg1[0] == '\0' )
     {
-        send_to_char( "Interesting combat technique.\n\r" , ch );
-        return;
-    }
-    
-    if ( victim->position == POS_FIGHTING )
-    {
-        send_to_char( "They're a little busy right now.\n\r" , ch );
-        return;
-    }
-    
-
-    if ( ch->position <= POS_SLEEPING )
-    {
-        send_to_char( "In your dreams or what?\n\r" , ch );
-        return;
-    }
-    
-    if ( victim->position <= POS_SLEEPING )
-    {
-        send_to_char( "You might want to wake them first...\n\r" , ch );
-        return;
+      send_to_char( "Spread propeganda to who?\n\r", ch );
+      return;
     }
 
-    clan = ch->pcdata->clan;
+  if ( ( victim = get_char_room( ch, arg1 ) ) == NULL )
+    {
+      send_to_char( "They aren't here.\n\r", ch );
+      return;
+    }
+
+  if ( victim == ch )
+    {
+      send_to_char( "That's pointless.\n\r", ch );
+      return;
+    }
+
+  if ( !IS_SET( victim->act , ACT_CITIZEN ) )
+    {
+      send_to_char( "I don't think diplomacy will work on them...\n\r" , ch );
+      return;    
+    }
+    
+  if ( IS_SET( ch->in_room->room_flags, ROOM_SAFE ) )
+    {
+      set_char_color( AT_MAGIC, ch );
+      send_to_char( "This isn't a good place to do that.\n\r", ch );
+      return;
+    }
+
+  if ( ch->position == POS_FIGHTING )
+    {
+      send_to_char( "Interesting combat technique.\n\r" , ch );
+      return;
+    }
+    
+  if ( victim->position == POS_FIGHTING )
+    {
+      send_to_char( "They're a little busy right now.\n\r" , ch );
+      return;
+    }
+
+  if ( ch->position <= POS_SLEEPING )
+    {
+      send_to_char( "In your dreams or what?\n\r" , ch );
+      return;
+    }
+    
+  if ( victim->position <= POS_SLEEPING )
+    {
+      send_to_char( "You might want to wake them first...\n\r" , ch );
+      return;
+    }
+
+  clan = ch->pcdata->clan;
        
-    planet = ch->in_room->area->planet;
+  planet = ch->in_room->area->planet;
         
-    sprintf( buf, ", and the evils of %s" , planet->governed_by ? planet->governed_by->name : "their current leaders" );
-    ch_printf( ch, "You speak to them about the benifits of the %s%s.\n\r", ch->pcdata->clan->name,
-        planet->governed_by == clan ? "" : buf );
-    act( AT_ACTION, "$n speaks about his organization.\n\r", ch, NULL, victim, TO_VICT    );
-    act( AT_ACTION, "$n tells $N about their organization.\n\r",  ch, NULL, victim, TO_NOTVICT );
+  sprintf( buf, ", and the evils of %s" , planet->governed_by ? planet->governed_by->name : "their current leaders" );
+  ch_printf( ch, "You speak to them about the benefits of the %s%s.\n\r", ch->pcdata->clan->name,
+	     planet->governed_by == clan ? "" : buf );
+  act( AT_ACTION, "$n speaks about his organization.\n\r", ch, NULL, victim, TO_VICT    );
+  act( AT_ACTION, "$n tells $N about their organization.\n\r",  ch, NULL, victim, TO_NOTVICT );
 
-    WAIT_STATE( ch, skill_table[gsn_propeganda]->beats );
+  WAIT_STATE( ch, skill_table[gsn_propeganda]->beats );
 
-    if ( percent - get_curr_cha(ch) + victim->top_level > ch->pcdata->learned[gsn_propeganda]  ) 
+  if ( percent - get_curr_cha(ch) + victim->top_level > ch->pcdata->learned[gsn_propeganda]  ) 
     {
-
-        if ( planet->governed_by != clan )
+      if ( planet->governed_by != clan )
 	{
 	  sprintf( buf, "%s is a traitor!" , ch->name);
 	  do_yell( victim, buf );
           global_retcode = multi_hit( victim, ch, TYPE_UNDEFINED );
 	}
-	
-	return;
+
+      return;
     }
     
-    if ( planet->governed_by == clan )
+  if ( planet->governed_by == clan )
     { 
-       planet->pop_support += 1;
-       send_to_char( "Popular support for your organization increases.\n\r", ch );
+      planet->pop_support += 1;
+      send_to_char( "Popular support for your organization increases.\n\r", ch );
     }     
-    else
+  else
     {
-       planet->pop_support -= .1;
-       send_to_char( "Popular support for the current government decreases.\n\r", ch );
+      planet->pop_support -= .1;
+      send_to_char( "Popular support for the current government decreases.\n\r", ch );
     }
     
-    if ( number_percent() == 23 )
+  if ( number_percent() == 23 )
     {
-	send_to_char( "You feel a bit more charming than you used to...\n\r", ch );
-        ch->perm_cha++;
-        ch->perm_cha = UMIN( ch->perm_cha , 25 );
+      send_to_char( "You feel a bit more charming than you used to...\n\r", ch );
+      ch->perm_cha++;
+      ch->perm_cha = UMIN( ch->perm_cha , 25 );
     }
 
-    learn_from_success( ch, gsn_propeganda );
+  learn_from_success( ch, gsn_propeganda );
         
-    if ( planet->pop_support > 100 )
-        planet->pop_support = 100;
-    if ( planet->pop_support < -100 )
-        planet->pop_support = -100;
+  if ( planet->pop_support > 100 )
+    planet->pop_support = 100;
+  if ( planet->pop_support < -100 )
+    planet->pop_support = -100;
 
+  save_planet( planet );
 }
 
 void  clear_roomtype( ROOM_INDEX_DATA * location )
@@ -2667,281 +2666,289 @@ void  clear_roomtype( ROOM_INDEX_DATA * location )
 
 void do_landscape ( CHAR_DATA *ch , char *argument )
 {
-    CLAN_DATA * clan;
-    OBJ_DATA *obj;
-    OBJ_DATA *obj_next;
-    ROOM_INDEX_DATA * location;
-    int chance;
-    char arg[MAX_INPUT_LENGTH];
+  CLAN_DATA * clan;
+  OBJ_DATA *obj;
+  OBJ_DATA *obj_next;
+  ROOM_INDEX_DATA * location;
+  int chance;
+  char arg[MAX_INPUT_LENGTH];
     
-    if ( IS_NPC(ch) || !ch->pcdata )
-    	return;
+  if ( IS_NPC(ch) || !ch->pcdata )
+    return;
 
-    if ( !ch->desc )
-	return;
+  if ( !ch->desc )
+    return;
 
-   switch( ch->substate )
-   {
-	default:
-	  break;
-	case SUB_ROOM_DESC:
-	  location = (ROOM_INDEX_DATA*) ch->dest_buf;
-	  if ( !location )
-	  {
-		bug( "landscape: sub_room_desc: NULL ch->dest_buf", 0 );
-		location = ch->in_room;
-	  }
-	  STRFREE( location->description );
-	  location->description = copy_buffer( ch );
-	  stop_editing( ch );
-	  ch->substate = ch->tempnum;
-          if ( strlen( location->description ) > 150 )
-   	     learn_from_success( ch , gsn_landscape );
-          else
-          {
-  	     send_to_char( "That rooms description is too short.\n\r", ch );
-  	     send_to_char( "You skill level deminishes with your lazyness.\n\r", ch );
-             if ( ch->pcdata->learned[gsn_landscape] > 50 )
-                ch->pcdata->learned[gsn_landscape] -= 5;
-          }   
-          SET_BIT( location->area->flags , AFLAG_MODIFIED );
-	  for ( obj = ch->in_room->first_content; obj; obj = obj_next )
-	  { 
-	    obj_next = obj->next_content;
-	    extract_obj( obj );
-	  }
-          echo_to_room( AT_WHITE, location , "The construction crew finishes its work." );
-	  return;
-   }
+  switch( ch->substate )
+    {
+    default:
+      break;
+
+    case SUB_ROOM_DESC:
+      location = (ROOM_INDEX_DATA*) ch->dest_buf;
+
+      if ( !location )
+	{
+	  bug( "landscape: sub_room_desc: NULL ch->dest_buf", 0 );
+	  location = ch->in_room;
+	}
+
+      STRFREE( location->description );
+      location->description = copy_buffer( ch );
+      stop_editing( ch );
+      ch->substate = ch->tempnum;
+
+      if ( strlen( location->description ) > 150 )
+	learn_from_success( ch , gsn_landscape );
+      else
+	{
+	  send_to_char( "That rooms description is too short.\n\r", ch );
+	  send_to_char( "You skill level deminishes with your lazyness.\n\r", ch );
+	  if ( ch->pcdata->learned[gsn_landscape] > 50 )
+	    ch->pcdata->learned[gsn_landscape] -= 5;
+	}   
+
+      SET_BIT( location->area->flags , AFLAG_MODIFIED );
+
+      for ( obj = ch->in_room->first_content; obj; obj = obj_next )
+	{ 
+	  obj_next = obj->next_content;
+	  extract_obj( obj );
+	}
+
+      echo_to_room( AT_WHITE, location , "The construction crew finishes its work." );
+      fold_area( location->area, location->area->filename, TRUE );
+      return;
+    }
      
-   location = ch->in_room;
-   clan = ch->pcdata->clan;
+  location = ch->in_room;
+  clan = ch->pcdata->clan;
 
-   if ( !clan )
-   {
-	send_to_char( "You need to be part of an organization before you can do that!\n\r", ch );
-	return;         
-   }
+  if ( !clan )
+    {
+      send_to_char( "You need to be part of an organization before you can do that!\n\r", ch );
+      return;         
+    }
 
-   if ( (ch->pcdata && ch->pcdata->bestowments
-   &&    is_name("build", ch->pcdata->bestowments))
-   || nifty_is_name( ch->name, clan->leaders  ) )
-	;
-   else
-   {
-	send_to_char( "Your organization hasn't given you permission to edit their lands!\n\r", ch );
-	return;
-   }
+  if ( (ch->pcdata && ch->pcdata->bestowments
+	&&    is_name("build", ch->pcdata->bestowments))
+       || nifty_is_name( ch->name, clan->leaders  ) )
+    ;
+  else
+    {
+      send_to_char( "Your organization hasn't given you permission to edit their lands!\n\r", ch );
+      return;
+    }
 
-   if ( !location->area || !location->area->planet ||
-   clan != location->area->planet->governed_by  )
-   {
-	send_to_char( "You may only landscape areas on planets that your organization controls!\n\r", ch );
-	return;   
-   }
+  if ( !location->area || !location->area->planet ||
+       clan != location->area->planet->governed_by  )
+    {
+      send_to_char( "You may only landscape areas on planets that your organization controls!\n\r", ch );
+      return;   
+    }
   
-   if ( IS_SET( location->room_flags , ROOM_NOPEDIT ) )
-   {
-	send_to_char( "Sorry, But you may not edit this room.\n\r", ch );
-	return;   
-   }
+  if ( IS_SET( location->room_flags , ROOM_NOPEDIT ) )
+    {
+      send_to_char( "Sorry, But you may not edit this room.\n\r", ch );
+      return;   
+    }
   
-   argument = one_argument( argument, arg );
+  argument = one_argument( argument, arg );
 
-   if ( argument[0] == '\0' )
-   {
-	send_to_char( "Usage: LANDSCAPE  <Room Type>  <New Room Name>\n\r", ch );
-	send_to_char( "<Room Type> may be one of the following:\n\r\n\r", ch );
-	
-	send_to_char( "wilderness   - the planets default terrain\n\r", ch );
-	send_to_char( "farmland     - cleared farmland\n\r", ch );
-	send_to_char( "city         - a city street\n\r", ch );	
-	send_to_char( "platform     - ships land here\n\r", ch );
-	send_to_char( "shipyard     - ships are built here\n\r", ch );
-	send_to_char( "inside       - inside a building\n\r", ch );
-	send_to_char( "house        - may be used as a players home\n\r", ch );
-	send_to_char( "cave         - a mine or dug out tunnel\n\r", ch );
-	send_to_char( "info         - message and information room\n\r", ch );
-	send_to_char( "mail         - post office\n\r", ch );
-	send_to_char( "hotel        - players can enter/leave game here\n\r", ch );
-	send_to_char( "trade        - players can sell resources here\n\r", ch );
-	send_to_char( "supply       - a supply store\n\r", ch );
-	send_to_char( "pawn         - will trade useful items\n\r", ch );
-	send_to_char( "restaurant   - food is bought here\n\r", ch );
-	send_to_char( "bar          - liquor is sold here\n\r", ch );
-	send_to_char( "control      - control tower for patrol ships\n\r", ch );
-	send_to_char( "barracks     - houses military patrols\n\r", ch );
-	send_to_char( "garage       - vehicles are built here\n\r", ch );
-	send_to_char( "bank         - room is a bank\n\r", ch );
-	send_to_char( "employment   - room is an employment office\n\r", ch );
-	return;   
-   }
+  if ( argument[0] == '\0' )
+    {
+      send_to_char( "Usage: LANDSCAPE  <Room Type>  <New Room Name>\n\r", ch );
+      send_to_char( "<Room Type> may be one of the following:\n\r\n\r", ch );
+      
+      send_to_char( "wilderness   - the planets default terrain\n\r", ch );
+      send_to_char( "farmland     - cleared farmland\n\r", ch );
+      send_to_char( "city         - a city street\n\r", ch );	
+      send_to_char( "platform     - ships land here\n\r", ch );
+      send_to_char( "shipyard     - ships are built here\n\r", ch );
+      send_to_char( "inside       - inside a building\n\r", ch );
+      send_to_char( "house        - may be used as a players home\n\r", ch );
+      send_to_char( "cave         - a mine or dug out tunnel\n\r", ch );
+      send_to_char( "info         - message and information room\n\r", ch );
+      send_to_char( "mail         - post office\n\r", ch );
+      send_to_char( "hotel        - players can enter/leave game here\n\r", ch );
+      send_to_char( "trade        - players can sell resources here\n\r", ch );
+      send_to_char( "supply       - a supply store\n\r", ch );
+      send_to_char( "pawn         - will trade useful items\n\r", ch );
+      send_to_char( "restaurant   - food is bought here\n\r", ch );
+      send_to_char( "bar          - liquor is sold here\n\r", ch );
+      send_to_char( "control      - control tower for patrol ships\n\r", ch );
+      send_to_char( "barracks     - houses military patrols\n\r", ch );
+      send_to_char( "garage       - vehicles are built here\n\r", ch );
+      send_to_char( "bank         - room is a bank\n\r", ch );
+      send_to_char( "employment   - room is an employment office\n\r", ch );
+      return;   
+    }
 
+  chance = (int) (ch->pcdata->learned[gsn_landscape]);
 
-   chance = (int) (ch->pcdata->learned[gsn_landscape]);
-   if ( number_percent( ) > chance )
-   {
-	send_to_char( "You can't quite get the desired affect.\n\r", ch );
-	return;   
-   }
+  if ( number_percent( ) > chance )
+    {
+      send_to_char( "You can't quite get the desired affect.\n\r", ch );
+      return;   
+    }
    
-   clear_roomtype( location );
+  clear_roomtype( location );
    
-   if ( IS_SET( location->room_flags , ROOM_PLR_HOME ))
-   {
+  if ( IS_SET( location->room_flags , ROOM_PLR_HOME ))
+    {
       location->area->planet->citysize++;
       SET_BIT( location->room_flags , ROOM_NO_MOB );
       SET_BIT( location->room_flags , ROOM_HOTEL );
       SET_BIT( location->room_flags , ROOM_SAFE );
-   }      
-   else if ( !str_cmp( arg, "city" ) )
-   {
+    }      
+  else if ( !str_cmp( arg, "city" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_CITY;
-   }
-   else if ( !str_cmp( arg, "wilderness" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "wilderness" ) )
+    {
       location->area->planet->wilderness++;
       location->sector_type = location->area->planet->sector;
-   }
-   else if ( !str_cmp( arg, "inside" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "inside" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;   
-   }
-   else if ( !str_cmp( arg, "farmland" ) )
-   {
+      SET_BIT( location->room_flags, ROOM_INDOORS );
+    }
+  else if ( !str_cmp( arg, "farmland" ) )
+    {
       location->area->planet->farmland++;
       location->sector_type = SECT_FARMLAND;
-   }
-   else if ( !str_cmp( arg, "platform" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "platform" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_CITY;
       SET_BIT( location->room_flags , ROOM_CAN_LAND );
-   }
-   else if ( !str_cmp( arg, "shipyard" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "shipyard" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_CITY;
       SET_BIT( location->room_flags , ROOM_SHIPYARD );
-   }
-   else if ( !str_cmp( arg, "house" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "house" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_EMPTY_HOME );
       SET_BIT( location->room_flags , ROOM_NO_MOB );
-   }
-   else if ( !str_cmp( arg, "cave" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "cave" ) )
+    {
       location->area->planet->wilderness++;
       location->sector_type = SECT_UNDERGROUND;
       SET_BIT( location->room_flags , ROOM_DARK );
-   }
-   else if ( !str_cmp( arg, "info" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "info" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_INFO );
       SET_BIT( location->room_flags , ROOM_NO_MOB );
-   }
-   else if ( !str_cmp( arg, "mail" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "mail" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_MAIL );
       SET_BIT( location->room_flags , ROOM_NO_MOB );
-   }
-   else if ( !str_cmp( arg, "bank" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "bank" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_BANK );
-   }
-   else if ( !str_cmp( arg, "hotel" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "hotel" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_HOTEL );
       SET_BIT( location->room_flags , ROOM_SAFE );
       SET_BIT( location->room_flags , ROOM_NO_MOB );
-   }
-   else if ( !str_cmp( arg, "trade" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "trade" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_SAFE );
       SET_BIT( location->room_flags , ROOM_TRADE );
-   }
-   else if ( !str_cmp( arg, "supply" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "supply" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_SAFE );
       SET_BIT( location->room_flags , ROOM_SUPPLY );
-   }
-   else if ( !str_cmp( arg, "pawn" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "pawn" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_SAFE );
       SET_BIT( location->room_flags , ROOM_PAWN );
-   }
-   else if ( !str_cmp( arg, "restaurant" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "restaurant" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_RESTAURANT );
-   }
-   else if ( !str_cmp( arg, "bar" ) ) 
-   {
+    }
+  else if ( !str_cmp( arg, "bar" ) ) 
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_BAR );
-   }
-   else if ( !str_cmp( arg, "control" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "control" ) )
+    {
       location->area->planet->controls++;
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_CONTROL );
-   }
-   else if ( !str_cmp( arg, "barracks" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "barracks" ) )
+    {
       location->area->planet->citysize++;
       location->area->planet->barracks++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_BARRACKS );
-   }
-   else if ( !str_cmp( arg, "garage" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "garage" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_GARAGE );
-   }
-   else if ( !str_cmp( arg, "employment" ) )
-   {
+    }
+  else if ( !str_cmp( arg, "employment" ) )
+    {
       location->area->planet->citysize++;
       location->sector_type = SECT_INSIDE;
       SET_BIT( location->room_flags , ROOM_EMPLOYMENT );
-   }
-   else
-   {
-     do_landscape( ch, const_char_to_nonconst("") );
-     return;   
+    }
+  else
+    {
+      do_landscape( ch, const_char_to_nonconst("") );
+      return;   
     }
 
-    echo_to_room( AT_WHITE, location, "A construction crew enters the room and begins to work." );
+  echo_to_room( AT_WHITE, location, "A construction crew enters the room and begins to work." );
     
-    STRFREE ( location->name );
-    location->name = STRALLOC( argument );
+  STRFREE ( location->name );
+  location->name = STRALLOC( argument );
     
-    ch->substate = SUB_ROOM_DESC;
-    ch->dest_buf = location;
-    start_editing( ch, location->description );
-    return;
-   
+  ch->substate = SUB_ROOM_DESC;
+  ch->dest_buf = location;
+  start_editing( ch, location->description );
+  return;
 }
 
 void do_construction ( CHAR_DATA *ch , char *argument )
