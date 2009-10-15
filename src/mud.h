@@ -592,6 +592,7 @@ struct	model_type
   int         shield;
   int         hull;
   short      rooms;
+  void (*room_builder)( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] );
 };
 
 #define LASER_DAMAGED    -1

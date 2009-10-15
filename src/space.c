@@ -3543,77 +3543,76 @@ void do_trajectory( CHAR_DATA *ch, char *argument )
 
 void do_buyship(CHAR_DATA *ch, char *argument )
 {
-    long         price;
-    SHIP_DATA   *ship;
-    SHIP_PROTOTYPE   *prototype;
-    char         shipname[MAX_STRING_LENGTH];
-        
-   if ( IS_NPC(ch) || !ch->pcdata )
-   {
-   	send_to_char( "&ROnly players can do that!\r\n" ,ch );
-   	return;
-   }
+  long         price = 0;
+  SHIP_DATA   *ship = NULL;
+  SHIP_PROTOTYPE   *prototype = NULL;
+  char         shipname[MAX_STRING_LENGTH];
 
-   if ( !ch->in_room || 
-   ( !IS_SET(ch->in_room->room_flags, ROOM_SHIPYARD)  && !IS_SET(ch->in_room->room_flags, ROOM_GARAGE) ) )
-   {
-   	send_to_char( "&RYou must be in a shipyard or garage to purchase transportation.\r\n" ,ch );
-   	return;
-   }
- 
-
-   prototype = get_ship_prototype( argument );
-   if ( prototype == NULL )
-   {
-   	send_to_char( "&RThat model does not exist.\r\n" ,ch );
-        if ( IS_SET( ch->in_room->room_flags , ROOM_SHIPYARD ) )
-	  do_prototypes( ch, const_char_to_nonconst("ships") );
-   	else
-	  do_prototypes( ch, const_char_to_nonconst("vehicles") );
-   	return;
-   }
-
-   if ( IS_SET( ch->in_room->room_flags , ROOM_SHIPYARD ) && prototype->ship_class > SPACE_STATION )
-   {
-   	send_to_char( "&RThats not a ship prototype.\r\n" ,ch );
-        do_prototypes( ch, const_char_to_nonconst("ships") );
-   	return;
-   }
-   if ( IS_SET( ch->in_room->room_flags , ROOM_GARAGE ) && prototype->ship_class <= SPACE_STATION )
-   {
-   	send_to_char( "&RThats not a vehicle prototype.\r\n" ,ch );
-        do_prototypes( ch, const_char_to_nonconst("vehicles") );
-   	return;
-   }
-
-
-   price = get_prototype_value( prototype );
-   
-    if ( ch->gold < price )
+  if ( IS_NPC(ch) || !ch->pcdata )
     {
-       ch_printf(ch, "&RThat type of ship costs %ld. You don't have enough credits!\r\n" , price );
-       return;
+      send_to_char( "&ROnly players can do that!\r\n" ,ch );
+      return;
     }
-    
-    ch->gold -= price;
-    ch_printf(ch, "&GYou pay %ld credits to purchace the ship.\r\n" , price );   
 
-    act( AT_PLAIN, "$n walks over to a terminal and makes a credit transaction.",ch,
-       NULL, argument , TO_ROOM );
-    
-    ship = make_ship( prototype );
-    ship_to_room( ship, ch->in_room->vnum );
-    ship->location = ch->in_room->vnum;
-    ship->lastdoc = ch->in_room->vnum;
-    
-    sprintf( shipname , "%ss %s %s" , ch->name , prototype->name , ship->filename );
+  if ( !ch->in_room || 
+       ( !IS_SET(ch->in_room->room_flags, ROOM_SHIPYARD)  && !IS_SET(ch->in_room->room_flags, ROOM_GARAGE) ) )
+    {
+      send_to_char( "&RYou must be in a shipyard or garage to purchase transportation.\r\n" ,ch );
+      return;
+    }
 
-    STRFREE( ship->owner );
-    ship->owner = STRALLOC( ch->name );
-    STRFREE( ship->name );
-    ship->name = STRALLOC( shipname );
-    save_ship( ship );
-                 
+  prototype = get_ship_prototype( argument );
+
+  if ( prototype == NULL )
+    {
+      send_to_char( "&RThat model does not exist.\r\n" ,ch );
+
+      if ( IS_SET( ch->in_room->room_flags , ROOM_SHIPYARD ) )
+	do_prototypes( ch, const_char_to_nonconst("ships") );
+      else
+	do_prototypes( ch, const_char_to_nonconst("vehicles") );
+
+      return;
+    }
+
+  if ( IS_SET( ch->in_room->room_flags , ROOM_SHIPYARD ) && prototype->ship_class > SPACE_STATION )
+    {
+      send_to_char( "&RThats not a ship prototype.\r\n" ,ch );
+      do_prototypes( ch, const_char_to_nonconst("ships") );
+      return;
+    }
+
+  if ( IS_SET( ch->in_room->room_flags , ROOM_GARAGE ) && prototype->ship_class <= SPACE_STATION )
+    {
+      send_to_char( "&RThats not a vehicle prototype.\r\n" ,ch );
+      do_prototypes( ch, const_char_to_nonconst("vehicles") );
+      return;
+    }
+
+  price = get_prototype_value( prototype );
+
+  if ( ch->gold < price )
+    {
+      ch_printf(ch, "&RThat type of ship costs %ld. You don't have enough credits!\r\n" , price );
+      return;
+    }
+
+  ch->gold -= price;
+  ch_printf(ch, "&GYou pay %ld credits to purchace the ship.\r\n" , price );   
+
+  act( AT_PLAIN, "$n walks over to a terminal and makes a credit transaction.",
+       ch, NULL, argument , TO_ROOM );
+  ship = make_ship( prototype );
+  ship_to_room( ship, ch->in_room->vnum );
+  ship->location = ch->in_room->vnum;
+  ship->lastdoc = ch->in_room->vnum;
+  sprintf( shipname , "%ss %s %s" , ch->name , prototype->name , ship->filename );
+
+  STRFREE( ship->owner );
+  ship->owner = STRALLOC( ch->name );
+  STRFREE( ship->name );
+  ship->name = STRALLOC( shipname );
+  save_ship( ship );
 }
 
 void do_clanbuyship(CHAR_DATA *ch, char *argument )
