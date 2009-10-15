@@ -568,7 +568,14 @@ typedef enum {PLAYER_SHIP, MOB_SHIP} ship_types;
 typedef enum {SHIP_DOCKED, SHIP_READY, SHIP_BUSY, SHIP_BUSY_2, SHIP_BUSY_3, SHIP_REFUEL,
               SHIP_LAUNCH, SHIP_LAUNCH_2, SHIP_LAND, SHIP_LAND_2, SHIP_HYPERSPACE, SHIP_DISABLED, SHIP_FLYING} ship_states;
 typedef enum {MISSILE_READY, MISSILE_FIRED, MISSILE_RELOAD, MISSILE_RELOAD_2, MISSILE_DAMAGED} missile_states;
+
 typedef enum {SPACECRAFT, SPACE_STATION, AIRCRAFT, BOAT, SUBMARINE, LAND_VEHICLE } ship_classes;
+
+static const long SPACECRAFT_BASE_PRICE = 10000;
+static const long AIRCRAFT_BASE_PRICE = 5000;
+static const long SUBMARINE_BASE_PRICE = 5000;
+static const long SPACESTATION_BASE_PRICE = 100000;
+static const long DEFAULT_CRAFT_BASE_PRICE = 2000;
 
 typedef enum {FIGHTER1, SHUTTLE1, TRANSPORT1, 
               FIGHTER2, SHUTTLE2, TRANSPORT2,
@@ -2331,6 +2338,18 @@ extern  short  gsn_grip;
 #define REMOVE_BIT(var, bit)	((var) &= ~(bit))
 #define TOGGLE_BIT(var, bit)	((var) ^= (bit))
 #define CH(d) ((d)->original ? (d)->original : (d)->character)
+
+#if defined(KEY)
+#undef KEY
+#endif
+
+#define KEY( literal, field, value )                                    \
+  if ( !str_cmp( word, literal ) )        \
+    {                                       \
+  field  = value;                     \
+  fMatch = TRUE;                      \
+  break;                              \
+    }
 
 /*
  * Memory allocation macros.

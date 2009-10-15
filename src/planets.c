@@ -129,19 +129,6 @@ void save_planet( PLANET_DATA *planet )
     fpReserve = fopen( NULL_FILE, "r" );
 }
 
-#if defined(KEY)
-#undef KEY
-#endif
-
-#define KEY( literal, field, value )					\
-				if ( !str_cmp( word, literal ) )	\
-				{					\
-				    field  = value;			\
-				    fMatch = TRUE;			\
-				    break;				\
-				}
-
-
 void fread_planet( PLANET_DATA *planet, FILE *fp )
 {
   char buf[MAX_STRING_LENGTH];
