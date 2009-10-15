@@ -11,20 +11,7 @@
 
 extern	int	_filbuf		args( (FILE *) );
 
-#if defined(KEY)
-#undef KEY
-#endif
-
 void init_supermob();
-
-#define KEY( literal, field, value )					\
-				if ( !str_cmp( word, literal ) )	\
-				{					\
-				    field  = value;			\
-				    fMatch = TRUE;			\
-				    break;				\
-				}
-
 
 /*
  * Globals.

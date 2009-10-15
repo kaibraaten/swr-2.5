@@ -30,20 +30,45 @@ static void create_default_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] );
 
 const	struct	model_type	model	[MAX_SHIP_MODEL+1] =
 {
-/* name, hyperspeed, realspeed, missiles, lasers, tractorbeam, manuever, energy, shield, hull, rooms */
-  { "Short Range Fighter", 	0,   255, 10,  4,  0, 255, 2500,  50,   250,   1, create_fighter1_rooms },  /* FIGHTER1  */
-  { "Shuttle", 		150, 200, 0,   1,  0, 100, 2500,  50,   250,   2, create_shuttle1_rooms },  /* SHUTTLE1  */
-  { "Transport", 		100, 100, 0,   2,  0, 75,  3500,  100,  1000,  4, create_transport1_rooms },  /* TRANSPORT1  */
-  { "Long Range Fighter", 	100, 150, 10,  4,  0, 150, 3500,  100,  500,   1, create_fighter2_rooms },  /* FIGHTER2  */
-  { "Assault Shuttle", 	150, 100, 0,   2,  0, 100, 3500,  100,  500,   3, create_shuttle2_rooms },  /* SHUTTLE2  */
-  { "Assault Transport", 	150, 75,  10,  2,  0, 75,  5000,  200,  1500,  5, create_transport2_rooms },  /* TRANSPORT2  */
-  { "Corvette", 		150, 100, 20,  6,  0, 100, 7500,  200,  2500,  8, create_corvette_rooms },  /* CORVETTE  */
-  { "Frigate" , 		150, 85,  30,  6,  0, 85,  10000, 250,  5000,  10, create_frigate_rooms },  /* FRIGATE  */
-  { "Destroyer", 		150, 70,  50,  8,  0, 70,  15000, 350,  10000, 14, create_destroyer_rooms },  /* DESTROYER  */
-  { "Cruiser", 		200, 50,  100, 8,  0, 50,  20000, 500,  20000, 15, create_cruiser_rooms },  /* CRUISER  */
-  { "Battlecruiser", 		200, 35,  150, 10, 0, 35,  30000, 750,  25000, 18, create_battleship_rooms },  /* BATTLESHIP  */
-  { "Flagship", 		250, 25,  200, 10, 0, 25,  35000, 1000, 30000, 24, create_flagship_rooms },  /* FLAGSHIP  */
-  { "Custom Ship", 		255, 255,  200, 10, 0, 255,  35000, 1000, 30000, MAX_SHIP_ROOMS, create_default_rooms }  /* CUSTOM_SHIP  */
+/* name, hyperspeed, realspeed, missiles, lasers, tractorbeam, manuever, energy, shield, hull, rooms, builder function */
+  { "Short Range Fighter", 0, 255, 10, 4, 0, 255, 2500, 50, 250, 1,
+    create_fighter1_rooms },  /* FIGHTER1  */
+
+  { "Shuttle", 150, 200, 0, 1, 0, 100, 2500, 50, 250, 2,
+    create_shuttle1_rooms },  /* SHUTTLE1  */
+
+  { "Transport", 100, 100, 0, 2, 0, 75,  3500, 100, 1000, 4,
+    create_transport1_rooms },  /* TRANSPORT1  */
+
+  { "Long Range Fighter", 100, 150, 10, 4, 0, 150, 3500, 100, 500, 1,
+    create_fighter2_rooms },  /* FIGHTER2  */
+
+  { "Assault Shuttle", 150, 100, 0, 2, 0, 100, 3500, 100, 500, 3,
+    create_shuttle2_rooms },  /* SHUTTLE2  */
+
+  { "Assault Transport", 150, 75, 10, 2, 0, 75, 5000, 200, 1500, 5,
+    create_transport2_rooms },  /* TRANSPORT2  */
+
+  { "Corvette", 150, 100, 20, 6, 0, 100, 7500, 200, 2500, 8,
+    create_corvette_rooms },  /* CORVETTE  */
+
+  { "Frigate" , 150, 85, 30, 6, 0, 85, 10000, 250, 5000, 10,
+    create_frigate_rooms },  /* FRIGATE  */
+
+  { "Destroyer", 150, 70, 50, 8, 0, 70, 15000, 350, 10000, 14,
+    create_destroyer_rooms },  /* DESTROYER  */
+
+  { "Cruiser", 200, 50, 100, 8, 0, 50, 20000, 500, 20000, 15,
+    create_cruiser_rooms },  /* CRUISER  */
+
+  { "Battlecruiser", 200, 35, 150, 10, 0, 35, 30000, 750, 25000, 18,
+    create_battleship_rooms },  /* BATTLESHIP  */
+
+  { "Flagship", 250, 25, 200, 10, 0, 25, 35000, 1000, 30000, 24,
+    create_flagship_rooms },  /* FLAGSHIP  */
+
+  { "Custom Ship", 255, 255, 200, 10, 0, 255, 35000, 1000, 30000,
+    MAX_SHIP_ROOMS, create_default_rooms }  /* CUSTOM_SHIP  */
 };
 
 /* local routines */
@@ -73,16 +98,16 @@ long int get_prototype_value( SHIP_PROTOTYPE *prototype )
   long int price = 0;
           
   if (prototype->ship_class == SPACECRAFT)
-    price = 10000;
+    price = SPACECRAFT_BASE_PRICE;
   else if (prototype->ship_class == AIRCRAFT) 
-    price = 5000;
+    price = AIRCRAFT_BASE_PRICE;
   else if (prototype->ship_class == SUBMARINE) 
-    price = 5000;
+    price = SUBMARINE_BASE_PRICE;
   else if (prototype->ship_class == SPACE_STATION) 
-    price = 100000;
-  else 
-    price = 2000;
-     
+    price = SPACESTATION_BASE_PRICE;
+  else
+    price = DEFAULT_CRAFT_BASE_PRICE;
+
   price += ( prototype->tractorbeam * 100 );
   price += ( prototype->realspeed * 10 );
   price += ( 5 * prototype->maxhull );
@@ -90,28 +115,28 @@ long int get_prototype_value( SHIP_PROTOTYPE *prototype )
   price += ( 100 * prototype->maxchaff );
                
   if (prototype->maxenergy > 5000 )
-    price += ( (prototype->maxenergy-5000)*20 ) ;
+    price += ( (prototype->maxenergy - 5000)*20 ) ;
      
   if (prototype->maxenergy > 10000 )
-    price += ( (prototype->maxenergy-10000)*50 );
+    price += ( (prototype->maxenergy - 10000)*50 );
      
   if (prototype->maxhull > 1000)
-    price += ( (prototype->maxhull-1000)*10 );
+    price += ( (prototype->maxhull - 1000)*10 );
      
   if (prototype->maxhull > 10000)
-    price += ( (prototype->maxhull-10000)*20 );
+    price += ( (prototype->maxhull - 10000)*20 );
         
   if (prototype->maxshield > 200)
-    price += ( (prototype->maxshield-200)*50 );
+    price += ( (prototype->maxshield - 200)*50 );
      
   if (prototype->maxshield > 1000)
-    price += ( (prototype->maxshield-1000)*100 );
+    price += ( (prototype->maxshield - 1000)*100 );
      
   if (prototype->realspeed > 100 )
-    price += ( (prototype->realspeed-100)*500 ) ;
+    price += ( (prototype->realspeed - 100)*500 ) ;
         
   if (prototype->lasers > 5 )
-    price += ( (prototype->lasers-5)*500 );
+    price += ( (prototype->lasers - 5)*500 );
       
   if (prototype->maxshield)
     price += ( 1000 + 10 * prototype->maxshield);
@@ -134,35 +159,35 @@ long int get_design_value( int hull, int energy, int shield, int speed,
 			   int manuever, int lasers, int missiles,
 			   int chaff, int smodel )
 {
-  long int price = 10000;
+  long int price = SPACECRAFT_BASE_PRICE;
   price += ( speed * 10 );
   price += ( 5 * hull );
   price += ( 2 * energy );
   price += ( 100 * chaff );
 
   if ( energy > 5000 )
-    price += ( (energy-5000)*20 ) ;
+    price += ( (energy - 5000)*20 ) ;
 
   if (energy > 10000 )
-    price += ( (energy-10000)*50 );
+    price += ( (energy - 10000)*50 );
 
   if (hull > 1000)
-    price += ( (hull-1000)*10 );
+    price += ( (hull - 1000)*10 );
 
   if (hull > 10000)
-    price += ( (hull-10000)*20 );
+    price += ( (hull - 10000)*20 );
 
   if (shield > 200)
-    price += ( (shield-200)*50 );
+    price += ( (shield - 200)*50 );
 
   if (shield > 1000)
-    price += ( (shield-1000)*100 );
+    price += ( (shield - 1000)*100 );
 
   if (speed > 100 )
-    price += ( (speed-100)*500 ) ;
+    price += ( (speed - 100)*500 ) ;
 
   if (lasers > 5 )
-    price += ( (lasers-5)*500 );
+    price += ( (lasers - 5)*500 );
 
   if (shield)
     price += ( 1000 + 10 * shield);
@@ -207,12 +232,14 @@ SHIP_PROTOTYPE *get_ship_prototype( const char *name )
 {
   SHIP_PROTOTYPE *prototype = NULL;
 
-  for ( prototype = first_ship_prototype; prototype; prototype = prototype->next )
-    if ( !str_cmp( name, prototype->name ) )
+  for( prototype = first_ship_prototype; prototype;
+       prototype = prototype->next )
+    if( !str_cmp( name, prototype->name ) )
       return prototype;
 
-  for ( prototype = first_ship_prototype; prototype; prototype = prototype->next )
-    if ( nifty_is_name_prefix( const_char_to_nonconst(name), prototype->name ) )
+  for( prototype = first_ship_prototype; prototype;
+       prototype = prototype->next )
+    if( nifty_is_name_prefix( const_char_to_nonconst(name), prototype->name ) )
       return prototype;
 
   return NULL;
@@ -275,18 +302,6 @@ void save_ship_prototype( SHIP_PROTOTYPE *prototype )
 /*
  * Read in actual prototype data.
  */
-
-#if defined(KEY)
-#undef KEY
-#endif
-
-#define KEY( literal, field, value )					\
-				if ( !str_cmp( word, literal ) )	\
-				{					\
-				    field  = value;			\
-				    fMatch = TRUE;			\
-				    break;				\
-				}
 
 void fread_ship_prototype( SHIP_PROTOTYPE *prototype, FILE *fp )
 {

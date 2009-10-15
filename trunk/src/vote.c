@@ -81,19 +81,6 @@ void save_poll( VOTE_DATA *poll )
 /*
  * Read in actual poll data.
  */
-
-#if defined(KEY)
-#undef KEY
-#endif
-
-#define KEY( literal, field, value )					\
-				if ( !str_cmp( word, literal ) )	\
-				{					\
-				    field  = value;			\
-				    fMatch = TRUE;			\
-				    break;				\
-				}
-
 void fread_poll( VOTE_DATA *poll, FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];

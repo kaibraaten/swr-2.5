@@ -808,19 +808,6 @@ void save_starsystem( SPACE_DATA *starsystem )
 /*
  * Read in actual starsystem data.
  */
-
-#if defined(KEY)
-#undef KEY
-#endif
-
-#define KEY( literal, field, value )					\
-				if ( !str_cmp( word, literal ) )	\
-				{					\
-				    field  = value;			\
-				    fMatch = TRUE;			\
-				    break;				\
-				}
-
 void fread_starsystem( SPACE_DATA *starsystem, FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
@@ -1547,19 +1534,6 @@ void save_ship( SHIP_DATA *ship )
 /*
  * Read in actual ship data.
  */
-
-#if defined(KEY)
-#undef KEY
-#endif
-
-#define KEY( literal, field, value )					\
-				if ( !str_cmp( word, literal ) )	\
-				{					\
-				    field  = value;			\
-				    fMatch = TRUE;			\
-				    break;				\
-				}
-
 void fread_ship( SHIP_DATA *ship, FILE *fp )
 {
     char buf[MAX_STRING_LENGTH];
@@ -3539,7 +3513,6 @@ void do_trajectory( CHAR_DATA *ch, char *argument )
 
   learn_from_success( ch, gsn_spacecraft );
 }
-
 
 void do_buyship(CHAR_DATA *ch, char *argument )
 {
