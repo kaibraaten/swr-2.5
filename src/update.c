@@ -9,8 +9,6 @@
 /* from swskills.c */
 void    add_reinforcements  args( ( CHAR_DATA *ch ) );
 
-void    channel_noise       args( ( ) );
-
 /*
  * Local functions.
  */
@@ -1743,9 +1741,7 @@ void update_handler( void )
     if ( --pulse_second   <= 0 )
     {
 	pulse_second	= PULSE_PER_SECOND;
-        if ( number_bits ( 6 ) == 0 )
-           channel_noise( );
-	char_check( );
+	char_check();
  	/*reboot_check( "" ); Disabled to check if its lagging a lot - Scryn*/
  	/* Much faster version enabled by Altrag..
  	   although I dunno how it could lag too much, it was just a bunch
