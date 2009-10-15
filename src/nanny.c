@@ -776,15 +776,8 @@ static void nanny_done_motd( DESCRIPTOR_DATA *d, char *argument )
       char filename[256];
       FILE *fph;
       ROOM_INDEX_DATA *storeroom = ch->plr_home;
-      OBJ_DATA *obj;
-      OBJ_DATA *obj_next;
 
-      for ( obj = storeroom->first_content; obj; obj = obj_next )
-	{
-	  obj_next = obj->next_content;
-	  extract_obj( obj );
-	}
-
+      room_extract_contents( storeroom );
       sprintf( filename, "%s%c/%s.home", PLAYER_DIR, tolower(ch->name[0]),
 	       capitalize( ch->name ) );
       if ( ( fph = fopen( filename, "r" ) ) != NULL )

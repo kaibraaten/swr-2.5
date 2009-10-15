@@ -1874,7 +1874,6 @@ void clear_char( CHAR_DATA *ch )
  */
 void free_char( CHAR_DATA *ch )
 {
-    OBJ_DATA *obj;
     AFFECT_DATA *paf;
     TIMER *timer;
     MPROG_ACT_LIST *mpact, *mpact_next;
@@ -1888,8 +1887,7 @@ void free_char( CHAR_DATA *ch )
     if ( ch->desc )
       bug( "Free_char: char still has descriptor." );
 
-    while ( (obj = ch->last_carrying) != NULL )
-	extract_obj( obj );
+    character_extract_carried_objects( ch );
 
     while ( (paf = ch->last_affect) != NULL )
 	affect_remove( ch, paf );

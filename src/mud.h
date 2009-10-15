@@ -3473,6 +3473,7 @@ int     get_wanted_flag args( ( const char *flag ) );
 void    save_some_areas args( ( ) );
 
 /* clans.c */
+void clan_decrease_vehicles_owned( CLAN_DATA *clan, const SHIP_DATA *ship );
 CL *	get_clan		args( ( const char *name ) );
 void	load_clans		args( ( void ) );
 void	save_clan		args( ( CLAN_DATA *clan ) );
@@ -3741,8 +3742,10 @@ bool 	check_grip		args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 void	disarm			args( ( CHAR_DATA *ch, CHAR_DATA *victim) );
 void	trip			args( ( CHAR_DATA *ch, CHAR_DATA *victim) );
 
-
 /* handler.c */
+void character_extract_carried_objects( CHAR_DATA *ch );
+void room_extract_mobiles( ROOM_INDEX_DATA *room );
+void room_extract_contents( ROOM_INDEX_DATA *room );
 void    explode         args( ( OBJ_DATA *obj ) );
 short	get_trust	args( ( CHAR_DATA *ch ) );
 short	get_age		args( ( CHAR_DATA *ch ) );

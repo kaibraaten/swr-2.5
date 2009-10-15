@@ -1448,6 +1448,19 @@ void do_setwages ( CHAR_DATA *ch , char *argument )
     ch_printf( ch , "Clan wages set to %d credits per hour\r\n" , clan->salary );
 
     save_char_obj( ch );	/* clan gets saved when pfile is saved */
-    
+}
 
+void clan_decrease_vehicles_owned( CLAN_DATA *clan, const SHIP_DATA *ship )
+{
+  if( ship->type != MOB_SHIP )
+    {
+      if( ship->ship_class <= SPACE_STATION )
+        {
+          clan->spacecraft--;
+        }
+      else
+        {
+          clan->vehicles--;
+        }
+    }
 }

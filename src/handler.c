@@ -1195,7 +1195,6 @@ void extract_obj( OBJ_DATA *obj )
 void extract_char( CHAR_DATA *ch, bool fPull )
 {
   CHAR_DATA *wch;
-  OBJ_DATA *obj;
   char buf[MAX_STRING_LENGTH];
   ROOM_INDEX_DATA *location;
 
@@ -1259,8 +1258,7 @@ void extract_char( CHAR_DATA *ch, bool fPull )
 
   REMOVE_BIT( ch->act, ACT_MOUNTED );
 
-  while ( (obj = ch->last_carrying) != NULL )
-    extract_obj( obj );
+  character_extract_carried_objects( ch );
 
   char_from_room( ch );
 
@@ -3143,4 +3141,42 @@ int times_killed( CHAR_DATA *ch, CHAR_DATA *mob )
 	if ( ch->pcdata->killed[x].vnum == 0 )
 	    break;
     return 0;
+}
+
+void room_extract_contents( ROOM_INDEX_DATA *room )
+{
+  OBJ_DATA *robj = NULL;
+  OBJ_DATA *obj_next = NULL;
+
+  for( robj = room->first_content; robj; robj = obj_next )
+    {
+      obj_next = robj->next_content;
+      //separate_obj( robj );
+      extract_obj( robj );
+    }
+}
+
+void room_extract_mobiles( ROOM_INDEX_DATA *room )
+{
+  CHAR_DATA *victim = NULL, *vnext = NULL;
+
+  for( victim = room->first_person; victim; victim = vnext )
+    {
+      vnext = victim->next_in_room;
+
+      if( IS_NPC(victim) )
+	extract_char( victim, TRUE );
+    }
+}
+
+void character_extract_carried_objects( CHAR_DATA *ch )
+{
+  OBJ_DATA *obj = NULL;
+  OBJ_DATA *obj_next = NULL;
+
+  for ( obj = ch->last_carrying; obj; obj = obj_next )
+    {
+      obj_next = obj->prev_content;
+      extract_obj( obj );
+    }
 }
