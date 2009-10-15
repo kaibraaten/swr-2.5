@@ -739,9 +739,8 @@ void do_mppurge( CHAR_DATA *ch, char *argument )
 	    if ( IS_NPC( victim ) && victim != ch )
 	      extract_char( victim, TRUE );
 	}
-	while ( ch->in_room->first_content )
-	   extract_obj( ch->in_room->first_content );
 
+	room_extract_contents( ch->in_room );
 	return;
     }
 

@@ -4568,22 +4568,8 @@ void fold_area( AREA_DATA *tarea, const char *filename, bool install )
 	vnum = room->vnum;
 	if ( install )
 	{
-	    CHAR_DATA *victim, *vnext;
-	    OBJ_DATA  *obj, *obj_next;
-
-	    /* purge room of (prototyped) mobiles */
-	    for ( victim = room->first_person; victim; victim = vnext )
-	    {
-		vnext = victim->next_in_room;
-		if ( IS_NPC(victim) )
-		  extract_char( victim, TRUE );
-	    }
-	    /* purge room of (prototyped) objects */
-	    for ( obj = room->first_content; obj; obj = obj_next )
-	    {
-		obj_next = obj->next_content;
-		extract_obj( obj );
-	    }
+	    room_extract_mobiles( room );
+	    room_extract_contents( room );
 	}
 	fprintf( fpout, "#%ld\n",	vnum				);
 	fprintf( fpout, "%s~\n",	room->name			);

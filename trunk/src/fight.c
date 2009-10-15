@@ -1783,7 +1783,6 @@ void raw_kill( CHAR_DATA *ch, CHAR_DATA *victim )
     char buf[MAX_STRING_LENGTH];
     char buf2[MAX_STRING_LENGTH];
     char arg[MAX_STRING_LENGTH];    
-    OBJ_DATA *obj, *obj_next;
     SHIP_DATA *ship;
     
     if ( !victim )
@@ -1851,12 +1850,7 @@ if ( !IS_NPC(victim) || ( !IS_SET( victim->act, ACT_NOKILL  ) && !IS_SET( victim
     make_corpse( victim, ch );
 else
 {
-    for ( obj = victim->last_carrying; obj; obj = obj_next )
-    {
-	obj_next = obj->prev_content;
-	obj_from_char( obj );
-	extract_obj( obj );
-    }
+  character_extract_carried_objects( victim );
 }
     
 /*    make_blood( victim ); */
@@ -1975,50 +1969,6 @@ else
   rename( buf, buf2 );
   
   return;
-
-
-/* original player kill started here
-    
-    extract_char( victim, FALSE );
-    if ( !victim )
-    {
-      bug( "oops! raw_kill: extract_char destroyed pc char", 0 );
-      return;
-    }
-    while ( victim->first_affect )
-	affect_remove( victim, victim->first_affect );
-    victim->affected_by	= race_table[victim->race].affected;
-    victim->resistant   = 0;
-    victim->susceptible = 0;
-    victim->immune      = 0;
-    victim->carry_weight= 0;
-    victim->armor	= 100;
-    victim->mod_str	= 0;
-    victim->mod_dex	= 0;
-    victim->mod_wis	= 0;
-    victim->mod_int	= 0;
-    victim->mod_con	= 0;
-    victim->mod_cha	= 0;
-    victim->mod_lck   	= 0;
-    victim->damroll	= 0;
-    victim->hitroll	= 0;
-    victim->mental_state = -10;
-    victim->alignment	= URANGE( -1000, victim->alignment, 1000 );
-    victim->saving_spell_staff = 0;
-    victim->position	= POS_RESTING;
-    victim->hit		= UMAX( 1, victim->hit  );
-    victim->mana	= UMAX( 1, victim->mana );
-    victim->move	= UMAX( 1, victim->move );
-    
-    victim->pcdata->condition[COND_FULL]   = 12;
-    victim->pcdata->condition[COND_THIRST] = 12;
-    
-    if ( IS_SET( sysdata.save_flags, SV_DEATH ) )
-	save_char_obj( victim );
-    return;
-
-*/
-
 }
 
 

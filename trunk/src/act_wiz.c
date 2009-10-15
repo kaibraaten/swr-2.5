@@ -1935,21 +1935,8 @@ void do_purge( CHAR_DATA *ch, char *argument )
     if ( arg[0] == '\0' )
     {
 	/* 'purge' */
-	CHAR_DATA *vnext;
-	OBJ_DATA  *obj_next;
-
-	for ( victim = ch->in_room->first_person; victim; victim = vnext )
-	{
-	    vnext = victim->next_in_room;
-	    if ( IS_NPC(victim) && victim != ch && !IS_SET(victim->act, ACT_POLYMORPHED))
-		extract_char( victim, TRUE );
-	}
-
-	for ( obj = ch->in_room->first_content; obj; obj = obj_next )
-	{
-	    obj_next = obj->next_content;
-	    extract_obj( obj );
-	}
+	room_extract_mobiles( ch->in_room );
+	room_extract_contents( ch->in_room );
 
 	act( AT_IMMORT, "$n purges the room!", ch, NULL, NULL, TO_ROOM);
 	send_to_char( "Ok.\r\n", ch );
@@ -2109,9 +2096,7 @@ void do_balzhur( CHAR_DATA *ch, char *argument )
 	do_help(victim, const_char_to_nonconst( "M_BALZHUR_" ) );
 	set_char_color( AT_WHITE, victim );
 	send_to_char( "You awake after a long period of time...\r\n", victim );
-	while ( victim->first_carrying )
-	     extract_obj( victim->first_carrying );
-        return;
+	character_extract_carried_objects( victim );
 }
 
 void do_advance( CHAR_DATA *ch, char *argument )

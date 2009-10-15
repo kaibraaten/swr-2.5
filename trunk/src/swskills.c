@@ -2667,8 +2667,6 @@ void  clear_roomtype( ROOM_INDEX_DATA * location )
 void do_landscape ( CHAR_DATA *ch , char *argument )
 {
   CLAN_DATA * clan;
-  OBJ_DATA *obj;
-  OBJ_DATA *obj_next;
   ROOM_INDEX_DATA * location;
   int chance;
   char arg[MAX_INPUT_LENGTH];
@@ -2709,13 +2707,7 @@ void do_landscape ( CHAR_DATA *ch , char *argument )
 	}   
 
       SET_BIT( location->area->flags , AFLAG_MODIFIED );
-
-      for ( obj = ch->in_room->first_content; obj; obj = obj_next )
-	{ 
-	  obj_next = obj->next_content;
-	  extract_obj( obj );
-	}
-
+      room_extract_contents( ch->in_room );
       echo_to_room( AT_WHITE, location , "The construction crew finishes its work." );
       fold_area( location->area, location->area->filename, TRUE );
       return;

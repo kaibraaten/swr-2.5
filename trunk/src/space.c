@@ -2480,19 +2480,14 @@ void do_allships( CHAR_DATA *ch, char *argument )
     
 }
 
-
 void ship_to_starsystem( SHIP_DATA *ship , SPACE_DATA *starsystem )
 {
-     if ( starsystem == NULL )
-        return;
-     
-     if ( ship == NULL )
-        return;
-     
-     LINK ( ship, starsystem->first_ship , starsystem->last_ship , next_in_starsystem , prev_in_starsystem );
-     
-     ship->starsystem = starsystem;
-        
+  if( starsystem == NULL || ship == NULL )
+    return;
+
+  LINK ( ship, starsystem->first_ship , starsystem->last_ship , next_in_starsystem , prev_in_starsystem );
+
+  ship->starsystem = starsystem;
 }
 
 void new_missile( SHIP_DATA *ship , SHIP_DATA *target , CHAR_DATA *ch  )
@@ -2544,17 +2539,12 @@ void new_missile( SHIP_DATA *ship , SHIP_DATA *target , CHAR_DATA *ch  )
 
 void ship_from_starsystem( SHIP_DATA *ship , SPACE_DATA *starsystem )
 {
+  if ( starsystem == NULL || ship == NULL )
+    return;
 
-     if ( starsystem == NULL )
-        return;
-     
-     if ( ship == NULL )
-        return;
+  UNLINK ( ship, starsystem->first_ship , starsystem->last_ship , next_in_starsystem , prev_in_starsystem );
 
-     UNLINK ( ship, starsystem->first_ship , starsystem->last_ship , next_in_starsystem , prev_in_starsystem );
-     
-     ship->starsystem = NULL;
-
+  ship->starsystem = NULL;
 }
 
 void extract_missile( MISSILE_DATA *missile )
@@ -2724,123 +2714,176 @@ void damage_ship( SHIP_DATA *ship , int min , int max )
      
 }
 
-void destroy_ship( SHIP_DATA *ship , CHAR_DATA *ch )
+static void ship_clear_turret_targets( SHIP_DATA *ship )
+{
+  TURRET_DATA *turret = NULL;
+
+  for( turret = ship->first_turret; turret; turret = turret->next )
+    {
+      turret->target = NULL;
+    }
+}
+
+static void ship_free_room_descriptions( SHIP_DATA *ship )
+{
+  size_t dIndex = 0;
+
+  for ( dIndex = 0 ; dIndex < MAX_SHIP_ROOMS ; dIndex++ )
+    {
+      if ( ship->description[dIndex] )
+	{
+	  STRFREE( ship->description[dIndex] );
+	}
+    }
+}
+
+static void ship_untarget_by_attackers( const SHIP_DATA *ship )
+{
+  SHIP_DATA *att = NULL;
+
+  for( att = first_ship; att; att = att->next )
+    {
+      if( att->target == ship )
+	{
+	  att->target = NULL;
+	}
+
+      TURRET_DATA *turret = NULL;
+
+      for ( turret = att->first_turret ; turret ; turret = turret->next )
+	{
+	  if ( turret->target == ship )
+	    {
+	      turret->target = NULL;
+	    }
+	}
+    }
+}
+
+static void ship_untarget_by_missiles( const SHIP_DATA *ship )
+{
+  MISSILE_DATA *missile = NULL;
+  MISSILE_DATA *m_next = NULL;
+
+  for ( missile = first_missile; missile; missile = m_next )
+    {
+      m_next = missile->next;
+
+      if ( missile->target && missile->target == ship )
+        extract_missile( missile );
+
+      if ( missile->fired_from && missile->fired_from == ship )
+        extract_missile( missile );
+    }
+}
+
+static void destroy_ship_kill_characters( const SHIP_DATA *ship,
+					  CHAR_DATA *killer )
+{
+  ROOM_INDEX_DATA *room = NULL;
+
+  for ( room = ship->first_room ; room ; room = room->next_in_ship )
+    {
+      CHAR_DATA *rch = room->first_person;
+
+      while ( rch )
+        {
+          bool survived = FALSE;
+
+          if ( !IS_NPC( rch ) && ship->starsystem
+               && ship->starsystem->last_planet
+	       && ship->starsystem->last_planet->area )
+            {
+              ROOM_INDEX_DATA * pRoom = NULL;
+              OBJ_DATA * scraps = NULL;
+              int rnum = 0;
+              int tnum = number_range( 0 , ship->starsystem->last_planet->wilderness + ship->starsystem->last_planet->farmland );
+
+              for ( pRoom = ship->starsystem->last_planet->area->first_room;
+		    pRoom ; pRoom = pRoom->next_in_area )
+                if ( pRoom->sector_type != SECT_CITY
+		     && pRoom->sector_type != SECT_DUNNO
+                     && pRoom->sector_type != SECT_INSIDE
+		     && pRoom->sector_type != SECT_UNDERGROUND )
+                  {
+                    if ( rnum++ < tnum )
+                      continue;
+
+                    char_from_room(rch);
+                    char_to_room( rch, pRoom );
+
+                    if ( !IS_IMMORTAL( rch ) )
+                      rch->hit = -1;
+
+                    update_pos( rch );
+		    echo_to_room( AT_WHITE, rch->in_room, "There is loud explosion as an escape pod hits the earth." );
+
+                    scraps = create_object( get_obj_index( OBJ_VNUM_SCRAPS ), 0 );
+                    scraps->timer = 15;
+                    STRFREE( scraps->short_descr );
+                    scraps->short_descr = STRALLOC( "a battered escape pod" );
+                    STRFREE( scraps->description );
+                    scraps->description = STRALLOC( "The smoking shell of an escape pod litters the earth.\r\n" );
+                    obj_to_room( scraps, pRoom);
+
+                    survived = TRUE;
+                    break;
+                  }
+            }
+
+          if ( !survived && IS_IMMORTAL(rch) )
+            {
+              char_from_room(rch);
+              char_to_room( rch, get_room_index(wherehome(rch)) );
+              survived = TRUE;
+            }
+
+          if ( !survived )
+            {
+              if ( killer )
+                {
+                  raw_kill( killer, rch );
+                }
+              else
+                {
+                  raw_kill( rch , rch );
+                }
+            }
+
+          rch = room->first_person;
+        }
+
+      room_extract_contents( room );
+    }
+}
+
+void destroy_ship( SHIP_DATA *ship , CHAR_DATA *killer )
 {   
   char buf[MAX_STRING_LENGTH];
-  ROOM_INDEX_DATA *room;
-  OBJ_DATA *robj;
-  CHAR_DATA *rch;
-  bool survived;
-  int dIndex;
-  SHIP_DATA *att;
-  MISSILE_DATA * missile;
-  MISSILE_DATA * m_next;
-  TURRET_DATA * turret;
 
   sprintf( buf , "%s explodes in a blinding flash of light!", ship->name );  
   echo_to_system( AT_WHITE + AT_BLINK , ship , buf , NULL );
 
-  sprintf( buf , "%s destroyed by %s", ship->name , ch ? ch->name : "(none)" );
+  sprintf( buf , "%s destroyed by %s", ship->name,
+	   killer ? killer->name : "(none)" );
   log_string( buf );
   echo_to_ship( AT_WHITE , ship , "The ship is shaken by a FATAL explosion. You realize its escape or perish.");
   echo_to_ship( AT_WHITE , ship , "The last thing you remember is reaching for the escape pod release lever.");
   echo_to_ship( AT_WHITE + AT_BLINK , ship , "A blinding flash of light.");
   echo_to_ship( AT_WHITE, ship , "And then darkness....");
 
-  for ( room = ship->first_room ; room ; room = room->next_in_ship )
-    {
-      rch = room->first_person;   
-
-      while ( rch )
-	{
-	  survived = FALSE;
-
-	  if ( !IS_NPC( rch ) && ship->starsystem  
-	       && ship->starsystem->last_planet && ship->starsystem->last_planet->area )
-            {
-	      ROOM_INDEX_DATA * pRoom;
-	      OBJ_DATA * scraps;
-	      int rnum = 0;
-	      int tnum = number_range( 0 , ship->starsystem->last_planet->wilderness + ship->starsystem->last_planet->farmland );
-
-	      for ( pRoom = ship->starsystem->last_planet->area->first_room ; pRoom ; pRoom = pRoom->next_in_area )
-		if ( pRoom->sector_type != SECT_CITY && pRoom->sector_type != SECT_DUNNO
-		     && pRoom->sector_type != SECT_INSIDE && pRoom->sector_type != SECT_UNDERGROUND )
-		  {
-		    if ( rnum++ < tnum )
-		      continue;
-
-		    char_from_room(rch);
-		    char_to_room( rch, pRoom );
-
-		    if ( !IS_IMMORTAL( rch ) )
-		      rch->hit = -1;
-
-		    update_pos( rch );
-		    echo_to_room( AT_WHITE , rch->in_room , "There is loud explosion as an escape pod hits the earth." );
-
-		    scraps        = create_object( get_obj_index( OBJ_VNUM_SCRAPS ), 0 );
-		    scraps->timer = 15;
-		    STRFREE( scraps->short_descr );
-		    scraps->short_descr = STRALLOC( "a battered escape pod" );
-		    STRFREE( scraps->description );
-		    scraps->description = STRALLOC( "The smoking shell of an escape pod litters the earth.\r\n" );
-		    obj_to_room( scraps, pRoom);
-
-		    survived = TRUE;     
-		    break;   
-		  }       
-            }
-
-	  if ( !survived && IS_IMMORTAL(rch) )
-            {
-	      char_from_room(rch);
-	      char_to_room( rch, get_room_index(wherehome(rch)) );
-	      survived = TRUE;
-            }
-
-	  if ( !survived )
-            {
-              if ( ch )
-		{
-		  raw_kill( ch , rch );
-		}
-	      else
-		{
-		  raw_kill( rch , rch );
-		}
-            }
-
-	  rch = room->first_person;     
-	}
-        
-      for ( robj = room->first_content ; robj ; robj = robj->next_content )
-	{
-	  separate_obj( robj );
-	  extract_obj( robj );
-	}
-    }
+  destroy_ship_kill_characters( ship, killer );
 
   if (ship->starsystem)
     ship_from_starsystem( ship, ship->starsystem );  
 
   extract_ship( ship );
 
-  if ( ship->type != MOB_SHIP )
+  CLAN_DATA *clan = get_clan( ship->owner );
+
+  if( clan )
     {
-      CLAN_DATA *clan;
-        
-      if ( ship->type != MOB_SHIP && (clan = get_clan( ship->owner )) != NULL )
-	{
-	  if ( ship->ship_class <= SPACE_STATION )
-	    {
-	      clan->spacecraft--;
-	    }
-	  else
-	    {
-	      clan->vehicles--;
-	    }
-	}
+      clan_decrease_vehicles_owned( clan, ship );
     }
 
   STRFREE( ship->owner );
@@ -2853,34 +2896,13 @@ void destroy_ship( SHIP_DATA *ship , CHAR_DATA *ch )
   ship->home = STRALLOC( "" );     
   ship->target = NULL;
 
-  for ( turret = ship->first_turret ; turret ; turret = turret->next )
-    turret->target = NULL;
-
-  for ( dIndex = 0 ; dIndex < MAX_SHIP_ROOMS ; dIndex++ )
-    if ( ship->description[dIndex] )
-      STRFREE( ship->description[dIndex] );
+  ship_clear_turret_targets( ship );
+  ship_free_room_descriptions( ship );
 
   UNLINK ( ship, first_ship , last_ship , next , prev );
 
-  for ( att = first_ship ; att ; att = att->next )
-    {
-         if ( att->target == ship )
-	   att->target = NULL;
-         for ( turret = att->first_turret ; turret ; turret = turret->next )
-	   if ( turret->target == ship )
-	     turret->target = NULL;
-    }
-
-  for ( missile = first_missile; missile; missile = m_next )
-    {
-      m_next = missile->next;
-
-      if ( missile->target && missile->target == ship )
-	extract_missile( missile );
-
-      if ( missile->fired_from && missile->fired_from == ship )
-	extract_missile( missile );            
-    }
+  ship_untarget_by_attackers( ship );
+  ship_untarget_by_missiles( ship );
 
   write_ship_list();
 }
