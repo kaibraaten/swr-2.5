@@ -408,7 +408,7 @@ ch_ret multi_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
     /* Very high chance of hitting compared to chance of going berserk */
     /* 40% or higher is always hit.. don't learn anything here though. */
     /* -- Altrag */
-    chance = IS_NPC(ch) ? 100 : (ch->pcdata->learned[gsn_berserk]*5/2);
+    chance = IS_NPC(ch) ? 100 : character_skill_level( ch, gsn_berserk ) *5/2;
     if ( IS_AFFECTED(ch, AFF_BERSERK) && number_percent() < chance )
       if ( (retcode = one_hit( ch, victim, dt )) != rNONE ||
             who_fighting( ch ) != victim )
@@ -416,8 +416,9 @@ ch_ret multi_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
 
     if ( get_eq_char( ch, WEAR_DUAL_WIELD ) )
     {
-      dual_bonus = IS_NPC(ch) ? ch->top_level : (ch->pcdata->learned[gsn_dual_wield] / 10);
-      chance = IS_NPC(ch) ? ch->top_level : ch->pcdata->learned[gsn_dual_wield];
+      dual_bonus = character_skill_level( ch, gsn_dual_wield ) / 10;
+      chance = character_skill_level( ch, gsn_dual_wield );
+
       if ( number_percent( ) < chance )
       {
 	learn_from_success( ch, gsn_dual_wield );
@@ -448,8 +449,8 @@ ch_ret multi_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
 	return retcode;
     }
 
-    chance = IS_NPC(ch) ? 0
-	   : (int) ((ch->pcdata->learned[gsn_second_attack]+dual_bonus)/1.5);
+    chance = IS_NPC(ch) ? 0 : ( character_skill_level( ch, gsn_second_attack ) + dual_bonus / 1.5);
+
     if ( number_percent( ) < chance )
     {
 	learn_from_success( ch, gsn_second_attack );
@@ -460,8 +461,7 @@ ch_ret multi_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
     else
 	learn_from_failure( ch, gsn_second_attack );
 
-    chance = IS_NPC(ch) ? 0
-	   : (int) ((ch->pcdata->learned[gsn_third_attack]+(dual_bonus*1.5))/2);
+    chance = IS_NPC(ch) ? 0 : ( character_skill_level( ch, gsn_third_attack )+(dual_bonus*1.5))/2;
     if ( number_percent( ) < chance )
     {
 	learn_from_success( ch, gsn_third_attack );
@@ -519,7 +519,7 @@ int weapon_prof_bonus_check( CHAR_DATA *ch, OBJ_DATA *wield, int *gsn_ptr )
 
 	}
 	if ( *gsn_ptr != -1 )
-	  bonus = (int) ( ch->pcdata->learned[*gsn_ptr] );
+	  bonus = character_skill_level( ch, *gsn_ptr );
 
     }
     if ( IS_NPC(ch) && wield )   
@@ -697,9 +697,9 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
       dam *= ( 1 + prof_bonus / 100 );
     
 
-    if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_enhanced_damage] > 0 )
+    if ( !IS_NPC(ch) && character_skill_level( ch, gsn_enhanced_damage ) > 0 )
     {
-	dam += (int) (dam * ch->pcdata->learned[gsn_enhanced_damage] / 120);
+      dam += (int) (dam * character_skill_level( ch, gsn_enhanced_damage ) / 120);
 	learn_from_success( ch, gsn_enhanced_damage );
     }
         

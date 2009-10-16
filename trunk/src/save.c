@@ -465,20 +465,24 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 	
 	for ( sn = 1; sn < top_sn; sn++ )
 	{
-	    if ( skill_table[sn]->name && ch->pcdata->learned[sn] > 0 )
+	  if ( skill_table[sn]->name
+	       && character_skill_level( ch, sn ) > 0 )
 		switch( skill_table[sn]->type )
 		{
 		    default:
 			fprintf( fp, "Skill        %d '%s'\n",
-			  ch->pcdata->learned[sn], skill_table[sn]->name );
+				 character_skill_level( ch, sn ),
+				 skill_table[sn]->name );
 			break;
 		    case SKILL_SPELL:
 			fprintf( fp, "Spell        %d '%s'\n",
-			  ch->pcdata->learned[sn], skill_table[sn]->name );
+				 character_skill_level( ch, sn ),
+				 skill_table[sn]->name );
 			break;
 		    case SKILL_WEAPON:
 			fprintf( fp, "Weapon       %d '%s'\n",
-			  ch->pcdata->learned[sn], skill_table[sn]->name );
+				 character_skill_level( ch, sn ),
+				 skill_table[sn]->name );
 			break;
 		}
 	}
@@ -889,10 +893,10 @@ bool load_char_obj( DESCRIPTOR_DATA *d, const char *name, bool preload )
 		    break;
         
     	for ( sn = 0; sn < top_sn ; sn++ )
-    	   if ( ch->pcdata->learned[sn] > 0 )
+	  if ( character_skill_level( ch, sn ) > 0 )
            {
                 num_skills++;
-                if ( ch->pcdata->learned[sn] >= 100 )
+                if ( character_skill_level( ch, sn ) >= 100 )
                    adept_skills++; 
            }
         ch->pcdata->num_skills          = num_skills;

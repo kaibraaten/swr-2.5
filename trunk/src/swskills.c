@@ -90,8 +90,8 @@ void do_makeblade( CHAR_DATA *ch, char *argument )
                    return;
                 }
  
-    	        chance = IS_NPC(ch) ? ch->top_level
-	                 : (int) (ch->pcdata->learned[gsn_makeblade]);
+    	        chance = character_skill_level( ch, gsn_makeblade );
+
                 if ( number_percent( ) < chance )
     		{
     		   send_to_char( "&GYou begin the long process of crafting a vibroblade.\r\n", ch);
@@ -121,7 +121,7 @@ void do_makeblade( CHAR_DATA *ch, char *argument )
     
     ch->substate = SUB_NONE;
 
-    level = IS_NPC(ch) ? ch->top_level : (int) (ch->pcdata->learned[gsn_makeblade]);
+    level = character_skill_level( ch, gsn_makeblade );
     vnum = OBJ_VNUM_PROTO_BLADE;
     
     if ( ( pObjIndex = get_obj_index( vnum ) ) == NULL )
@@ -303,8 +303,7 @@ void do_makeblaster( CHAR_DATA *ch, char *argument )
                    return;
                 }
  
-    	        chance = IS_NPC(ch) ? ch->top_level
-	                 : (int) (ch->pcdata->learned[gsn_makeblaster]);
+    	        chance = character_skill_level(ch, gsn_makeblaster );
                 if ( number_percent( ) < chance )
     		{
     		   send_to_char( "&GYou begin the long process of making a blaster.\r\n", ch);
@@ -334,7 +333,7 @@ void do_makeblaster( CHAR_DATA *ch, char *argument )
     
     ch->substate = SUB_NONE;
     
-    level = IS_NPC(ch) ? ch->top_level : (int) (ch->pcdata->learned[gsn_makeblaster]);
+    level = character_skill_level( ch, gsn_makeblaster );
     vnum = OBJ_VNUM_PROTO_BLASTER;
     
     if ( ( pObjIndex = get_obj_index( vnum ) ) == NULL )
@@ -585,8 +584,8 @@ void do_makelightsaber( CHAR_DATA *ch, char *argument )
                    return;
                 }
  
-    	        chance = IS_NPC(ch) ? ch->top_level
-	                 : (int) (ch->pcdata->learned[gsn_lightsaber_crafting]);
+    	        chance = character_skill_level( ch, gsn_lightsaber_crafting );
+
                 if ( number_percent( ) < chance )
     		{
     		   send_to_char( "&GYou begin the long process of crafting a lightsaber.\r\n", ch);
@@ -616,7 +615,7 @@ void do_makelightsaber( CHAR_DATA *ch, char *argument )
     
     ch->substate = SUB_NONE;
     
-    level = IS_NPC(ch) ? ch->top_level : (int) (ch->pcdata->learned[gsn_lightsaber_crafting]);
+    level = character_skill_level( ch, gsn_lightsaber_crafting );
     vnum = OBJ_VNUM_PROTO_LIGHTSABER;
     
     if ( ( pObjIndex = get_obj_index( vnum ) ) == NULL )
@@ -843,8 +842,8 @@ void do_makejewelry( CHAR_DATA *ch, char *argument )
                    return;
                 }
 
-    	        chance = IS_NPC(ch) ? ch->top_level
-	                 : (int) (ch->pcdata->learned[gsn_makejewelry]);
+    	        chance = character_skill_level(ch, gsn_makejewelry );
+
                 if ( number_percent( ) < chance )
     		{
     		   send_to_char( "&GYou begin the long process of creating some jewelry.\r\n", ch);
@@ -880,7 +879,7 @@ void do_makejewelry( CHAR_DATA *ch, char *argument )
     
     ch->substate = SUB_NONE;
     
-    level = IS_NPC(ch) ? ch->top_level : (int) (ch->pcdata->learned[gsn_makejewelry]);
+    level = character_skill_level( ch, gsn_makejewelry );
     
     checkmetal = FALSE;
     checkoven = FALSE;
@@ -1015,8 +1014,8 @@ void do_makearmor( CHAR_DATA *ch, char *argument )
                    return;
                 }
 
-    	        chance = IS_NPC(ch) ? ch->top_level
-	                 : (int) (ch->pcdata->learned[gsn_makearmor]);
+    	        chance = character_skill_level( ch, gsn_makearmor );
+
                 if ( number_percent( ) < chance )
     		{
     		   send_to_char( "&GYou begin the long process of creating some armor.\r\n", ch);
@@ -1052,7 +1051,7 @@ void do_makearmor( CHAR_DATA *ch, char *argument )
     
     ch->substate = SUB_NONE;
     
-    level = IS_NPC(ch) ? ch->top_level : (int) (ch->pcdata->learned[gsn_makearmor]);
+    level = character_skill_level( ch, gsn_makearmor );
     
     checksew = FALSE;
     checkfab = FALSE;
@@ -1184,8 +1183,7 @@ void do_makeshield( CHAR_DATA *ch, char *argument )
                    return;
                 }
                 
-    	        chance = IS_NPC(ch) ? ch->top_level
-	                 : (int) (ch->pcdata->learned[gsn_makeshield]);
+    	        chance = character_skill_level( ch, gsn_makeshield );
                 if ( number_percent( ) < chance )
     		{
     		   send_to_char( "&GYou begin the long process of crafting an energy shield.\r\n", ch);
@@ -1215,7 +1213,7 @@ void do_makeshield( CHAR_DATA *ch, char *argument )
     
     ch->substate = SUB_NONE;
     
-    level = IS_NPC(ch) ? ch->top_level : (int) (ch->pcdata->learned[gsn_makeshield]);
+    level = character_skill_level( ch, gsn_makeshield );
     vnum = OBJ_VNUM_PROTO_SHIELD;
     
     if ( ( pObjIndex = get_obj_index( vnum ) ) == NULL )
@@ -1371,8 +1369,8 @@ void do_makecontainer( CHAR_DATA *ch, char *argument )
                    return;
                 }
 
-    	        chance = IS_NPC(ch) ? ch->top_level
-	                 : (int) (ch->pcdata->learned[gsn_makecontainer]);
+    	        chance = character_skill_level( ch, gsn_makecontainer );
+
                 if ( number_percent( ) < chance )
     		{
     		   send_to_char( "&GYou begin the long process of creating a bag.\r\n", ch);
@@ -1408,7 +1406,7 @@ void do_makecontainer( CHAR_DATA *ch, char *argument )
     
     ch->substate = SUB_NONE;
     
-    level = IS_NPC(ch) ? ch->top_level : (int) (ch->pcdata->learned[gsn_makecontainer]);
+    level = character_skill_level( ch, gsn_makecontainer );
     
     checksew = FALSE;
     checkfab = FALSE;
@@ -1502,7 +1500,8 @@ void do_reinforcements( CHAR_DATA *ch, char *argument )
     	            return;
     	        }    
     	        
-    	        chance = (int) (ch->pcdata->learned[gsn_reinforcements]);
+    	        chance = character_skill_level( ch, gsn_reinforcements );
+
                 if ( number_percent( ) < chance )
     		{
     		   send_to_char( "&GYou begin making the call for reinforcements.\r\n", ch);
@@ -1584,7 +1583,8 @@ void do_postguard( CHAR_DATA *ch, char *argument )
     	            return;
     	        }    
     	        
-    	        chance = (int) (ch->pcdata->learned[gsn_postguard]);
+    	        chance = character_skill_level( ch, gsn_postguard );
+
                 if ( number_percent( ) < chance )
     		{
     		   send_to_char( "&GYou begin making the call for reinforcements.\r\n", ch);
@@ -1719,7 +1719,7 @@ void do_torture( CHAR_DATA *ch, char *argument )
     bool fail;
     
     if ( !IS_NPC(ch)
-    &&  ch->pcdata->learned[gsn_torture] <= 0  )
+	 &&  character_skill_level( ch, gsn_torture ) <= 0  )
     {
 	send_to_char(
 	    "Your mind races as you realize you have no idea how to do that.\r\n", ch );
@@ -1779,7 +1779,7 @@ void do_torture( CHAR_DATA *ch, char *argument )
     WAIT_STATE( ch, skill_table[gsn_torture]->beats );
     
     fail = FALSE;
-    chance = ris_save( victim, IS_NPC(ch) ? ch->top_level : ch->pcdata->learned[gsn_torture], RIS_PARALYSIS );
+    chance = ris_save( victim, character_skill_level( ch, gsn_torture ), RIS_PARALYSIS );
     if ( chance == 1000 )
       fail = TRUE;
     else
@@ -1788,7 +1788,7 @@ void do_torture( CHAR_DATA *ch, char *argument )
     chance = 5;
     if ( !fail
     && (  IS_NPC(ch)
-    || (number_percent( ) + chance) < ch->pcdata->learned[gsn_torture] ) )
+	  || (number_percent( ) + chance) < character_skill_level( ch, gsn_torture ) ) )
     {
 	learn_from_success( ch, gsn_torture );
 	WAIT_STATE( ch,     2 * PULSE_VIOLENCE );
@@ -1797,7 +1797,7 @@ void do_torture( CHAR_DATA *ch, char *argument )
 	act( AT_SKILL, "You torture $N, leaving $M screaming in pain.", ch, NULL, victim, TO_CHAR );
 	act( AT_SKILL, "$n tortures $N, leaving $M screaming in agony!", ch, NULL, victim, TO_NOTVICT );
         
-        dam = dice( (IS_NPC(ch) ? ch->top_level : ch->pcdata->learned[gsn_torture])/10 , 4 );
+        dam = dice( character_skill_level( ch, gsn_torture ) /10 , 4 );
         dam = URANGE( 0, victim->max_hit-10, dam ); 
         victim->hit -= dam;
         victim->max_hit -= dam;
@@ -1837,7 +1837,7 @@ void do_disguise( CHAR_DATA *ch, char *argument )
 	return;
     }
     
-    chance = (int) (ch->pcdata->learned[gsn_disguise]);
+    chance = character_skill_level( ch, gsn_disguise );
     
     if ( number_percent( ) > chance )
     {
@@ -1892,7 +1892,7 @@ void do_first_aid( CHAR_DATA *ch, char *argument )
    
    heal = number_range( 1, 150 );
    
-   if ( heal > ch->pcdata->learned[gsn_first_aid]*2 )
+   if ( heal > character_skill_level( ch, gsn_first_aid ) * 2 )
    {
        ch_printf( ch, "You fail in your attempt at first aid.\r\n");     
        learn_from_failure( ch , gsn_first_aid );
@@ -2343,7 +2343,8 @@ void do_throw( CHAR_DATA *ch, char *argument )
    {
        
        WAIT_STATE( ch, skill_table[gsn_throw]->beats );
-       if ( IS_NPC(ch) || number_percent( ) < ch->pcdata->learned[gsn_throw] )
+       if ( IS_NPC(ch)
+	    || number_percent() < character_skill_level( ch, gsn_throw ) )
        {
 	 learn_from_success( ch, gsn_throw );
 	 global_retcode = damage( ch, victim, number_range( obj->weight*2 , (obj->weight*2 + ch->perm_str) ), TYPE_HIT );
@@ -2453,7 +2454,7 @@ void do_hijack( CHAR_DATA *ch, char *argument )
       return;
     }
 
-  chance = IS_NPC(ch) ? 0 : (int)  (ch->pcdata->learned[gsn_hijack]) ;
+  chance = IS_NPC( ch ) ? 0 : character_skill_level( ch, gsn_hijack );
 
   if ( number_percent( ) > chance )
     {  
@@ -2461,8 +2462,7 @@ void do_hijack( CHAR_DATA *ch, char *argument )
       return;
     }
                 
-  chance = IS_NPC(ch) ? 0
-    : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+  chance = IS_NPC(ch) ? 0 : character_skill_level( ch, gsn_spacecraft );
   if ( number_percent( ) < chance )
     {
       if (ship->hatchopen)
@@ -2585,7 +2585,7 @@ void do_propeganda ( CHAR_DATA *ch , char *argument )
 
   WAIT_STATE( ch, skill_table[gsn_propeganda]->beats );
 
-  if ( percent - get_curr_cha(ch) + victim->top_level > ch->pcdata->learned[gsn_propeganda]  ) 
+  if ( percent - get_curr_cha(ch) + victim->top_level > character_skill_level( ch, gsn_propeganda ) ) 
     {
       if ( planet->governed_by != clan )
 	{
@@ -2702,7 +2702,7 @@ void do_landscape ( CHAR_DATA *ch , char *argument )
 	{
 	  send_to_char( "That rooms description is too short.\r\n", ch );
 	  send_to_char( "You skill level deminishes with your lazyness.\r\n", ch );
-	  if ( ch->pcdata->learned[gsn_landscape] > 50 )
+	  if ( character_skill_level( ch, gsn_landscape ) > 50 )
 	    ch->pcdata->learned[gsn_landscape] -= 5;
 	}   
 
@@ -2776,7 +2776,7 @@ void do_landscape ( CHAR_DATA *ch , char *argument )
       return;   
     }
 
-  chance = (int) (ch->pcdata->learned[gsn_landscape]);
+  chance = character_skill_level( ch, gsn_landscape );
 
   if ( number_percent( ) > chance )
     {
@@ -3013,7 +3013,8 @@ void do_construction ( CHAR_DATA *ch , char *argument )
 	return;   
    }
    	
-   chance = (int) (ch->pcdata->learned[gsn_construction]);
+   chance = character_skill_level( ch, gsn_construction );
+
    if ( number_percent( ) > chance )
    {
 	send_to_char( "You can't quite get the desired affect.\r\n", ch );
@@ -3118,7 +3119,8 @@ void do_bridge ( CHAR_DATA *ch , char *argument )
    }
    argument = one_argument( argument , arg2 );
 
-   chance = (int) (ch->pcdata->learned[gsn_bridge]);
+   chance = character_skill_level( ch, gsn_bridge );
+
    if ( number_percent( ) > chance )
    {
 	send_to_char( "You can't quite get the desired affect.\r\n", ch );
@@ -3257,8 +3259,9 @@ void do_survey ( CHAR_DATA *ch , char *argument )
     
     room = ch->in_room;
     
-   	chance = (int) (ch->pcdata->learned[gsn_survey]);
-   	if ( number_percent( ) > chance )
+    chance = character_skill_level( ch, gsn_survey );
+
+    if ( number_percent( ) > chance )
    	{
 		send_to_char( "You have a hard time surveying this region.\r\n", ch );
 		return;   
@@ -3356,8 +3359,9 @@ void do_quicktalk ( CHAR_DATA *ch , char *argument )
     
     act( AT_ACTION, "$n attempts to stop the fight.", ch, NULL, NULL, TO_ROOM );
 
-    chance = (int) (ch->pcdata->learned[gsn_quicktalk]);
+    chance = character_skill_level( ch, gsn_quicktalk );
     chance = UMIN( chance , 95 );
+
     if ( number_percent( ) > chance )
     {
 	send_to_char( "You fail to calm your attackers.\r\n", ch );

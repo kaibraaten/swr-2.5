@@ -216,14 +216,16 @@ void do_score(CHAR_DATA * ch, char *argument)
     	
         send_to_char( "&WSkilled at: &G" , ch );
     	for ( sn = 0; sn < top_sn ; sn++ )
-    	   if ( ch->pcdata->learned[sn] > 0 && ch->pcdata->learned[sn] < 100 )
-               ch_printf( ch,  "%s  ", skill_table[sn]->name );    	     	 
+	  if ( character_skill_level( ch, sn ) > 0
+	       && character_skill_level( ch, sn ) < 100 )
+               ch_printf( ch,  "%s  ", skill_table[sn]->name );
         send_to_char( "\r\n" , ch );
     
         send_to_char( "&WAdept at: &G" , ch );
     	for ( sn = 0; sn < top_sn ; sn++ )
     	   if ( ch->pcdata->learned[sn] >= 100 )
-               ch_printf( ch,  "%s  ", skill_table[sn]->name );    	     	 
+               ch_printf( ch,  "%s  ", skill_table[sn]->name );
+
         send_to_char( "\r\n" , ch );
     
     }           
@@ -520,13 +522,14 @@ void do_oldscore( CHAR_DATA *ch, char *argument )
     	
         send_to_char( "You are skilled at: " , ch );
     	for ( sn = 0; sn < top_sn ; sn++ )
-    	   if ( ch->pcdata->learned[sn] > 0 && ch->pcdata->learned[sn] < 100 )
+	  if ( character_skill_level( ch, sn ) > 0
+	       && character_skill_level( ch, sn ) < 100 )
                ch_printf( ch,  "%s  ", skill_table[sn]->name );    	     	 
         send_to_char( "\r\n" , ch );
     
         send_to_char( "You are an adept of: " , ch );
     	for ( sn = 0; sn < top_sn ; sn++ )
-    	   if ( ch->pcdata->learned[sn] >= 100 )
+	  if ( character_skill_level( ch, sn ) >= 100 )
                ch_printf( ch,  "%s  ", skill_table[sn]->name );    	     	 
         send_to_char( "\r\n" , ch );
     

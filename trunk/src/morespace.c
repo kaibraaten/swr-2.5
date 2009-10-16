@@ -1457,7 +1457,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
       return;
     }
 
-  if ( ch->pcdata->learned[gsn_shipdesign] <= 0 )
+  if ( character_skill_level( ch, gsn_shipdesign ) <= 0 )
     {
       send_to_char( "You have no idea how to do that..\r\n" , ch);
       return;

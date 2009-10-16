@@ -38,6 +38,10 @@ bool check_illegal_psteal( CHAR_DATA *ch, CHAR_DATA *victim );
 void failed_casting( struct skill_type *skill, CHAR_DATA *ch,
 		     CHAR_DATA *victim, OBJ_DATA *obj );
 
+int character_skill_level( const CHAR_DATA *ch, short skill )
+{
+  return IS_NPC(ch) ? 100 : (int) ch->pcdata->learned[skill];
+}
 
 /*
  * Dummy function
@@ -153,7 +157,7 @@ bool check_skill( CHAR_DATA *ch, char *command, char *argument )
 	&&  !str_prefix(command, skill_table[sn]->name)
 	&&  (skill_table[sn]->skill_fun || skill_table[sn]->spell_fun != spell_null)
 	&&  (IS_NPC(ch)
-	||  ( ch->pcdata->learned[sn] > 0 )) )
+	     ||  ( character_skill_level( ch, sn ) > 0 )) )
 		break;
 	if (first >= top)
 	    return FALSE;
@@ -269,7 +273,7 @@ bool check_skill( CHAR_DATA *ch, char *command, char *argument )
 	WAIT_STATE( ch, skill_table[sn]->beats );
 	/* check for failure */
 	if ( (number_percent( ) + skill_table[sn]->difficulty * 5)
-	   > (IS_NPC(ch) ? 75 : ch->pcdata->learned[sn]) )
+	     > (IS_NPC(ch) ? 75 : character_skill_level( ch, sn ) ) )
 	{
 	  failed_casting( skill_table[sn], ch, (CHAR_DATA*) vo, obj );
 	    learn_from_failure( ch, sn );
@@ -1071,17 +1075,18 @@ void learn_from_success( CHAR_DATA *ch, int sn )
 {
     int adept, learn, percent, chance;
 
-    if ( IS_NPC(ch) || ch->pcdata->learned[sn] == 0 )
+    if ( IS_NPC(ch) || character_skill_level( ch, sn ) == 0 )
       return;
     
     adept =  100;
  
-    if ( ch->pcdata->learned[sn] >= adept )
+    if ( character_skill_level( ch, sn ) >= adept )
        return;
     
-    if ( ch->pcdata->learned[sn] < 100 )
+    if ( character_skill_level( ch, sn ) < 100 )
     {
-	chance = ch->pcdata->learned[sn]/4 + 50 + ( 5 * skill_table[sn]->difficulty);
+      chance = character_skill_level( ch, sn ) / 4
+	+ 50 + ( 5 * skill_table[sn]->difficulty);
 	percent = number_percent();
 	learn = 0;
 	if ( percent > 95  )
@@ -1090,8 +1095,9 @@ void learn_from_success( CHAR_DATA *ch, int sn )
 	  learn = 2;
 	else if ( percent > chance )
 	  learn = 1;
-	ch->pcdata->learned[sn] = UMIN( adept, ch->pcdata->learned[sn] + learn );	
-	if ( ch->pcdata->learned[sn] >= adept )	 /* fully learned! */
+	ch->pcdata->learned[sn] = UMIN( adept, character_skill_level( ch, sn )
+					+ learn );	
+	if ( character_skill_level( ch, sn ) >= adept )	 /* fully learned! */
 	{
      	    set_char_color( AT_WHITE, ch );
 	    if (  number_bits(1) == 0 && sn != gsn_landscape )
@@ -1129,7 +1135,7 @@ void do_gouge( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if ( !IS_NPC(ch) && !ch->pcdata->learned[gsn_gouge] )
+    if ( !IS_NPC(ch) && !character_skill_level( ch, gsn_gouge ) )
     {
 	send_to_char("You do not yet know of this skill.\r\n", ch );
 	return;
@@ -1149,9 +1155,9 @@ void do_gouge( CHAR_DATA *ch, char *argument )
 
     percent = number_percent( ) - (get_curr_lck(ch) - 13);
 
-    if ( IS_NPC(ch) || percent < ch->pcdata->learned[gsn_gouge] )
+    if ( IS_NPC(ch) || percent < character_skill_level( ch, gsn_gouge ) )
     {
-	dam = number_range( 1, ch->pcdata->learned[gsn_gouge] );
+      dam = number_range( 1, character_skill_level( ch, gsn_gouge ) );
 	global_retcode = damage( ch, victim, dam, gsn_gouge );
 	if ( global_retcode == rNONE )
 	{
@@ -1160,7 +1166,7 @@ void do_gouge( CHAR_DATA *ch, char *argument )
 		  af.type      = gsn_blindness;
 		  af.location  = APPLY_HITROLL;
 		  af.modifier  = -6;
-		  af.duration  = 3 + IS_NPC(ch) ? ch->top_level : ch->pcdata->learned[gsn_gouge] / 20;
+		  af.duration  = 3 + IS_NPC(ch) ? ch->top_level : character_skill_level( ch, gsn_gouge ) / 20;
 		  af.bitvector = AFF_BLIND;
 		  affect_to_char( victim, &af );
 		  act( AT_SKILL, "You can't see a thing!", victim, NULL, NULL, TO_CHAR );
@@ -1249,7 +1255,7 @@ void do_steal( CHAR_DATA *ch, char *argument )
 	       + times_killed( ch, victim )*7;
 
     if ( victim->position == POS_FIGHTING
-    ||   percent > ( IS_NPC(ch) ? 90 : ch->pcdata->learned[gsn_steal] ) ) 
+	 ||   percent > ( IS_NPC(ch) ? 90 : character_skill_level( ch, gsn_steal ) ) ) 
     {
 	/*
 	 * Failure.
@@ -1437,7 +1443,7 @@ void do_backstab( CHAR_DATA *ch, char *argument )
     WAIT_STATE( ch, skill_table[gsn_backstab]->beats );
     if ( !IS_AWAKE(victim)
     ||   IS_NPC(ch)
-    ||   percent < ch->pcdata->learned[gsn_backstab] )
+	 ||   percent < character_skill_level( ch, gsn_backstab ) )
     {
 	learn_from_success( ch, gsn_backstab );
 	global_retcode = multi_hit( ch, victim, gsn_backstab );
@@ -1509,7 +1515,7 @@ void do_rescue( CHAR_DATA *ch, char *argument )
 	      - (get_curr_lck(victim) - 16);
 
     WAIT_STATE( ch, skill_table[gsn_rescue]->beats );
-    if ( !IS_NPC(ch) && percent > ch->pcdata->learned[gsn_rescue] )
+    if ( !IS_NPC(ch) && percent > character_skill_level( ch, gsn_rescue ) )
     {
 	send_to_char( "You fail the rescue.\r\n", ch );
 	act( AT_SKILL, "$n tries to rescue you!", ch, NULL, victim, TO_VICT   );
@@ -1556,10 +1562,10 @@ void do_kick( CHAR_DATA *ch, char *argument )
     }
 
     WAIT_STATE( ch, skill_table[gsn_kick]->beats );
-    if ( IS_NPC(ch) || number_percent( ) < ch->pcdata->learned[gsn_kick] )
+    if ( IS_NPC(ch) || number_percent( ) < character_skill_level( ch, gsn_kick ) )
     {
 	learn_from_success( ch, gsn_kick );
-	global_retcode = damage( ch, victim, number_range( 1, IS_NPC(ch) ? ch->top_level/5 : ch->pcdata->learned[gsn_kick]/5 ) , gsn_kick );
+	global_retcode = damage( ch, victim, number_range( 1, IS_NPC(ch) ? ch->top_level/5 : character_skill_level( ch, gsn_kick ) / 5 ) , gsn_kick );
     }
     else
     {
@@ -1633,7 +1639,7 @@ void do_disarm( CHAR_DATA *ch, char *argument )
     }
 
     if ( !IS_NPC(ch)
-    &&   ch->pcdata->learned[gsn_disarm] <= 0  )
+	 &&   character_skill_level( ch, gsn_disarm ) <= 0  )
     {
 	send_to_char( "You don't know how to disarm opponents.\r\n", ch );
 	return;
@@ -1662,7 +1668,7 @@ void do_disarm( CHAR_DATA *ch, char *argument )
 	      - (get_curr_lck(ch) - 15) + (get_curr_lck(victim) - 15);
     if ( !can_see_obj( ch, obj ) )
       percent += 10;
-    if ( IS_NPC(ch) || percent < ch->pcdata->learned[gsn_disarm] * 2 / 3 )
+    if ( IS_NPC(ch) || percent < character_skill_level( ch, gsn_disarm ) * 2 / 3 )
 	disarm( ch, victim );
     else
     {
@@ -1776,7 +1782,7 @@ void do_pick( CHAR_DATA *ch, char *argument )
 	   return;
 	}
         
-        if ( !IS_NPC(ch) && number_percent( ) > ch->pcdata->learned[gsn_pick_lock] )
+        if ( !IS_NPC(ch) && number_percent( ) > character_skill_level( ch, gsn_pick_lock ) )
         {
 	  send_to_char( "You failed.\r\n", ch);
 	  learn_from_failure( ch, gsn_pick_lock );
@@ -1813,7 +1819,7 @@ void do_pick( CHAR_DATA *ch, char *argument )
 	   return;
 	}
                   
-        if ( !IS_NPC(ch) && number_percent( ) > ch->pcdata->learned[gsn_pick_lock] )
+        if ( !IS_NPC(ch) && number_percent( ) > character_skill_level( ch, gsn_pick_lock ) )
         {
 	  send_to_char( "You failed.\r\n", ch);
 	  learn_from_failure( ch, gsn_pick_lock );
@@ -1848,7 +1854,7 @@ void do_pick( CHAR_DATA *ch, char *argument )
    
    	     WAIT_STATE( ch, skill_table[gsn_pickshiplock]->beats );
 
-             chance = URANGE( 0 , ch->pcdata->learned[gsn_pickshiplock] , 95 );
+             chance = URANGE( 0 , character_skill_level( ch, gsn_pickshiplock ) , 95 );
 
    	     if ( IS_NPC(ch) || !ch->pcdata || number_percent() > chance )
              {
@@ -1899,10 +1905,10 @@ void do_sneak( CHAR_DATA *ch, char *argument )
     send_to_char( "You attempt to move silently.\r\n", ch );
     affect_strip( ch, gsn_sneak );
 
-    if ( IS_NPC(ch) || number_percent( ) < ch->pcdata->learned[gsn_sneak] )
+    if ( IS_NPC(ch) || number_percent( ) < character_skill_level( ch, gsn_sneak ) )
     {
 	af.type      = gsn_sneak;
-	af.duration  = IS_NPC(ch) ? ch->top_level : (short)(ch->pcdata->learned[gsn_sneak]  * DUR_CONV);
+	af.duration  = IS_NPC(ch) ? ch->top_level : (short)(character_skill_level( ch, gsn_sneak )  * DUR_CONV);
 	af.location  = APPLY_NONE;
 	af.modifier  = 0;
 	af.bitvector = AFF_SNEAK;
@@ -1936,7 +1942,7 @@ void do_hide( CHAR_DATA *ch, char *argument )
     if ( IS_AFFECTED(ch, AFF_HIDE) )
 	REMOVE_BIT(ch->affected_by, AFF_HIDE);
 
-    if ( IS_NPC(ch) || number_percent( ) < ch->pcdata->learned[gsn_hide] )
+    if ( IS_NPC(ch) || number_percent( ) < character_skill_level( ch, gsn_hide ) )
     {
 	SET_BIT(ch->affected_by, AFF_HIDE);
 	learn_from_success( ch, gsn_hide );
@@ -2078,7 +2084,7 @@ void do_aid( CHAR_DATA *ch, char *argument )
 
     percent = number_percent( ) - (get_curr_lck(ch) - 13);
     WAIT_STATE( ch, skill_table[gsn_aid]->beats );
-    if ( !IS_NPC(ch) && percent > ch->pcdata->learned[gsn_aid] )
+    if ( !IS_NPC(ch) && percent > character_skill_level( ch, gsn_aid ) )
     {
 	send_to_char( "You fail.\r\n", ch );
 	learn_from_failure( ch, gsn_aid );
@@ -2105,7 +2111,7 @@ void do_mount( CHAR_DATA *ch, char *argument )
     CHAR_DATA *victim;
 
     if ( !IS_NPC(ch)
-    &&   ch->pcdata->learned[gsn_mount] <= 0  )
+	 &&   character_skill_level( ch, gsn_mount ) <= 0  )
     {
 	send_to_char(
 	    "I don't think that would be a good idea...\r\n", ch );
@@ -2149,7 +2155,7 @@ void do_mount( CHAR_DATA *ch, char *argument )
     }
 
     WAIT_STATE( ch, skill_table[gsn_mount]->beats );
-    if ( IS_NPC(ch) || number_percent( ) < ch->pcdata->learned[gsn_mount] )
+    if ( IS_NPC(ch) || number_percent( ) < character_skill_level( ch, gsn_mount ) )
     {
 	SET_BIT( victim->act, ACT_MOUNTED );
 	ch->mount = victim;
@@ -2181,7 +2187,7 @@ void do_dismount( CHAR_DATA *ch, char *argument )
     }
 
     WAIT_STATE( ch, skill_table[gsn_mount]->beats );
-    if ( IS_NPC(ch) || number_percent( ) < ch->pcdata->learned[gsn_mount] )
+    if ( IS_NPC(ch) || number_percent( ) < character_skill_level( ch, gsn_mount ) )
     {
 	act( AT_SKILL, "You dismount $N.", ch, NULL, victim, TO_CHAR );
 	act( AT_SKILL, "$n skillfully dismounts $N.", ch, NULL, victim, TO_NOTVICT );
@@ -2237,7 +2243,7 @@ bool check_parry( CHAR_DATA *ch, CHAR_DATA *victim )
             ( wield->value[3] != WEAPON_LIGHTSABER ) )
               return FALSE;
 	}
-	chances = (int) (victim->pcdata->learned[gsn_parry] );
+	chances = character_skill_level( victim, gsn_parry );
     }
     
     chances = URANGE ( 10 , chances , 90 );
@@ -2277,7 +2283,7 @@ bool check_dodge( CHAR_DATA *ch, CHAR_DATA *victim )
     if ( IS_NPC(victim) )
 	chances  = UMIN( 60, victim->top_level );
     else
-        chances  = (int) (victim->pcdata->learned[gsn_dodge] / 2);
+      chances  = character_skill_level( victim, gsn_dodge ) / 2;
 
     if ( number_range( 1, 100 ) > chances )
     {
@@ -2304,7 +2310,7 @@ void do_poison_weapon( CHAR_DATA *ch, char *argument )
   int       percent;
 
   if ( !IS_NPC( ch )
-  &&  ch->pcdata->learned[gsn_poison_weapon] <= 0  )
+       && character_skill_level( ch, gsn_poison_weapon ) <= 0  )
     {
     send_to_char( "What do you think you are, a thief?\r\n", ch );
     return;
@@ -2379,12 +2385,12 @@ void do_poison_weapon( CHAR_DATA *ch, char *argument )
     separate_obj( pobj );
     separate_obj( wobj );
     if ( !IS_NPC( ch )
-    && percent > ch->pcdata->learned[gsn_poison_weapon] )
+	 && percent > character_skill_level( ch, gsn_poison_weapon ) )
     {
 	set_char_color( AT_RED, ch );
 	send_to_char( "You failed and spill some on yourself.  Ouch!\r\n", ch );
 	set_char_color( AT_GREY, ch );
-	damage( ch, ch, IS_NPC(ch) ? ch->top_level : ch->pcdata->learned[gsn_poison_weapon] , gsn_poison_weapon );
+	damage( ch, ch, character_skill_level( ch, gsn_poison_weapon ), gsn_poison_weapon );
 	act(AT_RED, "$n spills the poison all over!", ch, NULL, NULL, TO_ROOM );
 	extract_obj( pobj );
 	extract_obj( wobj );
@@ -2397,9 +2403,9 @@ void do_poison_weapon( CHAR_DATA *ch, char *argument )
     act(AT_GREEN, "You pour the poison over $p, which glistens wickedly!",ch, obj, NULL, TO_CHAR  );
     act(AT_GREEN, "$n pours the poison over $p, which glistens wickedly!",ch, obj, NULL, TO_ROOM  );
     SET_BIT( obj->extra_flags, ITEM_POISONED );
-    obj->cost *= IS_NPC(ch) ? ch->top_level : ch->pcdata->learned[gsn_poison_weapon]/2;
+    obj->cost *= character_skill_level( ch, gsn_poison_weapon ) / 2;
     /* Set an object timer.  Don't want proliferation of poisoned weapons */
-    obj->timer = 10 + IS_NPC(ch) ? ch->top_level : ch->pcdata->learned[gsn_poison_weapon] ;
+    obj->timer = 10 + character_skill_level( ch, gsn_poison_weapon );
 
     if ( IS_OBJ_STAT( obj, ITEM_BLESS ) )
     obj->timer *= 2;
@@ -2430,7 +2436,7 @@ bool check_grip( CHAR_DATA *ch, CHAR_DATA *victim )
     if ( IS_NPC(victim) )
 	chance  = UMIN( 60, 2 * victim->top_level );
     else
-        chance  = (int) (victim->pcdata->learned[gsn_grip] / 2);
+      chance  = character_skill_level( victim, gsn_grip ) / 2;
 
     /* Consider luck as a factor */
     chance += (2 * (get_curr_lck(victim) - 13 ) );
@@ -2519,7 +2525,7 @@ void do_circle( CHAR_DATA *ch, char *argument )
 	      + (get_curr_lck(victim) - 13);
     
      WAIT_STATE( ch, skill_table[gsn_circle]->beats );
-    if ( percent < (IS_NPC(ch) ? ch->top_level  * 1.5 : ch->pcdata->learned[gsn_circle]) )
+     if ( percent < character_skill_level( ch, gsn_circle ) )
     {
 	learn_from_success( ch, gsn_circle );
 	global_retcode = multi_hit( ch, victim, gsn_circle );
@@ -2551,7 +2557,7 @@ void do_berserk( CHAR_DATA *ch, char *argument )
     return;
   }
   
-  percent = IS_NPC(ch) ? 80 : ch->pcdata->learned[gsn_berserk];
+  percent = IS_NPC(ch) ? 80 : character_skill_level( ch, gsn_berserk );
   WAIT_STATE(ch, skill_table[gsn_berserk]->beats);
   if ( !chance(ch, percent) )
   {
@@ -2596,14 +2602,14 @@ void do_hitall( CHAR_DATA *ch, char *argument )
     send_to_char( "There's no one here!\r\n", ch );
     return;
   }
-  percent = IS_NPC(ch) ? 80 : ch->pcdata->learned[gsn_hitall];
+  percent = IS_NPC(ch) ? 80 : character_skill_level( ch, gsn_hitall );
   for ( vch = ch->in_room->first_person; vch; vch = vch_next )
   {
     vch_next = vch->next_in_room;
     if ( is_same_group(ch, vch) || !is_legal_kill(ch, vch) ||
         !can_see(ch, vch) || is_safe(ch, vch) )
       continue;
-    if ( ++nvict > IS_NPC(ch) ? ch->top_level : ch->pcdata->learned[gsn_hitall]  / 5 )
+    if ( ++nvict > character_skill_level( ch, gsn_hitall ) / 5 )
       break;
     if ( chance(ch, percent) )
     {

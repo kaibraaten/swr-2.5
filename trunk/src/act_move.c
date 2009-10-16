@@ -5,7 +5,6 @@
 #include <time.h>
 #include "mud.h"
 
-
 const	short	movement_loss	[SECT_MAX]	=
 {
     1, 2, 2, 3, 4, 6, 4, 1, 6, 10, 6, 5, 7, 4, 6, 4, 2, 3, 6, 3, 3, 5, 4, 3, 2, 3, 7
@@ -17,14 +16,10 @@ const char *	const	dir_name	[]		=
     "northeast", "northwest", "southeast", "southwest", "somewhere"
 };
 
-
 const	short	rev_dir		[]		=
 {
     2, 3, 0, 1, 5, 4, 9, 8, 7, 6, 10
 };
-
-
-
 
 const char *	const		sect_names[SECT_MAX][2] =
 {
@@ -43,7 +38,6 @@ const char *	const		sect_names[SECT_MAX][2] =
     { "Steppe", "steppe" },		{ "Farmland", "farmland"	},    
     { "Volcano", "volcanic" }    
 };
-
 
 const	int		sent_total[SECT_MAX]		=
 {
@@ -683,7 +677,7 @@ ch_ret move_char( CHAR_DATA *ch, EXIT_DATA *pexit, int fall )
 
 	    if ( !found && !ch->mount )
 	    {
-		if ( ( !IS_NPC(ch) && number_percent( ) > ch->pcdata->learned[gsn_climb] )
+	      if ( ( !IS_NPC(ch) && number_percent( ) > character_skill_level( ch, gsn_climb ) )
 		||      drunk || ch->mental_state < -90 )
 		{
 		   send_to_char( "You start to climb... but lose your grip and fall!\r\n", ch);
@@ -1488,7 +1482,7 @@ void do_bashdoor( CHAR_DATA *ch, char *argument )
 	char       arg [ MAX_INPUT_LENGTH ];
 
 	if ( !IS_NPC( ch )
-	&&  ch->pcdata->learned[gsn_bashdoor] <= 0  )
+	     &&  character_skill_level( ch, gsn_bashdoor ) <= 0  )
 	{
 	    send_to_char( "You're not enough of a warrior to bash doors!\r\n", ch );
 	    return;
@@ -1527,10 +1521,8 @@ void do_bashdoor( CHAR_DATA *ch, char *argument )
 		keyword = "wall";
 	    else
 		keyword = pexit->keyword;
-	    if ( !IS_NPC(ch) )
-		chance = ch->pcdata->learned[gsn_bashdoor] / 2;
-	    else
-		chance = 90;
+
+	    chance = IS_NPC( ch ) ? 90 : character_skill_level( ch, gsn_bashdoor );
 
 	    if ( !IS_SET( pexit->exit_info, EX_BASHPROOF )
 	    &&   ch->move >= 15

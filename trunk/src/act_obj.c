@@ -974,7 +974,8 @@ bool could_dual( CHAR_DATA *ch )
 {
   if ( IS_NPC(ch) )
     return TRUE;
-  if ( ch->pcdata->learned[gsn_dual_wield] )
+
+  if ( character_skill_level( ch, gsn_dual_wield ) > 0 )
     return TRUE;
 
   return FALSE;
