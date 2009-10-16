@@ -10,6 +10,7 @@
 #include <signal.h>
 #include <stdarg.h>
 #include "mud.h"
+#include "os.h"
 
 /*
  * Socket and TCP/IP stuff.
@@ -94,6 +95,9 @@ void	mail_count		args( ( CHAR_DATA *ch ) );
 
 int main( int argc, char **argv )
 {
+  network_startup();
+  atexit( network_teardown );
+
     struct timeval now_time;
     /*int port;*/
     bool fCopyOver = FALSE;
@@ -193,41 +197,40 @@ int main( int argc, char **argv )
     sprintf( log_buf, "SWR 2.0 ready on port %d.", port );
     log_string( log_buf );
     game_loop();
-    close( control );
+    closesocket( control );
 
     /*
      * That's all, folks.
      */
     log_string( "Normal termination of game." );
-    exit( 0 );
-    return 0;
+    exit( 0 ); // network_teardown automatically called
 }
 
 
 int init_socket( int port )
 {
-    char hostname[64];
-    struct sockaddr_in	 sa;
-    struct hostent	*hp;
-    struct servent	*sp;
-    int x = 1;
-    int fd;
+  char hostname[64];
+  struct sockaddr_in	 sa;
+  struct hostent	*hp;
+  struct servent	*sp;
+  int optval = 1;
+  socklen_t optlen = sizeof( optval );
+  int fd;
 
-    gethostname(hostname, sizeof(hostname));
-    
+  gethostname(hostname, sizeof(hostname));
 
-    if ( ( fd = socket( AF_INET, SOCK_STREAM, 0 ) ) < 0 )
+  if ( ( fd = socket( PF_INET, SOCK_STREAM, IPPROTO_TCP ) ) == INVALID_SOCKET  )
     {
-	perror( "Init_socket: socket" );
-	exit( 1 );
+      perror( "Init_socket: socket" );
+      exit( 1 );
     }
 
-    if ( setsockopt( fd, SOL_SOCKET, SO_REUSEADDR,
-		    (void *) &x, sizeof(x) ) < 0 )
+  if( ( setsockopt( fd, SOL_SOCKET, SO_REUSEADDR,
+		    &optval, optlen ) ) == SOCKET_ERROR )
     {
-	perror( "Init_socket: SO_REUSEADDR" );
-	close( fd );
-	exit( 1 );
+      perror( "Init_socket: SO_REUSEADDR" );
+      closesocket( fd );
+      exit( 1 );
     }
 
 #if defined(SO_DONTLINGER) && !defined(SYSV)
@@ -238,10 +241,10 @@ int init_socket( int port )
 	ld.l_linger = 1000;
 
 	if ( setsockopt( fd, SOL_SOCKET, SO_DONTLINGER,
-			(void *) &ld, sizeof(ld) ) < 0 )
+			(void *) &ld, sizeof(ld) ) == SOCKET_ERROR )
 	{
 	    perror( "Init_socket: SO_DONTLINGER" );
-	    close( fd );
+	    closesocket( fd );
 	    exit( 1 );
 	}
     }
@@ -253,17 +256,17 @@ int init_socket( int port )
     sa.sin_family   = AF_INET; /* hp->h_addrtype; */
     sa.sin_port	    = htons( port );
 
-    if ( bind( fd, (struct sockaddr *) &sa, sizeof(sa) ) == -1 )
+    if ( bind( fd, (struct sockaddr *) &sa, sizeof(sa) ) == SOCKET_ERROR )
     {
 	perror( "Init_socket: bind" );
-	close( fd );
+	closesocket( fd );
 	exit( 1 );
     }
 
-    if ( listen( fd, 50 ) < 0 )
+    if ( listen( fd, 50 ) == SOCKET_ERROR )
     {
 	perror( "Init_socket: listen" );
-	close( fd );
+	closesocket( fd );
 	exit( 1 );
     }
 
@@ -304,7 +307,7 @@ static void caught_alarm( int foo )
 	log_string( "clearing newdesc" );
     }
     game_loop( );
-    close( control );
+    closesocket( control );
 
     log_string( "Normal termination of game." );
     exit( 0 );
@@ -354,7 +357,10 @@ void accept_new( int ctrl )
 	      break;
 	}
 
-	if ( select( maxdesc+1, &in_set, &out_set, &exc_set, &null_time ) < 0 )
+	int result = select( maxdesc+1, &in_set, &out_set, &exc_set,
+			     &null_time );
+
+	if ( result == SOCKET_ERROR )
 	{
 	    perror( "accept_new: select: poll" );
 	    exit( 1 );
@@ -562,7 +568,7 @@ void game_loop( )
 
 		stall_time.tv_usec = usecDelta;
 		stall_time.tv_sec  = secDelta;
-		if ( select( 0, NULL, NULL, NULL, &stall_time ) < 0 )
+		if ( select( 0, NULL, NULL, NULL, &stall_time ) == SOCKET_ERROR )
 		{
 		    perror( "game_loop: select: stall" );
 		    exit( 1 );
@@ -621,7 +627,7 @@ void new_descriptor( int new_desc )
       return;
     }
     set_alarm( 20 );
-    if ( ( desc = accept( new_desc, (struct sockaddr *) &sock, &size) ) < 0 )
+    if ( ( desc = accept( new_desc, (struct sockaddr *) &sock, &size) ) == INVALID_SOCKET )
     {
       /*perror( "New_descriptor: accept");*/
 	set_alarm( 0 );
@@ -716,7 +722,7 @@ void new_descriptor( int new_desc )
 
 void free_desc( DESCRIPTOR_DATA *d )
 {
-    close( d->descriptor );
+    closesocket( d->descriptor );
     STRFREE( d->host );
     DISPOSE( d->outbuf );
 
@@ -853,53 +859,52 @@ void close_socket( DESCRIPTOR_DATA *dclose, bool force )
 
 bool read_from_descriptor( DESCRIPTOR_DATA *d )
 {
-    /* Hold horses if pending command already. */
-    if ( d->incomm[0] != '\0' )
-	return TRUE;
-
-    /* Check for overflow. */
-    size_t iStart = strlen(d->inbuf);
-
-    if ( iStart >= sizeof(d->inbuf) - 10 )
-    {
-	sprintf( log_buf, "%s input overflow!", d->host );
-	log_string( log_buf );
-	write_to_descriptor( d->descriptor,
-	    "\r\n*** PUT A LID ON IT!!! ***\r\n", 0 );
-	return FALSE;
-    }
-
-    for ( ; ; )
-    {
-	int nRead;
-
-	nRead = read( d->descriptor, d->inbuf + iStart,
-	    sizeof(d->inbuf) - 10 - iStart );
-	if ( nRead > 0 )
-	{
-	    iStart += nRead;
-	    if ( d->inbuf[iStart-1] == '\n' || d->inbuf[iStart-1] == '\r' )
-		break;
-	}
-	else if ( nRead == 0 )
-	{
-	    log_string_plus( "EOF encountered on read.", LOG_COMM );
-	    return FALSE;
-	}
-	else if ( errno == EWOULDBLOCK )
-	    break;
-	else
-	{
-	    perror( "Read_from_descriptor" );
-	    return FALSE;
-	}
-    }
-
-    d->inbuf[iStart] = '\0';
+  /* Hold horses if pending command already. */
+  if ( d->incomm[0] != '\0' )
     return TRUE;
+
+  /* Check for overflow. */
+  size_t iStart = strlen(d->inbuf);
+
+  if ( iStart >= sizeof(d->inbuf) - 10 )
+    {
+      sprintf( log_buf, "%s input overflow!", d->host );
+      log_string( log_buf );
+      write_to_descriptor( d->descriptor,
+			   "\r\n*** PUT A LID ON IT!!! ***\r\n", 0 );
+      return FALSE;
+    }
+
+  for ( ; ; )
+    {
+      ssize_t nRead = recv( d->descriptor, d->inbuf + iStart,
+			    sizeof(d->inbuf) - 10 - iStart, 0 );
+
+      if ( nRead > 0 )
+	{
+	  iStart += nRead;
+	  if ( d->inbuf[iStart-1] == '\n' || d->inbuf[iStart-1] == '\r' )
+	    break;
+	}
+      else if ( nRead == 0 )
+	{
+	  log_string_plus( "EOF encountered on read.", LOG_COMM );
+	  return FALSE;
+	}
+      else if ( errno == EWOULDBLOCK )
+	{
+	  break;
+	}
+      else
+	{
+	  perror( "Read_from_descriptor" );
+	  return FALSE;
+	}
+    }
+
+  d->inbuf[iStart] = '\0';
+  return TRUE;
 }
-
-
 
 /*
  * Transfer one line from input buffer to input line.
@@ -1179,21 +1184,25 @@ void write_to_buffer( DESCRIPTOR_DATA *d, const char *txt, size_t length )
  */
 bool write_to_descriptor( int desc, const char *txt, int length )
 {
-    int iStart;
-    int nWrite;
-    int nBlock;
+  int iStart = 0;
+  ssize_t nWrite = 0;
+  int nBlock = 0;
 
-    if ( length <= 0 )
-	length = strlen(txt);
+  if ( length <= 0 )
+    length = strlen(txt);
 
-    for ( iStart = 0; iStart < length; iStart += nWrite )
+  for ( iStart = 0; iStart < length; iStart += nWrite )
     {
-	nBlock = UMIN( length - iStart, 4096 );
-	if ( ( nWrite = write( desc, txt + iStart, nBlock ) ) < 0 )
-	    { perror( "Write_to_descriptor" ); return FALSE; }
+      nBlock = UMIN( length - iStart, 4096 );
+
+      if ( ( nWrite = send( desc, txt + iStart, nBlock, 0 ) ) == SOCKET_ERROR )
+	{
+	  perror( "Write_to_descriptor" );
+	  return FALSE;
+	}
     }
 
-    return TRUE;
+  return TRUE;
 }
 
 
