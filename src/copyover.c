@@ -97,10 +97,6 @@ void do_copyover (CHAR_DATA *ch, char * argument)
   fprintf (fp, "-1\n");
   fclose (fp);
 
-  /* Close reserve and other always-open files and release other resources */
-  fclose (fpReserve);
-  fclose (fpLOG);
-
   /* exec - descriptors are inherited */
 
   sprintf (buf, "%d", port);
@@ -112,22 +108,6 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 
   perror ("do_copyover: execl");
   send_to_char ("Copyover FAILED!\r\n",ch);
-
-  /* Here you might want to reopen fpReserve */
-  /* Since I'm a neophyte type guy, I'll assume this is
-     a good idea and cut and past from main()  */
-
-  if ( ( fpReserve = fopen( NULL_FILE, "r" ) ) == NULL )
-    {
-      perror( NULL_FILE );
-      exit( 1 );
-    }
-
-  if ( ( fpLOG = fopen( NULL_FILE, "r" ) ) == NULL )
-    {
-      perror( NULL_FILE );
-      exit( 1 );
-    }
 }
 
 /* Recover from a copyover - load players */

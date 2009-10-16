@@ -191,8 +191,8 @@ void write_board( BOARD_DATA *board )
     /*
      * Rewrite entire list.
      */
-    fclose( fpReserve );
     sprintf( filename, "%s%s", BOARD_DIR, board->note_file );
+
     if ( ( fp = fopen( filename, "w" ) ) == NULL )
     {
 	perror( filename );
@@ -215,8 +215,6 @@ void write_board( BOARD_DATA *board )
 	}
 	fclose( fp );
     }
-    fpReserve = fopen( NULL_FILE, "r" );
-    return;
 }
 
 

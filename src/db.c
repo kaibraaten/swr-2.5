@@ -58,8 +58,6 @@ MAP_INDEX_DATA  *       first_map;	/* maps */
 
 AUCTION_DATA    * 	auction;	/* auctions */
 
-FILE		*	fpLOG;
-
 /* criminals */
 short   gsn_torture;
 short   gsn_disguise;
@@ -2922,7 +2920,6 @@ void append_file( CHAR_DATA *ch, const char *file, const char *str )
     if ( IS_NPC(ch) || str[0] == '\0' )
 	return;
 
-    fclose( fpLOG );
     if ( ( fp = fopen( file, "a" ) ) == NULL )
     {
 	send_to_char( "Could not open the file!\r\n", ch );
@@ -2933,9 +2930,6 @@ void append_file( CHAR_DATA *ch, const char *file, const char *str )
 	    ch->in_room ? ch->in_room->vnum : 0, ch->name, str );
 	fclose( fp );
     }
-
-    fpLOG = fopen( NULL_FILE, "r" );
-    return;
 }
 
 /*
@@ -3010,15 +3004,11 @@ void bug( const char *str, ... )
     }
     log_string( buf );
 
-    fclose( fpLOG );
     if ( ( fp = fopen( BUG_FILE, "a" ) ) != NULL )
     {
 	fprintf( fp, "%s\n", buf );
 	fclose( fp );
     }
-    fpLOG = fopen( NULL_FILE, "r" );
-
-    return;
 }
 
 /*
@@ -3036,15 +3026,11 @@ void boot_log( const char *str, ... )
     va_end(param);
     log_string( buf );
 
-    fclose( fpLOG );
     if ( ( fp = fopen( BOOTLOG_FILE, "a" ) ) != NULL )
     {
 	fprintf( fp, "%s\n", buf );
  	fclose( fp );
     }
-    fpLOG = fopen( NULL_FILE, "r" );
-
-    return;
 }
 
 /*
@@ -4447,7 +4433,6 @@ void save_sysdata( SYSTEM_DATA sys )
 
     sprintf( filename, "%ssysdata.dat", SYSTEM_DIR );
     
-    fclose( fpReserve );
     if ( ( fp = fopen( filename, "w" ) ) == NULL )
     {
     	bug( "save_sysdata: fopen" );
@@ -4466,8 +4451,6 @@ void save_sysdata( SYSTEM_DATA sys )
 	fprintf( fp, "#END\n"						);
     }
     fclose( fp );
-    fpReserve = fopen( NULL_FILE, "r" );
-    return;
 }
 
 

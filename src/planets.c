@@ -92,7 +92,6 @@ void save_planet( PLANET_DATA *planet )
  
     sprintf( filename, "%s%s", PLANET_DIR, planet->filename );
     
-    fclose( fpReserve );
     if ( ( fp = fopen( filename, "w" ) ) == NULL )
     {
     	bug( "save_planet: fopen", 0 );
@@ -126,7 +125,6 @@ void save_planet( PLANET_DATA *planet )
 	fprintf( fp, "#END\n"						);
     }
     fclose( fp );
-    fpReserve = fopen( NULL_FILE, "r" );
 }
 
 void fread_planet( PLANET_DATA *planet, FILE *fp )
@@ -317,7 +315,7 @@ void load_planets( )
     log_string( "Loading planets..." );
 
     sprintf( planetlist, "%s%s", PLANET_DIR, PLANET_LIST );
-    fclose( fpReserve );
+
     if ( ( fpList = fopen( planetlist, "r" ) ) == NULL )
     {
 	perror( planetlist );
@@ -339,8 +337,6 @@ void load_planets( )
     }
     fclose( fpList );
     log_string(" Done planets " );  
-    fpReserve = fopen( NULL_FILE, "r" );
-    return;
 }
 
 void do_setplanet( CHAR_DATA *ch, char *argument )

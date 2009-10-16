@@ -4550,12 +4550,11 @@ void fold_area( AREA_DATA *tarea, const char *filename, bool install )
 
     sprintf( buf, "%s.bak", filename );
     rename( filename, buf );
-    fclose( fpReserve );
+
     if ( ( fpout = fopen( filename, "w" ) ) == NULL )
     {
 	bug( "fold_area: fopen", 0 );
 	perror( filename );
-	fpReserve = fopen( NULL_FILE, "r" );
 	return;
     }
     
@@ -4630,7 +4629,6 @@ void fold_area( AREA_DATA *tarea, const char *filename, bool install )
     /* END */
     fprintf( fpout, "#$\n" );
     fclose( fpout );
-    fpReserve = fopen( NULL_FILE, "r" );
     return;
 }
 
@@ -5907,12 +5905,11 @@ void save_mobs()
     log_string_plus( buf, LOG_NORMAL );
 
     rename( "mobiles" , "mobiles.bak" );
-    fclose( fpReserve );
+
     if ( ( fpout = fopen( "mobiles", "w" ) ) == NULL )
     {
 	bug( "save_mobiles: fopen", 0 );
 	perror( "mobiles" );
-	fpReserve = fopen( NULL_FILE, "r" );
 	return;
     }
     
@@ -6070,9 +6067,6 @@ void save_mobs()
     /* END */
     fprintf( fpout, "#$\n" );
     fclose( fpout );
-    fpReserve = fopen( NULL_FILE, "r" );
-    return;
-
 }
 
 void save_objects()
@@ -6090,12 +6084,11 @@ void save_objects()
     log_string_plus( buf, LOG_NORMAL );
 
     rename( "objects", "objects.bak" );
-    fclose( fpReserve );
+
     if ( ( fpout = fopen( "objects", "w" ) ) == NULL )
     {
 	bug( "fold_area: fopen", 0 );
 	perror( "objects" );
-	fpReserve = fopen( NULL_FILE, "r" );
 	return;
     }
     
@@ -6177,8 +6170,6 @@ void save_objects()
     /* END */
     fprintf( fpout, "#$\n" );
     fclose( fpout );
-    fpReserve = fopen( NULL_FILE, "r" );
-    return;
 }
 
 void save_some_areas( )
