@@ -37,7 +37,7 @@ static bool autofly(SHIP_DATA *ship);
 bool write_to_descriptor( int desc, char *txt, int length );
 
 /* from act_info.c */
-bool is_online( char * argument );
+bool is_online( const char * argument );
 
 void echo_to_room_dnr ( int ecolor , ROOM_INDEX_DATA *room , const char *argument ) 
 {

@@ -3398,16 +3398,16 @@ char *	crypt		args( ( const char *key, const char *salt ) );
 /* act_comm.c */
 bool character_has_comlink( const CHAR_DATA *ch );
 void    sound_to_room( ROOM_INDEX_DATA *room , const char *argument );
-bool	circle_follow	args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
+bool	circle_follow	args( ( const CHAR_DATA *ch, const CHAR_DATA *victim ) );
 void	add_follower	args( ( CHAR_DATA *ch, CHAR_DATA *master ) );
 void	stop_follower	args( ( CHAR_DATA *ch ) );
 void	die_follower	args( ( CHAR_DATA *ch ) );
-bool	is_same_group	args( ( CHAR_DATA *ach, CHAR_DATA *bch ) );
+bool	is_same_group	args( ( const CHAR_DATA *ach, const CHAR_DATA *bch ) );
 void	send_ansi_title args( ( CHAR_DATA *ch ) );
 void	send_ascii_title args( ( CHAR_DATA *ch ) );
 void	to_channel	args( ( const char *argument, int channel,
 				const char *verb, short level ) );
-void  	talk_auction    args( ( char *argument ) );
+void  	talk_auction    args( ( const char *argument ) );
 char *	obj_short	args( ( OBJ_DATA *obj ) );
 
 /* act_info.c */
