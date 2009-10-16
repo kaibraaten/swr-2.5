@@ -2805,8 +2805,6 @@ extern		OBJ_DATA	  *	all_obj;
 extern		char			bug_buf		[];
 extern		time_t			current_time;
 extern		bool			fLogAll;
-extern		FILE *			fpReserve;
-extern		FILE *			fpLOG;
 extern		char			log_buf		[];
 extern		TIME_INFO_DATA		time_info;
 extern		WEATHER_DATA		weather_info;

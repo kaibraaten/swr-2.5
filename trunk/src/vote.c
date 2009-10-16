@@ -54,7 +54,6 @@ void save_poll( VOTE_DATA *poll )
  
     sprintf( player, "%s%s", VOTE_DIR, poll->player );
     
-    fclose( fpReserve );
     if ( ( fp = fopen( player, "w" ) ) == NULL )
     {
     	bug( "save_poll: fopen", 0 );
@@ -74,8 +73,6 @@ void save_poll( VOTE_DATA *poll )
 	fprintf( fp, "#END\n"						);
     }
     fclose( fp );
-    fpReserve = fopen( NULL_FILE, "r" );
-    return;
 }
 
 /*
@@ -232,7 +229,7 @@ void load_polls( )
     log_string( "Loading polls..." );
 
     sprintf( polllist, "%s%s", VOTE_DIR, VOTE_LIST );
-    fclose( fpReserve );
+
     if ( ( fpList = fopen( polllist, "r" ) ) == NULL )
     {
 	perror( polllist );
@@ -254,8 +251,5 @@ void load_polls( )
     }
     fclose( fpList );
     log_string(" Done polls\r\n" );
-    fpReserve = fopen( NULL_FILE, "r" );
-    
-    return;
 }
 

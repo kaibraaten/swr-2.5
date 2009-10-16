@@ -266,8 +266,6 @@ void save_ship_prototype( SHIP_PROTOTYPE *prototype )
 
   sprintf( filename, "%s%s", PROTOTYPE_DIR, prototype->filename );
 
-  fclose( fpReserve );
-
   if ( ( fp = fopen( filename, "w" ) ) == NULL )
     {
       bug( "save_ship_prototype: fopen", 0 );
@@ -296,7 +294,6 @@ void save_ship_prototype( SHIP_PROTOTYPE *prototype )
     }
 
   fclose( fp );
-  fpReserve = fopen( NULL_FILE, "r" );
 }
 
 /*
@@ -495,7 +492,6 @@ void load_prototypes( )
   log_string( "Loading ship prototypes..." );
 
   sprintf( prototypelist, "%s%s", PROTOTYPE_DIR, PROTOTYPE_LIST );
-  fclose( fpReserve );
 
   if ( ( fpList = fopen( prototypelist, "r" ) ) == NULL )
     {
@@ -520,7 +516,6 @@ void load_prototypes( )
 
   fclose( fpList );
   log_string(" Done ship prototypes " );
-  fpReserve = fopen( NULL_FILE, "r" );
 }
 
 void do_setprototype( CHAR_DATA *ch, char *argument )

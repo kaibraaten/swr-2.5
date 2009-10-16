@@ -88,7 +88,6 @@ void save_clan( CLAN_DATA *clan )
  
     sprintf( filename, "%s%s", CLAN_DIR, clan->filename );
     
-    fclose( fpReserve );
     if ( ( fp = fopen( filename, "w" ) ) == NULL )
     {
     	bug( "save_clan: fopen", 0 );
@@ -108,8 +107,6 @@ void save_clan( CLAN_DATA *clan )
 	fprintf( fp, "#END\n"						);
     }
     fclose( fp );
-    fpReserve = fopen( NULL_FILE, "r" );
-    return;
 }
 
 /*
@@ -274,7 +271,7 @@ void load_clans( )
     log_string( "Loading clans..." );
 
     sprintf( clanlist, "%s%s", CLAN_DIR, CLAN_LIST );
-    fclose( fpReserve );
+
     if ( ( fpList = fopen( clanlist, "r" ) ) == NULL )
     {
 	perror( clanlist );
@@ -296,9 +293,6 @@ void load_clans( )
     }
     fclose( fpList );
     log_string(" Done clans\r\n" );
-    fpReserve = fopen( NULL_FILE, "r" );
-    
-    return;
 }
 
 void do_make( CHAR_DATA *ch, char *argument )

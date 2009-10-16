@@ -926,7 +926,6 @@ void save_starsystem( SPACE_DATA *starsystem )
  
     sprintf( filename, "%s%s", SPACE_DIR, starsystem->filename );
     
-    fclose( fpReserve );
     if ( ( fp = fopen( filename, "w" ) ) == NULL )
     {
     	bug( "save_starsystem: fopen", 0 );
@@ -949,8 +948,6 @@ void save_starsystem( SPACE_DATA *starsystem )
 	fprintf( fp, "#END\n"						);
     }
     fclose( fp );
-    fpReserve = fopen( NULL_FILE, "r" );
-    return;
 }
 
 
@@ -1124,7 +1121,7 @@ void load_space( )
     log_string( "Loading space..." );
 
     sprintf( starsystemlist, "%s%s", SPACE_DIR, SPACE_LIST );
-    fclose( fpReserve );
+
     if ( ( fpList = fopen( starsystemlist, "r" ) ) == NULL )
     {
 	perror( starsystemlist );
@@ -1146,8 +1143,6 @@ void load_space( )
     }
     fclose( fpList );
     log_string(" Done starsystems " );
-    fpReserve = fopen( NULL_FILE, "r" );
-    return;
 }
 
 void do_setstarsystem( CHAR_DATA *ch, char *argument )
@@ -1634,7 +1629,6 @@ void save_ship( SHIP_DATA *ship )
  
     sprintf( filename, "%s%s", SHIP_DIR, ship->filename );
     
-    fclose( fpReserve );
     if ( ( fp = fopen( filename, "w" ) ) == NULL )
     {
     	bug( "save_ship: fopen", 0 );
@@ -1678,8 +1672,6 @@ void save_ship( SHIP_DATA *ship )
 	fprintf( fp, "#END\n"						);
     }
     fclose( fp );
-    fpReserve = fopen( NULL_FILE, "r" );
-    return;
 }
 
 
@@ -1946,7 +1938,6 @@ void load_ships( )
   log_string( "Loading ships..." );
 
   sprintf( shiplist, "%s%s", SHIP_DIR, SHIP_LIST );
-  fclose( fpReserve );
 
   if ( ( fpList = fopen( shiplist, "r" ) ) == NULL )
     {
@@ -1970,7 +1961,6 @@ void load_ships( )
 
   fclose( fpList );
   log_string(" Done ships " );
-  fpReserve = fopen( NULL_FILE, "r" );
 }
 
 void resetship( SHIP_DATA *ship )
