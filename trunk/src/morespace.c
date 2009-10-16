@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include "mud.h"
 
 SHIP_PROTOTYPE * first_ship_prototype = NULL;
@@ -413,12 +412,10 @@ SHIP_PROTOTYPE *ship_prototype_create( void )
 
 bool load_ship_prototype( const char *prototypefile )
 {
+  FILE *fp = NULL;
   char filename[256];
-  SHIP_PROTOTYPE *prototype = ship_prototype_create();;
-  FILE *fp;
-  bool found;
-        
-  found = FALSE;
+  SHIP_PROTOTYPE *prototype = ship_prototype_create();
+  bool found = FALSE;
   sprintf( filename, "%s%s", PROTOTYPE_DIR, prototypefile );
 
   if ( ( fp = fopen( filename, "r" ) ) != NULL )
@@ -756,6 +753,7 @@ void do_showprototype( CHAR_DATA *ch, char *argument )
 void do_makeship( CHAR_DATA *ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
+  SHIP_PROTOTYPE *prototype = NULL;
 
   argument = one_argument( argument, arg );
 
@@ -765,7 +763,7 @@ void do_makeship( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-  SHIP_PROTOTYPE *prototype = ship_prototype_create();
+  prototype = ship_prototype_create();
 
   LINK( prototype, first_ship_prototype, last_ship_prototype, next, prev );
 
@@ -1139,12 +1137,13 @@ static void create_flagship_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
 void create_ship_rooms( SHIP_DATA *ship )
 {
   int roomnum = 0;
+  int numrooms = 0;
   ROOM_INDEX_DATA *room[24];
 
   if ( ship->ship_class != SPACECRAFT )
     ship->model = 0;
 
-  int numrooms = UMIN( model[ship->model].rooms , MAX_SHIP_ROOMS-1 );
+  numrooms = UMIN( model[ship->model].rooms , MAX_SHIP_ROOMS-1 );
 
   for ( roomnum = 0 ; roomnum < numrooms ; roomnum++ )
     room[roomnum] = make_ship_room( ship );

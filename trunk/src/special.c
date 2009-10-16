@@ -1,7 +1,6 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include "mud.h"
 
 bool  remove_obj      args( ( CHAR_DATA *ch, int iWear, bool fReplace ) );

@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
-#include <time.h>
 #include <string.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -95,12 +94,11 @@ void	mail_count		args( ( CHAR_DATA *ch ) );
 
 int main( int argc, char **argv )
 {
+  struct timeval now_time;
+  bool fCopyOver = FALSE;
+
   network_startup();
   atexit( network_teardown );
-
-    struct timeval now_time;
-    /*int port;*/
-    bool fCopyOver = FALSE;
 
     /*
      * Memory debugging if needed.
@@ -328,56 +326,54 @@ bool check_bad_desc( int desc )
 
 void accept_new( int ctrl )
 {
-	static struct timeval null_time;
-	DESCRIPTOR_DATA *d;
-	/* int maxdesc; Moved up for use with id.c as extern */
+  static struct timeval null_time;
+  DESCRIPTOR_DATA *d;
+  int result = 0;
 
-#if defined(MALLOC_DEBUG)
-	if ( malloc_verify( ) != 1 )
-	    abort( );
+  /*
+   * Poll all active descriptors.
+   */
+  FD_ZERO( &in_set  );
+  FD_ZERO( &out_set );
+  FD_ZERO( &exc_set );
+  FD_SET( ctrl, &in_set );
+  maxdesc	= ctrl;
+  newdesc = 0;
+
+  for ( d = first_descriptor; d; d = d->next )
+    {
+      maxdesc = UMAX( maxdesc, d->descriptor );
+      FD_SET( d->descriptor, &in_set  );
+      FD_SET( d->descriptor, &out_set );
+      FD_SET( d->descriptor, &exc_set );
+
+      if ( d == last_descriptor )
+	break;
+    }
+
+#ifdef AMIGA
+  result = WaitSelect( maxdesc+1, &in_set, &out_set, &exc_set, &null_time, 0 );
+#else
+  result = select( maxdesc+1, &in_set, &out_set, &exc_set, &null_time );
 #endif
 
-	/*
-	 * Poll all active descriptors.
-	 */
-	FD_ZERO( &in_set  );
-	FD_ZERO( &out_set );
-	FD_ZERO( &exc_set );
-	FD_SET( ctrl, &in_set );
-	maxdesc	= ctrl;
-	newdesc = 0;
-	for ( d = first_descriptor; d; d = d->next )
-	{
-	    maxdesc = UMAX( maxdesc, d->descriptor );
-	    FD_SET( d->descriptor, &in_set  );
-	    FD_SET( d->descriptor, &out_set );
-	    FD_SET( d->descriptor, &exc_set );
+  if ( result == SOCKET_ERROR )
+    {
+      perror( "accept_new: select: poll" );
+      exit( 1 );
+    }
 
-	    if ( d == last_descriptor )
-	      break;
-	}
-
-	int result = select( maxdesc+1, &in_set, &out_set, &exc_set,
-			     &null_time );
-
-	if ( result == SOCKET_ERROR )
-	{
-	    perror( "accept_new: select: poll" );
-	    exit( 1 );
-	}
-
-	if ( FD_ISSET( ctrl, &exc_set ) )
-	{
-	    bug( "Exception raise on controlling descriptor %d", ctrl );
-	    FD_CLR( ctrl, &in_set );
-	    FD_CLR( ctrl, &out_set );
-	}
-	else
-	if ( FD_ISSET( ctrl, &in_set ) )
-	{
-	    newdesc = ctrl;
-	    new_descriptor( newdesc );
-	}
+  if ( FD_ISSET( ctrl, &exc_set ) )
+    {
+      bug( "Exception raise on controlling descriptor %d", ctrl );
+      FD_CLR( ctrl, &in_set );
+      FD_CLR( ctrl, &out_set );
+    }
+  else if ( FD_ISSET( ctrl, &in_set ) )
+    {
+      newdesc = ctrl;
+      new_descriptor( newdesc );
+    }
 }
 
 void game_loop( )
@@ -387,8 +383,11 @@ void game_loop( )
     DESCRIPTOR_DATA *d;
 /*  time_t	last_check = 0;  */
 
+
+#ifndef AMIGA
     signal( SIGPIPE, SIG_IGN );
     signal( SIGALRM, caught_alarm );
+#endif
     /* signal( SIGSEGV, SegVio ); */
     gettimeofday( &last_time, NULL );
     current_time = (time_t) last_time.tv_sec;
@@ -568,7 +567,12 @@ void game_loop( )
 
 		stall_time.tv_usec = usecDelta;
 		stall_time.tv_sec  = secDelta;
+
+#ifdef AMIGA
+		if( WaitSelect( 0, 0, 0, 0, &stall_time, 0 ) == SOCKET_ERROR )
+#else
 		if ( select( 0, NULL, NULL, NULL, &stall_time ) == SOCKET_ERROR )
+#endif
 		{
 		    perror( "game_loop: select: stall" );
 		    exit( 1 );
@@ -618,6 +622,9 @@ void new_descriptor( int new_desc )
     struct sockaddr_in sock;
     int desc;
     socklen_t size;
+#ifdef AMIGA
+    char optval = 1;
+#endif
 
     set_alarm( 20 );
     size = sizeof(sock);
@@ -643,7 +650,12 @@ void new_descriptor( int new_desc )
 #endif
 
     set_alarm( 20 );
+
+#ifdef AMIGA
+    if( IoctlSocket( desc, FIONBIO, &optval ) == -1 )
+#else
     if ( fcntl( desc, F_SETFL, FNDELAY ) == -1 )
+#endif
     {
 	perror( "New_descriptor: fcntl: FNDELAY" );
 	set_alarm( 0 );
@@ -657,7 +669,12 @@ void new_descriptor( int new_desc )
     init_descriptor( dnew, desc );
     dnew->port          = ntohs( sock.sin_port );
 
+#ifdef AMIGA
+    strcpy( buf, Inet_NtoA( *( ( unsigned long* ) &sock.sin_addr ) ) );
+#else
     strcpy( buf, inet_ntoa( sock.sin_addr ) );
+#endif
+
     sprintf( log_buf, "Sock.sinaddr:  %s, port %hd.",
 		buf, dnew->port );
     log_string_plus( log_buf, LOG_COMM );
@@ -859,12 +876,14 @@ void close_socket( DESCRIPTOR_DATA *dclose, bool force )
 
 bool read_from_descriptor( DESCRIPTOR_DATA *d )
 {
+  size_t iStart = 0;
+
   /* Hold horses if pending command already. */
   if ( d->incomm[0] != '\0' )
     return TRUE;
 
   /* Check for overflow. */
-  size_t iStart = strlen(d->inbuf);
+  iStart = strlen(d->inbuf);
 
   if ( iStart >= sizeof(d->inbuf) - 10 )
     {
@@ -953,7 +972,11 @@ void read_from_buffer( DESCRIPTOR_DATA *d )
 
 	if ( d->inbuf[i] == '\b' && k > 0 )
 	    --k;
+#ifdef AMIGA
+	else if( isprint( d->inbuf[i] ) )
+#else
 	else if ( isascii(d->inbuf[i]) && isprint(d->inbuf[i]) )
+#endif
 	    d->incomm[k++] = d->inbuf[i];
     }
 

@@ -1,6 +1,5 @@
 #include <sys/types.h>
 #include <stdio.h>
-#include <time.h>
 #include "mud.h"
 
 /* undef these at EOF */

@@ -2,7 +2,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include "mud.h"
 
 /*
@@ -388,9 +387,9 @@ static void broadcast_channel_newbie( CHAR_DATA *ch, const char *verb,
 static void broadcast_channel_ooc( CHAR_DATA *ch, const char *verb,
                                    const char *argument, char *buf )
 {
+  short position = ch->position;
   set_char_color( AT_OOC, ch );
   sprintf( buf, "(OOC) %s: $t", IS_IMMORTAL(ch) ? "$n" : ch->name  );
-  short position        = ch->position;
   ch->position    = POS_STANDING;
   act( AT_OOC, buf, ch, argument, NULL, TO_CHAR );
   ch->position    = position;
@@ -399,8 +398,8 @@ static void broadcast_channel_ooc( CHAR_DATA *ch, const char *verb,
 static void broadcast_channel_immtalk( CHAR_DATA *ch, const char *verb,
                                        const char *argument, char *buf )
 {
+  short position = ch->position;
   sprintf( buf, "%s> $t", IS_IMMORTAL(ch) ? "$n" : ch->name  );
-  short position  = ch->position;
   ch->position      = POS_STANDING;
   act( AT_IMMORT , buf, ch, argument, NULL, TO_CHAR );
   ch->position      = position;
@@ -572,6 +571,7 @@ void talk_channel( CHAR_DATA *ch, const char *argument, int channel, const char 
 	  if ( channel == CHANNEL_SYSTEM )
 	    {
 	      SHIP_DATA *ship = ship_from_cockpit( ch->in_room );
+	      SHIP_DATA *target = NULL;
 
 	      if ( !ship )
 		continue;
@@ -579,7 +579,7 @@ void talk_channel( CHAR_DATA *ch, const char *argument, int channel, const char 
 	      if ( !vch->in_room )
 		continue;
 
-	      SHIP_DATA *target = ship_from_cockpit( vch->in_room );
+	      target = ship_from_cockpit( vch->in_room );
 
 	      if (!target)
 		continue;
@@ -592,6 +592,7 @@ void talk_channel( CHAR_DATA *ch, const char *argument, int channel, const char 
 	  if ( channel == CHANNEL_SHIP  )
 	    {
 	      SHIP_DATA *ship = ship_from_room( ch->in_room );
+	      SHIP_DATA *target = NULL;
 
 	      if ( !ship )
 		continue;
@@ -599,7 +600,7 @@ void talk_channel( CHAR_DATA *ch, const char *argument, int channel, const char 
 	      if ( !vch->in_room )
 		continue;
 
-	      SHIP_DATA *target = ship_from_room( vch->in_room );
+	      target = ship_from_room( vch->in_room );
 
 	      if (!target)
 		continue;
@@ -1017,6 +1018,7 @@ void do_emote( CHAR_DATA *ch, char *argument )
 {
   char buf[MAX_STRING_LENGTH];
   const char *plast = NULL;
+  int actflags = ch->act;
 
   if ( !IS_NPC(ch) && IS_SET(ch->act, PLR_NO_EMOTE) )
     {
@@ -1029,8 +1031,6 @@ void do_emote( CHAR_DATA *ch, char *argument )
       send_to_char( "Emote what?\r\n", ch );
       return;
     }
-
-  int actflags = ch->act;
 
   if ( IS_NPC( ch ) )
     REMOVE_BIT( ch->act, ACT_SECRETIVE );
@@ -1070,6 +1070,8 @@ void do_qui( CHAR_DATA *ch, char *argument )
 
 void do_quit( CHAR_DATA *ch, char *argument )
 {
+  size_t x = 0, y = 0;
+
   if ( IS_NPC(ch) && IS_SET(ch->act, ACT_POLYMORPHED))
     { 
       send_to_char("You can't quit while polymorphed.\r\n", ch);
@@ -1124,8 +1126,6 @@ void do_quit( CHAR_DATA *ch, char *argument )
    */
   extract_char( ch, TRUE );
 
-  size_t x = 0, y = 0;
-
   for ( x = 0; x < MAX_WEAR; x++ )
     for ( y = 0; y < MAX_LAYERS; y++ )
       save_equipment[x][y] = NULL;
@@ -1134,7 +1134,6 @@ void do_quit( CHAR_DATA *ch, char *argument )
   log_string_plus( log_buf, LOG_COMM );
 }
 
-
 static void send_title( CHAR_DATA *ch, const char *filename )
 {
   FILE *rpfile = NULL;
@@ -1142,9 +1141,12 @@ static void send_title( CHAR_DATA *ch, const char *filename )
   if( ( rpfile = fopen( filename ,"r" ) ) != NULL )
     {
       size_t num = 0;
+#ifdef AMIGA
+      signed
+#endif
       char buf[MAX_STRING_LENGTH*2];
 
-      while( ( buf[ num ] = (char) fgetc( rpfile ) ) != EOF )
+      while( ( buf[ num ] = fgetc( rpfile ) ) != EOF )
 	{
 	  num++;
 	}

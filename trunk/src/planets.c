@@ -2,8 +2,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-/* #include <stdlib.h> */
-#include <time.h>
 #include "mud.h"
 
 void vector_randomize( Vector3 * const vec, int from, int to );
@@ -1027,17 +1025,21 @@ void do_capture ( CHAR_DATA *ch , char *argument )
 
 long get_taxes( PLANET_DATA *planet )
 {
-  int resource = planet->wilderness;
+  long gain = 0;
+  long bigships = 0;
+  int resource = 0;
+
+  resource = planet->wilderness;
   resource = UMIN( resource , planet->population );
       
-  long gain = 500*planet->population;
+  gain = 500*planet->population;
   gain += 10000*resource;
   gain += (long)(planet->pop_support*100); 
       
   gain -= 5000 * planet->barracks;
   gain -= 10000 * planet->controls;
       
-  int bigships = planet->controls/5;  /* 100k for destroyers, 1 mil for battleships */
+  bigships = planet->controls/5;  /* 100k for destroyers, 1 mil for battleships */
   gain -= 50000 * bigships;
       
   return gain;

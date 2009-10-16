@@ -79,6 +79,7 @@ static bool ship_is_facing( const SHIP_DATA * const ship,
 {
   Vector3 h, d;
   bool facing = FALSE;
+  double cosofa = 0.0;
 
   vector_copy( &h, &ship->head );
 
@@ -86,8 +87,7 @@ static bool ship_is_facing( const SHIP_DATA * const ship,
   d.y = target->y - ship->pos.y;
   d.z = target->z - ship->pos.z;
 
-  double cosofa = vector_dot( &h, &d )
-    / ( vector_length( &h ) + vector_length( &d ) );
+  cosofa = vector_dot( &h, &d ) / ( vector_length( &h ) + vector_length( &d ) );
 
   if( cosofa > 0.75 )
     facing = TRUE;

@@ -2,7 +2,6 @@
 #include <sys/time.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include <math.h>
 #include "mud.h"
 
@@ -203,11 +202,12 @@ int move_gain( CHAR_DATA *ch )
 void gain_condition( CHAR_DATA *ch, int iCond, int value )
 {
     ch_ret retcode = rNONE;
+    int condition = 0;
 
     if ( value == 0 || IS_NPC(ch) || IS_IMMORTAL(ch) || NOT_AUTHED(ch))
 	return;
 
-    int condition	        	    = ch->pcdata->condition[iCond];
+    condition	        	    = ch->pcdata->condition[iCond];
     ch->pcdata->condition[iCond]    = URANGE( 0, condition + value, 48 );
 
     if ( ch->pcdata->condition[iCond] == 0 )

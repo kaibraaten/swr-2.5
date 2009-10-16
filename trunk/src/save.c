@@ -2,8 +2,10 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include <unistd.h>
+#ifdef AMIGA
+#include <db.h>
+#endif
 #include <sys/stat.h>
 #include <sys/dir.h>
 #include "mud.h"
@@ -87,7 +89,8 @@ void load_home( CHAR_DATA *ch )
 
       for( ;; )
 	{
-	  char letter = fread_letter( fph );;
+	  char letter = fread_letter( fph );
+	  const char *word = NULL;
 
 	  if( letter == '*' )
 	    {
@@ -102,7 +105,7 @@ void load_home( CHAR_DATA *ch )
 	      break;
 	    }
 
-	  const char *word = fread_word( fph );
+	  word = fread_word( fph );
 
 	  if( !str_cmp( word, "OBJECT" ) )
 	    {
@@ -1781,7 +1784,9 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 
 void set_alarm( long seconds )
 {
+#ifndef AMIGA
     alarm( seconds );
+#endif
 }
 
 /*

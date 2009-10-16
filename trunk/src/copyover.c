@@ -28,12 +28,13 @@
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
-#include <time.h>
 #include <string.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdarg.h>
 #include "mud.h"
+#include "os.h"
+
 /*
  * Socket and TCP/IP stuff.
  */
@@ -60,6 +61,9 @@ extern int control;		/* Controlling descriptor	*/
 
 void do_copyover (CHAR_DATA *ch, char * argument)
 {
+#ifdef AMIGA
+  ch_printf( ch, "Not implemented on this platform.\r\n" );
+#else
   DESCRIPTOR_DATA *d, *d_next;
   char buf [100], buf2[100];
   FILE *fp = fopen (COPYOVER_FILE, "w");
@@ -108,6 +112,7 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 
   perror ("do_copyover: execl");
   send_to_char ("Copyover FAILED!\r\n",ch);
+#endif
 }
 
 /* Recover from a copyover - load players */

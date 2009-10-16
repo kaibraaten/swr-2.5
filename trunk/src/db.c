@@ -3,9 +3,11 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
-#include <time.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#ifdef AMIGA
+#include <db.h>
+#endif
 #include <dirent.h>
 #include "mud.h"
 
@@ -263,6 +265,8 @@ void shutdown_mud( const char *reason )
 
 static void boot_init_globals( void )
 {
+  size_t wear = 0, x = 0;
+
   top_r_vnum          = 0;
   nummobsloaded       = 0;
   numobjsloaded       = 0;
@@ -299,8 +303,6 @@ static void boot_init_globals( void )
   saving_char         = NULL;
   CREATE( auction, AUCTION_DATA, 1);
   auction->item       = NULL;
-
-  size_t wear = 0, x = 0;
 
   for( wear = 0; wear < MAX_WEAR; wear++ )
     {
@@ -392,12 +394,14 @@ static void boot_assign_global_skillnumbers( void )
 
 static void boot_set_time_weather( void )
 {
-  long lhour          = (current_time - 650336715)
+  long lday = 0, lmonth = 0, lhour = 0;
+
+  lhour          = (current_time - 650336715)
     / (PULSE_TICK / PULSE_PER_SECOND);
   time_info.hour      = lhour  % 24;
-  long lday           = lhour  / 24;
+  lday           = lhour  / 24;
   time_info.day       = lday   % 35;
-  long lmonth         = lday   / 35;
+  lmonth         = lday   / 35;
   time_info.month     = lmonth % 17;
   time_info.year      = lmonth / 17;
 
@@ -461,6 +465,7 @@ static void boot_read_area_files( void )
  */
 void boot_db( bool fCopyOver )
 {
+  size_t x = 0;
   show_hash( 32 );
   unlink( BOOTLOG_FILE );
   boot_log( "---------------------[ Boot Log ]--------------------" );
@@ -492,8 +497,6 @@ void boot_db( bool fCopyOver )
   gsn_first_skill  = 0;
   gsn_first_weapon = 0;
   gsn_top_sn	     = top_sn;
-
-  size_t x = 0;
 
   for ( x = 0; x < top_sn; x++ )
     {
@@ -602,6 +605,9 @@ void load_area( FILE *fp )
  */
 void load_flags( AREA_DATA *tarea, FILE *fp )
 {
+  const char *ln = NULL;
+  int x1 = 0, x2 = 0;
+
   if ( !tarea )
     {
       bug( "Load_flags: no #AREA seen yet." );
@@ -617,8 +623,7 @@ void load_flags( AREA_DATA *tarea, FILE *fp )
 	}
     }
 
-  const char *ln = fread_line( fp );
-  int x1 = 0, x2 = 0;
+  ln = fread_line( fp );
   sscanf( ln, "%d %d", &x1, &x2 );
   tarea->flags = x1;
 }
@@ -3062,29 +3067,32 @@ void boot_log( const char *str, ... )
  */
 void show_file( CHAR_DATA *ch, const char *filename )
 {
-    FILE *fp;
-    char buf[MAX_STRING_LENGTH];
-    int c;
-    int num = 0;
+  FILE *fp;
+#ifdef AMIGA
+  signed
+#endif
+  char buf[MAX_STRING_LENGTH];
+  int c;
+  int num = 0;
 
-    if ( (fp = fopen( filename, "r" )) != NULL )
+  if ( (fp = fopen( filename, "r" )) != NULL )
     {
       while ( !feof(fp) )
-      {
-	while ((buf[num]=fgetc(fp)) != EOF
-	&&      buf[num] != '\n'
-	&&      buf[num] != '\r'
-	&&      num < (MAX_STRING_LENGTH-2))
-	  num++;
-	c = fgetc(fp);
-	if ( (c != '\n' && c != '\r') || c == buf[num] )
-	  ungetc(c, fp);
-	buf[num++] = '\n';
-	buf[num++] = '\r';
-	buf[num  ] = '\0';
-	send_to_pager( buf, ch );
-	num = 0;
-      }
+	{
+	  while ((buf[num]=fgetc(fp)) != EOF
+		 &&      buf[num] != '\n'
+		 &&      buf[num] != '\r'
+		 &&      num < (MAX_STRING_LENGTH-2))
+	    num++;
+	  c = fgetc(fp);
+	  if ( (c != '\n' && c != '\r') || c == buf[num] )
+	    ungetc(c, fp);
+	  buf[num++] = '\n';
+	  buf[num++] = '\r';
+	  buf[num  ] = '\0';
+	  send_to_pager( buf, ch );
+	  num = 0;
+	}
     }
 }
 

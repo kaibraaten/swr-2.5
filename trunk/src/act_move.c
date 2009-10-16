@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include <time.h>
 #include "mud.h"
 
 const	short	movement_loss	[SECT_MAX]	=

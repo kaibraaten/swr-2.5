@@ -6,6 +6,13 @@
 #include <sys/cdefs.h>
 #include <sys/time.h>
 #include <math.h>
+
+#ifdef AMIGA
+typedef long clock_t;
+#endif
+
+#include <time.h>
+
 #include "vector3.h"
 
 typedef	int				ch_ret;
@@ -353,6 +360,9 @@ struct	descriptor_data
     unsigned long	pagesize;
     int			pagetop;
     char *		pagepoint;
+#ifdef AMIGA
+  signed
+#endif
     char		pagecmd;
     char		pagecolor;
     int			newstate;
