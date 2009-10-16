@@ -3341,7 +3341,9 @@ char *	crypt		args( ( const char *key, const char *salt ) );
  *   so players can go ahead and telnet to all the other descriptors.
  * Then we close it whenever we need to open a file (e.g. a save file).
  */
-#ifndef AMIGA
+#ifdef AMIGA
+#define UPDIR
+#else
 #define UPDIR ".."
 #endif
 

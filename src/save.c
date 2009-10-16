@@ -764,6 +764,8 @@ bool load_char_obj( DESCRIPTOR_DATA *d, const char *name, bool preload )
     found = FALSE;
     sprintf( strsave, "%s%c/%s", PLAYER_DIR, tolower(name[0]),
 			capitalize( name ) );
+
+#ifndef AMIGA
     if ( stat( strsave, &fst ) != -1 )
     {
       if ( fst.st_size == 0 )
@@ -780,6 +782,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, const char *name, bool preload )
 	log_string_plus( buf, LOG_COMM );
       }
     }
+#endif
     /* else no player file */
 
     if ( ( fp = fopen( strsave, "r" ) ) != NULL )

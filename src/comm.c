@@ -899,6 +899,31 @@ bool read_from_descriptor( DESCRIPTOR_DATA *d )
       ssize_t nRead = recv( d->descriptor, d->inbuf + iStart,
 			    sizeof(d->inbuf) - 10 - iStart, 0 );
 
+      if( nRead == 0 )
+	{
+	  log_string_plus( "EOF encountered on read.", LOG_COMM );
+	  return FALSE;
+	}
+
+      if( nRead == SOCKET_ERROR )
+	{
+	  if( GETERROR == EWOULDBLOCK || GETERROR == EAGAIN )
+	    {
+	      break;
+	    }
+	  else
+	    {
+	      log_string_plus( strerror( GETERROR ), LOG_COMM );
+	      return FALSE;
+	    }
+	}
+
+      iStart += nRead;
+
+      if( d->inbuf[iStart-1] == '\n' || d->inbuf[iStart-1] == '\r' )
+	break;
+
+      /*
       if ( nRead > 0 )
 	{
 	  iStart += nRead;
@@ -919,6 +944,7 @@ bool read_from_descriptor( DESCRIPTOR_DATA *d )
 	  perror( "Read_from_descriptor" );
 	  return FALSE;
 	}
+      */
     }
 
   d->inbuf[iStart] = '\0';
