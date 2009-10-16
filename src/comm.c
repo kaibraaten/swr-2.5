@@ -378,223 +378,242 @@ void accept_new( int ctrl )
 
 void game_loop( )
 {
-    struct timeval	  last_time;
-    char cmdline[MAX_INPUT_LENGTH];
-    DESCRIPTOR_DATA *d;
-/*  time_t	last_check = 0;  */
-
+  struct timeval	  last_time;
+  char cmdline[MAX_INPUT_LENGTH];
+  DESCRIPTOR_DATA *d;
 
 #ifndef AMIGA
-    signal( SIGPIPE, SIG_IGN );
-    signal( SIGALRM, caught_alarm );
+  signal( SIGPIPE, SIG_IGN );
+  signal( SIGALRM, caught_alarm );
+  /* signal( SIGSEGV, SegVio ); */
 #endif
-    /* signal( SIGSEGV, SegVio ); */
-    gettimeofday( &last_time, NULL );
-    current_time = (time_t) last_time.tv_sec;
 
-    /* Main loop */
-    while ( !mud_down )
+  gettimeofday( &last_time, NULL );
+  current_time = (time_t) last_time.tv_sec;
+
+  /* Main loop */
+  while ( !mud_down )
     {
-	accept_new( control  );
-	/*
-	 * Kick out descriptors with raised exceptions
-	 * or have been idle, then check for input.
-	 */
-	for ( d = first_descriptor; d; d = d_next )
+      accept_new( control  );
+      /*
+       * Kick out descriptors with raised exceptions
+       * or have been idle, then check for input.
+       */
+      for ( d = first_descriptor; d; d = d_next )
 	{
-	    if ( d == d->next )
+	  if ( d == d->next )
 	    {
 	      bug( "descriptor_loop: loop found & fixed" );
 	      d->next = NULL;
 	    }
- 	    d_next = d->next;   
 
-	    d->idle++;	/* make it so a descriptor can idle out */
-	    if ( FD_ISSET( d->descriptor, &exc_set ) )
-	    {
-		FD_CLR( d->descriptor, &in_set  );
-		FD_CLR( d->descriptor, &out_set );
-		if ( d->character
-		&& ( d->connected == CON_PLAYING
-		||   d->connected == CON_EDITING ) )
-		    save_char_obj( d->character );
-		d->outtop	= 0;
-		close_socket( d, TRUE );
-		continue;
-	    }
-	    else 
-	    if ( (!d->character && d->idle > 360)		  /* 2 mins */
-            ||   ( d->connected != CON_PLAYING && d->idle > 1200) /* 5 mins */
-	    ||     d->idle > 28800 )				  /* 2 hrs  */
-	    {
-		write_to_descriptor( d->descriptor,
-		 "Idle timeout... disconnecting.\r\n", 0 );
-		d->outtop	= 0;
-		close_socket( d, TRUE );
-		continue;
-	    }
-	    else
-	    {
-		d->fcommand	= FALSE;
+	  d_next = d->next;   
 
-		if ( FD_ISSET( d->descriptor, &in_set ) )
+	  d->idle++;	/* make it so a descriptor can idle out */
+
+	  if ( FD_ISSET( d->descriptor, &exc_set ) )
+	    {
+	      FD_CLR( d->descriptor, &in_set  );
+	      FD_CLR( d->descriptor, &out_set );
+
+	      if ( d->character
+		   && ( d->connected == CON_PLAYING
+			||   d->connected == CON_EDITING ) )
 		{
-			d->idle = 0;
-			if ( d->character )
-			  d->character->timer = 0;
-			if ( !read_from_descriptor( d ) )
+		  save_char_obj( d->character );
+		}
+
+	      d->outtop	= 0;
+	      close_socket( d, TRUE );
+	      continue;
+	    }
+	  else if( (!d->character && d->idle > 360)		  /* 2 mins */
+		   || ( d->connected != CON_PLAYING && d->idle > 1200) /* 5 mins*/
+		   || d->idle > 28800 )				  /* 2 hrs  */
+	    {
+	      write_to_descriptor( d->descriptor,
+				   "Idle timeout... disconnecting.\r\n", 0 );
+	      d->outtop	= 0;
+	      close_socket( d, TRUE );
+	      continue;
+	    }
+	  else
+	    {
+	      d->fcommand	= FALSE;
+
+	      if ( FD_ISSET( d->descriptor, &in_set ) )
+		{
+		  d->idle = 0;
+
+		  if ( d->character )
+		    d->character->timer = 0;
+
+		  if ( !read_from_descriptor( d ) )
+		    {
+		      FD_CLR( d->descriptor, &out_set );
+
+		      if ( d->character
+			   && ( d->connected == CON_PLAYING
+				||   d->connected == CON_EDITING ) )
 			{
-			    FD_CLR( d->descriptor, &out_set );
-			    if ( d->character
-			    && ( d->connected == CON_PLAYING
-			    ||   d->connected == CON_EDITING ) )
-				save_char_obj( d->character );
-			    d->outtop	= 0;
-			    close_socket( d, FALSE );
-			    continue;
+			  save_char_obj( d->character );
 			}
+
+		      d->outtop	= 0;
+		      close_socket( d, FALSE );
+		      continue;
+		    }
 		}
 
-		if ( d->character && d->character->wait > 0 )
+	      if ( d->character && d->character->wait > 0 )
 		{
-			--d->character->wait;
-			continue;
+		  --d->character->wait;
+		  continue;
 		}
 
-		read_from_buffer( d );
-		if ( d->incomm[0] != '\0' )
+	      read_from_buffer( d );
+
+	      if ( d->incomm[0] != '\0' )
 		{
-			d->fcommand	= TRUE;
-			stop_idling( d->character );
+		  d->fcommand	= TRUE;
+		  stop_idling( d->character );
 
-			strcpy( cmdline, d->incomm );
-			d->incomm[0] = '\0';
-			
-			if ( d->character )
-			  set_cur_char( d->character );
+		  strcpy( cmdline, d->incomm );
+		  d->incomm[0] = '\0';
 
-			if ( d->pagepoint )
-			  set_pager_input(d, cmdline);
-			else
-			  switch( d->connected )
-			  {
-			   default:
- 				nanny( d, cmdline );
-				break;
-			   case CON_PLAYING:
-				interpret( d->character, cmdline );
-				break;
-			   case CON_EDITING:
-				edit_buffer( d->character, cmdline );
-				break;
-			  }
+		  if ( d->character )
+		    set_cur_char( d->character );
+
+		  if ( d->pagepoint )
+		    set_pager_input(d, cmdline);
+		  else
+		    switch( d->connected )
+		      {
+		      default:
+			nanny( d, cmdline );
+			break;
+		      case CON_PLAYING:
+			interpret( d->character, cmdline );
+			break;
+		      case CON_EDITING:
+			edit_buffer( d->character, cmdline );
+			break;
+		      }
 		}
 	    }
-	    if ( d == last_descriptor )
-	      break;
+
+	  if ( d == last_descriptor )
+	    break;
 	}
 
-	/*
-	 * Autonomous game motion.
-	 */
-	update_handler( );
+      /*
+       * Autonomous game motion.
+       */
+      update_handler( );
 
-	/*
-	 * Output.
-	 */
-	for ( d = first_descriptor; d; d = d_next )
+      /*
+       * Output.
+       */
+      for ( d = first_descriptor; d; d = d_next )
 	{
-	    d_next = d->next;   
+	  d_next = d->next;   
 
-	    if ( ( d->fcommand || d->outtop > 0 )
-	    &&   FD_ISSET(d->descriptor, &out_set) )
+	  if ( ( d->fcommand || d->outtop > 0 )
+	       &&   FD_ISSET(d->descriptor, &out_set) )
 	    {
-	        if ( d->pagepoint )
+	      if ( d->pagepoint )
 	        {
 	          if ( !pager_output(d) )
-	          {
-	            if ( d->character
-	            && ( d->connected == CON_PLAYING
-	            ||   d->connected == CON_EDITING ) )
-	                save_char_obj( d->character );
-	            d->outtop = 0;
-	            close_socket(d, FALSE);
-	          }
+		    {
+		      if ( d->character
+			   && ( d->connected == CON_PLAYING
+				||   d->connected == CON_EDITING ) )
+			{
+			  save_char_obj( d->character );
+			}
+
+		      d->outtop = 0;
+		      close_socket(d, FALSE);
+		    }
 	        }
-		else if ( !flush_buffer( d, TRUE ) )
+	      else if ( !flush_buffer( d, TRUE ) )
 		{
-		    if ( d->character
-		    && ( d->connected == CON_PLAYING
-		    ||   d->connected == CON_EDITING ) )
-			save_char_obj( d->character );
-		    d->outtop	= 0;
-		    close_socket( d, FALSE );
+		  if ( d->character
+		       && ( d->connected == CON_PLAYING
+			    ||   d->connected == CON_EDITING ) )
+		    {
+		      save_char_obj( d->character );
+		    }
+
+		  d->outtop	= 0;
+		  close_socket( d, FALSE );
 		}
 	    }
-	    if ( d == last_descriptor )
+	  if ( d == last_descriptor )
+	    {
 	      break;
+	    }
 	}
 
-	/*
-	 * Synchronize to a clock.
-	 * Sleep( last_time + 1/PULSE_PER_SECOND - now ).
-	 * Careful here of signed versus unsigned arithmetic.
-	 */
-	{
-	    struct timeval now_time;
-	    long secDelta;
-	    long usecDelta;
+      /*
+       * Synchronize to a clock.
+       * Sleep( last_time + 1/PULSE_PER_SECOND - now ).
+       * Careful here of signed versus unsigned arithmetic.
+       */
+      {
+	struct timeval now_time;
+	long secDelta;
+	long usecDelta;
 
-	    gettimeofday( &now_time, NULL );
-	    usecDelta	= ((int) last_time.tv_usec) - ((int) now_time.tv_usec)
-			+ 1000000 / PULSE_PER_SECOND;
-	    secDelta	= ((int) last_time.tv_sec ) - ((int) now_time.tv_sec );
-	    while ( usecDelta < 0 )
-	    {
-		usecDelta += 1000000;
-		secDelta  -= 1;
-	    }
+	gettimeofday( &now_time, NULL );
+	usecDelta	= ((int) last_time.tv_usec) - ((int) now_time.tv_usec)
+	  + 1000000 / PULSE_PER_SECOND;
+	secDelta	= ((int) last_time.tv_sec ) - ((int) now_time.tv_sec );
 
-	    while ( usecDelta >= 1000000 )
-	    {
-		usecDelta -= 1000000;
-		secDelta  += 1;
-	    }
+	while ( usecDelta < 0 )
+	  {
+	    usecDelta += 1000000;
+	    secDelta  -= 1;
+	  }
 
-	    if ( secDelta > 0 || ( secDelta == 0 && usecDelta > 0 ) )
-	    {
-		struct timeval stall_time;
+	while ( usecDelta >= 1000000 )
+	  {
+	    usecDelta -= 1000000;
+	    secDelta  += 1;
+	  }
 
-		stall_time.tv_usec = usecDelta;
-		stall_time.tv_sec  = secDelta;
+	if ( secDelta > 0 || ( secDelta == 0 && usecDelta > 0 ) )
+	  {
+	    struct timeval stall_time;
+
+	    stall_time.tv_usec = usecDelta;
+	    stall_time.tv_sec  = secDelta;
 
 #ifdef AMIGA
-		if( WaitSelect( 0, 0, 0, 0, &stall_time, 0 ) == SOCKET_ERROR )
+	    if( WaitSelect( 0, 0, 0, 0, &stall_time, 0 ) == SOCKET_ERROR )
 #else
-		if ( select( 0, NULL, NULL, NULL, &stall_time ) == SOCKET_ERROR )
+	    if ( select( 0, NULL, NULL, NULL, &stall_time ) == SOCKET_ERROR )
 #endif
-		{
-		    perror( "game_loop: select: stall" );
-		    exit( 1 );
-		}
-	    }
-	}
+	      {
+		perror( "game_loop: select: stall" );
+		exit( 1 );
+	      }
+	  }
+      }
 
-	gettimeofday( &last_time, NULL );
-	current_time = (time_t) last_time.tv_sec;
+      gettimeofday( &last_time, NULL );
+      current_time = (time_t) last_time.tv_sec;
 
-        /* Check every 5 seconds...  (don't need it right now)
-	if ( last_check+5 < current_time )
-	{
-	  CHECK_LINKS(first_descriptor, last_descriptor, next, prev,
-	      DESCRIPTOR_DATA);
-	  last_check = current_time;
-	}
-	*/
+      /* Check every 5 seconds...  (don't need it right now)
+	 if ( last_check+5 < current_time )
+	 {
+	 CHECK_LINKS(first_descriptor, last_descriptor, next, prev,
+	 DESCRIPTOR_DATA);
+	 last_check = current_time;
+	 }
+      */
     }
-    return;
 }
-
 
 void init_descriptor( DESCRIPTOR_DATA *dnew, int desc )
 {
@@ -956,101 +975,102 @@ bool read_from_descriptor( DESCRIPTOR_DATA *d )
  */
 void read_from_buffer( DESCRIPTOR_DATA *d )
 {
-    int i, j, k;
+  int i, j, k;
 
-    /*
-     * Hold horses if pending command already.
-     */
-    if ( d->incomm[0] != '\0' )
-	return;
+  /*
+   * Hold horses if pending command already.
+   */
+  if ( d->incomm[0] != '\0' )
+    return;
 
-    /*
-     * Look for at least one new line.
-     */
-    for ( i = 0; d->inbuf[i] != '\n' && d->inbuf[i] != '\r' && i<MAX_INBUF_SIZE;
-	  i++ )
+  /*
+   * Look for at least one new line.
+   */
+  for ( i = 0; d->inbuf[i] != '\n' && d->inbuf[i] != '\r' && i<MAX_INBUF_SIZE;
+	i++ )
     {
-	if ( d->inbuf[i] == '\0' )
-	    return;
+      if ( d->inbuf[i] == '\0' )
+	return;
     }
 
-    /*
-     * Canonical input processing.
-     */
-    for ( i = 0, k = 0; d->inbuf[i] != '\n' && d->inbuf[i] != '\r'; i++ )
+  /*
+   * Canonical input processing.
+   */
+  for ( i = 0, k = 0; d->inbuf[i] != '\n' && d->inbuf[i] != '\r'; i++ )
     {
-	if ( k >= 254 )
+      if ( k >= 254 )
 	{
-	    write_to_descriptor( d->descriptor, "Line too long.\r\n", 0 );
+	  write_to_descriptor( d->descriptor, "Line too long.\r\n", 0 );
 
-	    /* skip the rest of the line */
-	    /*
+	  /* skip the rest of the line */
+	  /*
 	    for ( ; d->inbuf[i] != '\0' || i>= MAX_INBUF_SIZE ; i++ )
 	    {
-		if ( d->inbuf[i] == '\n' || d->inbuf[i] == '\r' )
-		    break;
-	    }
-	    */
-	    d->inbuf[i]   = '\n';
-	    d->inbuf[i+1] = '\0';
+	    if ( d->inbuf[i] == '\n' || d->inbuf[i] == '\r' )
 	    break;
+	    }
+	  */
+	  d->inbuf[i]   = '\n';
+	  d->inbuf[i+1] = '\0';
+	  break;
 	}
 
-	if ( d->inbuf[i] == '\b' && k > 0 )
-	    --k;
+      if ( d->inbuf[i] == '\b' && k > 0 )
+	--k;
 #ifdef AMIGA
-	else if( isprint( d->inbuf[i] ) )
+      else if( isprint( d->inbuf[i] ) )
 #else
-	else if ( isascii(d->inbuf[i]) && isprint(d->inbuf[i]) )
+      else if ( isascii(d->inbuf[i]) && isprint(d->inbuf[i]) )
 #endif
-	    d->incomm[k++] = d->inbuf[i];
+	d->incomm[k++] = d->inbuf[i];
     }
 
-    /*
-     * Finish off the line.
-     */
-    if ( k == 0 )
-	d->incomm[k++] = ' ';
-    d->incomm[k] = '\0';
+  /*
+   * Finish off the line.
+   */
+  if ( k == 0 )
+    d->incomm[k++] = ' ';
 
-    /*
-     * Deal with bozos with #repeat 1000 ...
-     */
-    if ( k > 1 || d->incomm[0] == '!' )
+  d->incomm[k] = '\0';
+
+  /*
+   * Deal with bozos with #repeat 1000 ...
+   */
+  if ( k > 1 || d->incomm[0] == '!' )
     {
-	if ( d->incomm[0] != '!' && strcmp( d->incomm, d->inlast ) )
+      if ( d->incomm[0] != '!' && strcmp( d->incomm, d->inlast ) )
 	{
-	    d->repeat = 0;
+	  d->repeat = 0;
 	}
-	else
+      else
 	{
-	    if ( ++d->repeat >= 20 )
+	  if ( ++d->repeat >= 20 )
 	    {
-/*		sprintf( log_buf, "%s input spamming!", d->host );
+	      /*		sprintf( log_buf, "%s input spamming!", d->host );
 		log_string( log_buf );
 */
-		write_to_descriptor( d->descriptor,
-		    "\r\n*** PUT A LID ON IT!!! ***\r\n", 0 );
+	      write_to_descriptor( d->descriptor,
+				   "\r\n*** PUT A LID ON IT!!! ***\r\n", 0 );
 	    }
 	}
     }
 
-    /*
-     * Do '!' substitution.
-     */
-    if ( d->incomm[0] == '!' )
-	strcpy( d->incomm, d->inlast );
-    else
-	strcpy( d->inlast, d->incomm );
+  /*
+   * Do '!' substitution.
+   */
+  if ( d->incomm[0] == '!' )
+    strcpy( d->incomm, d->inlast );
+  else
+    strcpy( d->inlast, d->incomm );
 
-    /*
-     * Shift the input buffer.
-     */
-    while ( d->inbuf[i] == '\n' || d->inbuf[i] == '\r' )
-	i++;
-    for ( j = 0; ( d->inbuf[j] = d->inbuf[i+j] ) != '\0'; j++ )
-	;
-    return;
+  /*
+   * Shift the input buffer.
+   */
+  while ( d->inbuf[i] == '\n' || d->inbuf[i] == '\r' )
+    i++;
+
+  for ( j = 0; ( d->inbuf[j] = d->inbuf[i+j] ) != '\0'; j++ )
+    ;
 }
 
 
