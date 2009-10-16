@@ -684,7 +684,10 @@ void load_helps( AREA_DATA *tarea, FILE *fp )
       pHelp->keyword	= fread_string( fp );
 
       if ( pHelp->keyword[0] == '$' )
-	break;
+	{
+	  DISPOSE( pHelp );
+	  break;
+	}
 
       pHelp->text	= fread_string( fp );
 
@@ -1277,39 +1280,45 @@ void load_rooms( AREA_DATA *tarea, FILE *fp )
  */
 void load_shops( AREA_DATA *tarea, FILE *fp )
 {
-    SHOP_DATA *pShop;
+  SHOP_DATA *pShop;
 
-    for ( ; ; )
+  for ( ; ; )
     {
-	MOB_INDEX_DATA *pMobIndex;
-	int iTrade;
+      MOB_INDEX_DATA *pMobIndex;
+      int iTrade;
+      int keeper = fread_number( fp );
 
-	CREATE( pShop, SHOP_DATA, 1 );
-	pShop->keeper		= fread_number( fp );
-	if ( pShop->keeper == 0 )
-	    break;
-	for ( iTrade = 0; iTrade < MAX_TRADE; iTrade++ )
-	    pShop->buy_type[iTrade]	= fread_number( fp );
-	pShop->profit_buy	= fread_number( fp );
-	pShop->profit_sell	= fread_number( fp );
-	pShop->profit_buy	= URANGE( pShop->profit_sell+5, pShop->profit_buy, 1000 );
-	pShop->profit_sell	= URANGE( 0, pShop->profit_sell, pShop->profit_buy-5 );
-	pShop->open_hour	= fread_number( fp );
-	pShop->close_hour	= fread_number( fp );
-				  fread_to_eol( fp );
-	pMobIndex		= get_mob_index( pShop->keeper );
-	pMobIndex->pShop	= pShop;
+      if ( keeper == 0 )
+        {
+          break;
+        }
 
-	if ( !first_shop )
-	    first_shop		= pShop;
-	else
-	    last_shop->next	= pShop;
-	pShop->next		= NULL;
-	pShop->prev		= last_shop;
-	last_shop		= pShop;
-	top_shop++;
+      CREATE( pShop, SHOP_DATA, 1 );
+      pShop->keeper = keeper;
+
+      for ( iTrade = 0; iTrade < MAX_TRADE; iTrade++ )
+	pShop->buy_type[iTrade]	= fread_number( fp );
+
+      pShop->profit_buy	= fread_number( fp );
+      pShop->profit_sell	= fread_number( fp );
+      pShop->profit_buy	= URANGE( pShop->profit_sell+5, pShop->profit_buy, 1000 );
+      pShop->profit_sell	= URANGE( 0, pShop->profit_sell, pShop->profit_buy-5 );
+      pShop->open_hour	= fread_number( fp );
+      pShop->close_hour	= fread_number( fp );
+      fread_to_eol( fp );
+      pMobIndex		= get_mob_index( pShop->keeper );
+      pMobIndex->pShop	= pShop;
+
+      if ( !first_shop )
+	first_shop		= pShop;
+      else
+	last_shop->next	= pShop;
+
+      pShop->next		= NULL;
+      pShop->prev		= last_shop;
+      last_shop		= pShop;
+      top_shop++;
     }
-    return;
 }
 
 /*
@@ -1323,13 +1332,17 @@ void load_repairs( AREA_DATA *tarea, FILE *fp )
     {
 	MOB_INDEX_DATA *pMobIndex;
 	int iFix;
+	int keeper = fread_number( fp );
+
+	if( keeper == 0 )
+	  break;
 
 	CREATE( rShop, REPAIR_DATA, 1 );
-	rShop->keeper		= fread_number( fp );
-	if ( rShop->keeper == 0 )
-	    break;
+	rShop->keeper = keeper;
+
 	for ( iFix = 0; iFix < MAX_FIX; iFix++ )
 	  rShop->fix_type[iFix] = fread_number( fp );
+
 	rShop->profit_fix	= fread_number( fp );
 	rShop->shop_type	= fread_number( fp );
 	rShop->open_hour	= fread_number( fp );
