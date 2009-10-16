@@ -261,251 +261,285 @@ void shutdown_mud( const char *reason )
     }
 }
 
+static void boot_init_globals( void )
+{
+  top_r_vnum          = 0;
+  nummobsloaded       = 0;
+  numobjsloaded       = 0;
+  physicalobjects     = 0;
+  sysdata.maxplayers  = 0;
+  first_object        = NULL;
+  last_object         = NULL;
+  first_char          = NULL;
+  last_char           = NULL;
+  first_area          = NULL;
+  last_area           = NULL;
+  first_build         = NULL;
+  last_area           = NULL;
+  first_shop          = NULL;
+  last_shop           = NULL;
+  first_repair        = NULL;
+  last_repair         = NULL;
+  first_teleport      = NULL;
+  last_teleport       = NULL;
+  first_asort         = NULL;
+  last_asort          = NULL;
+  extracted_obj_queue = NULL;
+  extracted_char_queue= NULL;
+  cur_qobjs           = 0;
+  cur_qchars          = 0;
+  cur_char            = NULL;
+  cur_obj             = 0;
+  cur_obj_serial      = 0;
+  cur_char_died       = FALSE;
+  cur_obj_extracted   = FALSE;
+  cur_room            = NULL;
+  quitting_char       = NULL;
+  loading_char        = NULL;
+  saving_char         = NULL;
+  CREATE( auction, AUCTION_DATA, 1);
+  auction->item       = NULL;
+
+  size_t wear = 0, x = 0;
+
+  for( wear = 0; wear < MAX_WEAR; wear++ )
+    {
+      for ( x = 0; x < MAX_LAYERS; x++ )
+	{
+	  save_equipment[wear][x] = NULL;
+	}
+    }
+}
+
+static void boot_assign_global_skillnumbers( void )
+{
+  ASSIGN_GSN( gsn_survey , "surveying" );
+  ASSIGN_GSN( gsn_landscape , "landscape and design" );
+  ASSIGN_GSN( gsn_construction , "construction" );
+  ASSIGN_GSN( gsn_quicktalk , "quicktalk" );
+  ASSIGN_GSN( gsn_bridge , "bridges and exits" );
+  ASSIGN_GSN( gsn_propeganda , "propeganda" );
+  ASSIGN_GSN( gsn_hijack  , "hijack" );
+  ASSIGN_GSN( gsn_makejewelry  , "makejewelry" );
+  ASSIGN_GSN( gsn_makeblade  , "makeblade" );
+  ASSIGN_GSN( gsn_makeblaster  , "makeblaster" );
+  ASSIGN_GSN( gsn_makelight   , "makeflashlight" );
+  ASSIGN_GSN( gsn_makecomlink   , "makecomlink" );
+  ASSIGN_GSN( gsn_makearmor  , "makearmor" );
+  ASSIGN_GSN( gsn_makeshield  , "makeshield" );
+  ASSIGN_GSN( gsn_makecontainer  , "makecontainer" );
+  ASSIGN_GSN( gsn_reinforcements  , "reinforcements" );
+  ASSIGN_GSN( gsn_postguard   , "post guard" );
+  ASSIGN_GSN( gsn_torture   , "torture" );
+  ASSIGN_GSN( gsn_throw   , "throw" );
+  ASSIGN_GSN( gsn_disguise   , "disguise" );
+  ASSIGN_GSN( gsn_first_aid   , "first aid" );
+  ASSIGN_GSN( gsn_lightsaber_crafting, "lightsaber crafting" );
+  ASSIGN_GSN( gsn_spice_refining,  "spice refining" );
+  ASSIGN_GSN( gsn_spacecombat,     "space combat" );
+  ASSIGN_GSN( gsn_weaponsystems,   "weapon systems" );
+  ASSIGN_GSN( gsn_spacecraft,    "spacecraft" );
+  ASSIGN_GSN( gsn_shipdesign,    "ship design" );
+  ASSIGN_GSN( gsn_shipmaintenance, "ship maintenance" );
+  ASSIGN_GSN( gsn_blasters,   "blasters" );
+  ASSIGN_GSN( gsn_bowcasters, "bowcasters" );
+  ASSIGN_GSN( gsn_force_pikes,        "force pikes" );
+  ASSIGN_GSN( gsn_lightsabers,        "lightsabers" );
+  ASSIGN_GSN( gsn_vibro_blades,       "vibro-blades" );
+  ASSIGN_GSN( gsn_flexible_arms,      "flexible arms" );
+  ASSIGN_GSN( gsn_talonous_arms,      "talonous arms" );
+  ASSIGN_GSN( gsn_bludgeons,  "bludgeons" );
+  ASSIGN_GSN( gsn_backstab,   "backstab" );
+  ASSIGN_GSN( gsn_circle,             "circle" );
+  ASSIGN_GSN( gsn_dodge,              "dodge" );
+  ASSIGN_GSN( gsn_hide,               "hide" );
+  ASSIGN_GSN( gsn_peek,               "peek" );
+  ASSIGN_GSN( gsn_pick_lock,  "picklock" );
+  ASSIGN_GSN( gsn_pickshiplock  , "pickshiplock" );
+  ASSIGN_GSN( gsn_sneak,              "sneak" );
+  ASSIGN_GSN( gsn_steal,              "steal" );
+  ASSIGN_GSN( gsn_gouge,              "gouge" );
+  ASSIGN_GSN( gsn_poison_weapon,      "poison weapon" );
+  ASSIGN_GSN( gsn_disarm,             "disarm" );
+  ASSIGN_GSN( gsn_enhanced_damage, "enhanced damage" );
+  ASSIGN_GSN( gsn_kick,               "kick" );
+  ASSIGN_GSN( gsn_parry,              "parry" );
+  ASSIGN_GSN( gsn_rescue,             "rescue" );
+  ASSIGN_GSN( gsn_second_attack,      "second attack" );
+  ASSIGN_GSN( gsn_third_attack,       "third attack" );
+  ASSIGN_GSN( gsn_dual_wield, "dual wield" );
+  ASSIGN_GSN( gsn_bashdoor,   "doorbash" );
+  ASSIGN_GSN( gsn_grip,               "grip" );
+  ASSIGN_GSN( gsn_berserk,    "berserk" );
+  ASSIGN_GSN( gsn_hitall,             "hitall" );
+  ASSIGN_GSN( gsn_aid,                "aid" );
+  ASSIGN_GSN( gsn_track,              "track" );
+  ASSIGN_GSN( gsn_mount,              "mount" );
+  ASSIGN_GSN( gsn_climb,              "climb" );
+  ASSIGN_GSN( gsn_slice,              "slice" );
+  ASSIGN_GSN( gsn_fireball,   "fireball" );
+  ASSIGN_GSN( gsn_lightning_bolt,     "lightning bolt" );
+  ASSIGN_GSN( gsn_aqua_breath,        "aqua breath" );
+  ASSIGN_GSN( gsn_blindness,  "blindness" );
+  ASSIGN_GSN( gsn_charm_person,       "affect mind" );
+  ASSIGN_GSN( gsn_invis,              "mask" );
+  ASSIGN_GSN( gsn_mass_invis, "group masking" );
+  ASSIGN_GSN( gsn_poison,             "poison" );
+  ASSIGN_GSN( gsn_sleep,              "sleep" );
+  ASSIGN_GSN( gsn_stun,               "stun" );
+  ASSIGN_GSN( gsn_possess,    "possess" );
+}
+
+static void boot_set_time_weather( void )
+{
+  long lhour          = (current_time - 650336715)
+    / (PULSE_TICK / PULSE_PER_SECOND);
+  time_info.hour      = lhour  % 24;
+  long lday           = lhour  / 24;
+  time_info.day       = lday   % 35;
+  long lmonth         = lday   / 35;
+  time_info.month     = lmonth % 17;
+  time_info.year      = lmonth / 17;
+
+  if ( time_info.hour <  5 )
+    weather_info.sunlight = SUN_DARK;
+  else if ( time_info.hour <  6 )
+    weather_info.sunlight = SUN_RISE;
+  else if ( time_info.hour < 19 )
+    weather_info.sunlight = SUN_LIGHT;
+  else if ( time_info.hour < 20 )
+    weather_info.sunlight = SUN_SET;
+  else
+    weather_info.sunlight = SUN_DARK;
+
+  weather_info.change = 0;
+  weather_info.mmhg   = 960;
+
+  if ( time_info.month >= 7 && time_info.month <=12 )
+    weather_info.mmhg += number_range( 1, 50 );
+  else
+    weather_info.mmhg += number_range( 1, 80 );
+
+  if ( weather_info.mmhg <=  980 )
+    weather_info.sky = SKY_LIGHTNING;
+  else if ( weather_info.mmhg <= 1000 )
+    weather_info.sky = SKY_RAINING;
+  else if ( weather_info.mmhg <= 1020 )
+    weather_info.sky = SKY_CLOUDY;
+  else
+    weather_info.sky = SKY_CLOUDLESS;
+}
+
+static void boot_read_area_files( void )
+{
+  FILE *fpList = NULL;
+
+  log_string("Reading in area files...");
+
+  if ( ( fpList = fopen( AREA_LIST, "r" ) ) == NULL )
+    {
+      shutdown_mud( "Unable to open area list" );
+      exit( 1 );
+    }
+
+  for ( ; ; )
+    {
+      strcpy( strArea, fread_word( fpList ) );
+
+      if ( strArea[0] == '$' )
+	break;
+
+      load_area_file( last_area, strArea );
+
+    }
+
+  fclose( fpList );
+}
 
 /*
  * Big mama top level function.
  */
 void boot_db( bool fCopyOver )
 {
-    short wear, x;
+  show_hash( 32 );
+  unlink( BOOTLOG_FILE );
+  boot_log( "---------------------[ Boot Log ]--------------------" );
 
-    show_hash( 32 );
-    unlink( BOOTLOG_FILE );
-    boot_log( "---------------------[ Boot Log ]--------------------" );
+  log_string( "Loading commands" );
+  load_commands();
 
-    log_string( "Loading commands" );
-    load_commands();
+  log_string( "Loading sysdata configuration..." );
 
-    log_string( "Loading sysdata configuration..." );
-
-    /* default values */
-    sysdata.save_frequency		= 20;	/* minutes */
-    sysdata.save_flags			= SV_DEATH | SV_PASSCHG | SV_AUTO
+  /* default values */
+  sysdata.save_frequency		= 20;	/* minutes */
+  sysdata.save_flags			= SV_DEATH | SV_PASSCHG | SV_AUTO
     					| SV_PUT | SV_DROP | SV_GIVE
     					| SV_AUCTION | SV_ZAPDROP | SV_IDLE;
-    if ( !load_systemdata(&sysdata) )
+  if ( !load_systemdata(&sysdata) )
     {
-	log_string( "Not found.  Creating new configuration." );
-	sysdata.alltimemax = 0;
+      log_string( "Not found.  Creating new configuration." );
+      sysdata.alltimemax = 0;
     }
 
-    log_string("Loading socials");
-    load_socials();
+  log_string("Loading socials");
+  load_socials();
 
-    log_string("Loading skill table");
-    load_skill_table();
-    sort_skill_table();
+  log_string("Loading skill table");
+  load_skill_table();
+  sort_skill_table();
 
-    gsn_first_spell  = 0;
-    gsn_first_skill  = 0;
-    gsn_first_weapon = 0;
-    gsn_top_sn	     = top_sn;
+  gsn_first_spell  = 0;
+  gsn_first_skill  = 0;
+  gsn_first_weapon = 0;
+  gsn_top_sn	     = top_sn;
 
-    for ( x = 0; x < top_sn; x++ )
-	if ( !gsn_first_spell && skill_table[x]->type == SKILL_SPELL )
-	    gsn_first_spell = x;
-	else
-	if ( !gsn_first_skill && skill_table[x]->type == SKILL_SKILL )
-	    gsn_first_skill = x;
-	else
-	if ( !gsn_first_weapon && skill_table[x]->type == SKILL_WEAPON )
-	    gsn_first_weapon = x;
+  size_t x = 0;
 
-    fBootDb		= TRUE;
+  for ( x = 0; x < top_sn; x++ )
+    {
+      if ( !gsn_first_spell && skill_table[x]->type == SKILL_SPELL )
+	{
+	  gsn_first_spell = x;
+	}
+      else if ( !gsn_first_skill && skill_table[x]->type == SKILL_SKILL )
+	{
+	  gsn_first_skill = x;
+	}
+      else if ( !gsn_first_weapon && skill_table[x]->type == SKILL_WEAPON )
+	{
+	  gsn_first_weapon = x;
+	}
+    }
+
+  fBootDb		= TRUE;
     
-    top_r_vnum 		= 0;
-    nummobsloaded	= 0;
-    numobjsloaded	= 0;
-    physicalobjects	= 0;
-    sysdata.maxplayers	= 0;
-    first_object	= NULL;
-    last_object		= NULL;
-    first_char		= NULL;
-    last_char		= NULL;
-    first_area		= NULL;
-    last_area		= NULL;
-    first_build		= NULL;
-    last_area		= NULL;
-    first_shop		= NULL;
-    last_shop		= NULL;
-    first_repair	= NULL;
-    last_repair		= NULL;
-    first_teleport	= NULL;
-    last_teleport	= NULL;
-    first_asort		= NULL;
-    last_asort		= NULL;
-    extracted_obj_queue	= NULL;
-    extracted_char_queue= NULL;
-    cur_qobjs		= 0;
-    cur_qchars		= 0;
-    cur_char		= NULL;
-    cur_obj		= 0;
-    cur_obj_serial	= 0;
-    cur_char_died	= FALSE;
-    cur_obj_extracted	= FALSE;
-    cur_room		= NULL;
-    quitting_char	= NULL;
-    loading_char	= NULL;
-    saving_char		= NULL;
-    CREATE( auction, AUCTION_DATA, 1);
-    auction->item 	= NULL;
-    for ( wear = 0; wear < MAX_WEAR; wear++ )
-	for ( x = 0; x < MAX_LAYERS; x++ )
-	    save_equipment[wear][x] = NULL;
+  boot_init_globals();
 
-    /*
-     * Init random number generator.
-     */
-    log_string("Initializing random number generator");
-    init_mm( );
+  /*
+   * Init random number generator.
+   */
+  log_string("Initializing random number generator");
+  init_mm( );
 
-    /*
-     * Set time and weather.
-     */
-    {
-	long lhour, lday, lmonth;
+  /*
+   * Set time and weather.
+   */
+  log_string("Setting time and weather");
+  boot_set_time_weather();
 
-	log_string("Setting time and weather");
+  /*
+   * Assign gsn's for skills which need them.
+   */
+  log_string("Assigning gsn's");
+  boot_assign_global_skillnumbers();
 
-	lhour		= (current_time - 650336715)
-			/ (PULSE_TICK / PULSE_PER_SECOND);
-	time_info.hour	= lhour  % 24;
-	lday		= lhour  / 24;
-	time_info.day	= lday   % 35;
-	lmonth		= lday   / 35;
-	time_info.month	= lmonth % 17;
-	time_info.year	= lmonth / 17;
+  /*
+   * Read in all the area files.
+   */
+  log_string("Reading in area files...");
+  boot_read_area_files();
 
-	     if ( time_info.hour <  5 ) weather_info.sunlight = SUN_DARK;
-	else if ( time_info.hour <  6 ) weather_info.sunlight = SUN_RISE;
-	else if ( time_info.hour < 19 ) weather_info.sunlight = SUN_LIGHT;
-	else if ( time_info.hour < 20 ) weather_info.sunlight = SUN_SET;
-	else                            weather_info.sunlight = SUN_DARK;
-
-	weather_info.change	= 0;
-	weather_info.mmhg	= 960;
-	if ( time_info.month >= 7 && time_info.month <=12 )
-	    weather_info.mmhg += number_range( 1, 50 );
-	else
-	    weather_info.mmhg += number_range( 1, 80 );
-
-	     if ( weather_info.mmhg <=  980 ) weather_info.sky = SKY_LIGHTNING;
-	else if ( weather_info.mmhg <= 1000 ) weather_info.sky = SKY_RAINING;
-	else if ( weather_info.mmhg <= 1020 ) weather_info.sky = SKY_CLOUDY;
-	else                                  weather_info.sky = SKY_CLOUDLESS;
-
-    }
-
-
-    /*
-     * Assign gsn's for skills which need them.
-     */
-    {
-	log_string("Assigning gsn's");
-
-        ASSIGN_GSN( gsn_survey , "surveying" );
-        ASSIGN_GSN( gsn_landscape , "landscape and design" );
-        ASSIGN_GSN( gsn_construction , "construction" );
-        ASSIGN_GSN( gsn_quicktalk , "quicktalk" );
-        ASSIGN_GSN( gsn_bridge , "bridges and exits" );
-        ASSIGN_GSN( gsn_propeganda , "propeganda" );
-        ASSIGN_GSN( gsn_hijack  , "hijack" );
-        ASSIGN_GSN( gsn_makejewelry  , "makejewelry" );
-        ASSIGN_GSN( gsn_makeblade  , "makeblade" );
-        ASSIGN_GSN( gsn_makeblaster  , "makeblaster" );
-        ASSIGN_GSN( gsn_makelight   , "makeflashlight" );
-        ASSIGN_GSN( gsn_makecomlink   , "makecomlink" );
-        ASSIGN_GSN( gsn_makearmor  , "makearmor" );        
-        ASSIGN_GSN( gsn_makeshield  , "makeshield" );
-        ASSIGN_GSN( gsn_makecontainer  , "makecontainer" );
-        ASSIGN_GSN( gsn_reinforcements  , "reinforcements" );
-        ASSIGN_GSN( gsn_postguard   , "post guard" );
-        ASSIGN_GSN( gsn_torture   , "torture" );
-        ASSIGN_GSN( gsn_throw   , "throw" );
-        ASSIGN_GSN( gsn_disguise   , "disguise" );
-        ASSIGN_GSN( gsn_first_aid   , "first aid" );
-        ASSIGN_GSN( gsn_lightsaber_crafting, "lightsaber crafting" );
-        ASSIGN_GSN( gsn_spice_refining,  "spice refining" );
-        ASSIGN_GSN( gsn_spacecombat,     "space combat" );
-        ASSIGN_GSN( gsn_weaponsystems,   "weapon systems" );
-        ASSIGN_GSN( gsn_spacecraft,    "spacecraft" );
-        ASSIGN_GSN( gsn_shipdesign,    "ship design" );
-        ASSIGN_GSN( gsn_shipmaintenance, "ship maintenance" );
-	ASSIGN_GSN( gsn_blasters,	"blasters" );
-	ASSIGN_GSN( gsn_bowcasters,	"bowcasters" );
-	ASSIGN_GSN( gsn_force_pikes,	"force pikes" );
-	ASSIGN_GSN( gsn_lightsabers,	"lightsabers" );
-	ASSIGN_GSN( gsn_vibro_blades,	"vibro-blades" );
-	ASSIGN_GSN( gsn_flexible_arms,	"flexible arms" );
-	ASSIGN_GSN( gsn_talonous_arms,	"talonous arms" );
-	ASSIGN_GSN( gsn_bludgeons,	"bludgeons" );
-	ASSIGN_GSN( gsn_backstab,	"backstab" );
-	ASSIGN_GSN( gsn_circle,		"circle" );
-	ASSIGN_GSN( gsn_dodge,		"dodge" );
-	ASSIGN_GSN( gsn_hide,		"hide" );
-	ASSIGN_GSN( gsn_peek,		"peek" );
-	ASSIGN_GSN( gsn_pick_lock,	"picklock" );
-	ASSIGN_GSN( gsn_pickshiplock  , "pickshiplock" );
-        ASSIGN_GSN( gsn_sneak,		"sneak" );
-	ASSIGN_GSN( gsn_steal,		"steal" );
-	ASSIGN_GSN( gsn_gouge,		"gouge" );
-	ASSIGN_GSN( gsn_poison_weapon, 	"poison weapon" );
-	ASSIGN_GSN( gsn_disarm,		"disarm" );
-	ASSIGN_GSN( gsn_enhanced_damage, "enhanced damage" );
-	ASSIGN_GSN( gsn_kick,		"kick" );
-	ASSIGN_GSN( gsn_parry,		"parry" );
-	ASSIGN_GSN( gsn_rescue,		"rescue" );
-	ASSIGN_GSN( gsn_second_attack, 	"second attack" );
-	ASSIGN_GSN( gsn_third_attack, 	"third attack" );
-	ASSIGN_GSN( gsn_dual_wield,	"dual wield" );
-	ASSIGN_GSN( gsn_bashdoor,	"doorbash" );
-	ASSIGN_GSN( gsn_grip,		"grip" ); 
-	ASSIGN_GSN( gsn_berserk,	"berserk" );
-	ASSIGN_GSN( gsn_hitall,		"hitall" );
-	ASSIGN_GSN( gsn_aid,		"aid" );
-	ASSIGN_GSN( gsn_track,		"track" );
-	ASSIGN_GSN( gsn_mount,		"mount" );
-	ASSIGN_GSN( gsn_climb,		"climb" );
-	ASSIGN_GSN( gsn_slice,		"slice" );
-	ASSIGN_GSN( gsn_fireball,	"fireball" );
-	ASSIGN_GSN( gsn_lightning_bolt,	"lightning bolt" );
-	ASSIGN_GSN( gsn_aqua_breath,	"aqua breath" );
-	ASSIGN_GSN( gsn_blindness,	"blindness" );
-	ASSIGN_GSN( gsn_charm_person, 	"affect mind" );
-	ASSIGN_GSN( gsn_invis,		"mask" );
-	ASSIGN_GSN( gsn_mass_invis,	"group masking" );
-	ASSIGN_GSN( gsn_poison,		"poison" );
-	ASSIGN_GSN( gsn_sleep,		"sleep" );
-	ASSIGN_GSN( gsn_stun,		"stun" );
-	ASSIGN_GSN( gsn_possess,	"possess" );
-    }
-
-    /*
-     * Read in all the area files.
-     */
-    {
-	FILE *fpList;
-
-	log_string("Reading in area files...");
-	if ( ( fpList = fopen( AREA_LIST, "r" ) ) == NULL )
-	{
-	    shutdown_mud( "Unable to open area list" );
-	    exit( 1 );
-	}
-
-	for ( ; ; )
-	{
-	    strcpy( strArea, fread_word( fpList ) );
-	    if ( strArea[0] == '$' )
-		break;
-
-	    load_area_file( last_area, strArea );
-	    
-	}
-	fclose( fpList );
-    }
-
-    init_supermob();
+  init_supermob();
 
 
     /*
@@ -514,41 +548,35 @@ void boot_db( bool fCopyOver )
      * Reset all areas once.
      * Load up the notes file.
      */
+  log_string( "Fixing exits" );
+  fix_exits( );
+  fBootDb	= FALSE;
+  log_string( "Loading boards" );
+  load_boards( );
+  log_string( "Loading clans" );
+  load_clans( );
+  log_string( "Loading bans" );
+  load_banlist( );
+  log_string( "Loading corpses" );
+  load_corpses( );
+  log_string( "Loading space" );
+  load_space( );
+  log_string( "Loading ship prototypes" );
+  load_prototypes( );
+  log_string( "Loading ships" );
+  load_ships( );
+  log_string( "Loading planet data" );
+  load_planets( );
+  log_string( "Resetting areas" );
+  reset_all();
+
+  MOBtrigger = TRUE;
+
+  if( fCopyOver )
     {
-	log_string( "Fixing exits" );
-	fix_exits( );
-	fBootDb	= FALSE;
-	log_string( "Loading boards" );
-	load_boards( );
-	log_string( "Loading clans" );
-	load_clans( );
-        log_string( "Loading bans" );
-        load_banlist( );
-        log_string( "Loading corpses" );
-        load_corpses( );
-        log_string( "Loading space" );
-        load_space( );
-        log_string( "Loading ship prototypes" );
-        load_prototypes( );
-        log_string( "Loading ships" );
-        load_ships( );
-        log_string( "Loading planet data" );
-        load_planets( );
-        log_string( "Resetting areas" );
-	reset_all( );
-	                
-        MOBtrigger = TRUE;
-
-	if( fCopyOver )
-	  {
-	    log_string( "Running copyover_recover." );
-	    copyover_recover();
-	  }
+      log_string( "Running copyover_recover." );
+      copyover_recover();
     }
-
-    /* init_maps ( ); */
-
-    return;
 }
 
 
