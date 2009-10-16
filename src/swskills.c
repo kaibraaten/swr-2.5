@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include "mud.h"
 
 void    add_reinforcements  args( ( CHAR_DATA *ch ) );

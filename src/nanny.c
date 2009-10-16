@@ -115,6 +115,7 @@ static void nanny_get_name( DESCRIPTOR_DATA *d, char *argument )
   char buf[MAX_STRING_LENGTH];
   BAN_DATA *pban;
   bool fOld, chk;
+  CHAR_DATA *ch = NULL;
 
   if ( argument[0] == '\0' )
     {
@@ -208,7 +209,7 @@ arts of this game...\r\n"
       return;
     }
 
-  CHAR_DATA *ch = d->character;
+  ch = d->character;
 
   for ( pban = first_ban; pban; pban = pban->next )
     {
@@ -386,6 +387,7 @@ static void nanny_confirm_new_name( DESCRIPTOR_DATA *d, char *argument )
 static void nanny_get_new_password( DESCRIPTOR_DATA *d, char *argument )
 {
   CHAR_DATA *ch = d->character;
+  const char *p = NULL, *pwdnew = NULL;
 
   write_to_buffer( d, "\r\n", 2 );
 
@@ -395,8 +397,7 @@ static void nanny_get_new_password( DESCRIPTOR_DATA *d, char *argument )
       return;
     }
 
-  const char *p;
-  const char *pwdnew = crypt( argument, ch->name );
+  pwdnew = crypt( argument, ch->name );
 
   for ( p = pwdnew; *p != '\0'; p++ )
     {
@@ -677,6 +678,7 @@ static void nanny_read_nmotd( DESCRIPTOR_DATA *d, char *argument )
 static void nanny_done_motd( DESCRIPTOR_DATA *d, char *argument )
 {
   CHAR_DATA *ch = d->character;
+  OBJ_INDEX_DATA *obj_ind = NULL;
 
   write_to_buffer( d, "\r\nWelcome...\r\n\r\n", 0 );
   add_char( ch );
@@ -735,7 +737,7 @@ static void nanny_done_motd( DESCRIPTOR_DATA *d, char *argument )
       obj_to_char( obj, ch );
 
       /* comlink */
-      OBJ_INDEX_DATA *obj_ind = get_obj_index( 23 );
+      obj_ind = get_obj_index( 23 );
 
       if ( obj_ind != NULL )
 	{

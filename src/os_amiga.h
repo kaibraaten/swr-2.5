@@ -25,8 +25,10 @@
 #ifndef _SWR2_OS_AMIGA_H_
 #define _SWR2_OS_AMIGA_H_
 
+#include <utility/tagitem.h>
 #include <exec/exec.h>
 #include <proto/exec.h>
+#include <lineread.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>

@@ -4,7 +4,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include "mud.h"
 
 VOTE_DATA * first_poll;

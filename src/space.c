@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include "mud.h"
 #include "vector3.h"
 #include "vector3_aux.h"
@@ -60,11 +59,11 @@ void move_missiles( void )
 
   for ( missile = first_missile; missile; missile = m_next )
     {
-      m_next = missile->next;
-
       SHIP_DATA *ship = missile->fired_from;
       SHIP_DATA *target = missile->target;
       bool ch_found = FALSE;
+
+      m_next = missile->next;
 
       if ( target && target->starsystem
            && target->starsystem == missile->starsystem )
@@ -592,6 +591,7 @@ static void ship_handle_autoflying_clanship( SHIP_DATA *ship, CLAN_DATA *clan )
     {
       int targetok = 0;
       ROOM_INDEX_DATA *room = NULL;
+      char buf[MAX_STRING_LENGTH];
 
       if( autofly(target) && !str_cmp( ship->owner , target->owner ) )
 	{
@@ -670,7 +670,6 @@ static void ship_handle_autoflying_clanship( SHIP_DATA *ship, CLAN_DATA *clan )
       if ( targetok >= 0 )
 	continue;
 
-      char buf[MAX_STRING_LENGTH];
       ship->target = target;
       sprintf( buf , "You are being scanned by %s.",
 	       ship->name);
@@ -2733,12 +2732,12 @@ static void ship_untarget_by_attackers( const SHIP_DATA *ship )
 
   for( att = first_ship; att; att = att->next )
     {
+      TURRET_DATA *turret = NULL;
+
       if( att->target == ship )
 	{
 	  att->target = NULL;
 	}
-
-      TURRET_DATA *turret = NULL;
 
       for ( turret = att->first_turret ; turret ; turret = turret->next )
 	{
@@ -2850,6 +2849,7 @@ static void destroy_ship_kill_characters( const SHIP_DATA *ship,
 void destroy_ship( SHIP_DATA *ship , CHAR_DATA *killer )
 {   
   char buf[MAX_STRING_LENGTH];
+  CLAN_DATA *clan = NULL;
 
   sprintf( buf , "%s explodes in a blinding flash of light!", ship->name );  
   echo_to_system( AT_WHITE + AT_BLINK , ship , buf , NULL );
@@ -2869,7 +2869,7 @@ void destroy_ship( SHIP_DATA *ship , CHAR_DATA *killer )
 
   extract_ship( ship );
 
-  CLAN_DATA *clan = get_clan( ship->owner );
+  clan = get_clan( ship->owner );
 
   if( clan )
     {
@@ -3572,10 +3572,10 @@ void do_trajectory( CHAR_DATA *ch, char *argument )
   char  buf[MAX_STRING_LENGTH];
   char  arg2[MAX_INPUT_LENGTH];
   char  arg3[MAX_INPUT_LENGTH];
-  int chance;
+  int chance = 0;
+  SHIP_DATA *ship = NULL;
   Vector3 vec;
   vector_init( &vec );
-  SHIP_DATA *ship;
 
   if (  (ship = ship_from_pilotseat(ch->in_room))  == NULL )
     {
@@ -4542,7 +4542,8 @@ void do_fire(CHAR_DATA *ch, char *argument )
     SHIP_DATA *target = NULL;
     char buf[MAX_STRING_LENGTH];
     TURRET_DATA *turret = NULL;
-    
+    int skill_level = 0;
+
         if (  (ship = ship_from_turret(ch->in_room))  == NULL )
         {
             send_to_char("&RYou must be in the gunners chair or turret of a ship to do that!\r\n",ch);
@@ -4577,7 +4578,7 @@ void do_fire(CHAR_DATA *ch, char *argument )
 	    return;
 	  }
     	              
-	int skill_level = character_skill_level( ch, gsn_weaponsystems )
+	skill_level = character_skill_level( ch, gsn_weaponsystems )
 	  + ch->perm_dex * 2 + character_skill_level( ch, gsn_spacecombat ) / 2;
 
         chance = IS_NPC(ch) ? 100 : skill_level;
@@ -5766,6 +5767,7 @@ void do_rentship( CHAR_DATA *ch, char *argument )
 
 SHIP_DATA *ship_create( void )
 {
+  size_t n = 0;
   SHIP_DATA *s = NULL;
   CREATE( s, SHIP_DATA, 1 );
 
@@ -5835,7 +5837,6 @@ SHIP_DATA *ship_create( void )
   vector_init( &s->head );
   vector_init( &s->jump );
 
-  size_t n = 0;
   for( n = 0; n < MAX_SHIP_ROOMS; ++n )
     s->description[n] = NULL;
 

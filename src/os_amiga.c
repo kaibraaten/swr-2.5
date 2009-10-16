@@ -26,7 +26,8 @@
 #include <stdio.h>
 #include "os.h"
 
-Library* SocketBase = 0;
+struct Library *SocketBase = NULL;
+struct Library *UserGroupBase = NULL;
 
 void network_startup( void )
 {
@@ -38,11 +39,11 @@ void network_startup( void )
     }
 }
 
-void network_teardown( void );
+void network_teardown( void )
 {
   if( SocketBase )
     {
       CloseLibrary( SocketBase );
-      SocketBase = 0;
+      SocketBase = NULL;
     }
 }

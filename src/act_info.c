@@ -2,7 +2,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <time.h>
 #include <unistd.h>
 #include "mud.h"
 
@@ -1708,10 +1707,12 @@ void do_hedit( CHAR_DATA *ch, char *argument )
  */
 const char *help_fix( char *text )
 {
+  char *fixed = NULL;
+
   if ( !text )
     return "";
 
-  char *fixed = strip_cr(text);
+  fixed = strip_cr(text);
 
   if ( fixed[0] == ' ' )
     fixed[0] = '.';
