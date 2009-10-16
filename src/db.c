@@ -579,25 +579,22 @@ void boot_db( bool fCopyOver )
     }
 }
 
-
-
 /*
  * Load an 'area' header line.
  */
 void load_area( FILE *fp )
 {
-    AREA_DATA *pArea;
+  AREA_DATA *pArea = 0;
 
-    CREATE( pArea, AREA_DATA, 1 );
-    pArea->first_room	= NULL;
-    pArea->last_room	= NULL;
-    pArea->planet       = NULL;
-    pArea->name		= fread_string_nohash( fp );
-    pArea->filename	= str_dup( strArea );
+  CREATE( pArea, AREA_DATA, 1 );
+  pArea->first_room	= NULL;
+  pArea->last_room	= NULL;
+  pArea->planet       = NULL;
+  pArea->name		= fread_string_nohash( fp );
+  pArea->filename	= str_dup( strArea );
 
-    LINK( pArea, first_area, last_area, next, prev );
-    top_area++;
-    return;
+  LINK( pArea, first_area, last_area, next, prev );
+  top_area++;
 }
 
 /*
@@ -605,26 +602,25 @@ void load_area( FILE *fp )
  */
 void load_flags( AREA_DATA *tarea, FILE *fp )
 {
-    char *ln;
-    int x1, x2;
-
-    if ( !tarea )
+  if ( !tarea )
     {
-	bug( "Load_flags: no #AREA seen yet." );
-	if ( fBootDb )
+      bug( "Load_flags: no #AREA seen yet." );
+
+      if ( fBootDb )
 	{
 	  shutdown_mud( "No #AREA" );
 	  exit( 1 );
 	}
-	else
+      else
+	{
 	  return;
+	}
     }
-    ln = fread_line( fp );
-    x1=x2=0;
-    sscanf( ln, "%d %d",
-	&x1, &x2 );
-    tarea->flags = x1;
-    return;
+
+  const char *ln = fread_line( fp );
+  int x1 = 0, x2 = 0;
+  sscanf( ln, "%d %d", &x1, &x2 );
+  tarea->flags = x1;
 }
 
 /*
@@ -634,38 +630,39 @@ void load_flags( AREA_DATA *tarea, FILE *fp )
  */
 void add_help( HELP_DATA *pHelp )
 {
-    HELP_DATA *tHelp;
-    int match;
+  HELP_DATA *tHelp = NULL;
+  int match = 0;
 
-    for ( tHelp = first_help; tHelp; tHelp = tHelp->next )
-	if ( pHelp->level == tHelp->level
-	&&   strcmp(pHelp->keyword, tHelp->keyword) == 0 )
+  for ( tHelp = first_help; tHelp; tHelp = tHelp->next )
+    {
+      if ( pHelp->level == tHelp->level
+	   && strcmp(pHelp->keyword, tHelp->keyword) == 0 )
 	{
-	    bug( "add_help: duplicate: %s.  Deleting.", pHelp->keyword );
-	    STRFREE( pHelp->text );
-	    STRFREE( pHelp->keyword );
-	    DISPOSE( pHelp );
-	    return;
+	  bug( "add_help: duplicate: %s.  Deleting.", pHelp->keyword );
+	  STRFREE( pHelp->text );
+	  STRFREE( pHelp->keyword );
+	  DISPOSE( pHelp );
+	  return;
 	}
+      else if ( (match=strcmp(pHelp->keyword[0]=='\'' ? pHelp->keyword+1 : pHelp->keyword, tHelp->keyword[0]=='\'' ? tHelp->keyword+1 : tHelp->keyword)) < 0
+		||   (match == 0 && pHelp->level > tHelp->level) )
+      {
+	if ( !tHelp->prev )
+	  first_help	  = pHelp;
 	else
-	if ( (match=strcmp(pHelp->keyword[0]=='\'' ? pHelp->keyword+1 : pHelp->keyword,
-			   tHelp->keyword[0]=='\'' ? tHelp->keyword+1 : tHelp->keyword)) < 0
-	||   (match == 0 && pHelp->level > tHelp->level) )
-	{
-	    if ( !tHelp->prev )
-		first_help	  = pHelp;
-	    else
-		tHelp->prev->next = pHelp;
-	    pHelp->prev		  = tHelp->prev;
-	    pHelp->next		  = tHelp;
-	    tHelp->prev		  = pHelp;
-	    break;
-	}
+	  tHelp->prev->next = pHelp;
 
-    if ( !tHelp )
-	LINK( pHelp, first_help, last_help, next, prev );
+	pHelp->prev		  = tHelp->prev;
+	pHelp->next		  = tHelp;
+	tHelp->prev		  = pHelp;
+	break;
+      }
+    }
 
-    top_help++;
+  if ( !tHelp )
+    LINK( pHelp, first_help, last_help, next, prev );
+
+  top_help++;
 }
 
 /*
@@ -673,29 +670,32 @@ void add_help( HELP_DATA *pHelp )
  */
 void load_helps( AREA_DATA *tarea, FILE *fp )
 {
-    HELP_DATA *pHelp;
+  HELP_DATA *pHelp = NULL;
 
-    for ( ; ; )
+  for ( ; ; )
     {
-	CREATE( pHelp, HELP_DATA, 1 );
-	pHelp->level	= fread_number( fp );
-	pHelp->keyword	= fread_string( fp );
-	if ( pHelp->keyword[0] == '$' )
-	    break;
-	pHelp->text	= fread_string( fp );
-	if ( pHelp->keyword[0] == '\0' )
+      CREATE( pHelp, HELP_DATA, 1 );
+      pHelp->level	= fread_number( fp );
+      pHelp->keyword	= fread_string( fp );
+
+      if ( pHelp->keyword[0] == '$' )
+	break;
+
+      pHelp->text	= fread_string( fp );
+
+      if ( pHelp->keyword[0] == '\0' )
 	{
-	    STRFREE( pHelp->text );
-	    STRFREE( pHelp->keyword );
-	    DISPOSE( pHelp );
-	    continue;
+	  STRFREE( pHelp->text );
+	  STRFREE( pHelp->keyword );
+	  DISPOSE( pHelp );
+	  continue;
 	}
 
-	if ( !str_cmp( pHelp->keyword, "greeting" ) )
-	    help_greeting = pHelp->text;
-	add_help( pHelp );
+      if ( !str_cmp( pHelp->keyword, "greeting" ) )
+	help_greeting = pHelp->text;
+
+      add_help( pHelp );
     }
-    return;
 }
 
 
@@ -704,7 +704,7 @@ void load_helps( AREA_DATA *tarea, FILE *fp )
  */
 void add_char( CHAR_DATA *ch )
 {
-    LINK( ch, first_char, last_char, next, prev );
+  LINK( ch, first_char, last_char, next, prev );
 }
 
 
@@ -1660,63 +1660,133 @@ CHAR_DATA *create_mobile( MOB_INDEX_DATA *pMobIndex )
     return mob;
 }
 
+static void create_object_default_values_food( OBJ_DATA *obj )
+{
+  /*
+   * optional food condition (rotting food)         -Thoric
+   * value1 is the max condition of the food
+   * value4 is the optional initial condition
+   */
+  if ( obj->value[4] )
+    obj->timer = obj->value[4];
+  else
+    obj->timer = obj->value[1];
+}
 
+static void create_object_default_values_device( OBJ_DATA *obj )
+{
+  obj->value[0] = number_fuzzy( obj->value[0] );
+  obj->value[1] = number_fuzzy( obj->value[1] );
+  obj->value[2] = obj->value[1];
+}
+
+static void create_object_default_values_battery( OBJ_DATA *obj )
+{
+  if ( obj->value[0] <= 0 )
+    obj->value[0] = number_fuzzy(95);
+}
+
+static void create_object_default_values_ammo( OBJ_DATA *obj )
+{
+  if ( obj->value[0] <=0 )
+    obj->value[0] = number_fuzzy(495);
+}
+
+static void create_object_default_values_weapon( OBJ_DATA *obj, int level )
+{
+  if ( obj->value[1] && obj->value[2] )
+    {
+      obj->value[2] *= obj->value[1];
+    }
+  else
+    {
+      obj->value[1] = number_fuzzy( number_fuzzy( 1 + level/20 ) );
+      obj->value[2] = number_fuzzy( number_fuzzy( 10 + level/10 ) );
+    }
+
+  if ( obj->value[1] > obj->value[2] )
+    obj->value[1] = obj->value[2]/3;
+
+  if (obj->value[0] == 0)
+    obj->value[0] = INIT_WEAPON_CONDITION;
+
+  switch (obj->value[3])
+    {
+    case WEAPON_BLASTER:
+    case WEAPON_LIGHTSABER:
+    case WEAPON_VIBRO_BLADE:
+
+      if ( obj->value[5] <=0 )
+	obj->value[5] = number_fuzzy(1000);
+    }
+
+  obj->value[4] = obj->value[5];
+}
+
+static void create_object_default_values_armor( OBJ_DATA *obj )
+{
+  if (obj->value[0] == 0)
+    obj->value[0] = obj->value[1];
+
+  obj->timer = obj->value[3];
+}
+
+static void create_object_default_values_money( OBJ_DATA *obj )
+{
+  obj->value[0]     = obj->cost;
+}
 
 /*
  * Create an instance of an object.
  */
 OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex, int level )
 {
-    OBJ_DATA *obj;
+  OBJ_DATA *obj = 0;
 
-    if ( !pObjIndex )
+  if ( !pObjIndex )
     {
-	bug( "Create_object: NULL pObjIndex." );
-	exit( 1 );
+      bug( "Create_object: NULL pObjIndex." );
+      exit( 1 );
     }
 
-    CREATE( obj, OBJ_DATA, 1 );
+  CREATE( obj, OBJ_DATA, 1 );
 
-    obj->pIndexData	= pObjIndex;
-    obj->in_room	= NULL;
-    obj->level		= level;
-    obj->wear_loc	= -1;
-    obj->count		= 1;
-    cur_obj_serial = UMAX((cur_obj_serial + 1 ) & (BV30-1), 1);
-    obj->serial = obj->pIndexData->serial = cur_obj_serial;
+  obj->pIndexData	= pObjIndex;
+  obj->in_room	= NULL;
+  obj->level		= level;
+  obj->wear_loc	= -1;
+  obj->count		= 1;
+  cur_obj_serial = UMAX((cur_obj_serial + 1 ) & (BV30-1), 1);
+  obj->serial = obj->pIndexData->serial = cur_obj_serial;
 
-    obj->name		= QUICKLINK( pObjIndex->name 	 );
-    obj->short_descr	= QUICKLINK( pObjIndex->short_descr );
-    obj->description	= QUICKLINK( pObjIndex->description );
-    obj->action_desc	= QUICKLINK( pObjIndex->action_desc );
-    obj->item_type	= pObjIndex->item_type;
-    obj->extra_flags	= pObjIndex->extra_flags;
-    obj->wear_flags	= pObjIndex->wear_flags;
-    obj->value[0]	= pObjIndex->value[0];
-    obj->value[1]	= pObjIndex->value[1];
-    obj->value[2]	= pObjIndex->value[2];
-    obj->value[3]	= pObjIndex->value[3];
-    obj->value[4]	= pObjIndex->value[4];
-    obj->value[5]	= pObjIndex->value[5];
-    obj->weight		= pObjIndex->weight;
-    obj->cost		= pObjIndex->cost;
-    /*
-    obj->cost		= number_fuzzy( 10 )
-			* number_fuzzy( level ) * number_fuzzy( level );
-     */
+  obj->name		= QUICKLINK( pObjIndex->name 	 );
+  obj->short_descr	= QUICKLINK( pObjIndex->short_descr );
+  obj->description	= QUICKLINK( pObjIndex->description );
+  obj->action_desc	= QUICKLINK( pObjIndex->action_desc );
+  obj->item_type	= pObjIndex->item_type;
+  obj->extra_flags	= pObjIndex->extra_flags;
+  obj->wear_flags	= pObjIndex->wear_flags;
+  obj->value[0]	= pObjIndex->value[0];
+  obj->value[1]	= pObjIndex->value[1];
+  obj->value[2]	= pObjIndex->value[2];
+  obj->value[3]	= pObjIndex->value[3];
+  obj->value[4]	= pObjIndex->value[4];
+  obj->value[5]	= pObjIndex->value[5];
+  obj->weight		= pObjIndex->weight;
+  obj->cost		= pObjIndex->cost;
 
-    /*
-     * Mess with object properties.
-     */
-    switch ( obj->item_type )
+  /*
+   * Mess with object properties.
+   */
+  switch ( obj->item_type )
     {
     default:
-	bug( "Read_object: vnum %ld bad type.", pObjIndex->vnum );
-	bug( "------------------------>     ", obj->item_type );
-	break;
-	
+      bug( "Read_object: vnum %ld bad type.", pObjIndex->vnum );
+      bug( "------------------------>     ", obj->item_type );
+      break;
+
     case ITEM_NONE:
-        break;
+      break;
         
     case ITEM_LENS:
     case ITEM_RESOURCE:
@@ -1740,17 +1810,10 @@ OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex, int level )
     case ITEM_CONTAINER:
     case ITEM_DRINK_CON:
 	break;
+
     case ITEM_FOOD:
-	/*
-	 * optional food condition (rotting food)		-Thoric
-	 * value1 is the max condition of the food
-	 * value4 is the optional initial condition
-	 */
-	if ( obj->value[4] )
-	  obj->timer = obj->value[4];
-	else
-	  obj->timer = obj->value[1];
-	break;
+      create_object_default_values_food( obj );
+      break;
 	
     case ITEM_DROID_CORPSE:
     case ITEM_CORPSE_NPC:
@@ -1761,139 +1824,110 @@ OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex, int level )
     case ITEM_PEN:
     case ITEM_LOCKPICK:
     case ITEM_SHOVEL:
-	break;
+      break;
 
     case ITEM_DEVICE:
-	obj->value[0]	= number_fuzzy( obj->value[0] );
-	obj->value[1]	= number_fuzzy( obj->value[1] );
-	obj->value[2]	= obj->value[1];
-	break;
+      create_object_default_values_device( obj );
+      break;
     
     case ITEM_BATTERY:
-        if ( obj->value[0] <= 0 )
-          obj->value[0] = number_fuzzy(95);
-        break;
+      create_object_default_values_battery( obj );
+      break;
     
     
     case ITEM_AMMO:
-        if ( obj->value[0] <=0 )  
-          obj->value[0] = number_fuzzy(495);
-        break;
+      create_object_default_values_ammo( obj );
+      break;
         
     case ITEM_WEAPON:
-	if ( obj->value[1] && obj->value[2] )
-	   obj->value[2] *= obj->value[1];
-	else
-	{
-	   obj->value[1] = number_fuzzy( number_fuzzy( 1 + level/20 ) );
-	   obj->value[2] = number_fuzzy( number_fuzzy( 10 + level/10 ) );
-	}
-	if ( obj->value[1] > obj->value[2] )
-	   obj->value[1] = obj->value[2]/3;
-	if (obj->value[0] == 0)
-	   obj->value[0] = INIT_WEAPON_CONDITION;
-	switch (obj->value[3])
-	{ 
-	  case WEAPON_BLASTER: 
-	  case WEAPON_LIGHTSABER: 
-	  case WEAPON_VIBRO_BLADE:
-	    if ( obj->value[5] <=0 )
-	      obj->value[5] = number_fuzzy(1000);
-	}
-	obj->value[4] = obj->value[5]; 
-	break;
+      create_object_default_values_weapon( obj, level );
+      break;
 
     case ITEM_ARMOR:
-	if (obj->value[0] == 0)
-	    obj->value[0] = obj->value[1];
-	obj->timer = obj->value[3];
-	break;
+      create_object_default_values_armor( obj );
+      break;
 
     case ITEM_MONEY:
-	obj->value[0]	= obj->cost;
-	break;
+      create_object_default_values_money( obj );
+      break;
     }
 
-    LINK( obj, first_object, last_object, next, prev );
-    ++pObjIndex->count;
-    ++numobjsloaded;
-    ++physicalobjects;
+  LINK( obj, first_object, last_object, next, prev );
+  ++pObjIndex->count;
+  ++numobjsloaded;
+  ++physicalobjects;
 
-    return obj;
+  return obj;
 }
-
 
 /*
  * Clear a new character.
  */
 void clear_char( CHAR_DATA *ch )
 {
-    ch->editor			= NULL;
-    ch->hunting			= NULL;
-    ch->fearing			= NULL;
-    ch->hating			= NULL;
-    ch->name			= NULL;
-    ch->short_descr		= NULL;
-    ch->long_descr		= NULL;
-    ch->description		= NULL;
-    ch->next			= NULL;
-    ch->prev			= NULL;
-    ch->first_carrying		= NULL;
-    ch->last_carrying		= NULL;
-    ch->next_in_room		= NULL;
-    ch->prev_in_room		= NULL;
-    ch->fighting		= NULL;
-    ch->switched		= NULL;
-    ch->first_affect		= NULL;
-    ch->last_affect		= NULL;
-    ch->prev_cmd		= NULL;    /* maps */
-    ch->last_cmd		= NULL;
-    ch->dest_buf		= NULL;
-    ch->dest_buf_2		= NULL;
-    ch->spare_ptr		= NULL;
-    ch->mount			= NULL;
-    ch->affected_by		= 0;
-    ch->logon			= current_time;
-    ch->armor			= 100;
-    ch->position		= POS_STANDING;
-    ch->hit			= 100;
-    ch->max_hit			= 100;
-    ch->mana			= 1000;
-    ch->max_mana		= 0;
-    ch->move			= 500;
-    ch->max_move		= 500;
-    ch->height			= 72;
-    ch->weight			= 180;
-    ch->xflags			= 0;
-    ch->barenumdie		= 1;
-    ch->baresizedie		= 4;
-    ch->substate		= 0;
-    ch->tempnum			= 0;
-    ch->perm_str		= 10;
-    ch->perm_dex		= 10;
-    ch->perm_int		= 10;
-    ch->perm_wis		= 10;
-    ch->perm_cha		= 10;
-    ch->perm_con		= 10;
-    ch->perm_lck		= 10;
-    ch->mod_str			= 0;
-    ch->mod_dex			= 0;
-    ch->mod_int			= 0;
-    ch->mod_wis			= 0;
-    ch->mod_cha			= 0;
-    ch->mod_con			= 0;
-    ch->mod_lck			= 0;
-    ch->pagelen                 = 24; 		     /* BUILD INTERFACE */
-    ch->inter_page 		= NO_PAGE;           /* BUILD INTERFACE */
-    ch->inter_type 		= NO_TYPE;           /* BUILD INTERFACE */
-    ch->inter_editing    	= NULL;              /* BUILD INTERFACE */
-    ch->inter_editing_vnum	= -1;                /* BUILD INTERFACE */
-    ch->inter_substate    	= SUB_NORTH;         /* BUILD INTERFACE */
-    ch->plr_home                = NULL;
-    return;
+  ch->editor		= NULL;
+  ch->hunting		= NULL;
+  ch->fearing		= NULL;
+  ch->hating		= NULL;
+  ch->name		= NULL;
+  ch->short_descr	= NULL;
+  ch->long_descr	= NULL;
+  ch->description	= NULL;
+  ch->next		= NULL;
+  ch->prev		= NULL;
+  ch->first_carrying	= NULL;
+  ch->last_carrying	= NULL;
+  ch->next_in_room	= NULL;
+  ch->prev_in_room	= NULL;
+  ch->fighting		= NULL;
+  ch->switched		= NULL;
+  ch->first_affect	= NULL;
+  ch->last_affect	= NULL;
+  ch->prev_cmd		= NULL;    /* maps */
+  ch->last_cmd		= NULL;
+  ch->dest_buf		= NULL;
+  ch->dest_buf_2	= NULL;
+  ch->spare_ptr		= NULL;
+  ch->mount		= NULL;
+  ch->affected_by	= 0;
+  ch->logon		= current_time;
+  ch->armor		= 100;
+  ch->position		= POS_STANDING;
+  ch->hit		= 100;
+  ch->max_hit		= 100;
+  ch->mana		= 1000;
+  ch->max_mana		= 0;
+  ch->move		= 500;
+  ch->max_move		= 500;
+  ch->height		= 72;
+  ch->weight		= 180;
+  ch->xflags		= 0;
+  ch->barenumdie	= 1;
+  ch->baresizedie	= 4;
+  ch->substate		= 0;
+  ch->tempnum		= 0;
+  ch->perm_str		= 10;
+  ch->perm_dex		= 10;
+  ch->perm_int		= 10;
+  ch->perm_wis		= 10;
+  ch->perm_cha		= 10;
+  ch->perm_con		= 10;
+  ch->perm_lck		= 10;
+  ch->mod_str		= 0;
+  ch->mod_dex		= 0;
+  ch->mod_int		= 0;
+  ch->mod_wis		= 0;
+  ch->mod_cha		= 0;
+  ch->mod_con		= 0;
+  ch->mod_lck		= 0;
+  ch->pagelen           = 24; 		     /* BUILD INTERFACE */
+  ch->inter_page 	= NO_PAGE;           /* BUILD INTERFACE */
+  ch->inter_type 	= NO_TYPE;           /* BUILD INTERFACE */
+  ch->inter_editing    	= NULL;              /* BUILD INTERFACE */
+  ch->inter_editing_vnum= -1;                /* BUILD INTERFACE */
+  ch->inter_substate   	= SUB_NORTH;         /* BUILD INTERFACE */
+  ch->plr_home          = NULL;
 }
-
-
 
 /*
  * Free a character.
@@ -1991,24 +2025,22 @@ char *get_extra_descr( const char *name, EXTRA_DESCR_DATA *ed )
  */
 MOB_INDEX_DATA *get_mob_index( long vnum )
 {
-    MOB_INDEX_DATA *pMobIndex;
+  MOB_INDEX_DATA *pMobIndex;
 
-    if ( vnum < 0 )
-      vnum = 0;
+  if ( vnum < 0 )
+    vnum = 0;
 
-    for ( pMobIndex  = mob_index_hash[vnum % MAX_KEY_HASH];
-	  pMobIndex;
-	  pMobIndex  = pMobIndex->next )
-	if ( pMobIndex->vnum == vnum )
-	    return pMobIndex;
+  for ( pMobIndex  = mob_index_hash[vnum % MAX_KEY_HASH];
+	pMobIndex;
+	pMobIndex  = pMobIndex->next )
+    if ( pMobIndex->vnum == vnum )
+      return pMobIndex;
 
-    if ( fBootDb )
-	bug( "Get_mob_index: bad vnum %ld.", vnum );
+  if ( fBootDb )
+    bug( "Get_mob_index: bad vnum %ld.", vnum );
 
-    return NULL;
+  return NULL;
 }
-
-
 
 /*
  * Translates obj virtual number to its obj index struct.
@@ -2016,24 +2048,22 @@ MOB_INDEX_DATA *get_mob_index( long vnum )
  */
 OBJ_INDEX_DATA *get_obj_index( long vnum )
 {
-    OBJ_INDEX_DATA *pObjIndex;
+  OBJ_INDEX_DATA *pObjIndex;
 
-    if ( vnum < 0 )
-      vnum = 0;
+  if ( vnum < 0 )
+    vnum = 0;
     
-    for ( pObjIndex  = obj_index_hash[vnum % MAX_KEY_HASH];
-	  pObjIndex;
-	  pObjIndex  = pObjIndex->next )
-	if ( pObjIndex->vnum == vnum )
-	    return pObjIndex;
+  for ( pObjIndex  = obj_index_hash[vnum % MAX_KEY_HASH];
+	pObjIndex;
+	pObjIndex  = pObjIndex->next )
+    if ( pObjIndex->vnum == vnum )
+      return pObjIndex;
 
-    if ( fBootDb )
-	bug( "Get_obj_index: bad vnum %ld.", vnum );
+  if ( fBootDb )
+    bug( "Get_obj_index: bad vnum %ld.", vnum );
 
-    return NULL;
+  return NULL;
 }
-
-
 
 /*
  * Translates room virtual number to its room index struct.
@@ -2041,24 +2071,22 @@ OBJ_INDEX_DATA *get_obj_index( long vnum )
  */
 ROOM_INDEX_DATA *get_room_index( long vnum )
 {
-    ROOM_INDEX_DATA *pRoomIndex;
+  ROOM_INDEX_DATA *pRoomIndex;
 
-    if ( vnum < 0 )
-      vnum = 0;
+  if ( vnum < 0 )
+    vnum = 0;
     
-    for ( pRoomIndex  = room_index_hash[vnum % MAX_KEY_HASH];
-	  pRoomIndex;
-	  pRoomIndex  = pRoomIndex->next )
-	if ( pRoomIndex->vnum == vnum )
-	    return pRoomIndex;
+  for ( pRoomIndex  = room_index_hash[vnum % MAX_KEY_HASH];
+	pRoomIndex;
+	pRoomIndex  = pRoomIndex->next )
+    if ( pRoomIndex->vnum == vnum )
+      return pRoomIndex;
 
-    if ( fBootDb )
-	bug( "Get_room_index: bad vnum %ld.", vnum );
+  if ( fBootDb )
+    bug( "Get_room_index: bad vnum %ld.", vnum );
 
-    return NULL;
+  return NULL;
 }
-
-
 
 /*
  * Added lots of EOF checks, as most of the file crashes are based on them.
@@ -2077,22 +2105,24 @@ ROOM_INDEX_DATA *get_room_index( long vnum )
  */
 char fread_letter( FILE *fp )
 {
-    char c;
+  char c;
 
-    do
+  do
     {
-        if ( feof(fp) )
+      if ( feof(fp) )
         {
           bug("fread_letter: EOF encountered on read.\r\n");
           if ( fBootDb )
             exit(1);
+
           return '\0';
         }
-	c = getc( fp );
-    }
-    while ( isspace(c) );
 
-    return c;
+      c = getc( fp );
+    }
+  while ( isspace(c) );
+
+  return c;
 }
 
 
@@ -2551,69 +2581,42 @@ int number_fuzzy( int number )
     return UMAX( 1, number );
 }
 
-
-
 /*
  * Generate a random number.
  */
 int number_range( int from, int to )
 {
-/*    int power;
-    int number;*/
+  if ( ( to = to - from + 1 ) <= 1 )
+    return from;
 
-    if ( ( to = to - from + 1 ) <= 1 )
-	return from;
-
-/*    for ( power = 2; power < to; power <<= 1 )
-	;
-
-    while ( ( number = number_mm( ) & (power - 1) ) >= to )
-	;
-
-    return from + number;*/
-    return (number_mm() % to) + from;
+  return (number_mm() % to) + from;
 }
-
-
 
 /*
  * Generate a percentile roll.
  */
 int number_percent( void )
 {
-/*    int percent;
-
-    while ( ( percent = number_mm( ) & (128-1) ) > 99 )
-	;
-
-    return 1 + percent;*/
-    return number_mm() % 100;
+  return number_mm() % 100;
 }
-
-
 
 /*
  * Generate a random door.
  */
 int number_door( void )
 {
-    int door;
+  int door;
 
-    while ( ( door = number_mm( ) & (16-1) ) > 9 )
-	;
+  while ( ( door = number_mm( ) & (16-1) ) > 9 )
+    ;
 
-    return door;
-/*    return number_mm() & 10; */
+  return door;
 }
-
-
 
 int number_bits( int width )
 {
-    return number_mm( ) & ( ( 1 << width ) - 1 );
+  return number_mm( ) & ( ( 1 << width ) - 1 );
 }
-
-
 
 /*
  * I've gotten too many bad reports on OS-supplied random number generators.
@@ -2696,7 +2699,7 @@ int dice( int number, int size )
  */
 int interpolate( int level, int value_00, int value_32 )
 {
-    return value_00 + level * (value_32 - value_00) / 32;
+  return value_00 + level * (value_32 - value_00) / 32;
 }
 
 
@@ -2706,11 +2709,11 @@ int interpolate( int level, int value_00, int value_32 )
  */
 void smash_tilde( char *str )
 {
-    for ( ; *str != '\0'; str++ )
-	if ( *str == '~' )
-	    *str = '-';
+  for ( ; *str != '\0'; str++ )
+    if ( *str == '~' )
+      *str = '-';
 
-    return;
+  return;
 }
 
 /*
@@ -2719,32 +2722,30 @@ void smash_tilde( char *str )
  */
 void hide_tilde( char *str )
 {
-    for ( ; *str != '\0'; str++ )
-	if ( *str == '~' )
-	    *str = HIDDEN_TILDE;
+  for ( ; *str != '\0'; str++ )
+    if ( *str == '~' )
+      *str = HIDDEN_TILDE;
 
-    return;
+  return;
 }
 
 char *show_tilde( char *str )
 {
-    static char buf[MAX_STRING_LENGTH];
-    char *bufptr;
+  static char buf[MAX_STRING_LENGTH];
+  char *bufptr;
 
-    bufptr = buf;
-    for ( ; *str != '\0'; str++, bufptr++ )
+  bufptr = buf;
+  for ( ; *str != '\0'; str++, bufptr++ )
     {
-	if ( *str == HIDDEN_TILDE )
-	    *bufptr = '~';
-	else
-	    *bufptr = *str;
+      if ( *str == HIDDEN_TILDE )
+	*bufptr = '~';
+      else
+	*bufptr = *str;
     }
-    *bufptr = '\0';
+  *bufptr = '\0';
 
-    return buf;
+  return buf;
 }
-
-
 
 /*
  * Compare strings, case insensitive.
@@ -2965,19 +2966,14 @@ void append_file( CHAR_DATA *ch, const char *file, const char *str )
  */
 void append_to_file( const char *file, const char *str )
 {
-    FILE *fp;
+  FILE *fp;
 
-    if ( ( fp = fopen( file, "a" ) ) == NULL )
-    {}
-    else
+  if ( ( fp = fopen( file, "a" ) ) )
     {
-	fprintf( fp, "%s\n", str );
-	fclose( fp );
+      fprintf( fp, "%s\n", str );
+      fclose( fp );
     }
-
-    return;
 }
-
 
 /*
  * Reports a bug.
@@ -3946,87 +3942,92 @@ ROOM_INDEX_DATA *make_ship_room( SHIP_DATA * ship )
  */
 OBJ_INDEX_DATA *make_object( long vnum, long cvnum, char *name )
 {
-	OBJ_INDEX_DATA *pObjIndex, *cObjIndex;
-	char buf[MAX_STRING_LENGTH];
-	int	iHash;
+  OBJ_INDEX_DATA *pObjIndex, *cObjIndex;
+  char buf[MAX_STRING_LENGTH];
+  int	iHash;
 
-	if ( cvnum > 0 )
-	  cObjIndex = get_obj_index( cvnum );
-	else
-	  cObjIndex = NULL;
-	CREATE( pObjIndex, OBJ_INDEX_DATA, 1 );
-	pObjIndex->vnum			= vnum;
-	pObjIndex->name			= STRALLOC( name );
-	pObjIndex->first_affect		= NULL;
-	pObjIndex->last_affect		= NULL;
-	pObjIndex->first_extradesc	= NULL;
-	pObjIndex->last_extradesc	= NULL;
-	if ( !cObjIndex )
+  if ( cvnum > 0 )
+    cObjIndex = get_obj_index( cvnum );
+  else
+    cObjIndex = NULL;
+
+  CREATE( pObjIndex, OBJ_INDEX_DATA, 1 );
+  pObjIndex->vnum			= vnum;
+  pObjIndex->name			= STRALLOC( name );
+  pObjIndex->first_affect		= NULL;
+  pObjIndex->last_affect		= NULL;
+  pObjIndex->first_extradesc	= NULL;
+  pObjIndex->last_extradesc	= NULL;
+
+  if ( !cObjIndex )
+    {
+      sprintf( buf, "A %s", name );
+      pObjIndex->short_descr	= STRALLOC( buf  );
+      sprintf( buf, "A %s is here.", name );
+      pObjIndex->description	= STRALLOC( buf );
+      pObjIndex->action_desc	= STRALLOC( "" );
+      pObjIndex->short_descr[0]	= LOWER(pObjIndex->short_descr[0]);
+      pObjIndex->description[0]	= UPPER(pObjIndex->description[0]);
+      pObjIndex->item_type		= ITEM_TRASH;
+      pObjIndex->extra_flags	= ITEM_PROTOTYPE;
+      pObjIndex->wear_flags		= 0;
+      pObjIndex->value[0]		= 0;
+      pObjIndex->value[1]		= 0;
+      pObjIndex->value[2]		= 0;
+      pObjIndex->value[3]		= 0;
+      pObjIndex->weight		= 1;
+      pObjIndex->cost		= 0;
+    }
+  else
+    {
+      EXTRA_DESCR_DATA *ed,  *ced;
+      AFFECT_DATA	   *paf, *cpaf;
+
+      pObjIndex->short_descr	= QUICKLINK( cObjIndex->short_descr );
+      pObjIndex->description	= QUICKLINK( cObjIndex->description );
+      pObjIndex->action_desc	= QUICKLINK( cObjIndex->action_desc );
+      pObjIndex->item_type		= cObjIndex->item_type;
+      pObjIndex->extra_flags	= cObjIndex->extra_flags
+	| ITEM_PROTOTYPE;
+      pObjIndex->wear_flags		= cObjIndex->wear_flags;
+      pObjIndex->value[0]		= cObjIndex->value[0];
+      pObjIndex->value[1]		= cObjIndex->value[1];
+      pObjIndex->value[2]		= cObjIndex->value[2];
+      pObjIndex->value[3]		= cObjIndex->value[3];
+      pObjIndex->weight		= cObjIndex->weight;
+      pObjIndex->cost		= cObjIndex->cost;
+
+      for ( ced = cObjIndex->first_extradesc; ced; ced = ced->next )
 	{
-	  sprintf( buf, "A %s", name );
-	  pObjIndex->short_descr	= STRALLOC( buf  );
-	  sprintf( buf, "A %s is here.", name );
-	  pObjIndex->description	= STRALLOC( buf );
-	  pObjIndex->action_desc	= STRALLOC( "" );
-	  pObjIndex->short_descr[0]	= LOWER(pObjIndex->short_descr[0]);
-	  pObjIndex->description[0]	= UPPER(pObjIndex->description[0]);
-	  pObjIndex->item_type		= ITEM_TRASH;
-	  pObjIndex->extra_flags	= ITEM_PROTOTYPE;
-	  pObjIndex->wear_flags		= 0;
-	  pObjIndex->value[0]		= 0;
-	  pObjIndex->value[1]		= 0;
-	  pObjIndex->value[2]		= 0;
-	  pObjIndex->value[3]		= 0;
-	  pObjIndex->weight		= 1;
-	  pObjIndex->cost		= 0;
+	  CREATE( ed, EXTRA_DESCR_DATA, 1 );
+	  ed->keyword		= QUICKLINK( ced->keyword );
+	  ed->description		= QUICKLINK( ced->description );
+	  LINK( ed, pObjIndex->first_extradesc, pObjIndex->last_extradesc,
+		next, prev );
+	  top_ed++;
 	}
-	else
+
+      for ( cpaf = cObjIndex->first_affect; cpaf; cpaf = cpaf->next )
 	{
-	  EXTRA_DESCR_DATA *ed,  *ced;
-	  AFFECT_DATA	   *paf, *cpaf;
-
-	  pObjIndex->short_descr	= QUICKLINK( cObjIndex->short_descr );
-	  pObjIndex->description	= QUICKLINK( cObjIndex->description );
-	  pObjIndex->action_desc	= QUICKLINK( cObjIndex->action_desc );
-	  pObjIndex->item_type		= cObjIndex->item_type;
-	  pObjIndex->extra_flags	= cObjIndex->extra_flags
-	  				| ITEM_PROTOTYPE;
-	  pObjIndex->wear_flags		= cObjIndex->wear_flags;
-	  pObjIndex->value[0]		= cObjIndex->value[0];
-	  pObjIndex->value[1]		= cObjIndex->value[1];
-	  pObjIndex->value[2]		= cObjIndex->value[2];
-	  pObjIndex->value[3]		= cObjIndex->value[3];
-	  pObjIndex->weight		= cObjIndex->weight;
-	  pObjIndex->cost		= cObjIndex->cost;
-	  for ( ced = cObjIndex->first_extradesc; ced; ced = ced->next )
-	  {
-		CREATE( ed, EXTRA_DESCR_DATA, 1 );
-		ed->keyword		= QUICKLINK( ced->keyword );
-		ed->description		= QUICKLINK( ced->description );
-		LINK( ed, pObjIndex->first_extradesc, pObjIndex->last_extradesc,
-			  next, prev );
-		top_ed++;
-	  }
-	  for ( cpaf = cObjIndex->first_affect; cpaf; cpaf = cpaf->next )
-	  {
-		CREATE( paf, AFFECT_DATA, 1 );
-		paf->type		= cpaf->type;
-		paf->duration		= cpaf->duration;
-		paf->location		= cpaf->location;
-		paf->modifier		= cpaf->modifier;
-		paf->bitvector		= cpaf->bitvector;
-		LINK( paf, pObjIndex->first_affect, pObjIndex->last_affect,
-			   next, prev );
-		top_affect++;
-	  }
+	  CREATE( paf, AFFECT_DATA, 1 );
+	  paf->type		= cpaf->type;
+	  paf->duration		= cpaf->duration;
+	  paf->location		= cpaf->location;
+	  paf->modifier		= cpaf->modifier;
+	  paf->bitvector		= cpaf->bitvector;
+	  LINK( paf, pObjIndex->first_affect, pObjIndex->last_affect,
+		next, prev );
+	  top_affect++;
 	}
-	pObjIndex->count		= 0;
-	iHash				= vnum % MAX_KEY_HASH;
-	pObjIndex->next			= obj_index_hash[iHash];
-	obj_index_hash[iHash]		= pObjIndex;
-	top_obj_index++;
+    }
 
-	return pObjIndex;
+  pObjIndex->count		= 0;
+  iHash				= vnum % MAX_KEY_HASH;
+  pObjIndex->next			= obj_index_hash[iHash];
+  obj_index_hash[iHash]		= pObjIndex;
+  top_obj_index++;
+
+  return pObjIndex;
 }
 
 /*
@@ -4035,116 +4036,119 @@ OBJ_INDEX_DATA *make_object( long vnum, long cvnum, char *name )
  */
 MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
 {
-	MOB_INDEX_DATA *pMobIndex, *cMobIndex;
-	char buf[MAX_STRING_LENGTH];
-	int	iHash;
+  MOB_INDEX_DATA *pMobIndex, *cMobIndex;
+  char buf[MAX_STRING_LENGTH];
+  int	iHash;
 
-	if ( cvnum > 0 )
-	  cMobIndex = get_mob_index( cvnum );
-	else
-	  cMobIndex = NULL;
-	CREATE( pMobIndex, MOB_INDEX_DATA, 1 );
-	pMobIndex->vnum			= vnum;
-	pMobIndex->count		= 0;
-	pMobIndex->killed		= 0;
-	pMobIndex->player_name		= STRALLOC( name );
-	if ( !cMobIndex )
-	{
-	  sprintf( buf, "A newly created %s", name );
-	  pMobIndex->short_descr	= STRALLOC( buf  );
-	  sprintf( buf, "Some god abandoned a newly created %s here.\r\n", name );
-	  pMobIndex->long_descr		= STRALLOC( buf );
-	  pMobIndex->description	= STRALLOC( "" );
-	  pMobIndex->short_descr[0]	= LOWER(pMobIndex->short_descr[0]);
-	  pMobIndex->long_descr[0]	= UPPER(pMobIndex->long_descr[0]);
-	  pMobIndex->description[0]	= UPPER(pMobIndex->description[0]);
-	  pMobIndex->act		= ACT_IS_NPC | ACT_PROTOTYPE;
-	  pMobIndex->affected_by	= 0;
-	  pMobIndex->pShop		= NULL;
-	  pMobIndex->rShop		= NULL;
-	  pMobIndex->spec_fun		= NULL;
-	  pMobIndex->spec_2		= NULL;
-	  pMobIndex->mudprogs		= NULL;
-	  pMobIndex->progtypes		= 0;
-	  pMobIndex->alignment		= 0;
-	  pMobIndex->level		= 1;
-	  pMobIndex->mobthac0		= 0;
-	  pMobIndex->ac			= 0;
-	  pMobIndex->hitnodice		= 0;
-	  pMobIndex->hitsizedice	= 0;
-	  pMobIndex->hitplus		= 0;
-	  pMobIndex->damnodice		= 0;
-	  pMobIndex->damsizedice	= 0;
-	  pMobIndex->damplus		= 0;
-	  pMobIndex->gold		= 0;
-	  pMobIndex->exp		= 0;
-	  pMobIndex->position		= 8;
-	  pMobIndex->defposition	= 8;
-	  pMobIndex->sex		= 0;
-	  pMobIndex->perm_str		= 10;
-	  pMobIndex->perm_dex		= 10;
-	  pMobIndex->perm_int		= 10;
-	  pMobIndex->perm_wis		= 10;
-	  pMobIndex->perm_cha		= 10;
-	  pMobIndex->perm_con		= 10;
-	  pMobIndex->perm_lck		= 10;
-	  pMobIndex->xflags		= 0;
-	  pMobIndex->resistant		= 0;
-	  pMobIndex->immune		= 0;
-	  pMobIndex->susceptible	= 0;
-	  pMobIndex->numattacks		= 0;
-	  pMobIndex->attacks		= 0;
-	  pMobIndex->defenses		= 0;
-	}
-	else
-	{
-	  pMobIndex->short_descr	= QUICKLINK( cMobIndex->short_descr );
-	  pMobIndex->long_descr		= QUICKLINK( cMobIndex->long_descr  );
-	  pMobIndex->description	= QUICKLINK( cMobIndex->description );
-	  pMobIndex->act		= cMobIndex->act | ACT_PROTOTYPE;
-	  pMobIndex->affected_by	= cMobIndex->affected_by;
-	  pMobIndex->pShop		= NULL;
-	  pMobIndex->rShop		= NULL;
-	  pMobIndex->spec_fun		= cMobIndex->spec_fun;
-	  pMobIndex->spec_2		= cMobIndex->spec_2;
-	  pMobIndex->mudprogs		= NULL;
-	  pMobIndex->progtypes		= 0;
-	  pMobIndex->alignment		= cMobIndex->alignment;
-	  pMobIndex->level		= cMobIndex->level;
-	  pMobIndex->mobthac0		= cMobIndex->mobthac0;
-	  pMobIndex->ac			= cMobIndex->ac;
-	  pMobIndex->hitnodice		= cMobIndex->hitnodice;
-	  pMobIndex->hitsizedice	= cMobIndex->hitsizedice;
-	  pMobIndex->hitplus		= cMobIndex->hitplus;
-	  pMobIndex->damnodice		= cMobIndex->damnodice;
-	  pMobIndex->damsizedice	= cMobIndex->damsizedice;
-	  pMobIndex->damplus		= cMobIndex->damplus;
-	  pMobIndex->gold		= cMobIndex->gold;
-	  pMobIndex->exp		= cMobIndex->exp;
-	  pMobIndex->position		= cMobIndex->position;
-	  pMobIndex->defposition	= cMobIndex->defposition;
-	  pMobIndex->sex		= cMobIndex->sex;
-	  pMobIndex->perm_str		= cMobIndex->perm_str;
-	  pMobIndex->perm_dex		= cMobIndex->perm_dex;
-	  pMobIndex->perm_int		= cMobIndex->perm_int;
-	  pMobIndex->perm_wis		= cMobIndex->perm_wis;
-	  pMobIndex->perm_cha		= cMobIndex->perm_cha;
-	  pMobIndex->perm_con		= cMobIndex->perm_con;
-	  pMobIndex->perm_lck		= cMobIndex->perm_lck;
-	  pMobIndex->xflags		= cMobIndex->xflags;
-	  pMobIndex->resistant		= cMobIndex->resistant;
-	  pMobIndex->immune		= cMobIndex->immune;
-	  pMobIndex->susceptible	= cMobIndex->susceptible;
-	  pMobIndex->numattacks		= cMobIndex->numattacks;
-	  pMobIndex->attacks		= cMobIndex->attacks;
-	  pMobIndex->defenses		= cMobIndex->defenses;
-	}
-	iHash				= vnum % MAX_KEY_HASH;
-	pMobIndex->next			= mob_index_hash[iHash];
-	mob_index_hash[iHash]		= pMobIndex;
-	top_mob_index++;
+  if ( cvnum > 0 )
+    cMobIndex = get_mob_index( cvnum );
+  else
+    cMobIndex = NULL;
 
-	return pMobIndex;
+  CREATE( pMobIndex, MOB_INDEX_DATA, 1 );
+  pMobIndex->vnum			= vnum;
+  pMobIndex->count		= 0;
+  pMobIndex->killed		= 0;
+  pMobIndex->player_name		= STRALLOC( name );
+
+  if ( !cMobIndex )
+    {
+      sprintf( buf, "A newly created %s", name );
+      pMobIndex->short_descr	= STRALLOC( buf  );
+      sprintf( buf, "Some god abandoned a newly created %s here.\r\n", name );
+      pMobIndex->long_descr		= STRALLOC( buf );
+      pMobIndex->description	= STRALLOC( "" );
+      pMobIndex->short_descr[0]	= LOWER(pMobIndex->short_descr[0]);
+      pMobIndex->long_descr[0]	= UPPER(pMobIndex->long_descr[0]);
+      pMobIndex->description[0]	= UPPER(pMobIndex->description[0]);
+      pMobIndex->act		= ACT_IS_NPC | ACT_PROTOTYPE;
+      pMobIndex->affected_by	= 0;
+      pMobIndex->pShop		= NULL;
+      pMobIndex->rShop		= NULL;
+      pMobIndex->spec_fun		= NULL;
+      pMobIndex->spec_2		= NULL;
+      pMobIndex->mudprogs		= NULL;
+      pMobIndex->progtypes		= 0;
+      pMobIndex->alignment		= 0;
+      pMobIndex->level		= 1;
+      pMobIndex->mobthac0		= 0;
+      pMobIndex->ac			= 0;
+      pMobIndex->hitnodice		= 0;
+      pMobIndex->hitsizedice	= 0;
+      pMobIndex->hitplus		= 0;
+      pMobIndex->damnodice		= 0;
+      pMobIndex->damsizedice	= 0;
+      pMobIndex->damplus		= 0;
+      pMobIndex->gold		= 0;
+      pMobIndex->exp		= 0;
+      pMobIndex->position		= 8;
+      pMobIndex->defposition	= 8;
+      pMobIndex->sex		= 0;
+      pMobIndex->perm_str		= 10;
+      pMobIndex->perm_dex		= 10;
+      pMobIndex->perm_int		= 10;
+      pMobIndex->perm_wis		= 10;
+      pMobIndex->perm_cha		= 10;
+      pMobIndex->perm_con		= 10;
+      pMobIndex->perm_lck		= 10;
+      pMobIndex->xflags		= 0;
+      pMobIndex->resistant		= 0;
+      pMobIndex->immune		= 0;
+      pMobIndex->susceptible	= 0;
+      pMobIndex->numattacks		= 0;
+      pMobIndex->attacks		= 0;
+      pMobIndex->defenses		= 0;
+    }
+  else
+    {
+      pMobIndex->short_descr	= QUICKLINK( cMobIndex->short_descr );
+      pMobIndex->long_descr		= QUICKLINK( cMobIndex->long_descr  );
+      pMobIndex->description	= QUICKLINK( cMobIndex->description );
+      pMobIndex->act		= cMobIndex->act | ACT_PROTOTYPE;
+      pMobIndex->affected_by	= cMobIndex->affected_by;
+      pMobIndex->pShop		= NULL;
+      pMobIndex->rShop		= NULL;
+      pMobIndex->spec_fun		= cMobIndex->spec_fun;
+      pMobIndex->spec_2		= cMobIndex->spec_2;
+      pMobIndex->mudprogs		= NULL;
+      pMobIndex->progtypes		= 0;
+      pMobIndex->alignment		= cMobIndex->alignment;
+      pMobIndex->level		= cMobIndex->level;
+      pMobIndex->mobthac0		= cMobIndex->mobthac0;
+      pMobIndex->ac			= cMobIndex->ac;
+      pMobIndex->hitnodice		= cMobIndex->hitnodice;
+      pMobIndex->hitsizedice	= cMobIndex->hitsizedice;
+      pMobIndex->hitplus		= cMobIndex->hitplus;
+      pMobIndex->damnodice		= cMobIndex->damnodice;
+      pMobIndex->damsizedice	= cMobIndex->damsizedice;
+      pMobIndex->damplus		= cMobIndex->damplus;
+      pMobIndex->gold		= cMobIndex->gold;
+      pMobIndex->exp		= cMobIndex->exp;
+      pMobIndex->position		= cMobIndex->position;
+      pMobIndex->defposition	= cMobIndex->defposition;
+      pMobIndex->sex		= cMobIndex->sex;
+      pMobIndex->perm_str		= cMobIndex->perm_str;
+      pMobIndex->perm_dex		= cMobIndex->perm_dex;
+      pMobIndex->perm_int		= cMobIndex->perm_int;
+      pMobIndex->perm_wis		= cMobIndex->perm_wis;
+      pMobIndex->perm_cha		= cMobIndex->perm_cha;
+      pMobIndex->perm_con		= cMobIndex->perm_con;
+      pMobIndex->perm_lck		= cMobIndex->perm_lck;
+      pMobIndex->xflags		= cMobIndex->xflags;
+      pMobIndex->resistant		= cMobIndex->resistant;
+      pMobIndex->immune		= cMobIndex->immune;
+      pMobIndex->susceptible	= cMobIndex->susceptible;
+      pMobIndex->numattacks		= cMobIndex->numattacks;
+      pMobIndex->attacks		= cMobIndex->attacks;
+      pMobIndex->defenses		= cMobIndex->defenses;
+    }
+
+  iHash				= vnum % MAX_KEY_HASH;
+  pMobIndex->next			= mob_index_hash[iHash];
+  mob_index_hash[iHash]		= pMobIndex;
+  top_mob_index++;
+
+  return pMobIndex;
 }
 
 /*
@@ -4397,37 +4401,21 @@ void sort_area( AREA_DATA *pArea, bool proto )
     }
 }
 
-
-/*
- * Display vnums currently assigned to areas		-Altrag & Thoric
- * Sorted, and flagged if loaded.
- */
-void show_vnums( CHAR_DATA *ch, int low, int high, bool proto, bool shownl,
-		 const char *loadst, const char *notloadst )
-{
-    return;
-}
-
 /*
  * Shows prototype vnums ranges, and if loaded
  */
 
 void do_vnums( CHAR_DATA *ch, char *argument )
 {
-    char arg1[MAX_INPUT_LENGTH];
-    char arg2[MAX_INPUT_LENGTH];
-    int low, high;
+  AREA_DATA *pArea = NULL;
+  size_t counter = 1;
 
-    argument = one_argument( argument, arg1 );
-    argument = one_argument( argument, arg2 );
-    low = 0;	high = 32766;
-    if ( arg1[0] != '\0' )
+  for( pArea = first_area; pArea; pArea = pArea->next, ++counter )
     {
-	low = atoi(arg1);
-	if ( arg2[0] != '\0' )
-	  high = atoi(arg2);
+      ch_printf( ch, "%2d) %-10s : %5d - %-5d\r\n",
+                 counter, pArea->filename,
+                 pArea->first_room->vnum, pArea->last_room->vnum );
     }
-    show_vnums( ch, low, high, TRUE, TRUE, " *", "" );
 }
 
 /*
