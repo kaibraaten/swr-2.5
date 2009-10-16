@@ -44,7 +44,7 @@ int ch_slookup( CHAR_DATA *ch, const char *name )
     {
 	if ( !skill_table[sn]->name )
 	    break;
-	if (  ch->pcdata->learned[sn] > 0
+	if (  character_skill_level( ch, sn ) > 0
 	&&    LOWER(name[0]) == LOWER(skill_table[sn]->name[0])
 	&&   !str_prefix( name, skill_table[sn]->name ) )
 	    return sn;
@@ -163,7 +163,7 @@ int ch_bsearch_skill( CHAR_DATA *ch, const char *name, int first, int top )
 
 	if ( LOWER(name[0]) == LOWER(skill_table[sn]->name[0])
 	&&  !str_prefix(name, skill_table[sn]->name)
-	&&   ch->pcdata->learned[sn] > 0 )
+	     &&   character_skill_level( ch, sn ) > 0 )
 		return sn;
 	if (first >= top)
 	    return -1;
@@ -777,7 +777,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
 	if ( !IS_IMMORTAL(ch) )
 	{
 	    if ( ( sn = find_spell( ch, arg1, TRUE ) ) < 0
-	    || ( !IS_NPC(ch) &&  ch->pcdata->learned[sn] <= 0  ) )
+		 || ( !IS_NPC(ch) && character_skill_level( ch, sn ) <= 0  ) )
 	    {
 		send_to_char( "You can't do that.\r\n", ch );
 		return;
@@ -1014,7 +1014,7 @@ void do_cast( CHAR_DATA *ch, char *argument )
       }
     }    
     if ( !IS_NPC(ch)
-    &&   (number_percent( ) + skill->difficulty * 5) > ch->pcdata->learned[sn] )
+	 && (number_percent() + skill->difficulty * 5) > character_skill_level( ch, sn ) )
     {
 	/* Some more interesting loss of concentration messages  -Thoric */
 	switch( number_bits(2) )

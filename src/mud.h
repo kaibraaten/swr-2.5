@@ -3733,6 +3733,7 @@ void	release_supermob	args( ( ) );
 void	set_title	args( ( CHAR_DATA *ch, char *title ) );
 
 /* skills.c */
+int character_skill_level( const CHAR_DATA *ch, short skill );
 bool	check_skill		args( ( CHAR_DATA *ch, char *command, char *argument ) );
 void	learn_from_success	args( ( CHAR_DATA *ch, int sn ) );
 void	learn_from_failure	args( ( CHAR_DATA *ch, int sn ) );

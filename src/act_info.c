@@ -616,15 +616,14 @@ void show_char_to_char_1( CHAR_DATA *victim, CHAR_DATA *ch )
     if ( IS_NPC(ch) || victim == ch )
       return;
 
-    if ( number_percent( ) < ch->pcdata->learned[gsn_peek] )
+    if ( number_percent( ) < character_skill_level( ch, gsn_peek ) )
     {
 	send_to_char( "\r\nYou peek at the inventory:\r\n", ch );
 	show_list_to_char( victim->first_carrying, ch, TRUE, TRUE );
 	learn_from_success( ch, gsn_peek );
     }
-    else
-      if ( ch->pcdata->learned[gsn_peek] )
-        learn_from_failure( ch, gsn_peek );
+    else if ( character_skill_level( ch, gsn_peek ) )
+      learn_from_failure( ch, gsn_peek );
 
     return;
 }
@@ -2317,13 +2316,13 @@ void do_forget( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if ( ch->pcdata->learned[sn] <= 0 ) 
+    if ( character_skill_level( ch, sn ) <= 0 ) 
     {
         send_to_char( "You don't know that skill...\r\n", ch );
 	return;
     }
 
-    if ( ch->pcdata->learned[sn] > 50 ) 
+    if ( character_skill_level( ch, sn ) > 50 ) 
     {
         send_to_char( "You cannot forget something you know so well...\r\n", ch );
 	return;
@@ -2385,7 +2384,7 @@ void do_teach( CHAR_DATA *ch, char *argument )
 	
 	adept = 20;
 
-	if ( victim->pcdata->learned[sn] >= adept )
+	if ( character_skill_level( victim, sn ) >= adept )
 	{
 	    act( AT_TELL, "$n must practice that on their own.", victim, NULL, ch, TO_VICT );
 	    return;
@@ -2434,14 +2433,14 @@ void do_teach( CHAR_DATA *ch, char *argument )
                  return;
 	  }
 		
-	if ( ch->pcdata->learned[sn] < 100 )
+	if ( character_skill_level( ch, sn ) < 100 )
 	{
 	    act( AT_TELL, "You must perfect that yourself before teaching others.", victim, NULL, ch, TO_VICT );
 	    return;
 	}
 	else
 	{
-	    if ( victim->pcdata->learned[sn] <= 0 )
+	  if ( character_skill_level( victim, sn ) <= 0 )
                   victim->pcdata->num_skills++;
 	    victim->pcdata->learned[sn] += int_app[get_curr_int(ch)].learn;
 	    sprintf( buf, "You teach %s $T.", victim->name );

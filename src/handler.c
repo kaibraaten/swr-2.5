@@ -436,79 +436,79 @@ void affect_modify( CHAR_DATA *ch, AFFECT_DATA *paf, bool fAdd )
 
     case APPLY_PALM:	/* not implemented yet */		break;
     case APPLY_TRACK:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_track]> 0 )
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_track ) > 0 )
 	  ch->pcdata->learned[gsn_track] =
-		UMAX( 1, ch->pcdata->learned[gsn_track] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_track ) + mod );
 	break;
     case APPLY_HIDE:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_hide]> 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_hide ) > 0)
 	  ch->pcdata->learned[gsn_hide] = 
-		UMAX( 1, ch->pcdata->learned[gsn_hide] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_hide ) + mod );
 	break;
     case APPLY_STEAL:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_steal] > 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_steal ) > 0)
 	  ch->pcdata->learned[gsn_steal] =
-		UMAX( 1, ch->pcdata->learned[gsn_steal] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_steal ) + mod );
 	break;
     case APPLY_SNEAK:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_sneak]> 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_sneak ) > 0)
 	  ch->pcdata->learned[gsn_sneak] =
-		UMAX( 1, ch->pcdata->learned[gsn_sneak] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_sneak ) + mod );
 	break;
     case APPLY_PICK:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_pick_lock]> 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_pick_lock ) > 0)
 	  ch->pcdata->learned[gsn_pick_lock] =
-		UMAX( 1, ch->pcdata->learned[gsn_pick_lock] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_pick_lock ) + mod );
 	break;
     case APPLY_BACKSTAB:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_backstab]> 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_backstab ) > 0)
 	  ch->pcdata->learned[gsn_backstab] =
-		UMAX( 1, ch->pcdata->learned[gsn_backstab] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_backstab ) + mod );
 	break;
     case APPLY_DODGE:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_dodge]> 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_dodge ) > 0)
 	  ch->pcdata->learned[gsn_dodge] =
-		UMAX( 1, ch->pcdata->learned[gsn_dodge] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_dodge ) + mod );
 	break;
     case APPLY_PEEK:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_peek]> 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_peek ) > 0)
 	  ch->pcdata->learned[gsn_peek] =
-		UMAX( 1, ch->pcdata->learned[gsn_peek] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_peek ) + mod );
 	break;
     case APPLY_GOUGE:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_gouge]> 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_gouge ) > 0)
 	  ch->pcdata->learned[gsn_gouge] =
-		UMAX( 1, ch->pcdata->learned[gsn_gouge] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_gouge ) + mod );
 	break;
     case APPLY_MOUNT:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_mount]> 0 )
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_mount ) > 0 )
 	  ch->pcdata->learned[gsn_mount] =
-		UMAX( 1, ch->pcdata->learned[gsn_mount] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_mount ) + mod );
 	break;
     case APPLY_DISARM:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_disarm]> 0 )
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_disarm ) > 0 )
 	  ch->pcdata->learned[gsn_disarm] =
-		UMAX( 1, ch->pcdata->learned[gsn_disarm] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_disarm ) + mod );
 	break;
     case APPLY_KICK:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_kick]> 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_kick ) > 0)
 	  ch->pcdata->learned[gsn_kick] =
-		UMAX( 1, ch->pcdata->learned[gsn_kick] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_kick ) + mod );
 	break;
     case APPLY_PARRY:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_parry]> 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_parry ) > 0)
 	  ch->pcdata->learned[gsn_parry] =
-		UMAX( 1, ch->pcdata->learned[gsn_parry] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_parry ) + mod );
 	break;
     case APPLY_CLIMB:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_climb]> 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_climb ) > 0)
 	  ch->pcdata->learned[gsn_climb] =
-		UMAX( 1, ch->pcdata->learned[gsn_climb] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_climb ) + mod );
 	break;
     case APPLY_GRIP:
-	if ( !IS_NPC(ch) && ch->pcdata->learned[gsn_grip]> 0)
+      if ( !IS_NPC(ch) && character_skill_level( ch, gsn_grip ) > 0)
 	  ch->pcdata->learned[gsn_grip] =
-		UMAX( 1, ch->pcdata->learned[gsn_grip] + mod );
+	    UMAX( 1, character_skill_level( ch, gsn_grip ) + mod );
 	break;
     }
 

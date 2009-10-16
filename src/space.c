@@ -2909,16 +2909,15 @@ void destroy_ship( SHIP_DATA *ship , CHAR_DATA *killer )
 
 bool ship_to_room(SHIP_DATA *ship , long vnum )
 {
-    ROOM_INDEX_DATA *shipto;
+  ROOM_INDEX_DATA *shipto = NULL;
     
-    if ( (shipto=get_room_index(vnum)) == NULL )
-            return FALSE;
+  if ( (shipto=get_room_index(vnum)) == NULL )
+    return FALSE;
             
-    LINK( ship, shipto->first_ship, shipto->last_ship, next_in_room, prev_in_room );
-    ship->in_room = shipto; 
-    return TRUE;
+  LINK( ship, shipto->first_ship, shipto->last_ship, next_in_room, prev_in_room );
+  ship->in_room = shipto; 
+  return TRUE;
 }
-
 
 void do_board( CHAR_DATA *ch, char *argument )
 {
@@ -3042,135 +3041,134 @@ void do_leaveship( CHAR_DATA *ch, char *argument )
         send_to_char ( "The exit doesn't seem to be working properly.\r\n", ch );  
 }
 
-void do_launch
-( CHAR_DATA *ch, char *argument )
+void do_launch( CHAR_DATA *ch, char *argument )
 {
-    int chance; 
-    long price = 0;
-    SHIP_DATA *ship;
-    char buf[MAX_STRING_LENGTH];
-            
-    	        if ( (ship = ship_from_pilotseat(ch->in_room)) == NULL )  
-    	        {
-    	            send_to_char("&RYou must be in the pilots seat of a ship to do that!\r\n",ch);
-    	            return;
-    	        }
-    	        
-    	        if ( ship->ship_class > SPACE_STATION )
-    	        {
-    	            send_to_char("&RThis isn't a spacecraft!\r\n",ch);
-    	            return;
-    	        }
-    	        
-    	        if ( autofly(ship) )
-    	        {
-    	            send_to_char("&RThe ship is set on autopilot, you'll have to turn it off first.\r\n",ch);
-    	            return;
-    	        }
-    	        
-                if  ( ship->ship_class == SPACE_STATION )
-                {
-                   send_to_char( "You can't do that here.\r\n" , ch );
-                   return;
-                }   
-    
-    	        if ( !check_pilot( ch , ship ) )
-    	        {
-    	            send_to_char("&RHey, thats not your ship! Try renting a public one.\r\n",ch);
-    	            return;
-    	        }
-    	        
-    	        if ( ship->lastdoc != ship->location )
-                {
-                     send_to_char("&rYou don't seem to be docked right now.\r\n",ch);
-                     return;
-                }
-    
-    	        if ( ship->shipstate != SHIP_DOCKED && ship->shipstate != SHIP_DISABLED )
-    	        {
-    	            send_to_char("The ship is not docked right now.\r\n",ch);
-    	            return;
-    	        }
-                
-                chance = IS_NPC(ch) ? 100
-	                 : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
-                if ( number_percent( ) < chance )
-    		{  
-                       price=20;
-                      
-                     price += ( ship->maxhull-ship->hull );
-                     if (ship->missiles )
-     	                 price += ( 50 * (ship->maxmissiles-ship->missiles) );
-                     
-                     if (ship->shipstate == SHIP_DISABLED )
-                            price += 200;
-                     if ( ship->missilestate == MISSILE_DAMAGED )
-                            price += 100;
-                     if ( ship->laserstate == LASER_DAMAGED )
-                            price += 50;
-                
-    	          if ( ch->pcdata && ch->pcdata->clan && !str_cmp(ch->pcdata->clan->name,ship->owner) ) 
-                  {
-                   if ( ch->pcdata->clan->funds < price )
-                   {
-                       ch_printf(ch, "&R%s doesn't have enough funds to prepare this ship for launch.\r\n", ch->pcdata->clan->name );
-                       return;
-                   }
-    
-                   ch->pcdata->clan->funds -= price;
-                   ch_printf(ch, "&GIt costs %s %ld credits to ready this ship for launch.\r\n", ch->pcdata->clan->name, price );   
-                  }
-                  else
-                  {
-                   if ( ch->gold < price )
-                   {
-                       ch_printf(ch, "&RYou don't have enough funds to prepare this ship for launch.\r\n");
-                       return;
-                   }
-    
-                   ch->gold -= price;
-                   ch_printf(ch, "&GYou pay %ld credits to ready the ship for launch.\r\n", price );   
-                
-                  }
-                
-                  ship->energy = ship->maxenergy;
-                  ship->chaff = ship->maxchaff;
-                  ship->missiles = ship->maxmissiles;
-       		  ship->shield = 0;
-       		  ship->autorecharge = FALSE;
-       		  ship->autotrack = FALSE;
-       		  ship->autospeed = FALSE;
-       		  ship->hull = ship->maxhull;
-       
-       		  ship->missilestate = MISSILE_READY;
-       		  ship->laserstate = LASER_READY;
-       		  ship->shipstate = SHIP_DOCKED;
-                
-    		   if (ship->hatchopen)
-    		   {
-    		     ship->hatchopen = FALSE;
-    		     sprintf( buf , "The hatch on %s closes." , ship->name);  
-       	             echo_to_room( AT_YELLOW , get_room_index(ship->location) , buf );
-       	             echo_to_room( AT_YELLOW , ship->entrance , "The hatch slides shut." );
-       	             sound_to_room( ship->entrance , "!!SOUND(door)" );
-      		     sound_to_room( get_room_index(ship->location) , "!!SOUND(door)" );
-       	           }
-    		   set_char_color( AT_GREEN, ch );
-    		   send_to_char( "Launch sequence initiated.\r\n", ch);
-    		   act( AT_PLAIN, "$n starts up the ship and begins the launch sequence.", ch,
-		        NULL, argument , TO_ROOM );
-		   echo_to_ship( AT_YELLOW , ship , "The ship hums as it lifts off the ground.");
-    		   sprintf( buf, "%s begins to launch.", ship->name );
-    		   echo_to_room( AT_YELLOW , get_room_index(ship->location) , buf );
-    		   ship->shipstate = SHIP_LAUNCH;
-    		   ship->currspeed = ship->realspeed;
-                   learn_from_success( ch, gsn_spacecraft );
-                   return;   	   	
-                }
-                set_char_color( AT_RED, ch );
-	        send_to_char("You fail to work the controls properly!\r\n",ch);
-    	   	return;	
-    	
+  int chance = 0;
+  long price = 0;
+  SHIP_DATA *ship;
+  char buf[MAX_STRING_LENGTH];
+
+  if ( (ship = ship_from_pilotseat(ch->in_room)) == NULL )  
+    {
+      send_to_char("&RYou must be in the pilots seat of a ship to do that!\r\n",ch);
+      return;
+    }
+
+  if ( ship->ship_class > SPACE_STATION )
+    {
+      send_to_char("&RThis isn't a spacecraft!\r\n",ch);
+      return;
+    }
+
+  if ( autofly(ship) )
+    {
+      send_to_char("&RThe ship is set on autopilot, you'll have to turn it off first.\r\n",ch);
+      return;
+    }
+
+  if  ( ship->ship_class == SPACE_STATION )
+    {
+      send_to_char( "You can't do that here.\r\n" , ch );
+      return;
+    }
+
+  if ( !check_pilot( ch , ship ) )
+    {
+      send_to_char("&RHey, thats not your ship! Try renting a public one.\r\n",ch);
+      return;
+    }
+
+  if ( ship->lastdoc != ship->location )
+    {
+      send_to_char("&rYou don't seem to be docked right now.\r\n",ch);
+      return;
+    }
+
+  if ( ship->shipstate != SHIP_DOCKED && ship->shipstate != SHIP_DISABLED )
+    {
+      send_to_char("The ship is not docked right now.\r\n",ch);
+      return;
+    }
+
+  chance = character_skill_level( ch, gsn_spacecraft );
+
+  if ( number_percent( ) < chance )
+    {
+      price=20;
+      price += ( ship->maxhull-ship->hull );
+
+      if (ship->missiles )
+	price += ( 50 * (ship->maxmissiles-ship->missiles) );
+
+      if (ship->shipstate == SHIP_DISABLED )
+	price += 200;
+
+      if ( ship->missilestate == MISSILE_DAMAGED )
+	price += 100;
+
+      if ( ship->laserstate == LASER_DAMAGED )
+	price += 50;
+
+      if ( ch->pcdata && ch->pcdata->clan && !str_cmp(ch->pcdata->clan->name,ship->owner) ) 
+	{
+	  if ( ch->pcdata->clan->funds < price )
+	    {
+	      ch_printf(ch, "&R%s doesn't have enough funds to prepare this ship for launch.\r\n", ch->pcdata->clan->name );
+	      return;
+	    }
+
+	  ch->pcdata->clan->funds -= price;
+	  ch_printf(ch, "&GIt costs %s %ld credits to ready this ship for launch.\r\n", ch->pcdata->clan->name, price );   
+	}
+      else
+	{
+	  if ( ch->gold < price )
+	    {
+	      ch_printf(ch, "&RYou don't have enough funds to prepare this ship for launch.\r\n");
+	      return;
+	    }
+
+	  ch->gold -= price;
+	  ch_printf(ch, "&GYou pay %ld credits to ready the ship for launch.\r\n", price );   
+	}
+
+      ship->energy = ship->maxenergy;
+      ship->chaff = ship->maxchaff;
+      ship->missiles = ship->maxmissiles;
+      ship->shield = 0;
+      ship->autorecharge = FALSE;
+      ship->autotrack = FALSE;
+      ship->autospeed = FALSE;
+      ship->hull = ship->maxhull;
+      ship->missilestate = MISSILE_READY;
+      ship->laserstate = LASER_READY;
+      ship->shipstate = SHIP_DOCKED;
+
+      if (ship->hatchopen)
+	{
+	  ship->hatchopen = FALSE;
+	  sprintf( buf , "The hatch on %s closes." , ship->name);  
+	  echo_to_room( AT_YELLOW , get_room_index(ship->location) , buf );
+	  echo_to_room( AT_YELLOW , ship->entrance , "The hatch slides shut." );
+	  sound_to_room( ship->entrance , "!!SOUND(door)" );
+	  sound_to_room( get_room_index(ship->location) , "!!SOUND(door)" );
+	}
+
+      set_char_color( AT_GREEN, ch );
+      send_to_char( "Launch sequence initiated.\r\n", ch);
+      act( AT_PLAIN, "$n starts up the ship and begins the launch sequence.",
+	   ch, NULL, argument , TO_ROOM );
+      echo_to_ship( AT_YELLOW , ship , "The ship hums as it lifts off the ground.");
+      sprintf( buf, "%s begins to launch.", ship->name );
+      echo_to_room( AT_YELLOW , get_room_index(ship->location) , buf );
+      ship->shipstate = SHIP_LAUNCH;
+      ship->currspeed = ship->realspeed;
+      learn_from_success( ch, gsn_spacecraft );
+      return;   	   	
+    }
+
+  set_char_color( AT_RED, ch );
+  send_to_char("You fail to work the controls properly!\r\n",ch);
 }
 
 void launchship( SHIP_DATA *ship )
@@ -3397,8 +3395,8 @@ void do_land( CHAR_DATA *ch, char *argument )
     	           }
     	        }
     	           
-                chance = IS_NPC(ch) ? 100
-	                 : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+                chance = character_skill_level( ch, gsn_spacecraft );
+
                 if ( number_percent( ) < chance )
     		{
     		   set_char_color( AT_GREEN, ch );
@@ -3542,8 +3540,8 @@ void do_accelerate( CHAR_DATA *ch, char *argument )
     	           return;
     	        }
     	        
-                chance = IS_NPC(ch) ? 100
-	                 : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+                chance = character_skill_level( ch, gsn_spacecraft );
+
                 if ( number_percent( ) >= chance )
     		{
 	           send_to_char("&RYou fail to work the controls properly.\r\n",ch);
@@ -3643,8 +3641,7 @@ void do_trajectory( CHAR_DATA *ch, char *argument )
       return;
     }
 
-  chance = IS_NPC(ch) ? 100
-    : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+  chance = character_skill_level( ch, gsn_spacecraft );
 
   if ( number_percent( ) > chance )
     { 
@@ -3972,8 +3969,8 @@ void do_autorecharge(CHAR_DATA *ch, char *argument )
     	            return;
     	        }
     	        
-                chance = IS_NPC(ch) ? 100
-	                 : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+	chance = character_skill_level( ch, gsn_spacecraft );
+
         if ( number_percent( ) > chance )
         {
            send_to_char("&RYou fail to work the controls properly.\r\n",ch);
@@ -4243,8 +4240,8 @@ void do_status(CHAR_DATA *ch, char *argument )
          return;
     }          
     
-    chance = IS_NPC(ch) ? 100
-	                 : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+    chance = character_skill_level( ch, gsn_spacecraft );
+
     if ( number_percent( ) > chance )
     {
         send_to_char("&RYou cant figure out what the readout means.\r\n",ch);
@@ -4369,8 +4366,8 @@ void do_hyperspace(CHAR_DATA *ch, char *argument )
            }    	   
     	}
     	        
-        chance = IS_NPC(ch) ? 100
-             : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+        chance = character_skill_level( ch, gsn_spacecraft );
+
         if ( number_percent( ) > chance )
         {
             send_to_char("&RYou can't figure out which lever to use.\r\n",ch);
@@ -4477,8 +4474,8 @@ void do_target(CHAR_DATA *ch, char *argument )
                     return;
                 }
                 
-                chance = IS_NPC(ch) ? ch->top_level
-	                 : (int)  (ch->pcdata->learned[gsn_weaponsystems]) ;
+                chance = character_skill_level( ch, gsn_weaponsystems );
+
                 if ( number_percent( ) < chance )
     		{
     		   send_to_char( "&GTracking target.\r\n", ch);
@@ -4584,16 +4581,16 @@ void do_fire(CHAR_DATA *ch, char *argument )
              return;
         }   
   
-                if ( autofly(ship) )
-    	        {
-    	            send_to_char("&RYou'll have to turn off the ships autopilot first.\r\n",ch);
-    	            return;
-    	        }
+	if ( autofly(ship) )
+	  {
+	    send_to_char("&RYou'll have to turn off the ships autopilot first.\r\n",ch);
+	    return;
+	  }
     	              
-        
-        chance = IS_NPC(ch) ? ch->top_level
-                 : (int) ( ch->perm_dex*2 + ch->pcdata->learned[gsn_weaponsystems]/2
-                           + ch->pcdata->learned[gsn_spacecombat]/2 );        
+	int skill_level = character_skill_level( ch, gsn_weaponsystems )
+	  + ch->perm_dex * 2 + character_skill_level( ch, gsn_spacecombat ) / 2;
+
+        chance = IS_NPC(ch) ? 100 : skill_level;
         
     	if ( !str_prefix( argument , "lasers") )
     	{
@@ -4869,8 +4866,8 @@ void do_calculate(CHAR_DATA *ch, char *argument )
 	}
       return;
     }
-  chance = IS_NPC(ch) ? 100
-    : (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+  chance = character_skill_level( ch, gsn_spacecraft );
+
   if ( number_percent( ) > chance )
     {
       send_to_char("&RYou cant seem to figure the charts out today.\r\n",ch);
@@ -4962,8 +4959,8 @@ void do_recharge(CHAR_DATA *ch, char *argument )
               return;
         }
     	        
-        chance = IS_NPC(ch) ? 100
-             		: (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+        chance = character_skill_level( ch, gsn_spacecraft );
+
         if ( number_percent( ) > chance )
         {
             send_to_char("&RYou fail to work the controls properly.\r\n",ch);
@@ -5008,8 +5005,8 @@ void do_repairship(CHAR_DATA *ch, char *argument )
                    return;
                 }
                             
-                chance = IS_NPC(ch) ? ch->top_level
-	                 : (int) (ch->pcdata->learned[gsn_shipmaintenance]);
+                chance = character_skill_level( ch, gsn_shipmaintenance );
+
                 if ( number_percent( ) < chance )
     		{
     		   send_to_char( "&GYou begin your repairs\r\n", ch);
@@ -5049,8 +5046,8 @@ void do_repairship(CHAR_DATA *ch, char *argument )
     if ( !str_cmp(arg,"hull") )
     {
         change = URANGE( 0 , 
-                         number_range( (int) ( ch->pcdata->learned[gsn_shipmaintenance] / 2 ) , (int) (ch->pcdata->learned[gsn_shipmaintenance]) ),
-                         ( ship->maxhull - ship->hull ) );
+                         number_range( character_skill_level( ch, gsn_shipmaintenance ) / 2, character_skill_level( ch, gsn_shipmaintenance ) ),
+				       ( ship->maxhull - ship->hull ) );
         ship->hull += change;
         ch_printf( ch, "&GRepair complete.. Hull strength inreased by %d points.\r\n", change );
     }
@@ -5251,8 +5248,8 @@ void do_radar( CHAR_DATA *ch, char *argument )
     	       return;
     	}        
     	        
-        chance = IS_NPC(ch) ? 100
-             		: (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+        chance = character_skill_level( ch, gsn_spacecraft );
+
         if ( number_percent( ) > chance )
         {
            send_to_char("&RYou fail to work the controls properly.\r\n",ch);
@@ -5339,8 +5336,7 @@ void do_autotrack( CHAR_DATA *ch, char *argument )
     	            return;
     	        }
     	        
-        chance = IS_NPC(ch) ? 100
-             		: (int)  (ch->pcdata->learned[gsn_spacecraft]) ;
+		chance = character_skill_level( ch, gsn_spacecraft );
         if ( number_percent( ) > chance )
         {
            send_to_char("&RYour notsure which switch to flip.\r\n",ch);
@@ -5737,8 +5733,9 @@ void do_chaff( CHAR_DATA *ch, char *argument )
     	            send_to_char("&RYou don't have any chaff to release!\r\n",ch);
     	            return;
     	        }
-                chance = IS_NPC(ch) ? ch->top_level
-                 : (int)  (ch->pcdata->learned[gsn_weaponsystems]) ;
+
+                chance = character_skill_level( ch, gsn_weaponsystems );
+
         if ( number_percent( ) > chance )
         {
             send_to_char("&RYou can't figure out which switch it is.\r\n",ch);
