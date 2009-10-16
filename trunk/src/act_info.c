@@ -7,7 +7,7 @@
 #include "mud.h"
 
 const char *	const	where_name	[] =
-{
+  {
     "<used as light>     ",
     "<worn on finger>    ",
     "<worn on finger>    ",
@@ -30,7 +30,7 @@ const char *	const	where_name	[] =
     "<worn on ears>      ",
     "<worn on eyes>      ",
     "<missile wielded>   "
-};
+  };
 
 /*
  * Local functions.
@@ -41,7 +41,7 @@ void	show_char_to_char	args( ( CHAR_DATA *list, CHAR_DATA *ch ) );
 void	show_ships_to_char	args( ( SHIP_DATA *ship, CHAR_DATA *ch ) );
 bool	check_blind		args( ( CHAR_DATA *ch ) );
 void    show_condition          args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
-bool 	is_online		args( ( char * argument ) );
+bool 	is_online		args( ( const char * argument ) );
 
 char *format_obj_to_char( OBJ_DATA *obj, CHAR_DATA *ch, bool fShort )
 {
@@ -3246,7 +3246,7 @@ void do_pager( CHAR_DATA *ch, char *argument )
   return;
 }
 
-bool is_online( char * argument )
+bool is_online( const char * argument )
 {
     DESCRIPTOR_DATA *d;
 

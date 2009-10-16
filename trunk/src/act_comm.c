@@ -1221,9 +1221,9 @@ void do_save( CHAR_DATA *ch, char *argument )
  * follow in a loop through an exit leading back into the same room
  * (Which exists in many maze areas)			-Thoric
  */
-bool circle_follow( CHAR_DATA *ch, CHAR_DATA *victim )
+bool circle_follow( const CHAR_DATA *ch, const CHAR_DATA *victim )
 {
-  CHAR_DATA *tmp = FALSE;
+  const CHAR_DATA *tmp = NULL;
 
   for ( tmp = victim; tmp; tmp = tmp->master )
     if ( tmp == ch )
@@ -1424,17 +1424,6 @@ void do_order( CHAR_DATA *ch, char *argument )
       send_to_char( "You have no followers here.\r\n", ch );
     }
 }
-
-/*
-char *itoa(int foo)
-{
-  static char bar[256];
-
-  sprintf(bar,"%d",foo);
-  return(bar);
-
-}
-*/
 
 void do_group( CHAR_DATA *ch, char *argument )
 {
@@ -1685,7 +1674,7 @@ void do_gtell( CHAR_DATA *ch, char *argument )
  * (2) if A ~ B then B ~ A
  * (3) if A ~ B  and B ~ C, then A ~ C
  */
-bool is_same_group( CHAR_DATA *ach, CHAR_DATA *bch )
+bool is_same_group( const CHAR_DATA *ach, const CHAR_DATA *bch )
 {
   if ( ach->leader )
     ach = ach->leader;
@@ -1693,7 +1682,7 @@ bool is_same_group( CHAR_DATA *ach, CHAR_DATA *bch )
   if ( bch->leader )
     bch = bch->leader;
 
-  return ( ach == bch );
+  return ach == bch;
 }
 
 /*
@@ -1701,17 +1690,16 @@ bool is_same_group( CHAR_DATA *ach, CHAR_DATA *bch )
  * I am not too sure if this method is right..
  */
 
-void talk_auction (char *argument)
+void talk_auction (const char *argument)
 {
-  DESCRIPTOR_DATA *d;
+  DESCRIPTOR_DATA *d = NULL;
   char buf[MAX_STRING_LENGTH];
-  CHAR_DATA *original;
 
   sprintf (buf,"Auction: %s", argument); /* last %s to reset color */
 
   for (d = first_descriptor; d; d = d->next)
     {
-      original = d->original ? d->original : d->character; /* if switched */
+      CHAR_DATA *original = d->original ? d->original : d->character; /* if switched */
       if ((d->connected == CON_PLAYING) && !IS_SET(original->deaf,CHANNEL_AUCTION) 
 	  && !NOT_AUTHED(original))
 	act( AT_GOSSIP, buf, original, NULL, NULL, TO_CHAR );

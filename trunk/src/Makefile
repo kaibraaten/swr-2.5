@@ -27,7 +27,7 @@ $(BINARY):	$(OBJ)
 		@echo "Done."
 
 $(ODIR)/%.o:	 %.c $(DEPS)
-		@echo "Compiling" $@
+		@echo "Compiling" $<
 		@$(CC) -c -o $@ $< $(CCFLAGS)
 
 -include $(ODIR)/*.d
