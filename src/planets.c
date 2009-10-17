@@ -904,15 +904,11 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
   write_area_list();
   write_planet_list();
 
-  if ( ch->substate == SUB_REPEATCMD )
-    ch->tempnum = SUB_REPEATCMD;
-  else
-    ch->tempnum = SUB_NONE;
+  ch->tempnum = SUB_NONE;
   ch->substate = SUB_ROOM_DESC;
   ch->dest_buf = (void *) pArea;
   ch->dest_buf_2 = (void *) planet; 
   start_editing( ch, description );
-  return;
 }
 
 void do_planets( CHAR_DATA *ch, char *argument )
