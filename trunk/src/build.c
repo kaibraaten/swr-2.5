@@ -3880,7 +3880,7 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
 	    }
 	    count = 0;  wordln = strlen(word1);  word2ln = strlen(word2);
 	    ch_printf( ch, "Replacing all occurrences of %s with %s...\r\n", word1, word2 );
-	    for ( x = edit->on_line; x < edit->numlines; x++ )
+	    for ( x = 0; x < edit->numlines; x++ )
 	    {
 		lwptr = edit->line[x];
 		while ( (wptr = strstr( lwptr, word1 )) != NULL )

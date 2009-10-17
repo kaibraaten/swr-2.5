@@ -1421,12 +1421,6 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
 	    break;
 
 	case 'V':
-	    if ( !str_cmp( word, "Vnum" ) )
-	    {
-		ch->pIndexData = get_mob_index( fread_number( fp ) );
-		fMatch = TRUE;
-		break;
-	    }
 	    KEY( "Version",	file_ver,		fread_number( fp ) );
 	    break;
 

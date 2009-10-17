@@ -588,94 +588,107 @@ ROOM_INDEX_DATA *find_location( CHAR_DATA *ch, const char *arg )
   return NULL;
 }
 
-
-
-void do_transfer( CHAR_DATA *ch, char *argument )
+/* This function shared by do_transfer and do_mptransfer
+ *
+ * Immortals bypass most restrictions on where to transfer victims.
+ * NPCs cannot transfer victims who are:
+ * 1. Not authorized yet.
+ * 2. Outside of the level range for the target room's area.
+ * 3. Being sent to private rooms.
+ */
+void transfer_char( CHAR_DATA *ch, CHAR_DATA *victim, ROOM_INDEX_DATA *location )
 {
-    char arg1[MAX_INPUT_LENGTH];
-    char arg2[MAX_INPUT_LENGTH];
-    ROOM_INDEX_DATA *location;
-    DESCRIPTOR_DATA *d;
-    CHAR_DATA *victim;
-
-    argument = one_argument( argument, arg1 );
-    argument = one_argument( argument, arg2 );
-
-    if ( arg1[0] == '\0' )
+  if( !victim->in_room )
     {
-	send_to_char( "Transfer whom (and where)?\r\n", ch );
-	return;
+      bug( "%s: victim in NULL room: %s", __FUNCTION__, victim->name );
+      return;
     }
 
-    if ( !str_cmp( arg1, "all" ) )
+  if( IS_NPC(ch) && room_is_private( victim, location ) )
     {
-	for ( d = first_descriptor; d; d = d->next )
+      progbug( "Mptransfer - Private room", ch );
+      return;
+    }
+
+  if( !can_see( ch, victim ) )
+    return;
+
+  if( IS_NPC(ch) && NOT_AUTHED( victim ) && location->area != victim->in_room->area )
+    {
+      char buf[MAX_STRING_LENGTH];
+
+      snprintf( buf, MAX_STRING_LENGTH, "Mptransfer - unauthed char (%s)", victim->name );
+      progbug( buf, ch );
+      return;
+    }
+
+  if( victim->fighting )
+    stop_fighting( victim, TRUE );
+
+  if( !IS_NPC(ch) )
+    {
+      act( AT_MAGIC, "$n disappears in a cloud of swirling colors.", victim, NULL, NULL, TO_ROOM );
+      victim->retran = victim->in_room->vnum;
+    }
+  char_from_room( victim );
+  char_to_room( victim, location );
+  if( !IS_NPC(ch) )
+    {
+      act( AT_MAGIC, "$n arrives from a puff of smoke.", victim, NULL, NULL, TO_ROOM );
+      if( ch != victim )
+	act( AT_IMMORT, "$n has transferred you.", ch, NULL, victim, TO_VICT );
+      do_look( victim, const_char_to_nonconst( "auto" ) );
+      if( !IS_IMMORTAL( victim ) && !IS_NPC( victim ) )
+	act( AT_DANGER, "Warning:  this player's level is not within the area's level range.", ch, NULL, NULL, TO_CHAR );
+    }
+}
+
+void do_transfer( CHAR_DATA * ch, char *argument )
+{
+  char arg1[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+  ROOM_INDEX_DATA *location;
+  DESCRIPTOR_DATA *d;
+  CHAR_DATA *victim;
+
+  set_char_color( AT_IMMORT, ch );
+
+  argument = one_argument( argument, arg1 );
+  argument = one_argument( argument, arg2 );
+
+  if( arg1[0] == '\0' )
+    {
+      send_to_char( "Transfer whom (and where)?\n\r", ch );
+      return;
+    }
+
+  if( arg2[0] != '\0' )
+    {
+      if( !( location = find_location( ch, arg2 ) ) )
 	{
-	    if ( d->connected == CON_PLAYING
-	    &&   d->character != ch
-	    &&   d->character->in_room
-	    &&   d->newstate != 2
-	    &&   can_see( ch, d->character ) )
-	    {
-		char buf[MAX_STRING_LENGTH];
-		sprintf( buf, "%s %s", d->character->name, arg2 );
-		do_transfer( ch, buf );
-	    }
+	  send_to_char( "That location does not exist.\n\r", ch );
+	  return;
 	}
-	return;
     }
+  else
+    location = ch->in_room;
 
-    /*
-     * Thanks to Grodyn for the optional location parameter.
-     */
-    if ( arg2[0] == '\0' )
+  if( !str_cmp( arg1, "all" ) )
     {
-	location = ch->in_room;
-    }
-    else
-    {
-	if ( ( location = find_location( ch, arg2 ) ) == NULL )
+      for( d = first_descriptor; d; d = d->next )
 	{
-	    send_to_char( "No such location.\r\n", ch );
-	    return;
+	  if( d->connected == CON_PLAYING && d->character && d->character != ch && d->character->in_room )
+            transfer_char( ch, d->character, location );
 	}
-
-	if ( room_is_private( ch, location ) )
-	{
-	    send_to_char( "That room is private right now.\r\n", ch );
-	    return;
-	}
+      return;
     }
 
-    if ( ( victim = get_char_world( ch, arg1 ) ) == NULL )
+  if( !( victim = get_char_world( ch, arg1 ) ) )
     {
-	send_to_char( "They aren't here.\r\n", ch );
-	return;
+      send_to_char( "They aren't here.\n\r", ch );
+      return;
     }
-
-    if (NOT_AUTHED(victim))
-    {
-	send_to_char( "They are not authorized yet!\r\n", ch);
-	return;
-    }
-
-    if ( !victim->in_room )
-    {
-	send_to_char( "They are in limbo.\r\n", ch );
-	return;
-    }
-
-    if ( victim->fighting )
-	stop_fighting( victim, TRUE );
-    act( AT_MAGIC, "$n disappears in a cloud of swirling colors.", victim, NULL, NULL, TO_ROOM );
-    victim->retran = victim->in_room->vnum;
-    char_from_room( victim );
-    char_to_room( victim, location );
-    act( AT_MAGIC, "$n arrives from a puff of smoke.", victim, NULL, NULL, TO_ROOM );
-    if ( ch != victim )
-    act( AT_IMMORT, "$n has transferred you.", ch, NULL, victim, TO_VICT );
-    do_look( victim, const_char_to_nonconst( "auto" ) );
-    send_to_char( "Ok.\r\n", ch );
+  transfer_char( ch, victim, location );
 }
 
 void do_retran( CHAR_DATA *ch, char *argument )
