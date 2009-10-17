@@ -1178,7 +1178,7 @@ void actiondesc( CHAR_DATA *ch, const OBJ_DATA *obj, void *vo )
       else if ( *srcptr == '%' && *++srcptr == 's' ) 
 	{
 	  ichar = "You";
-	  iroom = IS_NPC( ch ) ? ch->short_descr : ch->name;
+	  iroom = "$n";
 	}
       else
 	{

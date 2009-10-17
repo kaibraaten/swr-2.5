@@ -17,16 +17,17 @@ ch_ret	spell_affectchar args( ( int sn, int level, CHAR_DATA *ch, void *vo ) );
  */
 bool is_immune( CHAR_DATA *ch, short damtype )
 {
-    switch( damtype )
+  switch( damtype )
     {
-	case SD_FIRE:	     if (IS_SET(ch->immune, RIS_FIRE))	 return TRUE;
-	case SD_COLD:	     if (IS_SET(ch->immune, RIS_COLD))	 return TRUE;
-	case SD_ELECTRICITY: if (IS_SET(ch->immune, RIS_ELECTRICITY)) return TRUE;
-	case SD_ENERGY:	     if (IS_SET(ch->immune, RIS_ENERGY)) return TRUE;
-	case SD_ACID:	     if (IS_SET(ch->immune, RIS_ACID))	 return TRUE;
-	case SD_POISON:	     if (IS_SET(ch->immune, RIS_POISON)) return TRUE;
-	case SD_DRAIN:	     if (IS_SET(ch->immune, RIS_DRAIN))	 return TRUE;
+    case SD_FIRE:           return( IS_SET( ch->immune, RIS_FIRE ) );
+    case SD_COLD:           return( IS_SET( ch->immune, RIS_COLD ) );
+    case SD_ELECTRICITY:    return( IS_SET( ch->immune, RIS_ELECTRICITY ) );
+    case SD_ENERGY:         return( IS_SET( ch->immune, RIS_ENERGY ) );
+    case SD_ACID:           return( IS_SET( ch->immune, RIS_ACID ) );
+    case SD_POISON:         return( IS_SET( ch->immune, RIS_POISON ) );
+    case SD_DRAIN:          return( IS_SET( ch->immune, RIS_DRAIN ) );
     }
+
     return FALSE;
 }
 

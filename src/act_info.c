@@ -1681,22 +1681,35 @@ void do_hedit( CHAR_DATA *ch, char *argument )
     }
     if ( (pHelp = get_help( ch, argument )) == NULL )	/* new help */
     {
-	char argnew[MAX_INPUT_LENGTH];
-	int lev;
+      HELP_DATA *tHelp;
+      char argnew[MAX_INPUT_LENGTH];
+      int lev;
+      bool new_help = TRUE;
 
-	if ( isdigit(argument[0]) )
+      for( tHelp = first_help; tHelp; tHelp = tHelp->next )
+	if( !str_cmp( argument, tHelp->keyword ) )
+	  {
+            pHelp = tHelp;
+            new_help = FALSE;
+            break;
+	  }
+      if( new_help )
 	{
-	    lev = number_argument( argument, argnew );
-	    argument = argnew;
+	  if( isdigit( argument[0] ) )
+	    {
+	      lev = number_argument( argument, argnew );
+	      argument = argnew;
+	    }
+	  else
+            lev = get_trust( ch );
+	  CREATE( pHelp, HELP_DATA, 1 );
+	  pHelp->keyword = STRALLOC( strupper( argument ) );
+	  pHelp->text = STRALLOC( "" );
+	  pHelp->level = lev;
+	  add_help( pHelp );
 	}
-	else
-	    lev = get_trust(ch);
-	CREATE( pHelp, HELP_DATA, 1 );
-	pHelp->keyword = STRALLOC( strupper(argument) );
-	pHelp->text    = STRALLOC( "" );
-	pHelp->level   = lev;
-	add_help( pHelp );
     }
+
     ch->substate = SUB_HELP_EDIT;
     ch->dest_buf = pHelp;
     start_editing( ch, pHelp->text );

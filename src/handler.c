@@ -1239,9 +1239,9 @@ void extract_char( CHAR_DATA *ch, bool fPull )
 	      wch->position = POS_STANDING;
 	    }
 	}
-    }
 
-  REMOVE_BIT( ch->act, ACT_MOUNTED );
+      REMOVE_BIT( ch->act, ACT_MOUNTED );
+    }
 
   character_extract_carried_objects( ch );
 
@@ -2576,22 +2576,62 @@ void queue_extracted_obj( OBJ_DATA *obj )
     extracted_obj_queue = obj;
 }
 
+/* Deallocates the memory used by a single object after it's been extracted. */
+void free_obj( OBJ_DATA * obj )
+{
+  AFFECT_DATA *paf, *paf_next;
+  EXTRA_DESCR_DATA *ed, *ed_next;
+  MPROG_ACT_LIST *mpact, *mpact_next;
+
+  for( mpact = obj->mpact; mpact; mpact = mpact_next )
+    {
+      mpact_next = mpact->next;
+      DISPOSE( mpact->buf );
+      DISPOSE( mpact );
+    }
+
+  /*
+   * remove affects 
+   */
+  for( paf = obj->first_affect; paf; paf = paf_next )
+    {
+      paf_next = paf->next;
+      DISPOSE( paf );
+    }
+  obj->first_affect = obj->last_affect = NULL;
+
+  /*
+   * remove extra descriptions 
+   */
+  for( ed = obj->first_extradesc; ed; ed = ed_next )
+    {
+      ed_next = ed->next;
+      STRFREE( ed->description );
+      STRFREE( ed->keyword );
+      DISPOSE( ed );
+    }
+  obj->first_extradesc = obj->last_extradesc = NULL;
+
+  STRFREE( obj->name );
+  STRFREE( obj->description );
+  STRFREE( obj->short_descr );
+  STRFREE( obj->action_desc );
+  DISPOSE( obj );
+}
+
 /*
  * Clean out the extracted object queue
  */
-void clean_obj_queue()
+void clean_obj_queue( void )
 {
-    OBJ_DATA *obj;
+  OBJ_DATA *obj;
 
-    while ( extracted_obj_queue )
+  while( extracted_obj_queue )
     {
-	obj = extracted_obj_queue;
-	extracted_obj_queue = extracted_obj_queue->next;
-	STRFREE( obj->name        );
-	STRFREE( obj->description );
-	STRFREE( obj->short_descr );
-	DISPOSE( obj );
-	--cur_qobjs;
+      obj = extracted_obj_queue;
+      extracted_obj_queue = extracted_obj_queue->next;
+      free_obj( obj );
+      --cur_qobjs;
     }
 }
 

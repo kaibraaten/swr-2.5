@@ -424,6 +424,11 @@ void do_outcast( CHAR_DATA *ch, char *argument )
 	    return;
     }
 
+    if( clan_char_is_leader( clan, victim ) )
+      {
+	send_to_char( "You are not able to outcast them.\r\n", ch );
+	return;
+      }
 
     --clan->members;
     victim->pcdata->clan = NULL;
@@ -540,6 +545,20 @@ void do_setclan( CHAR_DATA *ch, char *argument )
     
     if ( !strcmp( arg2, "name" ) )
     {
+      CLAN_DATA *uclan = NULL;
+
+      if( !argument || argument[0] == '\0' )
+	{
+	  send_to_char( "You can't name a clan nothing.\r\n", ch );
+	  return;
+	}
+
+      if( ( uclan = get_clan( argument ) ) )
+	{
+	  send_to_char( "There is already another clan with that name.\r\n", ch );
+	  return;
+	}
+
 	STRFREE( clan->name );
 	clan->name = STRALLOC( argument );
 	send_to_char( "Done.\r\n", ch );
@@ -549,12 +568,23 @@ void do_setclan( CHAR_DATA *ch, char *argument )
 
     if ( !strcmp( arg2, "filename" ) )
     {
-	DISPOSE( clan->filename );
-	clan->filename = str_dup( argument );
-	send_to_char( "Done.\r\n", ch );
-	save_clan( clan );
-	write_clan_list( );
+      char filename[256];
+
+      if( !is_valid_filename( ch, CLAN_DIR, argument ) )
 	return;
+
+      snprintf( filename, sizeof( filename ), "%s%s", CLAN_DIR,
+		clan->filename );
+
+      if( remove( filename ) )
+	send_to_char( "Old clan file deleted.\r\n", ch );
+
+      DISPOSE( clan->filename );
+      clan->filename = str_dup( argument );
+      send_to_char( "Done.\r\n", ch );
+      save_clan( clan );
+      write_clan_list( );
+      return;
     }
 
     if ( !str_cmp( arg2, "desc" ) )

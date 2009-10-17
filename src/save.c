@@ -574,26 +574,24 @@ void fwrite_obj( const CHAR_DATA *ch, const OBJ_DATA *obj, FILE *fp, int iNest,
   if ( obj->count > 1 )
     fprintf( fp, "Count        %d\n",	obj->count	     );
 
-  if( obj->name
-      && ( !obj->pIndexData->name
-           || str_cmp( obj->name, obj->pIndexData->name ) ) )
-    fprintf( fp, "Name         %s~\n",	obj->name	     );
-
+  if( obj->name && ( !obj->pIndexData->name
+		     || str_cmp( obj->name, obj->pIndexData->name ) ) )
+    fprintf( fp, "Name         %s~\n", obj->name );
 
   if( obj->short_descr
       && ( !obj->pIndexData->short_descr
-           || str_cmp( obj->short_descr, obj->pIndexData->short_descr ) ) )
-    fprintf( fp, "ShortDescr   %s~\n",	obj->short_descr     );
+	   || str_cmp( obj->short_descr, obj->pIndexData->short_descr ) ) )
+    fprintf( fp, "ShortDescr   %s~\n", obj->short_descr );
 
   if( obj->description
       && ( !obj->pIndexData->description
-           || str_cmp( obj->description, obj->pIndexData->description ) ) )
-    fprintf( fp, "Description  %s~\n",	obj->description     );
+	   || str_cmp( obj->description, obj->pIndexData->description ) ) )
+    fprintf( fp, "Description  %s~\n", obj->description );
 
   if( obj->action_desc
       && ( !obj->pIndexData->action_desc
-           || str_cmp( obj->action_desc, obj->pIndexData->action_desc ) ) )
-    fprintf( fp, "ActionDesc   %s~\n",	obj->action_desc     );
+	   || str_cmp( obj->action_desc, obj->pIndexData->action_desc ) ) )
+    fprintf( fp, "ActionDesc   %s~\n", obj->action_desc );
 
   fprintf( fp, "Vnum         %ld\n",	obj->pIndexData->vnum	     );
 
@@ -931,6 +929,13 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
     for ( ; ; )
     {
 	word   = feof( fp ) ? "End" : fread_word( fp );
+
+	if( word[0] == '\0' )
+	  {
+	    bug( "%s: EOF encountered reading file!", __FUNCTION__ );
+	    word = "End";
+	  }
+
 	fMatch = FALSE;
 
 	switch ( UPPER(word[0]) )
@@ -1485,6 +1490,13 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
     for ( ; ; )
     {
 	word   = feof( fp ) ? "End" : fread_word( fp );
+
+	if( word[0] == '\0' )
+	  {
+	    bug( "%s: EOF encountered reading file!", __FUNCTION__ );
+	    word = "End";
+	  }
+
 	fMatch = FALSE;
 
 	switch ( UPPER(word[0]) )

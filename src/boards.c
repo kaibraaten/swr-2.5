@@ -1414,16 +1414,21 @@ void do_bset( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg2, "filename" ) )
     {
-	if ( !argument || argument[0] == '\0' )
-	{
-	    send_to_char( "No filename specified.\r\n", ch );
-	    return;
-	}
-	DISPOSE( board->note_file );
-	board->note_file = str_dup( argument );
-	write_boards_txt( );
-	send_to_char( "Done.\r\n", ch );
+      char filename[256];
+
+      if( !is_valid_filename( ch, BOARD_DIR, argument ) )
 	return;
+
+      snprintf( filename, sizeof( filename ), "%s%s",
+		BOARD_DIR, board->note_file );
+      if( !remove( filename ) )
+	send_to_char( "Old board file deleted.\r\n", ch );
+
+      DISPOSE( board->note_file );
+      board->note_file = str_dup( argument );
+      write_boards_txt(  );
+      send_to_char( "Done.  (board's filename set)\r\n", ch );
+      return;
     }
 
     if ( !str_cmp( arg2, "post" ) )

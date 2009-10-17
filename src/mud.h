@@ -3543,6 +3543,8 @@ void	act		args( ( short AType, const char *format, CHAR_DATA *ch,
 void	reset_all	args( ( ) );
 
 /* db.c */
+bool is_valid_filename( const CHAR_DATA *ch, const char *direct,
+			const char *filename );
 void replace_char( char *buf, char replace, char with );
 void	show_file	args( ( const CHAR_DATA *ch, const char *filename ) );
 char *	str_dup		args( ( const char *str ) );

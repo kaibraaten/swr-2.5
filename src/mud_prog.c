@@ -385,7 +385,8 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
     for ( pObj = mob->in_room->first_content; pObj;
           pObj = pObj->next_content )
       if ( can_see_obj(mob, pObj) && pObj->pIndexData->vnum == vnum )
-        lhsvl++;
+	lhsvl += pObj->count;
+
     rhsvl = is_number(rval) ? atoi(rval) : -1;
     if ( rhsvl < 1 )
       rhsvl = 1;
@@ -414,7 +415,7 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
     for ( pObj = mob->in_room->first_content; pObj;
           pObj = pObj->next_content )
       if ( can_see_obj(mob, pObj) && pObj->item_type == type )
-        lhsvl++;
+	lhsvl += pObj->count;
     rhsvl = is_number(rval) ? atoi(rval) : -1;
     if ( rhsvl < 1 )
       rhsvl = 1;
@@ -436,7 +437,7 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
     for ( pObj = mob->in_room->first_content; pObj;
           pObj = pObj->next_content )
       if ( can_see_obj(mob, pObj) && pObj->pIndexData->vnum == vnum )
-        lhsvl++;
+	lhsvl += pObj->count;
     rhsvl = is_number(rval) ? atoi(rval) : -1;
     if ( rhsvl < 1 )
       rhsvl = 1;
@@ -462,7 +463,7 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
     for ( pObj = mob->in_room->first_content; pObj;
           pObj = pObj->next_content )
       if ( can_see_obj(mob, pObj) && pObj->item_type == type )
-        lhsvl++;
+	lhsvl += pObj->count;
     rhsvl = is_number(rval) ? atoi(rval) : -1;
     if ( rhsvl < 1 )
       rhsvl = 1;
@@ -480,15 +481,21 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
       progbug("OvnumCarry: bad vnum", mob);
       return BERR;
     }
+
     lhsvl = 0;
+
     for ( pObj = mob->first_carrying; pObj; pObj = pObj->next_content )
       if ( can_see_obj(mob, pObj) && pObj->pIndexData->vnum == vnum )
-        lhsvl++;
+	lhsvl += pObj->count;
+
     rhsvl = is_number(rval) ? atoi(rval) : -1;
+
     if ( rhsvl < 1 )
       rhsvl = 1;
+
     if ( !*opr )
       strcpy(opr, "==");
+
     return mprog_veval(lhsvl, opr, rhsvl, mob);
   }
   if ( !str_cmp(chck, "otypecarry") )
@@ -508,7 +515,7 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
     lhsvl = 0;
     for ( pObj = mob->first_carrying; pObj; pObj = pObj->next_content )
       if ( can_see_obj(mob, pObj) && pObj->item_type == type )
-        lhsvl++;
+	lhsvl += pObj->count;
     rhsvl = is_number(rval) ? atoi(rval) : -1;
     if ( rhsvl < 1 )
       rhsvl = 1;
@@ -530,7 +537,7 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
     for ( pObj = mob->first_carrying; pObj; pObj = pObj->next_content )
       if ( pObj->wear_loc != WEAR_NONE && can_see_obj(mob, pObj) &&
            pObj->pIndexData->vnum == vnum )
-        lhsvl++;
+	lhsvl += pObj->count;
     rhsvl = is_number(rval) ? atoi(rval) : -1;
     if ( rhsvl < 1 )
       rhsvl = 1;
@@ -556,7 +563,7 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
     for ( pObj = mob->first_carrying; pObj; pObj = pObj->next_content )
       if ( pObj->wear_loc != WEAR_NONE && can_see_obj(mob, pObj) &&
            pObj->item_type == type )
-        lhsvl++;
+	lhsvl += pObj->count;
     rhsvl = is_number(rval) ? atoi(rval) : -1;
     if ( rhsvl < 1 )
       rhsvl = 1;
@@ -578,7 +585,7 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
     for ( pObj = mob->first_carrying; pObj; pObj = pObj->next_content )
       if ( pObj->wear_loc == WEAR_NONE && can_see_obj(mob, pObj) &&
            pObj->pIndexData->vnum == vnum )
-        lhsvl++;
+	lhsvl += pObj->count;
     rhsvl = is_number(rval) ? atoi(rval) : -1;
     if ( rhsvl < 1 )
       rhsvl = 1;
@@ -604,7 +611,7 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
     for ( pObj = mob->first_carrying; pObj; pObj = pObj->next_content )
       if ( pObj->wear_loc == WEAR_NONE && can_see_obj(mob, pObj) &&
            pObj->item_type == type )
-        lhsvl++;
+	lhsvl += pObj->count;
     rhsvl = is_number(rval) ? atoi(rval) : -1;
     if ( rhsvl < 1 )
       rhsvl = 1;

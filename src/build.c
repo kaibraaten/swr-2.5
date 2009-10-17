@@ -129,10 +129,10 @@ const char *	const	plr_flags [] =
 
 const char *	const	trap_flags [] =
 {
-"room", "obj", "enter", "leave", "open", "close", "get", "put", "pick",
-"unlock", "north", "south", "east", "r1", "west", "up", "down", "examine",
-"r2", "r3", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13",
-"r14", "r15" 
+  "room", "obj", "enter", "leave", "open", "close", "get", "put", "pick",
+  "unlock", "north", "south", "east", "west", "up", "down", "examine",
+  "northeast", "northwest", "southeast", "southwest", "r6", "r7", "r8",
+  "r9", "r10", "r11", "r12", "r13", "r14", "r15"
 };
 
 const char *	const	wear_locs [] =
@@ -614,7 +614,7 @@ char *copy_buffer( const CHAR_DATA *ch )
       if ( tmp[len-1] == '~' )
         tmp[len-1] = '\0';
       else
-        strcat( tmp, "\r\n" );
+        strcat( tmp, "\n" );
       strcat( buf, tmp );
    }
    return STRALLOC( buf );
@@ -4605,10 +4605,35 @@ void do_aset( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg2, "name" ) )
     {
-	DISPOSE( tarea->name );
-	tarea->name = str_dup( argument );
-	send_to_char( "Done.\r\n", ch );
-	return;
+      AREA_DATA *uarea;
+
+      if( !argument || argument[0] == '\0' )
+	{
+	  send_to_char( "You can't set an area's name to nothing.\r\n", ch );
+	  return;
+	}
+
+      for( uarea = first_area; uarea; uarea = uarea->next )
+	{
+	  if( !str_cmp( uarea->name, argument ) )
+	    {
+	      send_to_char( "There is already an installed area with that name.\r\n", ch );
+	      return;
+	    }
+	}
+
+      for( uarea = first_build; uarea; uarea = uarea->next )
+	{
+	  if( !str_cmp( uarea->name, argument ) )
+	    {
+	      send_to_char( "There is already a prototype area with that name.\r\n", ch );
+	      return;
+	    }
+	}
+      DISPOSE( tarea->name );
+      tarea->name = str_dup( argument );
+      send_to_char( "Done.\r\n", ch );
+      return;
     }
 
     if ( !str_cmp( arg2, "no_edit" ) )
@@ -4680,12 +4705,26 @@ void do_aset( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg2, "filename" ) )
     {
-	DISPOSE( tarea->filename );
-	tarea->filename = str_dup( argument );
-	write_area_list( );
-	fold_area( tarea, tarea->filename, TRUE );
-	send_to_char( "Done.\r\n", ch );
+      char filename[256];
+      char new_fullname[256];
+
+      if( proto )
+	{
+	  send_to_char( "You should only change the filename of installed areas.\r\n", ch );
+	  return;
+	}
+
+      if( !is_valid_filename( ch, AREA_DIR, argument ) )
 	return;
+
+      sprintf( filename, "%s%s", AREA_DIR, tarea->filename );
+      sprintf( new_fullname, "%s%s", AREA_DIR, argument );
+      DISPOSE( tarea->filename );
+      tarea->filename = str_dup( argument );
+      rename( filename, new_fullname );
+      write_area_list();
+      send_to_char( "Done.\r\n", ch );
+      return;
     }
 
     if ( !str_cmp( arg2, "flags" ) )
@@ -5474,7 +5513,7 @@ void do_rpedit( CHAR_DATA *ch, char *argument )
 	send_to_char( "Command being one of:\r\n",			ch );
 	send_to_char( "  add delete insert edit list\r\n",		ch );
 	send_to_char( "Program being one of:\r\n",			ch );
-	send_to_char( "  act speech rand sleep rest rfight enter\r\n",  ch );
+	send_to_char( "  act speech rand sleep rest rfight entry\r\n",  ch );
 	send_to_char( "  leave death\r\n",                              ch );
 	send_to_char( "\r\n",						ch );
 	send_to_char( "You should be standing in room you wish to edit.\r\n",ch);

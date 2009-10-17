@@ -432,31 +432,13 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
 
     if ( !strcmp( arg2, "filename" ) )
     {
-      /*
-	DISPOSE( planet->filename );
-	planet->filename = str_dup( argument );
-	send_to_char( "Done.\r\n", ch );
-	save_planet( planet );
-	write_planet_list( );
+      char filename[256];
+
+      if( !is_valid_filename( ch, PLANET_DIR, argument ) )
 	return;
-      */
 
-      PLANET_DATA *tplanet;
-
-      if( !argument || argument[0] == '\0' )
-	{
-	  send_to_char( "You must choose a file name.\r\n", ch );
-	  return;
-	}
-      for( tplanet = first_planet; tplanet; tplanet = tplanet->next )
-	{
-          if( !str_cmp( tplanet->filename, argument ) )
-	    {
-              send_to_char( "A planet with that filename already exists!\r\n", ch );
-              return;
-	    }
-	}
-
+      sprintf( filename, "%s%s", PLANET_DIR, planet->filename );
+      remove( filename );
       DISPOSE( planet->filename );
       planet->filename = str_dup( argument );
       send_to_char( "Done.\r\n", ch );
