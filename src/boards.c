@@ -116,14 +116,15 @@ void write_boards_txt( )
     fclose( fpout );
 }
 
-BOARD_DATA *get_board( OBJ_DATA *obj )
+BOARD_DATA *get_board( const OBJ_DATA *obj )
 {
-    BOARD_DATA *board;
+  BOARD_DATA *board;
     
-    for ( board = first_board; board; board = board->next )
-       if ( board->board_obj == obj->pIndexData->vnum )
-         return board;
-    return NULL;	
+  for ( board = first_board; board; board = board->next )
+    if ( board->board_obj == obj->pIndexData->vnum )
+      return board;
+
+  return NULL;	
 }
 
 BOARD_DATA *find_board( CHAR_DATA *ch )
@@ -692,7 +693,7 @@ void do_note( CHAR_DATA *ch, char *arg_passed, bool IS_MAIL )
 	if ( ( paper = get_eq_char(ch, WEAR_HOLD) ) == NULL
 	||     paper->item_type != ITEM_PAPER )
 	{
-	    paper = create_object( get_obj_index(OBJ_VNUM_NOTE), 0 );
+	    paper = create_object( get_obj_index(OBJ_VNUM_NOTE) );
 	    if ((tmpobj = get_eq_char(ch, WEAR_HOLD)) != NULL)
 	      unequip_char(ch, tmpobj); 
 	    paper = obj_to_char(paper, ch);
@@ -728,7 +729,7 @@ void do_note( CHAR_DATA *ch, char *arg_passed, bool IS_MAIL )
 	if ( ( paper = get_eq_char(ch, WEAR_HOLD) ) == NULL
 	||     paper->item_type != ITEM_PAPER )
 	{
-	    paper = create_object( get_obj_index(OBJ_VNUM_NOTE), 0 );
+	    paper = create_object( get_obj_index(OBJ_VNUM_NOTE) );
     	    if ((tmpobj = get_eq_char(ch, WEAR_HOLD)) != NULL)
 		unequip_char(ch, tmpobj); 
 	    paper = obj_to_char(paper, ch);
@@ -766,7 +767,7 @@ void do_note( CHAR_DATA *ch, char *arg_passed, bool IS_MAIL )
 	if ( ( paper = get_eq_char(ch, WEAR_HOLD) ) == NULL
 	||     paper->item_type != ITEM_PAPER )
 	{
-	    paper = create_object( get_obj_index(OBJ_VNUM_NOTE), 0 );
+	    paper = create_object( get_obj_index(OBJ_VNUM_NOTE) );
     	    if ((tmpobj = get_eq_char(ch, WEAR_HOLD)) != NULL)
 		unequip_char(ch, tmpobj);
 	    paper = obj_to_char(paper, ch);
@@ -982,7 +983,7 @@ void do_note( CHAR_DATA *ch, char *arg_passed, bool IS_MAIL )
 
  		if ( take != 0 )
 		{
-		    paper = create_object( get_obj_index(OBJ_VNUM_NOTE), 0 );
+		    paper = create_object( get_obj_index(OBJ_VNUM_NOTE) );
 		    ed = SetOExtra( paper, "_sender_" );
 		    STRFREE( ed->description );
 		    ed->description = QUICKLINK(pnote->sender);

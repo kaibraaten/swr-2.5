@@ -192,39 +192,39 @@ const char *	const		room_sents[SECT_MAX][25]	=
 
 };
 
-int wherehome( CHAR_DATA *ch)
+int wherehome( const CHAR_DATA *ch)
 {
-    SHIP_DATA *ship = 0;
-    PLANET_DATA * planet = 0;
-    CLAN_DATA *clan = 0;
-    ROOM_INDEX_DATA *room = 0;
+  SHIP_DATA *ship = 0;
+  PLANET_DATA * planet = 0;
+  CLAN_DATA *clan = 0;
+  ROOM_INDEX_DATA *room = 0;
         
-    if( ch->plr_home )
-      return ch->plr_home->vnum;
+  if( ch->plr_home )
+    return ch->plr_home->vnum;
 
-    if ( IS_IMMORTAL(ch) )
-       return ROOM_IMMORTAL_START;
+  if ( IS_IMMORTAL(ch) )
+    return ROOM_IMMORTAL_START;
 
-    if ( ch->pcdata && ch->pcdata->clan )
-       for ( planet = first_planet ; planet ; planet = planet->next )
-           if ( planet->governed_by == clan && planet->area )
-              for( room = planet->area->first_room ; room ; room = room->next_in_area )
-		if ( IS_SET( room->room_flags, ROOM_HOTEL )  && !IS_SET( room->room_flags, ROOM_PLR_HOME )  )
-		   return room->vnum;
+  if ( ch->pcdata && ch->pcdata->clan )
+    for ( planet = first_planet ; planet ; planet = planet->next )
+      if ( planet->governed_by == clan && planet->area )
+	for( room = planet->area->first_room ; room ; room = room->next_in_area )
+	  if ( IS_SET( room->room_flags, ROOM_HOTEL )  && !IS_SET( room->room_flags, ROOM_PLR_HOME )  )
+	    return room->vnum;
     
-    for ( ship = first_ship ; ship ; ship = ship->next )
+  for ( ship = first_ship ; ship ; ship = ship->next )
     {
-        if ( !str_cmp( ship->owner , ch->name ) && ship->shipstate == SHIP_DOCKED )
-          return ship->lastdoc;
+      if ( !str_cmp( ship->owner , ch->name ) && ship->shipstate == SHIP_DOCKED )
+	return ship->lastdoc;
     } 
 
-    for ( planet = first_planet ; planet ; planet = planet->next )
-           if ( planet->area )
-              for( room = planet->area->first_room ; room ; room = room->next_in_area )
-		if ( IS_SET( room->room_flags, ROOM_HOTEL )  && !IS_SET( room->room_flags, ROOM_PLR_HOME )  )
-		   return room->vnum;
-    
-    return ROOM_VNUM_LIMBO;   
+  for ( planet = first_planet ; planet ; planet = planet->next )
+    if ( planet->area )
+      for( room = planet->area->first_room ; room ; room = room->next_in_area )
+	if ( IS_SET( room->room_flags, ROOM_HOTEL )  && !IS_SET( room->room_flags, ROOM_PLR_HOME )  )
+	  return room->vnum;
+  
+  return ROOM_VNUM_LIMBO;   
 }
 
 char *grab_word( char *argument, char *arg_first )
@@ -371,7 +371,7 @@ void clear_vrooms( )
  * Function to get the equivelant exit of DIR 0-MAXDIR out of linked list.
  * Made to allow old-style diku-merc exit functions to work.	-Thoric
  */
-EXIT_DATA *get_exit( ROOM_INDEX_DATA *room, short dir )
+EXIT_DATA *get_exit( const ROOM_INDEX_DATA *room, short dir )
 {
     EXIT_DATA *xit;
 
@@ -390,7 +390,7 @@ EXIT_DATA *get_exit( ROOM_INDEX_DATA *room, short dir )
 /*
  * Function to get an exit, leading the the specified room
  */
-EXIT_DATA *get_exit_to( ROOM_INDEX_DATA *room, short dir, long vnum )
+EXIT_DATA *get_exit_to( const ROOM_INDEX_DATA *room, short dir, long vnum )
 {
     EXIT_DATA *xit;
 
@@ -409,7 +409,7 @@ EXIT_DATA *get_exit_to( ROOM_INDEX_DATA *room, short dir, long vnum )
 /*
  * Function to get the nth exit of a room			-Thoric
  */
-EXIT_DATA *get_exit_num( ROOM_INDEX_DATA *room, short count )
+EXIT_DATA *get_exit_num( const ROOM_INDEX_DATA *room, short count )
 {
     EXIT_DATA *xit;
     int cnt;
@@ -430,7 +430,7 @@ EXIT_DATA *get_exit_num( ROOM_INDEX_DATA *room, short count )
 /*
  * Modify movement due to encumbrance				-Thoric
  */
-short encumbrance( CHAR_DATA *ch, short move )
+short encumbrance( const CHAR_DATA *ch, short move )
 {
   int max = can_carry_w(ch);
   int cur = ch->carry_weight;
@@ -457,25 +457,27 @@ short encumbrance( CHAR_DATA *ch, short move )
  */
 bool will_fall( CHAR_DATA *ch, int fall )
 {
-    if ( IS_SET( ch->in_room->room_flags, ROOM_NOFLOOR )
-    &&   CAN_GO(ch, DIR_DOWN)
-    && (!IS_AFFECTED( ch, AFF_FLYING )
-    || ( ch->mount && !IS_AFFECTED( ch->mount, AFF_FLYING ) ) ) )
+  if ( IS_SET( ch->in_room->room_flags, ROOM_NOFLOOR )
+       &&   CAN_GO(ch, DIR_DOWN)
+       && (!IS_AFFECTED( ch, AFF_FLYING )
+	   || ( ch->mount && !IS_AFFECTED( ch->mount, AFF_FLYING ) ) ) )
     {
-	if ( fall > 80 )
+      if ( fall > 80 )
 	{
-	   bug( "Falling (in a loop?) more than 80 rooms: vnum %d", ch->in_room->vnum );
-	   char_from_room( ch );
-	   char_to_room( ch, get_room_index( wherehome(ch) ) );
-	   fall = 0;
-	   return TRUE;
+	  bug( "Falling (in a loop?) more than 80 rooms: vnum %d", ch->in_room->vnum );
+	  char_from_room( ch );
+	  char_to_room( ch, get_room_index( wherehome(ch) ) );
+	  fall = 0;
+	  return TRUE;
 	}
-	set_char_color( AT_FALLING, ch );
-	send_to_char( "You're falling down...\r\n", ch );
-	move_char( ch, get_exit(ch->in_room, DIR_DOWN), ++fall );
-	return TRUE;
+
+      set_char_color( AT_FALLING, ch );
+      send_to_char( "You're falling down...\r\n", ch );
+      move_char( ch, get_exit(ch->in_room, DIR_DOWN), ++fall );
+      return TRUE;
     }
-    return FALSE;
+
+  return FALSE;
 }
 
 
@@ -1089,8 +1091,6 @@ void do_southwest( CHAR_DATA *ch, char *argument )
     move_char( ch, get_exit(ch->in_room, DIR_SOUTHWEST), 0 );
     return;
 }
-
-
 
 EXIT_DATA *find_door( CHAR_DATA *ch, char *arg, bool quiet )
 {

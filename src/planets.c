@@ -69,7 +69,7 @@ void write_planet_list( )
     fclose( fpout );
 }
 
-void save_planet( PLANET_DATA *planet )
+void save_planet( const PLANET_DATA *planet )
 {
     FILE *fp;
     char filename[256];
@@ -1056,7 +1056,7 @@ void do_capture ( CHAR_DATA *ch , char *argument )
    return; 
 }
 
-long get_taxes( PLANET_DATA *planet )
+long get_taxes( const PLANET_DATA *planet )
 {
   long gain = 0;
   long bigships = 0;
@@ -1078,7 +1078,7 @@ long get_taxes( PLANET_DATA *planet )
   return gain;
 }
 
-int max_population( PLANET_DATA *planet )
+int max_population( const PLANET_DATA *planet )
 {
   int support = (int)((planet->pop_support + 200) / 3);
   int pmax = planet->citysize;

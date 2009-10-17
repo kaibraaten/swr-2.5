@@ -92,7 +92,7 @@ void    make_garage( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
 void    make_elevator( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
 long    get_design_value( int hull, int energy, int shield, int speed, int manuever, int lasers, int missiles, int chaff, int smodel );
 
-long int get_prototype_value( SHIP_PROTOTYPE *prototype )
+long int get_prototype_value( const SHIP_PROTOTYPE *prototype )
 {
   long int price = 0;
           
@@ -244,7 +244,7 @@ SHIP_PROTOTYPE *get_ship_prototype( const char *name )
   return NULL;
 }
 
-void save_ship_prototype( SHIP_PROTOTYPE *prototype )
+void save_ship_prototype( const SHIP_PROTOTYPE *prototype )
 {
   FILE *fp;
   char filename[256];
@@ -775,7 +775,7 @@ void do_makeship( CHAR_DATA *ch, char *argument )
   write_prototype_list( );
 }
 
-SHIP_DATA * make_ship( SHIP_PROTOTYPE *prototype )
+SHIP_DATA * make_ship( const SHIP_PROTOTYPE *prototype )
 {
   SHIP_DATA *ship = NULL;
   int shipreg = 0;
@@ -1795,7 +1795,7 @@ void post_ship_guard( ROOM_INDEX_DATA * pRoomIndex )
 
   if ( ( pObjIndex = get_obj_index( OBJ_VNUM_BLASTER ) ) != NULL )
     {
-      blaster = create_object( pObjIndex, mob->top_level );
+      blaster = create_object( pObjIndex );
       obj_to_char( blaster, mob );
       equip_char( mob, blaster, WEAR_WIELD );                        
     }

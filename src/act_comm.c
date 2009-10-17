@@ -22,7 +22,7 @@ const char *drunk_speech( const char *argument, CHAR_DATA *ch );
 
 #define	MAX_NOISE	1
 
-void sound_to_room( ROOM_INDEX_DATA *room, const char *argument )
+void sound_to_room( const ROOM_INDEX_DATA *room, const char *argument )
 {
   CHAR_DATA *vic = NULL;
 

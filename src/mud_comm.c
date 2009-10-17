@@ -118,7 +118,7 @@ void do_mp_offer_job( CHAR_DATA *ch, char *argument )
           return;
        }
 
-       obj = create_object( pObjIndex , 1 );
+       obj = create_object( pObjIndex );
        STRFREE( obj->name );
        obj->name = STRALLOC( buf );
        STRFREE( obj->short_descr );
@@ -696,7 +696,7 @@ void do_mpoload( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    obj = create_object( pObjIndex, level );
+    obj = create_object( pObjIndex );
     obj->timer = timer;
     if ( CAN_WEAR(obj, ITEM_TAKE) )
 	obj_to_char( obj, ch );

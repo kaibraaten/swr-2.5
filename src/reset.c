@@ -89,7 +89,7 @@ void reset_all( )
                    SET_BIT(mob->affected_by, AFF_INFRARED);
                   if ( ( pObjIndex = get_obj_index( OBJ_VNUM_BLASTER ) ) != NULL )
                   {
-                     obj = create_object( pObjIndex, mob->top_level );
+		    obj = create_object( pObjIndex );
                      obj_to_char( obj, mob );
                      equip_char( mob, obj, WEAR_WIELD );                        
                   } 
@@ -218,7 +218,7 @@ void reset_all( )
         		   bug( "Reset_all: Missing default light (%d)", OBJ_VNUM_LIGHT );
       			   return;
       			}
-                     obj = create_object(pObjIndex, 1);
+                     obj = create_object(pObjIndex);
                      SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                      obj = obj_to_char(obj, mob);
                    }
@@ -229,7 +229,7 @@ void reset_all( )
         		   bug( "Reset_all: Missing default comlink (%d)", OBJ_VNUM_COMLINK );
       			   return;
       			}
-                     obj = create_object(pObjIndex, 1);
+                     obj = create_object(pObjIndex);
                      SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                      obj = obj_to_char(obj, mob);
                    }
@@ -240,7 +240,7 @@ void reset_all( )
         		   bug( "Reset_all: Missing default canteen (%d)", OBJ_VNUM_CANTEEN );
       			   return;
       			}
-                     obj = create_object(pObjIndex, 1);
+                     obj = create_object(pObjIndex);
                      SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                      obj = obj_to_char(obj, mob);
                    }
@@ -251,7 +251,7 @@ void reset_all( )
         		   bug( "Reset_all: Missing default shovel (%d)", OBJ_VNUM_SHOVEL );
       			   return;
       			}
-                     obj = create_object(pObjIndex, 1);
+                     obj = create_object(pObjIndex);
                      SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                      obj = obj_to_char(obj, mob);
                    }
@@ -263,7 +263,7 @@ void reset_all( )
       		   {
                      if ( (pObjIndex = get_obj_index(OBJ_VNUM_BATTERY)) )
                      {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                      }
@@ -272,7 +272,7 @@ void reset_all( )
       		   {
                      if ( !(pObjIndex = get_obj_index(OBJ_VNUM_BACKPACK)) )
                      {
-                       obj = create_object(pObjIndex, 1);
+                       obj = create_object(pObjIndex);
                        SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                        obj = obj_to_char(obj, mob);
                      }
@@ -281,7 +281,7 @@ void reset_all( )
       		   {
                      if ( (pObjIndex = get_obj_index(OBJ_VNUM_AMMO)) )
                      {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);	        
                      }
@@ -290,7 +290,7 @@ void reset_all( )
       		   {
                      if ( (pObjIndex = get_obj_index(OBJ_VNUM_SCHOOL_DAGGER)) )
                      {
-                       obj = create_object(pObjIndex, 1);
+                       obj = create_object(pObjIndex);
                        SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                        obj = obj_to_char(obj, mob);
 	             }
@@ -299,7 +299,7 @@ void reset_all( )
       		   {
                      if ( (pObjIndex = get_obj_index(OBJ_VNUM_BLASTER)) )
                      {
-                       obj = create_object(pObjIndex, 1);
+                       obj = create_object(pObjIndex);
                        SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                        obj = obj_to_char(obj, mob);
 	             }
@@ -308,7 +308,7 @@ void reset_all( )
 	           onum = number_range( OBJ_VNUM_FIRST_PART ,OBJ_VNUM_LAST_PART  );
                    if ( (pObjIndex = get_obj_index(onum)) )
                    {
-                     obj = create_object(pObjIndex, 1);
+                     obj = create_object(pObjIndex);
                      obj = obj_to_char(obj, mob);
                      SET_BIT(obj->extra_flags, ITEM_INVENTORY);
 	           }
@@ -319,37 +319,37 @@ void reset_all( )
 	       {
                     if ( (pObjIndex = get_obj_index(OBJ_VNUM_APPETIZER)) )
                     {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                     }
                     if ( (pObjIndex = get_obj_index(OBJ_VNUM_SALAD)) )
                     {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                     }
                     if ( (pObjIndex = get_obj_index(OBJ_VNUM_LUNCH)) )
                     {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                     }
                     if ( (pObjIndex = get_obj_index(OBJ_VNUM_DINNER)) )
                     {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                     }
                     if ( (pObjIndex = get_obj_index(OBJ_VNUM_GLASSOFWATER)) )
                     {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                     }
                     if ( (pObjIndex = get_obj_index(OBJ_VNUM_COFFEE)) )
                     {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                     }
@@ -359,25 +359,25 @@ void reset_all( )
 	       {
                     if ( (pObjIndex = get_obj_index(OBJ_VNUM_BEER)) )
                     {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                     }
                     if ( (pObjIndex = get_obj_index(OBJ_VNUM_WHISKEY)) )
                     {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                     }
                     if ( (pObjIndex = get_obj_index(OBJ_VNUM_GLASSOFWATER)) )
                     {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                     }
                     if ( (pObjIndex = get_obj_index(OBJ_VNUM_COFFEE)) )
                     {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                     }
@@ -395,7 +395,7 @@ void reset_all( )
    	   }
    	   if ( count_obj_list(pObjIndex, pRoomIndex->first_content) <= 0 )
    	   {
-      	     obj = create_object(pObjIndex, 1);
+      	     obj = create_object(pObjIndex);
              obj_to_room(obj, pRoomIndex);
    	   }
         }
@@ -409,7 +409,7 @@ void reset_all( )
    	   }
    	   if ( count_obj_list(pObjIndex, pRoomIndex->first_content) <= 0 )
    	   {
-      	     obj = create_object(pObjIndex, 1);
+      	     obj = create_object(pObjIndex);
              obj_to_room(obj, pRoomIndex);
    	   }
         }
@@ -444,9 +444,9 @@ void reset_all( )
             mob->hitroll = 20;
             if ( ( pObjIndex = get_obj_index( OBJ_VNUM_BLASTER ) ) != NULL )
             {
-                 blaster = create_object( pObjIndex, mob->top_level );
-                 obj_to_char( blaster, mob );
-                 equip_char( mob, blaster, WEAR_WIELD );                        
+	      blaster = create_object( pObjIndex );
+	      obj_to_char( blaster, mob );
+	      equip_char( mob, blaster, WEAR_WIELD );                        
             } 
             do_setblaster( mob , const_char_to_nonconst("full") );
 
@@ -600,7 +600,7 @@ void reset_all( )
         	   bug( "Reset_all: Missing obj (%d)", vnum );
         	   return;
       	    }
-            obj = create_object(pObjIndex , 1);
+            obj = create_object(pObjIndex);
             if ( pRoomIndex->sector_type != SECT_FARMLAND )
             {
                if ( vnum == OBJ_VNUM_ROOT || vnum == OBJ_VNUM_CRYSTAL 
@@ -646,13 +646,13 @@ void reset_all( )
                   for ( rep = 0 ; rep < 3 ; rep++ )
                     if ( (pObjIndex = get_obj_index( number_range( OBJ_VNUM_FIRST_FABRIC , OBJ_VNUM_LAST_FABRIC  ) ) ) )
                     {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                     }
                   if ( (pObjIndex = get_obj_index( OBJ_VNUM_SEWKIT ) ) )
                   {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                   }
@@ -670,7 +670,7 @@ void reset_all( )
                   pRoomIndex->area->planet->population++;
                   if ( (pObjIndex = get_obj_index( OBJ_VNUM_BLACK_POWDER ) ) )
                   {
-                        obj = create_object(pObjIndex, 1);
+                        obj = create_object(pObjIndex);
                         SET_BIT(obj->extra_flags, ITEM_INVENTORY);
                         obj = obj_to_char(obj, mob);
                   }
@@ -793,11 +793,11 @@ void reset_all( )
                   pRoomIndex->area->planet->population++;
                   if ( (pObjIndex = get_obj_index( OBJ_VNUM_DRAGON_NEST ) ) )
                   {
-                        nest = create_object(pObjIndex, 1);
+                        nest = create_object(pObjIndex);
                         nest = obj_to_room(nest, pRoomIndex);
                         if ( (pObjIndex = get_obj_index( OBJ_VNUM_DRAGON_CRYSTAL ) ) )
                         {
-                            obj = create_object(pObjIndex, 1);
+                            obj = create_object(pObjIndex);
                             obj = obj_to_obj(obj, nest);
                         }
                   }
@@ -920,275 +920,6 @@ void reset_all( )
 
      }
    }
-                        
-/*
-
-  for ( pReset = first_reset; pReset; pReset = pReset->next )
-  {
-    num++;
-    switch( pReset->command )
-    {
-    default:
-      bug( "Reset_area: %d bad command %c.", num,  pReset->command );
-      break;
-    
-    case 'M':
-      if ( !(pMobIndex = get_mob_index(pReset->arg1)) )
-      {
-        bug( "Reset_area: %d 'M': bad mob vnum %ld.", num, pReset->arg1 );
-        continue;
-      }
-      if ( !(pRoomIndex = get_room_index(pReset->arg3)) )
-      {
-        bug( "Reset_area: %d 'M': bad room vnum %ld.", num, pReset->arg3 );
-        continue;
-      }
-      if ( pMobIndex->count >= pReset->arg2 )
-      {
-        mob = NULL;
-        break;
-      }
-      mob = create_mobile(pMobIndex);
-      {
-        ROOM_INDEX_DATA *pRoomPrev = get_room_index(pReset->arg3 - 1);
-        
-        if ( pRoomPrev && IS_SET(pRoomPrev->room_flags, ROOM_PET_SHOP) )
-          SET_BIT(mob->act, ACT_PET);
-      }
-      if ( room_is_dark(pRoomIndex) )
-        SET_BIT(mob->affected_by, AFF_INFRARED);
-      char_to_room(mob, pRoomIndex);
-      level = URANGE(0, mob->top_level - 2, LEVEL_AVATAR);
-      if ( pRoomIndex->area->planet )
-            pRoomIndex->area->planet->population++;
-      break;
-    
-    case 'G':
-    case 'E':
-      if ( !(pObjIndex = get_obj_index(pReset->arg1)) )
-      {
-        bug( "Reset_area: %d 'E' or 'G': bad obj vnum %ld.", num, pReset->arg1 );
-        continue;
-      }
-      if ( !mob )
-      {
-        lastobj = NULL;
-        break;
-      }
-      if ( mob->pIndexData->pShop )
-      {
-	int olevel = generate_itemlevel( pObjIndex );
-        obj = create_object(pObjIndex, olevel);
-        SET_BIT(obj->extra_flags, ITEM_INVENTORY);
-      }
-      else
-        obj = create_object(pObjIndex, number_fuzzy(level));
-      obj->level = URANGE(0, obj->level, LEVEL_AVATAR);
-      obj = obj_to_char(obj, mob);
-      if ( pReset->command == 'E' )
-        equip_char(mob, obj, pReset->arg3);
-      lastobj = obj;
-      break;
-    
-    case 'O':
-      if ( !(pObjIndex = get_obj_index(pReset->arg1)) )
-      {
-        bug( "Reset_area: %d 'O': bad obj vnum %ld.", num, pReset->arg1 );
-        continue;
-      }
-      if ( !(pRoomIndex = get_room_index(pReset->arg3)) )
-      {
-        bug( "Reset_area: %d 'O': bad room vnum %ld.", num, pReset->arg3 );
-        continue;
-      }
-      if ( count_obj_list(pObjIndex, pRoomIndex->first_content) > 0 )
-      {
-        obj = NULL;
-        lastobj = NULL;
-        break;
-      }
-      obj = create_object(pObjIndex, number_fuzzy(generate_itemlevel( pObjIndex)));
-      obj->level = UMIN(obj->level, LEVEL_AVATAR);
-      obj->cost = 0;
-      obj_to_room(obj, pRoomIndex);
-      lastobj = obj;
-      break;
-    
-    case 'P':
-      if ( !(pObjIndex = get_obj_index(pReset->arg1)) )
-      {
-        bug( "Reset_area: %d 'P': bad obj vnum %ld.", num, pReset->arg1 );
-        continue;
-      }
-      if ( pReset->arg3 > 0 )
-      {
-        if ( !(pObjToIndex = get_obj_index(pReset->arg3)) )
-        {
-          bug( "Reset_area: %d 'P': bad objto vnum %ld.", num, pReset->arg3 );
-          continue;
-        }
-        if (
-           !(to_obj = get_obj_type(pObjToIndex)) ||
-            !to_obj->in_room ||
-             count_obj_list(pObjIndex, to_obj->first_content) > 0 )
-        {
-          obj = NULL;
-          break;
-        }
-        lastobj = to_obj;
-      }
-      else
-      {
-        int iNest;
-        
-        if ( !lastobj )
-          break;
-        to_obj = lastobj;
-        for ( iNest = 0; iNest < pReset->extra; iNest++ )
-          if ( !(to_obj = to_obj->last_content) )
-          {
-            bug( "Reset_area: %d 'P': Invalid nesting obj %d.", num, pReset->arg1 );
-            iNest = -1;
-            break;
-          }
-        if ( iNest < 0 )
-          continue;
-      }
-      obj = create_object(pObjIndex, number_fuzzy(UMAX(generate_itemlevel( pObjIndex),to_obj->level)));
-      obj->level = UMIN(obj->level, LEVEL_AVATAR);
-      obj_to_obj(obj, to_obj);
-      break;
-    
-    case 'H':
-      if ( pReset->arg1 > 0 )
-      {
-        if ( !(pObjToIndex = get_obj_index(pReset->arg1)) )
-        {
-          bug( "Reset_area: %d 'H': bad objto vnum %ld.", num, pReset->arg1 );
-          continue;
-        }
-        if ( 
-           !(to_obj = get_obj_type(pObjToIndex)) ||
-            !to_obj->in_room ||
-             IS_OBJ_STAT(to_obj, ITEM_HIDDEN) )
-          break;
-      }
-      else
-      {
-        if ( !lastobj || !obj )
-          break;
-        to_obj = obj;
-      }
-      SET_BIT(to_obj->extra_flags, ITEM_HIDDEN);
-      break;
-    
-    case 'B':
-      switch(pReset->arg2 & BIT_RESET_TYPE_MASK)
-      {
-      case BIT_RESET_DOOR:
-        {
-        int doornum;
-        
-        if ( !(pRoomIndex = get_room_index(pReset->arg1)) )
-        {
-          bug( "Reset_area: %d 'B': door: bad room vnum %ld.", num, pReset->arg1 );
-          continue;
-        }
-        doornum = (pReset->arg2 & BIT_RESET_DOOR_MASK)
-                >> BIT_RESET_DOOR_THRESHOLD;
-        if ( !(pexit = get_exit(pRoomIndex, doornum)) )
-          break;
-        plc = &pexit->exit_info;
-        }
-        break;
-      case BIT_RESET_ROOM:
-        if ( !(pRoomIndex = get_room_index(pReset->arg1)) )
-        {
-          bug( "Reset_area: %d 'B': room: bad room vnum %ld.", num, pReset->arg1 );
-          continue;
-        }
-        plc = &pRoomIndex->room_flags;
-        break;
-      case BIT_RESET_OBJECT:
-        if ( pReset->arg1 > 0 )
-        {
-          if ( !(pObjToIndex = get_obj_index(pReset->arg1)) )
-          {
-            bug( "Reset_area: %d 'B': object: bad objto vnum %ld.", num, pReset->arg1 );
-            continue;
-          }
-          if ( !(to_obj = get_obj_type(pObjToIndex)) ||
-                !to_obj->in_room  )
-            continue;
-        }
-        else
-        {
-          if ( !lastobj || !obj )
-            continue;
-          to_obj = obj;
-        }
-        plc = &to_obj->extra_flags;
-        break;
-      case BIT_RESET_MOBILE:
-        if ( !mob )
-          continue;
-        plc = &mob->affected_by;
-        break;
-      default:
-        bug( "Reset_area: %d 'B': bad options %d.", num, pReset->arg2 );
-        continue;
-      }
-      if ( IS_SET(pReset->arg2, BIT_RESET_SET) )
-        SET_BIT(*plc, pReset->arg3);
-      else if ( IS_SET(pReset->arg2, BIT_RESET_TOGGLE) )
-        TOGGLE_BIT(*plc, pReset->arg3);
-      else
-        REMOVE_BIT(*plc, pReset->arg3);
-      break;
-    
-    case 'D':
-      if ( !(pRoomIndex = get_room_index(pReset->arg1)) )
-      {
-        bug( "Reset_area: %d 'D': bad room vnum %ld.", num, pReset->arg1 );
-        continue;
-      }
-      if ( !(pexit = get_exit(pRoomIndex, pReset->arg2)) )
-        break;
-      switch( pReset->arg3 )
-      {
-      case 0:
-        REMOVE_BIT(pexit->exit_info, EX_CLOSED);
-        REMOVE_BIT(pexit->exit_info, EX_LOCKED);
-        break;
-      case 1:
-        SET_BIT(   pexit->exit_info, EX_CLOSED);
-        REMOVE_BIT(pexit->exit_info, EX_LOCKED);
-        if ( IS_SET(pexit->exit_info, EX_xSEARCHABLE) )
-          SET_BIT( pexit->exit_info, EX_SECRET);
-        break;
-      case 2:
-        SET_BIT(   pexit->exit_info, EX_CLOSED);
-        SET_BIT(   pexit->exit_info, EX_LOCKED);
-        if ( IS_SET(pexit->exit_info, EX_xSEARCHABLE) )
-          SET_BIT( pexit->exit_info, EX_SECRET);
-        break;
-      }
-      break;
-    
-    case 'R':
-      if ( !(pRoomIndex = get_room_index(pReset->arg1)) )
-      {
-        bug( "Reset_area: %d 'R': bad room vnum %ld.", num, pReset->arg1 );
-        continue;
-      }
-      randomize_exits(pRoomIndex, pReset->arg2-1);
-      break;
-    }
-  }
-  return;
-
-*/
-
 }
 
 SHIP_DATA * make_mob_ship( PLANET_DATA *planet , int model )

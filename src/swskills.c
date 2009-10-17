@@ -166,7 +166,7 @@ void do_makeblade( CHAR_DATA *ch, char *argument )
        return;
     }
 
-    obj = create_object( pObjIndex, level );
+    obj = create_object( pObjIndex );
     
     obj->item_type = ITEM_WEAPON;
     SET_BIT( obj->wear_flags, ITEM_WIELD );
@@ -413,7 +413,7 @@ void do_makeblaster( CHAR_DATA *ch, char *argument )
        return;
     }
 
-    obj = create_object( pObjIndex, level );
+    obj = create_object( pObjIndex );
     
     obj->item_type = ITEM_WEAPON;
     SET_BIT( obj->wear_flags, ITEM_WIELD );
@@ -716,7 +716,7 @@ void do_makelightsaber( CHAR_DATA *ch, char *argument )
        return;
     }
 
-    obj = create_object( pObjIndex, level );
+    obj = create_object( pObjIndex );
     
     obj->item_type = ITEM_WEAPON;
     SET_BIT( obj->wear_flags, ITEM_WIELD );
@@ -1276,7 +1276,7 @@ void do_makeshield( CHAR_DATA *ch, char *argument )
        return;
     }
 
-    obj = create_object( pObjIndex, level );
+    obj = create_object( pObjIndex );
     
     obj->item_type = ITEM_ARMOR;
     SET_BIT( obj->wear_flags, ITEM_WIELD );
@@ -1662,9 +1662,9 @@ void add_reinforcements( CHAR_DATA *ch )
             mob[mob_cnt]->hitroll = 10;
             if ( ( pObjIndex = get_obj_index( OBJ_VNUM_BLASTER ) ) != NULL )
             {
-                 blaster = create_object( pObjIndex, mob[mob_cnt]->top_level );
-                 obj_to_char( blaster, mob[mob_cnt] );
-                 equip_char( mob[mob_cnt], blaster, WEAR_WIELD );                        
+	      blaster = create_object( pObjIndex );
+	      obj_to_char( blaster, mob[mob_cnt] );
+	      equip_char( mob[mob_cnt], blaster, WEAR_WIELD );                        
             } 
             
             if ( mob[mob_cnt]->master )
@@ -1700,9 +1700,9 @@ void add_reinforcements( CHAR_DATA *ch )
         mob->hitroll = 20;
         if ( ( pObjIndex = get_obj_index( OBJ_VNUM_BLASTER ) ) != NULL )
         {
-            blaster = create_object( pObjIndex, mob->top_level );
-            obj_to_char( blaster, mob );
-            equip_char( mob, blaster, WEAR_WIELD );                        
+	  blaster = create_object( pObjIndex );
+	  obj_to_char( blaster, mob );
+	  equip_char( mob, blaster, WEAR_WIELD );                        
         }
         do_setblaster( mob , const_char_to_nonconst("full") );
         if ( ch->pcdata && ch->pcdata->clan )   

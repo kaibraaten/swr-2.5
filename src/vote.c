@@ -37,7 +37,7 @@ void write_poll_list( )
 /*
  * Save a poll's data to its data file
  */
-void save_poll( VOTE_DATA *poll )
+void save_poll( const VOTE_DATA *poll )
 {
     FILE *fp;
     char player[256];

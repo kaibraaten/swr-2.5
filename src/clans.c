@@ -66,46 +66,47 @@ void write_clan_list( )
 /*
  * Save a clan's data to its data file
  */
-void save_clan( CLAN_DATA *clan )
+void save_clan( const CLAN_DATA *clan )
 {
-    FILE *fp;
-    char filename[256];
-    char buf[MAX_STRING_LENGTH];
+  FILE *fp;
+  char filename[256];
+  char buf[MAX_STRING_LENGTH];
 
-    if ( !clan )
+  if ( !clan )
     {
-	bug( "save_clan: null clan pointer!", 0 );
-	return;
+      bug( "save_clan: null clan pointer!", 0 );
+      return;
     }
         
-    if ( !clan->filename || clan->filename[0] == '\0' )
+  if ( !clan->filename || clan->filename[0] == '\0' )
     {
-	sprintf( buf, "save_clan: %s has no filename", clan->name );
-	bug( buf, 0 );
-	return;
+      sprintf( buf, "save_clan: %s has no filename", clan->name );
+      bug( buf, 0 );
+      return;
     }
  
-    sprintf( filename, "%s%s", CLAN_DIR, clan->filename );
+  sprintf( filename, "%s%s", CLAN_DIR, clan->filename );
     
-    if ( ( fp = fopen( filename, "w" ) ) == NULL )
+  if ( ( fp = fopen( filename, "w" ) ) == NULL )
     {
-    	bug( "save_clan: fopen", 0 );
-    	perror( filename );
+      bug( "save_clan: fopen", 0 );
+      perror( filename );
     }
-    else
+  else
     {
-	fprintf( fp, "#CLAN\n" );
-	fprintf( fp, "Name         %s~\n",	clan->name		);
-	fprintf( fp, "Filename     %s~\n",	clan->filename		);
-	fprintf( fp, "Description  %s~\n",	clan->description	);
-	fprintf( fp, "Leaders      %s~\n",	clan->leaders		);
-	fprintf( fp, "Atwar        %s~\n",	clan->atwar		);
-	fprintf( fp, "Members      %d\n",	clan->members		);
-	fprintf( fp, "Funds        %ld\n",	clan->funds		);
-	fprintf( fp, "End\n\n"						);
-	fprintf( fp, "#END\n"						);
+      fprintf( fp, "#CLAN\n" );
+      fprintf( fp, "Name         %s~\n",	clan->name		);
+      fprintf( fp, "Filename     %s~\n",	clan->filename		);
+      fprintf( fp, "Description  %s~\n",	clan->description	);
+      fprintf( fp, "Leaders      %s~\n",	clan->leaders		);
+      fprintf( fp, "Atwar        %s~\n",	clan->atwar		);
+      fprintf( fp, "Members      %d\n",	clan->members		);
+      fprintf( fp, "Funds        %ld\n",	clan->funds		);
+      fprintf( fp, "End\n\n"						);
+      fprintf( fp, "#END\n"						);
     }
-    fclose( fp );
+
+  fclose( fp );
 }
 
 /*

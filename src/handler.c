@@ -1912,7 +1912,7 @@ bool room_is_private( CHAR_DATA *ch , ROOM_INDEX_DATA *pRoomIndex )
 /*
  * True if char can see victim.
  */
-bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )
+bool can_see( const CHAR_DATA *ch, const CHAR_DATA *victim )
 {
     if (!victim)
        return FALSE;
@@ -1987,7 +1987,7 @@ bool can_see( CHAR_DATA *ch, CHAR_DATA *victim )
 /*
  * True if char can see obj.
  */
-bool can_see_obj( CHAR_DATA *ch, OBJ_DATA *obj )
+bool can_see_obj( const CHAR_DATA *ch, const OBJ_DATA *obj )
 {
     if ( !IS_NPC(ch) && IS_SET(ch->act, PLR_HOLYLIGHT) )
 	return TRUE;
@@ -2702,7 +2702,7 @@ void add_timer( CHAR_DATA *ch, short type, short count, DO_FUN *fun, int value )
     }
 }
 
-TIMER *get_timerptr( CHAR_DATA *ch, short type )
+TIMER *get_timerptr( const CHAR_DATA *ch, short type )
 {
     TIMER *timer;
 
@@ -2712,7 +2712,7 @@ TIMER *get_timerptr( CHAR_DATA *ch, short type )
     return NULL;
 }
 
-short get_timer( CHAR_DATA *ch, short type )
+short get_timer( const CHAR_DATA *ch, short type )
 {
     TIMER *timer;
 

@@ -881,7 +881,7 @@ SPACE_DATA *starsystem_from_name( const char *name )
 /*
  * Get pointer to space structure from the dock vnun.
  */
-SPACE_DATA *starsystem_from_room( ROOM_INDEX_DATA * room )
+SPACE_DATA *starsystem_from_room( const ROOM_INDEX_DATA * room )
 {
     SHIP_DATA * ship;
     ROOM_INDEX_DATA * sRoom;
@@ -904,7 +904,7 @@ SPACE_DATA *starsystem_from_room( ROOM_INDEX_DATA * room )
 /*
  * Save a starsystem's data to its data file
  */
-void save_starsystem( SPACE_DATA *starsystem )
+void save_starsystem( const SPACE_DATA *starsystem )
 {
     FILE *fp;
     char filename[256];
@@ -1253,7 +1253,7 @@ void do_setstarsystem( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void showstarsystem( CHAR_DATA *ch , SPACE_DATA *starsystem )
+void showstarsystem( CHAR_DATA *ch , const SPACE_DATA *starsystem )
 {   
   PLANET_DATA * planet;
     
@@ -1372,7 +1372,7 @@ void write_ship_list( )
     fclose( fpout );
 }
                                                                     
-SHIP_DATA * ship_in_room( ROOM_INDEX_DATA *room, const char *name )
+SHIP_DATA * ship_in_room( const ROOM_INDEX_DATA *room, const char *name )
 {
     SHIP_DATA *ship;
 
@@ -1440,7 +1440,7 @@ SHIP_DATA *get_ship( const char *name )
 /*
  * Checks if ships in a starsystem and returns poiner if it is.
  */
-SHIP_DATA *get_ship_here( const char *name , SPACE_DATA *starsystem)
+SHIP_DATA *get_ship_here( const char *name, const SPACE_DATA *starsystem)
 {
   SHIP_DATA *ship;
     
@@ -1486,23 +1486,23 @@ SHIP_DATA *ship_from_pilot( const char *name )
  * Get pointer to ship structure from cockpit, or entrance ramp vnum.
  */
  
-SHIP_DATA *ship_from_room( ROOM_INDEX_DATA * room )
+SHIP_DATA *ship_from_room( const ROOM_INDEX_DATA * room )
 {
-   SHIP_DATA *ship;
-   ROOM_INDEX_DATA *sRoom;
+  SHIP_DATA *ship;
+  ROOM_INDEX_DATA *sRoom;
    
-   if ( room == NULL )
-      return NULL;
-   
-   for ( ship = first_ship; ship; ship = ship->next )
-     for ( sRoom = ship->first_room ; sRoom ; sRoom = sRoom->next_in_ship ) 
-        if ( room == sRoom )
-              return ship;
-
+  if ( room == NULL )
     return NULL;
+   
+  for ( ship = first_ship; ship; ship = ship->next )
+    for ( sRoom = ship->first_room ; sRoom ; sRoom = sRoom->next_in_ship ) 
+      if ( room == sRoom )
+	return ship;
+
+  return NULL;
 }
 
-SHIP_DATA *ship_from_cockpit( ROOM_INDEX_DATA * room )
+SHIP_DATA *ship_from_cockpit( const ROOM_INDEX_DATA * room )
 {
    SHIP_DATA *ship;
    TURRET_DATA *turret;
@@ -1526,7 +1526,7 @@ SHIP_DATA *ship_from_cockpit( ROOM_INDEX_DATA * room )
    return NULL;
 }
 
-SHIP_DATA *ship_from_pilotseat( ROOM_INDEX_DATA * room )
+SHIP_DATA *ship_from_pilotseat( const ROOM_INDEX_DATA * room )
 {
    SHIP_DATA *ship;
 
@@ -1540,7 +1540,7 @@ SHIP_DATA *ship_from_pilotseat( ROOM_INDEX_DATA * room )
    return NULL;
 }
 
-SHIP_DATA *ship_from_gunseat( ROOM_INDEX_DATA * room )
+SHIP_DATA *ship_from_gunseat( const ROOM_INDEX_DATA * room )
 {
    SHIP_DATA *ship;
 
@@ -1554,7 +1554,7 @@ SHIP_DATA *ship_from_gunseat( ROOM_INDEX_DATA * room )
    return NULL;
 }
 
-SHIP_DATA *ship_from_entrance( ROOM_INDEX_DATA * room )
+SHIP_DATA *ship_from_entrance( const ROOM_INDEX_DATA * room )
 {
    SHIP_DATA *ship;
 
@@ -1567,7 +1567,7 @@ SHIP_DATA *ship_from_entrance( ROOM_INDEX_DATA * room )
 
     return NULL;
 }
-SHIP_DATA *ship_from_engine( ROOM_INDEX_DATA * room )
+SHIP_DATA *ship_from_engine( const ROOM_INDEX_DATA * room )
 {
    SHIP_DATA *ship;
 
@@ -1581,7 +1581,7 @@ SHIP_DATA *ship_from_engine( ROOM_INDEX_DATA * room )
     return NULL;
 }
 
-SHIP_DATA *ship_from_turret( ROOM_INDEX_DATA * room )
+SHIP_DATA *ship_from_turret( const ROOM_INDEX_DATA * room )
 {
    SHIP_DATA *ship;
    TURRET_DATA *turret;
@@ -1603,7 +1603,7 @@ SHIP_DATA *ship_from_turret( ROOM_INDEX_DATA * room )
 
 
 
-void save_ship( SHIP_DATA *ship )
+void save_ship( const SHIP_DATA *ship )
 {
     FILE *fp;
     char filename[256];
@@ -2575,7 +2575,7 @@ void extract_missile( MISSILE_DATA *missile )
           
 }
 
-bool check_pilot( CHAR_DATA *ch , SHIP_DATA *ship )
+bool check_pilot( const CHAR_DATA *ch , const SHIP_DATA *ship )
 {
    if ( !str_cmp(ch->name,ship->owner) || !str_cmp(ch->name,ship->pilot) 
    || !str_cmp(ch->name,ship->copilot) )
@@ -2808,7 +2808,7 @@ static void destroy_ship_kill_characters( const SHIP_DATA *ship,
                     update_pos( rch );
 		    echo_to_room( AT_WHITE, rch->in_room, "There is loud explosion as an escape pod hits the earth." );
 
-                    scraps = create_object( get_obj_index( OBJ_VNUM_SCRAPS ), 0 );
+                    scraps = create_object( get_obj_index( OBJ_VNUM_SCRAPS ) );
                     scraps->timer = 15;
                     STRFREE( scraps->short_descr );
                     scraps->short_descr = STRALLOC( "a battered escape pod" );
