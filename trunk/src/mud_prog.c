@@ -1137,7 +1137,7 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
   bool ifstate[MAX_IFS][ DO_ELSE + 1 ];
   static int prog_nest;
   
-  if IS_AFFECTED( mob, AFF_CHARM )
+  if( IS_AFFECTED( mob, AFF_CHARM ) )
     return;
     
   /* Next couple of checks stop program looping. -- Altrag */

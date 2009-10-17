@@ -1985,8 +1985,8 @@ void do_who( CHAR_DATA *ch, char *argument )
 	    
 	  strcpy( clan_name, " (" );
 
-	    if ( nifty_is_name( wch->name, pclan->leaders ) )
-              strcat( clan_name, "Leader, " );
+	  if( clan_char_is_leader( pclan, wch ) )
+	    strcat( clan_name, "Leader, " );
 
 	  strcat( clan_name, pclan->name );
 	  strcat( clan_name, ")" );
@@ -3085,7 +3085,7 @@ void do_afk( CHAR_DATA *ch, char *argument )
      if ( IS_NPC(ch) )
      return;
      
-     if IS_SET(ch->act, PLR_AFK)
+     if( IS_SET(ch->act, PLR_AFK) )
      {
     	REMOVE_BIT(ch->act, PLR_AFK);
 	send_to_char( "You are no longer afk.\r\n", ch );

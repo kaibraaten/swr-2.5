@@ -510,12 +510,10 @@ struct	help_data
     char *	text;
 };
 
-
-
 /*
  * Shop types.
  */
-#define MAX_TRADE	 5
+#define MAX_TRADE 5
 
 struct	shop_data
 {
@@ -529,9 +527,9 @@ struct	shop_data
     short	close_hour;		/* First closing hour		*/
 };
 
-#define MAX_FIX		3
-#define SHOP_FIX	1
-#define SHOP_RECHARGE	2
+#define MAX_FIX 3
+#define SHOP_FIX 1
+#define SHOP_RECHARGE 2
 
 struct	repairshop_data
 {
@@ -2347,11 +2345,12 @@ int urange( int mincheck, int check, int maxcheck );
 #define URANGE(a, b, c )  ( urange( (a), (b), (c) ) )
 #define LOWER(c)		((char) tolower((c)))
 #define UPPER(c)		((char) toupper((c)))
-#define IS_SET(flag, bit)	((flag) & (bit))
+bool IS_SET( long, long );
+CHAR_DATA *CH( DESCRIPTOR_DATA* );
+
 #define SET_BIT(var, bit)	((var) |= (bit))
 #define REMOVE_BIT(var, bit)	((var) &= ~(bit))
 #define TOGGLE_BIT(var, bit)	((var) ^= (bit))
-#define CH(d) ((d)->original ? (d)->original : (d)->character)
 
 #if defined(KEY)
 #undef KEY
@@ -2547,47 +2546,26 @@ do								\
 /*
  * Character macros.
  */
-#define IS_NPC(ch)		(IS_SET((ch)->act, ACT_IS_NPC))
-#define IS_IMMORTAL(ch)		((ch)->top_level == 200 )
-#define IS_OFFICIAL(ch)		(is_name((ch)->name,sysdata.officials))
-#define IS_AFFECTED(ch, sn)	(IS_SET((ch)->affected_by, (sn)))
-#define HAS_BODYPART(ch, part)	((ch)->xflags == 0 || IS_SET((ch)->xflags, (part)))
-
-#define IS_GOOD(ch)		((ch)->alignment >= 350)
-#define IS_EVIL(ch)		((ch)->alignment <= -350)
-#define IS_NEUTRAL(ch)		(!IS_GOOD(ch) && !IS_EVIL(ch))
-
-#define IS_AWAKE(ch)		((ch)->position > POS_SLEEPING)
-#define GET_AC(ch)		( (ch)->armor + ( IS_AWAKE(ch) ? dex_app[get_curr_dex(ch)].defensive : 0 ) )
-#define GET_HITROLL(ch)		((ch)->hitroll				    \
-				    +str_app[get_curr_str(ch)].tohit	    \
-				    +(2-(abs((ch)->mental_state)/10)))
-#define GET_DAMROLL(ch)		((ch)->damroll                              \
-				    +str_app[get_curr_str(ch)].todam	    \
-				    +(((ch)->mental_state > 5		    \
-				    &&(ch)->mental_state < 15) ? 1 : 0) )
-
-#define IS_OUTSIDE(ch)		(!IS_SET(				    \
-				    (ch)->in_room->room_flags,		    \
-				    ROOM_INDOORS) && !IS_SET(               \
-				    (ch)->in_room->room_flags,              \
-				    ROOM_SPACECRAFT) )
-
-#define IS_DRUNK(ch, drunk)     (number_percent() < \
-			        ( (ch)->pcdata->condition[COND_DRUNK] \
-				* 2 / (drunk) ) )
-
-#define IS_CLANNED(ch)		(!IS_NPC((ch))				    \
-				&& (ch)->pcdata->clan			    )
+bool IS_NPC( const CHAR_DATA *ch );
+bool IS_IMMORTAL( const CHAR_DATA *ch );
+bool IS_OFFICIAL( const CHAR_DATA *ch );
+bool IS_AFFECTED( const CHAR_DATA*, int sn );
+bool HAS_BODYPART( const CHAR_DATA*, int part );
+bool IS_GOOD( const CHAR_DATA *ch );
+bool IS_EVIL( const CHAR_DATA *ch );
+bool IS_NEUTRAL( const CHAR_DATA* );
+bool IS_AWAKE( const CHAR_DATA *ch );
+short GET_AC( const CHAR_DATA *ch );
+short GET_HITROLL( const CHAR_DATA *ch );
+short GET_DAMROLL( const CHAR_DATA *ch );
+bool IS_OUTSIDE( const CHAR_DATA *ch );
+bool IS_DRUNK( const CHAR_DATA *ch, int drunk );
+bool IS_CLANNED( const CHAR_DATA *ch );
 
 #define WAIT_STATE(ch, npulse)	((ch)->wait = (short)(UMAX((ch)->wait, (npulse))))
 
-
-#define EXIT(ch, door)		( get_exit( (ch)->in_room, door ) )
-
-#define CAN_GO(ch, door)	(EXIT((ch),(door))			 \
-				&& (EXIT((ch),(door))->to_room != NULL)  \
-                          	&& !IS_SET(EXIT((ch), (door))->exit_info, EX_CLOSED))
+#define EXIT(ch,door) (get_exit(((ch)->in_room), (door)))
+#define CAN_GO(ch,door) ((EXIT((ch),(door))) && (EXIT((ch),(door))->to_room) != NULL && (!IS_SET( EXIT((ch),(door))->exit_info,EX_CLOSED)))
 
 #define IS_VALID_SN(sn)		( (sn) >=0 && (sn) < MAX_SKILL		     \
 				&& skill_table[(sn)]			     \
@@ -3484,6 +3462,9 @@ int     get_wanted_flag args( ( const char *flag ) );
 void    save_some_areas args( ( ) );
 
 /* clans.c */
+void clan_add_leader( CLAN_DATA *clan, const char *name );
+void clan_remove_leader( CLAN_DATA *ch, const char *name );
+bool clan_char_is_leader( const CLAN_DATA*, const CHAR_DATA* );
 void clan_decrease_vehicles_owned( CLAN_DATA *clan, const SHIP_DATA *ship );
 CL *	get_clan		args( ( const char *name ) );
 void	load_clans		args( ( void ) );
@@ -3759,19 +3740,19 @@ void character_extract_carried_objects( CHAR_DATA *ch );
 void room_extract_mobiles( ROOM_INDEX_DATA *room );
 void room_extract_contents( ROOM_INDEX_DATA *room );
 void    explode         args( ( OBJ_DATA *obj ) );
-short	get_trust	args( ( CHAR_DATA *ch ) );
-short	get_age		args( ( CHAR_DATA *ch ) );
-short	get_curr_str	args( ( CHAR_DATA *ch ) );
-short	get_curr_int	args( ( CHAR_DATA *ch ) );
-short	get_curr_wis	args( ( CHAR_DATA *ch ) );
-short	get_curr_dex	args( ( CHAR_DATA *ch ) );
-short	get_curr_con	args( ( CHAR_DATA *ch ) );
-short	get_curr_cha	args( ( CHAR_DATA *ch ) );
-short  get_curr_lck	args( ( CHAR_DATA *ch ) );
-short  get_curr_frc	args( ( CHAR_DATA *ch ) );
-bool	can_take_proto	args( ( CHAR_DATA *ch ) );
-int	can_carry_n	args( ( CHAR_DATA *ch ) );
-int	can_carry_w	args( ( CHAR_DATA *ch ) );
+short	get_trust	args( ( const CHAR_DATA *ch ) );
+short	get_age		args( ( const CHAR_DATA *ch ) );
+short	get_curr_str	args( ( const CHAR_DATA *ch ) );
+short	get_curr_int	args( ( const CHAR_DATA *ch ) );
+short	get_curr_wis	args( ( const CHAR_DATA *ch ) );
+short	get_curr_dex	args( ( const CHAR_DATA *ch ) );
+short	get_curr_con	args( ( const CHAR_DATA *ch ) );
+short	get_curr_cha	args( ( const CHAR_DATA *ch ) );
+short  get_curr_lck	args( ( const CHAR_DATA *ch ) );
+short  get_curr_frc	args( ( const CHAR_DATA *ch ) );
+bool	can_take_proto	args( ( const CHAR_DATA *ch ) );
+int	can_carry_n	args( ( const CHAR_DATA *ch ) );
+int	can_carry_w	args( ( const CHAR_DATA *ch ) );
 bool	is_name		args( ( const char *str, char *namelist ) );
 bool	is_name_prefix	args( ( const char *str, char *namelist ) );
 bool	nifty_is_name	args( ( char *str, char *namelist ) );
@@ -3780,14 +3761,14 @@ void	affect_modify	args( ( CHAR_DATA *ch, AFFECT_DATA *paf, bool fAdd ) );
 void	affect_to_char	args( ( CHAR_DATA *ch, AFFECT_DATA *paf ) );
 void	affect_remove	args( ( CHAR_DATA *ch, AFFECT_DATA *paf ) );
 void	affect_strip	args( ( CHAR_DATA *ch, int sn ) );
-bool	is_affected	args( ( CHAR_DATA *ch, int sn ) );
+bool	is_affected	args( ( const CHAR_DATA *ch, int sn ) );
 void	affect_join	args( ( CHAR_DATA *ch, AFFECT_DATA *paf ) );
 void	char_from_room	args( ( CHAR_DATA *ch ) );
 void	char_to_room	args( ( CHAR_DATA *ch, ROOM_INDEX_DATA *pRoomIndex ) );
 OD *	obj_to_char	args( ( OBJ_DATA *obj, CHAR_DATA *ch ) );
 void	obj_from_char	args( ( OBJ_DATA *obj ) );
 int	apply_ac	args( ( OBJ_DATA *obj, int iWear ) );
-OD *	get_eq_char	args( ( CHAR_DATA *ch, int iWear ) );
+OD *	get_eq_char	args( ( const CHAR_DATA *ch, int iWear ) );
 void	equip_char	args( ( CHAR_DATA *ch, OBJ_DATA *obj, int iWear ) );
 void	unequip_char	args( ( CHAR_DATA *ch, OBJ_DATA *obj ) );
 int	count_obj_list	args( ( OBJ_INDEX_DATA *obj, OBJ_DATA *list ) );
@@ -3846,8 +3827,6 @@ TIMER * get_timerptr	args( ( CHAR_DATA *ch, short type ) );
 short	get_timer	args( ( CHAR_DATA *ch, short type ) );
 void	extract_timer	args( ( CHAR_DATA *ch, TIMER *timer ) );
 void	remove_timer	args( ( CHAR_DATA *ch, short type ) );
-bool	in_soft_range	args( ( CHAR_DATA *ch, AREA_DATA *tarea ) );
-bool	in_hard_range	args( ( CHAR_DATA *ch, AREA_DATA *tarea ) );
 bool	chance  	args( ( CHAR_DATA *ch, short percent ) );
 bool 	chance_attrib	args( ( CHAR_DATA *ch, short percent, short attrib ) );
 OD *	clone_object	args( ( OBJ_DATA *obj ) );

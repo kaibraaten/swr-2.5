@@ -536,9 +536,9 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 void fwrite_obj( CHAR_DATA *ch, OBJ_DATA *obj, FILE *fp, int iNest,
 		 short os_type )
 {
-  EXTRA_DESCR_DATA *ed;
-  AFFECT_DATA *paf;
-  short wear, wear_loc, x;
+  EXTRA_DESCR_DATA *ed = NULL;
+  AFFECT_DATA *paf = NULL;
+  short wear = 0, wear_loc = 0, x = 0;
 
   if ( iNest >= MAX_NEST )
     {

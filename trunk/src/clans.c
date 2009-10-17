@@ -316,7 +316,7 @@ void do_induct( CHAR_DATA *ch, char *argument )
     
     if ( (ch->pcdata && ch->pcdata->bestowments
     &&    is_name("induct", ch->pcdata->bestowments))
-    ||   nifty_is_name( ch->name, clan->leaders  ))
+	 ||   clan_char_is_leader( clan, ch ) )
 	;
     else
     {
@@ -382,7 +382,7 @@ void do_outcast( CHAR_DATA *ch, char *argument )
 
     if ( (ch->pcdata && ch->pcdata->bestowments
     &&    is_name("outcast", ch->pcdata->bestowments))
-    ||   nifty_is_name( ch->name, clan->leaders  ))
+	 ||   clan_char_is_leader( clan, ch ) )
 	;
     else
     {
@@ -511,14 +511,21 @@ void do_setclan( CHAR_DATA *ch, char *argument )
     }
 
 
-    if ( !strcmp( arg2, "leaders" ) )
+    if ( !strcmp( arg2, "addleader" ) )
     {
-	STRFREE( clan->leaders );
-	clan->leaders = STRALLOC( argument );
-	send_to_char( "Done.\r\n", ch );
-	save_clan( clan );
-	return;
+      clan_add_leader( clan, argument );
+      send_to_char( "Done.\r\n", ch );
+      save_clan( clan );
+      return;
     }
+
+    if( !str_cmp( arg2, "rmleader" ) )
+      {
+	clan_remove_leader( clan, argument );
+	send_to_char( "Done.\r\n", ch );
+        save_clan( clan );
+        return;
+      }
 
     if ( !strcmp( arg2, "atwar" ) )
     {
@@ -932,7 +939,7 @@ void do_resign( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-       if ( nifty_is_name( ch->name, ch->pcdata->clan->leaders ) )
+	if ( clan_char_is_leader( ch->pcdata->clan, ch ) )
        {
            ch_printf( ch, "You can't resign from %s ... you are one of the leaders!\r\n", clan->name );
            return;
@@ -974,7 +981,7 @@ void do_clan_withdraw( CHAR_DATA *ch, char *argument )
     
     if ( (ch->pcdata && ch->pcdata->bestowments
     &&    is_name("withdraw", ch->pcdata->bestowments))
-    ||   nifty_is_name( ch->name, ch->pcdata->clan->leaders  ))
+	 || clan_char_is_leader( clan, ch ) )
 	;
     else
     {
@@ -1078,7 +1085,7 @@ void do_appoint ( CHAR_DATA *ch , char *argument )
 	return;
     }
 
-    if (  !nifty_is_name( ch->name, ch->pcdata->clan->leaders  )  )
+    if ( !clan_char_is_leader( ch->pcdata->clan, ch ) )
     {
 	send_to_char( "Only your leaders can do that!\r\n", ch );
 	return;
@@ -1130,7 +1137,7 @@ void do_demote ( CHAR_DATA *ch , char *argument )
 	return;
     }
 
-    if (  !nifty_is_name( ch->name, ch->pcdata->clan->leaders  )  )
+    if ( !clan_char_is_leader( ch->pcdata->clan, ch ) )
     {
 	send_to_char( "Only your leaders can do that!\r\n", ch );
 	return;
@@ -1164,7 +1171,7 @@ void do_empower ( CHAR_DATA *ch , char *argument )
 
     if ( (ch->pcdata && ch->pcdata->bestowments
     &&    is_name("empower", ch->pcdata->bestowments))
-    || nifty_is_name( ch->name, clan->leaders  ) )
+	 || clan_char_is_leader( clan, ch ) )
 	;
     else
     {
@@ -1217,6 +1224,15 @@ void do_empower ( CHAR_DATA *ch , char *argument )
                       victim->name, victim->pcdata->bestowments );
         return;
     }
+
+    if( !clan_char_is_leader( clan, ch ) )
+      {
+	if( !is_name( arg2, ch->pcdata->bestowments ) )
+	  {
+	    send_to_char( "&RI don't think you're even allowed to do that.&W\r\n", ch );
+	    return;
+	  }
+      }
 
     if ( !str_cmp( arg2, "none" ) )
     {
@@ -1341,7 +1357,7 @@ void do_war ( CHAR_DATA *ch , char *argument )
 
     if ( ( ch->pcdata->bestowments
     &&    is_name("war", ch->pcdata->bestowments))
-    || nifty_is_name( ch->name, clan->leaders  ) )
+	 || clan_char_is_leader( clan, ch ) )
 	;
     else
     {
@@ -1421,7 +1437,7 @@ void do_setwages ( CHAR_DATA *ch , char *argument )
 
     if ( ( ch->pcdata->bestowments
     &&    is_name("payroll", ch->pcdata->bestowments))
-    || nifty_is_name( ch->name, clan->leaders  ) )
+	 || clan_char_is_leader( clan, ch ) )
 	;
     else
     {
@@ -1456,4 +1472,46 @@ void clan_decrease_vehicles_owned( CLAN_DATA *clan, const SHIP_DATA *ship )
           clan->vehicles--;
         }
     }
+}
+
+bool clan_char_is_leader( const CLAN_DATA *clan, const CHAR_DATA *ch )
+{
+  return nifty_is_name( ch->name, clan->leaders  );
+}
+
+void clan_add_leader( CLAN_DATA *clan, const char *name )
+{
+  if( !nifty_is_name( const_char_to_nonconst( name ), clan->leaders ) )
+    {
+      char buf[MAX_STRING_LENGTH];
+      sprintf( buf, "%s %s", clan->leaders, name );
+      STRFREE( clan->leaders );
+      clan->leaders = STRALLOC( buf );
+    }
+}
+
+void clan_remove_leader( CLAN_DATA *clan, const char *name )
+{
+  char tc[MAX_STRING_LENGTH];
+  char on[MAX_STRING_LENGTH];
+  char * leadership = clan->leaders;
+
+  strcpy ( tc , "" );
+
+  while ( leadership[0] != '\0' )
+    {
+      leadership = one_argument( leadership , on );
+
+      if ( str_cmp ( name, on )
+	   && (strlen(on) + strlen(tc)) < (MAX_STRING_LENGTH+1) )
+	{
+	  if ( strlen(tc) != 0 )
+	    strcat ( tc , " " );
+
+	  strcat ( tc , on );
+	}
+    }
+
+  STRFREE( clan->leaders );
+  clan->leaders = STRALLOC( tc );
 }

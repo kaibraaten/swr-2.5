@@ -228,36 +228,45 @@ int slot_lookup( int slot )
 void successful_casting( SKILLTYPE *skill, CHAR_DATA *ch,
 			 CHAR_DATA *victim, OBJ_DATA *obj )
 {
-    short chitroom = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_ACTION);
-    short chit	    = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HIT);
-    short chitme   = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HITME);
+  short chitroom = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_ACTION);
+  short chit	    = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HIT);
+  short chitme   = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HITME);
 
-    if ( skill->target != TAR_CHAR_OFFENSIVE )
+  if ( skill->target != TAR_CHAR_OFFENSIVE )
     {
-	chit = chitroom;
-	chitme = chitroom;
+      chit = chitroom;
+      chitme = chitroom;
     }
 
-    if ( ch && ch != victim )
+  if ( ch && ch != victim )
     {
-	if ( skill->hit_char && skill->hit_char[0] != '\0' )
-	  act( chit, skill->hit_char, ch, obj, victim, TO_CHAR );
-	else
-	if ( skill->type == SKILL_SPELL )
+      if ( skill->hit_char && skill->hit_char[0] != '\0' )
+	act( chit, skill->hit_char, ch, obj, victim, TO_CHAR );
+      else if ( skill->type == SKILL_SPELL )
           act( chit, "Ok.", ch, NULL, NULL, TO_CHAR );
     }
-    if ( ch && skill->hit_room && skill->hit_room[0] != '\0' )
-      act( chitroom, skill->hit_room, ch, obj, victim, TO_NOTVICT );
-    if ( ch && victim && skill->hit_vict && skill->hit_vict[0] != '\0' )
+
+  if ( ch && skill->hit_room && skill->hit_room[0] != '\0' )
+    act( chitroom, skill->hit_room, ch, obj, victim, TO_NOTVICT );
+
+  if ( ch && victim && skill->hit_vict && skill->hit_vict[0] != '\0' )
     {
-	if ( ch != victim )
-	  act( chitme, skill->hit_vict, ch, obj, victim, TO_VICT );
-	else
-	  act( chitme, skill->hit_vict, ch, obj, victim, TO_CHAR );
+      if ( ch != victim )
+	act( chitme, skill->hit_vict, ch, obj, victim, TO_VICT );
+      else
+	act( chitme, skill->hit_vict, ch, obj, victim, TO_CHAR );
     }
-    else
-    if ( ch && ch == victim && skill->type == SKILL_SPELL )
+  else if ( ch && ch == victim && skill->type == SKILL_SPELL )
+    {
       act( chitme, "Ok.", ch, NULL, NULL, TO_CHAR );
+    }
+  else if( ch && ch == victim && skill->type == SKILL_SKILL )
+    {
+      if( skill->hit_char && ( skill->hit_char[0] != '\0' ) )
+	act( chit, skill->hit_char, ch, obj, victim, TO_CHAR );
+      else
+	act( chit, "Ok.", ch, NULL, NULL, TO_CHAR );
+    }
 }
 
 /*

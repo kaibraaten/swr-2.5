@@ -2585,8 +2585,9 @@ bool check_pilot( CHAR_DATA *ch , SHIP_DATA *ship )
    {        
       if ( !str_cmp(ch->pcdata->clan->name,ship->owner) ) 
       {
-        if ( nifty_is_name(ch->name, ch->pcdata->clan->leaders) )
+	if( clan_char_is_leader( ch->pcdata->clan, ch ) )
           return TRUE;
+
         if ( ch->pcdata->bestowments && is_name( "pilot", ch->pcdata->bestowments) )
           return TRUE;
       }
@@ -3769,7 +3770,7 @@ void do_clanbuyship(CHAR_DATA *ch, char *argument )
    
    if ( ( ch->pcdata->bestowments
     &&    is_name("clanbuyship", ch->pcdata->bestowments))
-    ||   nifty_is_name( ch->name, clan->leaders  ))
+	|| clan_char_is_leader( clan, ch ) )
 	;
    else
    {
@@ -5092,7 +5093,7 @@ void do_addpilot(CHAR_DATA *ch, char *argument )
    {
    
      if ( !IS_NPC(ch) && ch->pcdata && ch->pcdata->clan && !str_cmp(ch->pcdata->clan->name,ship->owner) ) 
-         if ( nifty_is_name(ch->name, ch->pcdata->clan->leaders) )
+       if ( clan_char_is_leader( ch->pcdata->clan, ch ) )
            ;
          else
          {
@@ -5158,7 +5159,7 @@ void do_rempilot(CHAR_DATA *ch, char *argument )
    {
    
      if ( !IS_NPC(ch) && ch->pcdata && ch->pcdata->clan && !str_cmp(ch->pcdata->clan->name,ship->owner) ) 
-         if ( nifty_is_name(ch->name, ch->pcdata->clan->leaders) )
+       if ( clan_char_is_leader( ch->pcdata->clan, ch ) )
            ;
          else
          {
