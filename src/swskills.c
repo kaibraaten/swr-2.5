@@ -1842,6 +1842,7 @@ void do_disguise( CHAR_DATA *ch, char *argument )
     
     smash_tilde( argument );
     set_title( ch, argument );
+    learn_from_success( ch, gsn_disguise );
     send_to_char( "Ok.\r\n", ch );
 }
 

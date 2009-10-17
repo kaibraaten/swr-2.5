@@ -1052,12 +1052,24 @@ void do_emote( CHAR_DATA *ch, char *argument )
 
 void do_bug( CHAR_DATA *ch, char *argument )
 {
+  if( !argument || argument[0] == '\0' )
+    {
+      send_to_char( "What do you want to submit as a bug?\n\r", ch );
+      return;
+    }
+
   append_file( ch, BUG_FILE, argument );
-  send_to_char( "Ok.  Thanks.\r\n", ch );
+  send_to_char( "Ok.  Thanks.\n\r", ch );
 }
 
 void do_typo( CHAR_DATA *ch, char *argument )
 {
+  if( !argument || argument[0] == '\0' )
+    {
+      send_to_char( "What do you want to submit as an idea?\n\r", ch );
+      return;
+    }
+
   append_file( ch, TYPO_FILE, argument );
   send_to_char( "Ok.  Thanks.\r\n", ch );
 }

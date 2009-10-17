@@ -3,6 +3,7 @@
 #include <string.h>
 #include "mud.h"
 
+void transfer_char( CHAR_DATA *ch, CHAR_DATA *victim, ROOM_INDEX_DATA *location );
 ch_ret	simple_damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt );
 CHAR_DATA * get_char_room_mp  args( ( CHAR_DATA *ch, char *argument ) );
 
@@ -926,105 +927,88 @@ void do_mpadvance( CHAR_DATA *ch, char *argument )
     return;
 }
 
-
-
 /* lets the mobile transfer people.  the all argument transfers
-   everyone in the current room to the specified location */
-
-void do_mptransfer( CHAR_DATA *ch, char *argument )
+   everyone in the current room to the specified location 
+   the area argument transfers everyone in the current area to the
+   specified location */
+void do_mptransfer( CHAR_DATA * ch, char *argument )
 {
-    char             arg1[ MAX_INPUT_LENGTH ];
-    char             arg2[ MAX_INPUT_LENGTH ];
-    char buf[MAX_STRING_LENGTH];
-    ROOM_INDEX_DATA *location;
-    CHAR_DATA       *victim;
-    CHAR_DATA       *nextinroom;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  ROOM_INDEX_DATA *location;
+  CHAR_DATA *victim, *nextinroom;
+  DESCRIPTOR_DATA *d;
 
-    if ( IS_AFFECTED( ch, AFF_CHARM ) )
+  if( !IS_NPC( ch ) || IS_AFFECTED( ch, AFF_CHARM ) )
+    {
+      send_to_char( "Huh?\n\r", ch );
       return;
-
-    if ( !IS_NPC( ch ) )
-    {
-	send_to_char( "Huh?\r\n", ch );
-	return;
-    }
-    argument = one_argument( argument, arg1 );
-    argument = one_argument( argument, arg2 );
-
-    if ( arg1[0] == '\0' )
-    {
-	progbug( "Mptransfer - Bad syntax", ch );
-	return;
     }
 
-    /* Put in the variable nextinroom to make this work right. -Narn */
-    if ( !str_cmp( arg1, "all" ) )
+  argument = one_argument( argument, arg1 );
+  argument = one_argument( argument, arg2 );
+
+  if( arg1[0] == '\0' )
     {
-        int toomany = 0;
-	for ( victim = ch->in_room->first_person; victim; victim = nextinroom )
+      progbug( "Mptransfer - Bad syntax", ch );
+      return;
+    }
+
+  if( arg2[0] != '\0' )
+    {
+      if( !( location = find_location( ch, arg2 ) ) )
 	{
-            nextinroom = victim->next_in_room;
-	    if ( victim != ch
-	    &&   !NOT_AUTHED(victim)
-	    &&   can_see( ch, victim ) )
-	    {
-		sprintf( buf, "%s %s", victim->name, arg2 );
-		do_mptransfer( ch, buf );
-	    }
-	    if ( ++toomany > 200 )
-	       return;
-	}
-	return;
-    }
-
-    /*
-     * Thanks to Grodyn for the optional location parameter.
-     */
-    if ( arg2[0] == '\0' )
-    {
-	location = ch->in_room;
-    }
-    else
-    {
-	if ( ( location = find_location( ch, arg2 ) ) == NULL )
-	{
-	    progbug( "Mptransfer - No such location", ch );
-	    return;
-	}
-
-	if ( room_is_private( ch, location ) )
-	{
-	    progbug( "Mptransfer - Private room", ch );
-	    return;
+	  progbug( "Mptransfer - No such location", ch );
+	  return;
 	}
     }
+  else
+    location = ch->in_room;
 
-    if ( ( victim = get_char_world( ch, arg1 ) ) == NULL )
+  /*
+   * Put in the variable nextinroom to make this work right. -Narn 
+   */
+  if( !str_cmp( arg1, "all" ) )
     {
-	progbug( "Mptransfer - No such person", ch );
-	return;
+      for( victim = ch->in_room->first_person; victim; victim = nextinroom )
+	{
+	  nextinroom = victim->next_in_room;
+
+	  if( ch == victim )
+            continue;
+
+	  transfer_char( ch, victim, location );
+	}
+      return;
     }
 
-    if ( !victim->in_room )
+  /*
+   * This will only transfer PC's in the area not Mobs --Shaddai 
+   */
+  if( !str_cmp( arg1, "area" ) )
     {
-	progbug( "Mptransfer - Victim in Limbo", ch );
-	return;
+      for( d = first_descriptor; d; d = d->next )
+	{
+	  if( !d->character || ( d->connected != CON_PLAYING &&  d->connected != CON_EDITING )
+	      || ch->in_room->area != d->character->in_room->area )
+            continue;
+
+	  if( ch == d->character )
+            continue;
+
+	  transfer_char( ch, d->character, location );
+	}
+      return;
     }
 
-    if (NOT_AUTHED(victim) && location->area != victim->in_room->area)
+  if( !( victim = get_char_world( ch, arg1 ) ) )
     {
- 	progbug( "Mptransfer - transferring unauthorized player", ch);
-	return;
+      progbug( "Mptransfer - No such person", ch );
+      return;
     }
-
-    if ( victim->fighting )
-	stop_fighting( victim, TRUE );
-
-    char_from_room( victim );
-    char_to_room( victim, location );
-
-    return;
+  transfer_char( ch, victim, location );
+  return;
 }
+
 
 /* lets the mobile force someone to do something.  must be mortal level
    and the all argument only affects those in the room with the mobile */
