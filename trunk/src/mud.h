@@ -2345,12 +2345,11 @@ int urange( int mincheck, int check, int maxcheck );
 #define URANGE(a, b, c )  ( urange( (a), (b), (c) ) )
 #define LOWER(c)		((char) tolower((c)))
 #define UPPER(c)		((char) toupper((c)))
-bool IS_SET( long, long );
-CHAR_DATA *CH( DESCRIPTOR_DATA* );
-
+#define IS_SET(flag, bit)       ((flag) & (bit))
 #define SET_BIT(var, bit)	((var) |= (bit))
 #define REMOVE_BIT(var, bit)	((var) &= ~(bit))
 #define TOGGLE_BIT(var, bit)	((var) ^= (bit))
+#define CH(d) ((d)->original ? (d)->original : (d)->character)
 
 #if defined(KEY)
 #undef KEY
@@ -2546,21 +2545,36 @@ do								\
 /*
  * Character macros.
  */
-bool IS_NPC( const CHAR_DATA *ch );
-bool IS_IMMORTAL( const CHAR_DATA *ch );
-bool IS_OFFICIAL( const CHAR_DATA *ch );
-bool IS_AFFECTED( const CHAR_DATA*, int sn );
-bool HAS_BODYPART( const CHAR_DATA*, int part );
-bool IS_GOOD( const CHAR_DATA *ch );
-bool IS_EVIL( const CHAR_DATA *ch );
-bool IS_NEUTRAL( const CHAR_DATA* );
-bool IS_AWAKE( const CHAR_DATA *ch );
-short GET_AC( const CHAR_DATA *ch );
-short GET_HITROLL( const CHAR_DATA *ch );
-short GET_DAMROLL( const CHAR_DATA *ch );
-bool IS_OUTSIDE( const CHAR_DATA *ch );
-bool IS_DRUNK( const CHAR_DATA *ch, int drunk );
-bool IS_CLANNED( const CHAR_DATA *ch );
+#define IS_NPC(ch)              (IS_SET((ch)->act, ACT_IS_NPC))
+#define IS_IMMORTAL(ch)         ((ch)->top_level == 200 )
+#define IS_OFFICIAL(ch)         (is_name((ch)->name,sysdata.officials))
+#define IS_AFFECTED(ch, sn)     (IS_SET((ch)->affected_by, (sn)))
+#define HAS_BODYPART(ch, part)  ((ch)->xflags == 0 || IS_SET((ch)->xflags, (part)))
+#define IS_GOOD(ch)             ((ch)->alignment >= 350)
+#define IS_EVIL(ch)             ((ch)->alignment <= -350)
+#define IS_NEUTRAL(ch)          (!IS_GOOD(ch) && !IS_EVIL(ch))
+
+#define IS_AWAKE(ch)            ((ch)->position > POS_SLEEPING)
+#define GET_AC(ch)              ( (ch)->armor + ( IS_AWAKE(ch) ? dex_app[get_curr_dex(ch)].defensive : 0 ) )
+#define GET_HITROLL(ch)         ((ch)->hitroll                              \
+				 +str_app[get_curr_str(ch)].tohit        \
+				 +(2-(abs((ch)->mental_state)/10)))
+#define GET_DAMROLL(ch)         ((ch)->damroll                              \
+				 +str_app[get_curr_str(ch)].todam        \
+				 +(((ch)->mental_state > 5               \
+                                    &&(ch)->mental_state < 15) ? 1 : 0) )
+
+#define IS_OUTSIDE(ch)          (!IS_SET(                                   \
+					 (ch)->in_room->room_flags,              \
+					 ROOM_INDOORS) && !IS_SET(               \
+								  (ch)->in_room->room_flags,              \
+								  ROOM_SPACECRAFT) )
+
+#define IS_DRUNK(ch, drunk)     (number_percent() < \
+				 ( (ch)->pcdata->condition[COND_DRUNK] \
+				   * 2 / (drunk) ) )
+#define IS_CLANNED(ch)          (!IS_NPC((ch))                              \
+				 && (ch)->pcdata->clan                       )
 
 #define WAIT_STATE(ch, npulse)	((ch)->wait = (short)(UMAX((ch)->wait, (npulse))))
 
