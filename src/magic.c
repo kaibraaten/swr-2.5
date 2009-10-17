@@ -2380,24 +2380,21 @@ ch_ret spell_obj_inv( int sn, int level, CHAR_DATA *ch, void *vo )
 		}
 		break;
 	     case SP_MINOR:
-		if ( ch->top_level - obj->level < 20
-		||   obj->cost > ch->top_level * get_curr_int(ch) / 5 )
+	       if( obj->cost > ch->top_level * get_curr_int(ch) / 5 )
 		{
 		   failed_casting( skill, ch, NULL, obj );
 		   return rNONE;
 		}
 		break;
 	     case SP_GREATER:
-		if ( ch->top_level - obj->level < 5
-		||   obj->cost > ch->top_level * 10 * get_curr_int(ch) * get_curr_wis(ch) )
+		if ( obj->cost > ch->top_level * 10 * get_curr_int(ch) * get_curr_wis(ch) )
 		{
 		   failed_casting( skill, ch, NULL, obj );
 		   return rNONE;
 		}
 		break;
 	     case SP_MAJOR:
-		if ( ch->top_level - obj->level < 0
-		||   obj->cost > ch->top_level * 50 * get_curr_int(ch) * get_curr_wis(ch) )
+		if ( obj->cost > ch->top_level * 50 * get_curr_int(ch) * get_curr_wis(ch) )
 		{
 		   failed_casting( skill, ch, NULL, obj );
 		   return rNONE;

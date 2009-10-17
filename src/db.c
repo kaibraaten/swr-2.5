@@ -789,7 +789,7 @@ void load_mobiles( AREA_DATA *tarea, FILE *fp )
 	pMobIndex->rShop		= NULL;
 	pMobIndex->alignment		= fread_number( fp );
 	letter				= fread_letter( fp );
-	pMobIndex->level		= fread_number( fp );
+	/*pMobIndex->level		=*/ fread_number( fp );
 
 	pMobIndex->mobthac0		= fread_number( fp );
 	pMobIndex->ac			= fread_number( fp );
@@ -1768,7 +1768,6 @@ OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex )
 
   obj->pIndexData	= pObjIndex;
   obj->in_room	= NULL;
-  obj->level		= 1;
   obj->wear_loc	= -1;
   obj->count		= 1;
   cur_obj_serial = UMAX((cur_obj_serial + 1 ) & (BV30-1), 1);

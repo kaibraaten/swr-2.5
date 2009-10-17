@@ -1967,7 +1967,7 @@ struct	obj_index_data
     char *		description;
     char *		action_desc;
     long		vnum;
-    short              level;
+  //short              level;
     short		item_type;
     int			extra_flags;
     int			magic_flags; /*Need more bitvectors for spells - Scryn*/
@@ -1979,7 +1979,6 @@ struct	obj_index_data
     int			serial;
     short		layers;
 };
-
 
 /*
  * One object.
@@ -2015,7 +2014,7 @@ struct	obj_data
     short		wear_loc;
     short		weight;
     int			cost;
-    short		level;
+  //short		level;
     short		timer;
     int			value	[6];
     short		count;		/* support for object grouping */

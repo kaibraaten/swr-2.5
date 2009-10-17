@@ -2144,7 +2144,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
       send_to_char( "Syntax: oset <object> <field>  <value>\r\n",	ch );
 	send_to_char( "\r\n",						ch );
 	send_to_char( "Field being one of:\r\n",			ch );
-	send_to_char( "  flags wear level weight cost timer\r\n",	ch );
+	send_to_char( "  flags wear weight cost timer\r\n",	ch );
 	send_to_char( "  name short long desc ed rmed actiondesc\r\n",	ch );
 	send_to_char( "  type value0 value1 value2 value3 value4 value5\r\n",	ch );
 	send_to_char( "  affect rmaffect layers\r\n",				ch );
@@ -2328,14 +2328,6 @@ void do_oset( CHAR_DATA *ch, char *argument )
 
 	if ( IS_OBJ_STAT( obj, ITEM_PROTOTYPE ) )
 	  obj->pIndexData->wear_flags = obj->wear_flags;
-	return;
-    }
-
-    if ( !str_cmp( arg2, "level" ) )
-    {
-	if ( !can_omodify( ch, obj ) )
-	  return;
-	obj->level = value;
 	return;
     }
 

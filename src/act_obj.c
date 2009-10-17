@@ -31,9 +31,6 @@ short get_obj_resistance( const OBJ_DATA *obj )
   if ( IS_OBJ_STAT( obj, ITEM_INVENTORY ) )
     resist += 20;
 
-  /* okay... let's add some bonus/penalty for item level... */
-  resist += (obj->level / 10);
-
   /* and lasty... take armor or weapon's condition into consideration */
   if (obj->item_type == ITEM_ARMOR || obj->item_type == ITEM_WEAPON)
     resist += (obj->value[0]);
