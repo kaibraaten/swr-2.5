@@ -2836,7 +2836,6 @@ OBJ_DATA *clone_object( OBJ_DATA *obj )
     clone->wear_loc	= obj->wear_loc;
     clone->weight	= obj->weight;
     clone->cost		= obj->cost;
-    clone->level	= obj->level;
     clone->timer	= obj->timer;
     clone->value[0]	= obj->value[0];
     clone->value[1]	= obj->value[1];
@@ -2881,7 +2880,6 @@ OBJ_DATA *group_object( OBJ_DATA *obj1, OBJ_DATA *obj2 )
 	 && obj1->wear_loc == obj2->wear_loc
 	 && obj1->weight == obj2->weight
 	 && obj1->cost == obj2->cost
-	 && obj1->level == obj2->level
 	 && obj1->timer	== obj2->timer
 	 && obj1->value[0] == obj2->value[0]
 	 && obj1->value[1] == obj2->value[1]

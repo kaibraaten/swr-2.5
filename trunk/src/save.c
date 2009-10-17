@@ -633,9 +633,6 @@ void fwrite_obj( CHAR_DATA *ch, OBJ_DATA *obj, FILE *fp, int iNest,
   if ( obj->weight != obj->pIndexData->weight )
     fprintf( fp, "Weight       %d\n",	obj->weight		     );
 
-  if ( obj->level )
-    fprintf( fp, "Level        %d\n",	obj->level		     );
-
   if ( obj->timer )
     fprintf( fp, "Timer        %d\n",	obj->timer		     );
 
@@ -1653,10 +1650,6 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 
 	case 'I':
 	    KEY( "ItemType",	obj->item_type,		fread_number( fp ) );
-	    break;
-
-	case 'L':
-	    KEY( "Level",	obj->level,		fread_number( fp ) );
 	    break;
 
 	case 'N':

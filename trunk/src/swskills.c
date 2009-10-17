@@ -171,7 +171,6 @@ void do_makeblade( CHAR_DATA *ch, char *argument )
     obj->item_type = ITEM_WEAPON;
     SET_BIT( obj->wear_flags, ITEM_WIELD );
     SET_BIT( obj->wear_flags, ITEM_TAKE );
-    obj->level = level;
     obj->weight = 3;
     STRFREE( obj->name );
     strcpy( buf, arg );
@@ -418,7 +417,6 @@ void do_makeblaster( CHAR_DATA *ch, char *argument )
     obj->item_type = ITEM_WEAPON;
     SET_BIT( obj->wear_flags, ITEM_WIELD );
     SET_BIT( obj->wear_flags, ITEM_TAKE );
-    obj->level = level;
     obj->weight = 2+level/10;
     STRFREE( obj->name );
     strcpy( buf , arg );
@@ -721,7 +719,6 @@ void do_makelightsaber( CHAR_DATA *ch, char *argument )
     obj->item_type = ITEM_WEAPON;
     SET_BIT( obj->wear_flags, ITEM_WIELD );
     SET_BIT( obj->wear_flags, ITEM_TAKE );
-    obj->level = level;
     obj->weight = 5;
     STRFREE( obj->name );
     obj->name = STRALLOC( "lightsaber saber" );
@@ -926,7 +923,6 @@ void do_makejewelry( CHAR_DATA *ch, char *argument )
         SET_BIT( obj->wear_flags, ITEM_WEAR_NECK );                    
     else
         SET_BIT( obj->wear_flags, 1 << value );
-    obj->level = level;
     STRFREE( obj->name );
     strcpy( buf, arg2 );
     obj->name = STRALLOC( buf );
@@ -1086,7 +1082,6 @@ void do_makearmor( CHAR_DATA *ch, char *argument )
         SET_BIT( obj->wear_flags, ITEM_WEAR_BODY );                    
     else
         SET_BIT( obj->wear_flags, 1 << value );
-    obj->level = level;
     STRFREE( obj->name );
     strcpy( buf, arg2 );
     obj->name = STRALLOC( buf );
@@ -1281,7 +1276,6 @@ void do_makeshield( CHAR_DATA *ch, char *argument )
     obj->item_type = ITEM_ARMOR;
     SET_BIT( obj->wear_flags, ITEM_WIELD );
     SET_BIT( obj->wear_flags, ITEM_WEAR_SHIELD );
-    obj->level = level;
     obj->weight = 2;
     STRFREE( obj->name );
     obj->name = STRALLOC( "energy shield" );
@@ -1441,7 +1435,6 @@ void do_makecontainer( CHAR_DATA *ch, char *argument )
         SET_BIT( obj->wear_flags, ITEM_HOLD );                    
     else
         SET_BIT( obj->wear_flags, 1 << value );
-    obj->level = level;
     STRFREE( obj->name );
     strcpy( buf, arg2 );
     obj->name = STRALLOC( buf );

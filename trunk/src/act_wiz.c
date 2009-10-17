@@ -997,8 +997,8 @@ void do_ostat( CHAR_DATA *ch, char *argument )
 	1,           get_obj_number( obj ),
 	obj->weight, get_obj_weight( obj ), obj->pIndexData->layers );
 
-    ch_printf( ch, "Cost: %d.  Timer: %d.  Level: %d.\r\n",
-	obj->cost, obj->timer, obj->level );
+    ch_printf( ch, "Cost: %d.  Timer: %d.\r\n",
+	obj->cost, obj->timer );
 
     ch_printf( ch,
 	"In room: %ld.  In object: %s.  Carried by: %s.  Wear_loc: %d.\r\n",
@@ -3805,9 +3805,9 @@ void do_vsearch( CHAR_DATA *ch, char *argument )
 	  in_obj = in_obj->in_obj );
 
 	if ( in_obj->carried_by != NULL )
-	  pager_printf( ch, "[%2d] Level %d %s carried by %s.\r\n", 
+	  pager_printf( ch, "[%2d] %s carried by %s.\r\n", 
 		obj_counter,
-		obj->level, obj_short(obj),
+		obj_short(obj),
 		PERS( in_obj->carried_by, ch ) );
 	else           
 	  pager_printf( ch, "[%2d] [%-5d] %s in %s.\r\n", obj_counter,
