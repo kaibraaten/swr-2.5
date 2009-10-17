@@ -891,6 +891,7 @@ struct	smaug_affect
  * Well known mob virtual numbers.
  * Defined in #MOBILES.
  */
+#define MOB_VNUM_SUPERMOB               2
 #define MOB_VNUM_SOLDIER		3
 #define MOB_VNUM_GUARD			4
 #define MOB_VNUM_PATROL			5
@@ -1390,6 +1391,7 @@ typedef enum
  * Well known room virtual numbers.
  * Defined in #ROOMS.
  */
+#define ROOM_VNUM_SUPERMOB_OFFICE     1
 #define ROOM_VNUM_LIMBO		      2
 #define ROOM_LIMBO_SHIPYARD           3
 #define ROOM_IMMORTAL_START           4
@@ -4142,6 +4144,7 @@ void            init_maps();
  * mudprograms stuff
  */
 extern	CHAR_DATA *supermob;
+extern OBJ_DATA *supermob_obj;
 
 void oprog_wear_trigger( CHAR_DATA *ch, OBJ_DATA *obj );
 bool oprog_use_trigger( CHAR_DATA *ch, OBJ_DATA *obj, 

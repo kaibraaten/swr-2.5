@@ -765,7 +765,7 @@ void do_mppurge( CHAR_DATA *ch, char *argument )
     	return;
     }
 
-    if ( IS_NPC( victim ) && victim->pIndexData->vnum == 3 )
+    if ( IS_NPC( victim ) && victim->pIndexData->vnum == MOB_VNUM_SUPERMOB )
     {
         progbug( "Mppurge: trying to purge supermob", ch );
 	return;

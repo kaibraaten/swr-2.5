@@ -738,7 +738,7 @@ OBJ_DATA *obj_to_char( OBJ_DATA *obj, CHAR_DATA *ch )
     if (IS_OBJ_STAT( obj, ITEM_PROTOTYPE ) )
     {
 	if (!IS_IMMORTAL( ch ) 
-	&& (IS_NPC(ch) && !IS_SET(ch->act, ACT_PROTOTYPE)) )
+	&& ( !IS_NPC(ch) || !IS_SET(ch->act, ACT_PROTOTYPE)) )
 	  return obj_to_room( obj, ch->in_room );
     }
 
@@ -2030,7 +2030,7 @@ bool can_drop_obj( CHAR_DATA *ch, OBJ_DATA *obj )
     if ( !IS_NPC(ch) && IS_IMMORTAL(ch) )
 	return TRUE;
 
-    if ( IS_NPC(ch) && ch->pIndexData->vnum == 3 )
+    if ( IS_NPC(ch) && ch->pIndexData->vnum == MOB_VNUM_SUPERMOB )
 	return TRUE;
 
     return FALSE;

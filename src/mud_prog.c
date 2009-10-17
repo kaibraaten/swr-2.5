@@ -89,11 +89,10 @@ char * strstr(s1,s2) const char *s1; const char *s2;
 
 void init_supermob()
 {
-   RID *office;
+  RID *office = get_room_index ( ROOM_VNUM_SUPERMOB_OFFICE );
 
-   supermob = create_mobile(get_mob_index( 2 ));
-   office = get_room_index ( 1 );
-   char_to_room( supermob, office );
+  supermob = create_mobile(get_mob_index( MOB_VNUM_SUPERMOB ));
+  char_to_room( supermob, office );
 
 #ifdef NOTDEFD
    CREATE( supermob, CHAR_DATA, 1 );
@@ -111,6 +110,44 @@ void init_supermob()
 
 #undef RID
 
+void uphold_supermob( int *curr_serial, int serial, ROOM_INDEX_DATA **supermob_room, OBJ_DATA *true_supermob_obj )
+{
+  if( *curr_serial != serial )
+    {
+      char buf[128];
+
+      if( supermob->in_room != *supermob_room )
+	{
+	  char_from_room( supermob );
+	  char_to_room( supermob, *supermob_room );
+	}
+
+      if( true_supermob_obj && true_supermob_obj != supermob_obj )
+	{
+          supermob_obj = true_supermob_obj;
+          STRFREE( supermob->short_descr );
+          STRFREE( supermob->description );
+          supermob->short_descr = QUICKLINK( supermob_obj->short_descr );
+          snprintf( buf, 128, "Object #%ld", supermob_obj->pIndexData->vnum );
+          supermob->description = STRALLOC( buf );
+	}
+      else
+	{
+	  if( !true_supermob_obj )
+            supermob_obj = NULL;
+	  if( supermob->short_descr )
+            STRFREE( supermob->short_descr );
+	  if( supermob->description )
+            STRFREE( supermob->description );
+	  supermob->short_descr = QUICKLINK( (*supermob_room)->name );
+	  snprintf( buf, 128, "Room #%ld", (*supermob_room)->vnum );
+	  supermob->description = STRALLOC( buf );
+	}
+      *curr_serial = serial;
+    }
+  else
+    *supermob_room = supermob->in_room;
+}
 
 /* Used to get sequential lines of a multi line string (separated by "\r\n")
  * Thus its like one_argument(), but a trifle different. It is destructive
@@ -1136,6 +1173,24 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
   int iflevel, result;
   bool ifstate[MAX_IFS][ DO_ELSE + 1 ];
   static int prog_nest;
+  static int serial;
+  int curr_serial;
+  ROOM_INDEX_DATA *supermob_room;
+  OBJ_DATA *true_supermob_obj;
+  bool rprog_oprog = ( mob == supermob );
+
+  if( rprog_oprog )
+    {
+      serial++;
+      supermob_room = mob->in_room;
+      true_supermob_obj = supermob_obj;
+    }
+  else
+    {
+      true_supermob_obj = NULL, supermob_room = NULL;
+    }
+
+  curr_serial = serial;
   
   if( IS_AFFECTED( mob, AFF_CHARM ) )
     return;
@@ -1235,6 +1290,9 @@ void mprog_driver ( char *com_list, CHAR_DATA *mob, CHAR_DATA *actor,
             ( ifstate[iflevel][IN_IF] && !ifstate[iflevel][DO_IF] )
             || ( ifstate[iflevel][IN_ELSE] && !ifstate[iflevel][DO_ELSE] ),
             ( ignorelevel > 0 ) );
+
+    if( rprog_oprog )
+      uphold_supermob( &curr_serial, serial, &supermob_room, true_supermob_obj );
 
     /* Script prog support  -Thoric */
     if ( single_step )
@@ -2033,36 +2091,38 @@ void rprog_script_trigger( ROOM_INDEX_DATA *room )
  */
 void set_supermob( OBJ_DATA *obj)
 {
-  ROOM_INDEX_DATA *room;
-  OBJ_DATA *in_obj;
-  CHAR_DATA *mob;
+  ROOM_INDEX_DATA *room = NULL;
+  OBJ_DATA *in_obj = NULL;
+  CHAR_DATA *mob = NULL;
   char buf[200];
 
   if ( !supermob )
-    supermob = create_mobile(get_mob_index( 2 ));
+    supermob = create_mobile(get_mob_index( MOB_VNUM_SUPERMOB ));
 
   mob = supermob;   /* debugging */
 
   if(!obj)
-     return;
+    return;
+
+  supermob_obj = obj;
 
   for ( in_obj = obj; in_obj->in_obj; in_obj = in_obj->in_obj )
     ;
 
   if ( in_obj->carried_by )
-  {   
+    {   
       room = in_obj->carried_by->in_room;
-  }
+    }
   else
-  {
+    {
       room = obj->in_room;
-  }
+    }
 
   if(!room)
-     return;
+    return;
 
   if (supermob->short_descr)
-     STRFREE(supermob->short_descr);
+    STRFREE(supermob->short_descr);
 
   supermob->short_descr = QUICKLINK(obj->short_descr);
   supermob->mpscriptpos = obj->mpscriptpos;
@@ -2074,16 +2134,17 @@ void set_supermob( OBJ_DATA *obj)
   supermob->description = STRALLOC( buf );
 
   if(room != NULL)
-  {
-    char_from_room (supermob );
-    char_to_room( supermob, room); 
-  }
+    {
+      char_from_room (supermob );
+      char_to_room( supermob, room); 
+    }
 }
 
-void release_supermob( )
+void release_supermob()
 {
+  supermob_obj = NULL;
   char_from_room( supermob );
-  char_to_room( supermob, get_room_index( 3 ) );
+  char_to_room( supermob, get_room_index( ROOM_VNUM_SUPERMOB_OFFICE ) );
 }
 
 
@@ -2752,7 +2813,7 @@ void progbug( const char *str, CHAR_DATA *mob )
 
   /* Check if we're dealing with supermob, which means the bug occurred
      in a room or obj prog. */
-  if ( mob->pIndexData->vnum == 3 )
+  if ( mob->pIndexData->vnum == MOB_VNUM_SUPERMOB )
   {
     /* It's supermob.  In set_supermob and rset_supermob, the description
        was set to indicate the object or room, so we just need to show

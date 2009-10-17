@@ -1418,7 +1418,7 @@ void do_bodybag( CHAR_DATA *ch, char *argument )
     {
 	if ( obj->in_room 
         && !str_cmp( buf2, obj->short_descr ) 
-        && (obj->pIndexData->vnum == 11 ) )
+        && (obj->pIndexData->vnum == OBJ_VNUM_CORPSE_PC ) )
 	{
 	    found = TRUE;
 	    ch_printf( ch, "Bagging body: [%5d] %-28s [%5d] %s\r\n",
@@ -2949,17 +2949,16 @@ void do_invis( CHAR_DATA *ch, char *argument )
 	return;
     }
     
-    if (!IS_NPC(ch))
-    {
-    if ( ch->pcdata->wizinvis < 2 )
-      ch->pcdata->wizinvis = ch->top_level;
-    }
-
     if (IS_NPC(ch))
     {
-    if ( ch->mobinvis < 2 )
-      ch->mobinvis = ch->top_level;
+      if ( ch->mobinvis < 2 )
+	ch->mobinvis = ch->top_level;
+
+      return;
     }
+
+    if ( ch->pcdata->wizinvis < 2 )
+      ch->pcdata->wizinvis = ch->top_level;
 
     if ( IS_SET(ch->act, PLR_WIZINVIS) )
     {

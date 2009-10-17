@@ -508,35 +508,34 @@ int number_argument( const char *orig_argument, char *arg )
  */
 char *one_argument( char *argument, char *arg_first )
 {
-    char cEnd;
-    short count;
+  char cEnd = ' ';
+  short count = 0;
 
-    count = 0;
+  while ( isspace(*argument) )
+    argument++;
 
-    while ( isspace(*argument) )
-	argument++;
+  if ( *argument == '\'' || *argument == '"' )
+    cEnd = *argument++;
 
-    cEnd = ' ';
-    if ( *argument == '\'' || *argument == '"' )
-	cEnd = *argument++;
-
-    while ( *argument != '\0' || ++count >= 255 )
+  while ( *argument != '\0' || ++count >= 255 )
     {
-	if ( *argument == cEnd )
+      if ( *argument == cEnd )
 	{
-	    argument++;
-	    break;
+	  argument++;
+	  break;
 	}
-	*arg_first = LOWER(*argument);
-	arg_first++;
-	argument++;
+
+      *arg_first = *argument;
+      arg_first++;
+      argument++;
     }
-    *arg_first = '\0';
 
-    while ( isspace(*argument) )
-	argument++;
+  *arg_first = '\0';
 
-    return argument;
+  while ( isspace(*argument) )
+    argument++;
+
+  return argument;
 }
 
 /*
@@ -545,35 +544,34 @@ char *one_argument( char *argument, char *arg_first )
  */
 char *one_argument2( char *argument, char *arg_first )
 {
-    char cEnd;
-    short count;
+  char cEnd = ' ';
+  short count = 0;
 
-    count = 0;
+  while ( isspace(*argument) )
+    argument++;
 
-    while ( isspace(*argument) )
-	argument++;
+  if ( *argument == '\'' || *argument == '"' )
+    cEnd = *argument++;
 
-    cEnd = ' ';
-    if ( *argument == '\'' || *argument == '"' )
-	cEnd = *argument++;
-
-    while ( *argument != '\0' || ++count >= 255 )
+  while ( *argument != '\0' || ++count >= 255 )
     {
-	if ( *argument == cEnd || *argument == '-' )
+      if ( *argument == cEnd || *argument == '-' )
 	{
-	    argument++;
-	    break;
+	  argument++;
+	  break;
 	}
-	*arg_first = LOWER(*argument);
-	arg_first++;
-	argument++;
+
+      *arg_first = *argument;
+      arg_first++;
+      argument++;
     }
-    *arg_first = '\0';
 
-    while ( isspace(*argument) )
-	argument++;
+  *arg_first = '\0';
 
-    return argument;
+  while ( isspace(*argument) )
+    argument++;
+
+  return argument;
 }
 
 void do_timecmd( CHAR_DATA *ch, char *argument )

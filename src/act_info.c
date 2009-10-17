@@ -1785,10 +1785,27 @@ void do_hset( CHAR_DATA *ch, char *argument )
     }
     if ( !str_cmp( arg1, "level" ) )
     {
-	pHelp->level = atoi( arg2 );
-	send_to_char( "Done.\r\n", ch );
-	return;
+      int lev;
+
+      if( !is_number(arg2) )
+	{
+	  send_to_char( "Level field must be numeric.\r\n", ch );
+	  return;
+	}
+
+      lev = atoi(arg2);
+
+      if( lev < -1 || lev > get_trust(ch) )
+	{
+	  send_to_char( "You can't set the level to that.\r\n", ch );
+	  return;
+	}
+
+      pHelp->level = lev;
+      send_to_char( "Done.\r\n", ch );
+      return;
     }
+
     if ( !str_cmp( arg1, "keyword" ) )
     {
 	STRFREE( pHelp->keyword );
