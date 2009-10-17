@@ -34,11 +34,11 @@ static	OBJ_DATA *	rgObjNest	[MAX_NEST];
 /*
  * Local functions.
  */
-void	fwrite_char	args( ( CHAR_DATA *ch, FILE *fp ) );
+void	fwrite_char	args( ( const CHAR_DATA *ch, FILE *fp ) );
 void	fread_char	args( ( CHAR_DATA *ch, FILE *fp, bool preload) );
 void	write_corpses	args( ( CHAR_DATA *ch, char *name ) );
 
-void save_home( CHAR_DATA *ch )
+void save_home( const CHAR_DATA *ch )
 {
   if ( ch->plr_home )
     {
@@ -316,7 +316,7 @@ void save_clone( CHAR_DATA *ch )
 /*
  * Write the char.
  */
-void fwrite_char( CHAR_DATA *ch, FILE *fp )
+void fwrite_char( const CHAR_DATA *ch, FILE *fp )
 {
     AFFECT_DATA *paf = NULL;
     int sn = 0, track = 0;
@@ -533,7 +533,7 @@ void fwrite_char( CHAR_DATA *ch, FILE *fp )
 /*
  * Write an object and its contents.
  */
-void fwrite_obj( CHAR_DATA *ch, OBJ_DATA *obj, FILE *fp, int iNest,
+void fwrite_obj( const CHAR_DATA *ch, const OBJ_DATA *obj, FILE *fp, int iNest,
 		 short os_type )
 {
   EXTRA_DESCR_DATA *ed = NULL;
@@ -882,7 +882,6 @@ bool load_char_obj( DESCRIPTOR_DATA *d, const char *name, bool preload )
 	{
 	  if ( ch->pcdata->wizinvis < 2 )
 	    ch->pcdata->wizinvis = ch->top_level;
- 	  assign_area( ch );
 	}
 	if ( file_ver > 1 )
 	  for ( i = 0; i < MAX_WEAR; i++ )

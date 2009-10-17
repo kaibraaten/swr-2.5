@@ -33,31 +33,25 @@ bool is_immune( CHAR_DATA *ch, short damtype )
 /*
  * Lookup a skill by name, only stopping at skills the player has.
  */
-int ch_slookup( CHAR_DATA *ch, const char *name )
+int ch_slookup( const CHAR_DATA *ch, const char *name )
 {
-    int sn;
+  int sn;
 
-    if ( IS_NPC(ch) )
-	return skill_lookup( name );
-    for ( sn = 0; sn < top_sn; sn++ )
+  if ( IS_NPC(ch) )
+    return skill_lookup( name );
+
+  for ( sn = 0; sn < top_sn; sn++ )
     {
-	if ( !skill_table[sn]->name )
-	    break;
-	if (  character_skill_level( ch, sn ) > 0
-	&&    LOWER(name[0]) == LOWER(skill_table[sn]->name[0])
-	&&   !str_prefix( name, skill_table[sn]->name ) )
-	    return sn;
+      if ( !skill_table[sn]->name )
+	break;
+
+      if (  character_skill_level( ch, sn ) > 0
+	    &&    LOWER(name[0]) == LOWER(skill_table[sn]->name[0])
+	    &&   !str_prefix( name, skill_table[sn]->name ) )
+	return sn;
     }
 
-    return -1;
-}
-
-/*
- * Lookup a personal skill
- */
-int personal_lookup( CHAR_DATA *ch, const char *name )
-{
-    return -1;
+  return -1;
 }
 
 /*
@@ -152,30 +146,31 @@ int bsearch_skill_exact( const char *name, int first, int top )
  * Each different section of the skill table is sorted alphabetically
  * Only match skills player knows				-Thoric
  */
-int ch_bsearch_skill( CHAR_DATA *ch, const char *name, int first, int top )
+int ch_bsearch_skill( const CHAR_DATA *ch, const char *name, int first, int top )
 {
-    int sn;
-
-    for (;;)
+  for (;;)
     {
-	sn = (first + top) >> 1;
+      int sn = (first + top) >> 1;
 
-	if ( LOWER(name[0]) == LOWER(skill_table[sn]->name[0])
-	&&  !str_prefix(name, skill_table[sn]->name)
-	     &&   character_skill_level( ch, sn ) > 0 )
-		return sn;
-	if (first >= top)
-	    return -1;
-    	if (strcmp( name, skill_table[sn]->name) < 1)
-	    top = sn - 1;
-    	else
-	    first = sn + 1;
+      if ( LOWER(name[0]) == LOWER(skill_table[sn]->name[0])
+	   &&  !str_prefix(name, skill_table[sn]->name)
+	   &&   character_skill_level( ch, sn ) > 0 )
+	return sn;
+
+      if (first >= top)
+	return -1;
+
+      if (strcmp( name, skill_table[sn]->name) < 1)
+	top = sn - 1;
+      else
+	first = sn + 1;
     }
-    return -1;
+
+  return -1;
 }
 
 
-int find_spell( CHAR_DATA *ch, const char *name, bool know )
+int find_spell( const CHAR_DATA *ch, const char *name, bool know )
 {
     if ( IS_NPC(ch) || !know )
 	return bsearch_skill( name, gsn_first_spell, gsn_first_skill-1 );
@@ -183,7 +178,7 @@ int find_spell( CHAR_DATA *ch, const char *name, bool know )
 	return ch_bsearch_skill( ch, name, gsn_first_spell, gsn_first_skill-1 );
 }
 
-int find_skill( CHAR_DATA *ch, const char *name, bool know )
+int find_skill( const CHAR_DATA *ch, const char *name, bool know )
 {
     if ( IS_NPC(ch) || !know )
 	return bsearch_skill( name, gsn_first_skill, gsn_first_weapon-1 );
@@ -191,7 +186,7 @@ int find_skill( CHAR_DATA *ch, const char *name, bool know )
 	return ch_bsearch_skill( ch, name, gsn_first_skill, gsn_first_weapon-1 );
 }
 
-int find_weapon( CHAR_DATA *ch, const char *name, bool know )
+int find_weapon( const CHAR_DATA *ch, const char *name, bool know )
 {
     if ( IS_NPC(ch) || !know )
 	return bsearch_skill( name, gsn_first_weapon, gsn_top_sn-1 );
@@ -424,7 +419,7 @@ int ris_save( CHAR_DATA *ch, int chance, int ris )
  * Used for spell dice parsing, ie: 3d8+L-6
  *
  */
-int rd_parse(CHAR_DATA *ch, int level, char *exp)
+int rd_parse(const CHAR_DATA *ch, int level, char *exp)
 {
   int x = 0, lop = 0, gop = 0, eop = 0;
   char operation;
@@ -521,7 +516,7 @@ int rd_parse(CHAR_DATA *ch, int level, char *exp)
 }
 
 /* wrapper function so as not to destroy exp */
-int dice_parse(CHAR_DATA *ch, int level, char *exp)
+int dice_parse(const CHAR_DATA *ch, int level, char *exp)
 {
     char buf[MAX_INPUT_LENGTH];
 
@@ -533,7 +528,7 @@ int dice_parse(CHAR_DATA *ch, int level, char *exp)
  * Compute a saving throw.
  * Negative apply's make saving throw better.
  */
-bool saves_poison_death( int level, CHAR_DATA *victim )
+bool saves_poison_death( int level, const CHAR_DATA *victim )
 {
     int save;
 
@@ -541,7 +536,7 @@ bool saves_poison_death( int level, CHAR_DATA *victim )
     save = URANGE( 5, save, 95 );
     return chance( victim, save );
 }
-bool saves_wands( int level, CHAR_DATA *victim )
+bool saves_wands( int level, const CHAR_DATA *victim )
 {
     int save;
 
@@ -552,7 +547,7 @@ bool saves_wands( int level, CHAR_DATA *victim )
     save = URANGE( 5, save, 95 );
     return chance( victim, save );
 }
-bool saves_para_petri( int level, CHAR_DATA *victim )
+bool saves_para_petri( int level, const CHAR_DATA *victim )
 {
     int save;
 
@@ -560,7 +555,7 @@ bool saves_para_petri( int level, CHAR_DATA *victim )
     save = URANGE( 5, save, 95 );
     return chance( victim, save );
 }
-bool saves_breath( int level, CHAR_DATA *victim )
+bool saves_breath( int level, const CHAR_DATA *victim )
 {
     int save;
 
@@ -568,7 +563,7 @@ bool saves_breath( int level, CHAR_DATA *victim )
     save = URANGE( 5, save, 95 );
     return chance( victim, save );
 }
-bool saves_spell_staff( int level, CHAR_DATA *victim )
+bool saves_spell_staff( int level, const CHAR_DATA *victim )
 {
     int save;
 

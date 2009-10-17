@@ -225,64 +225,70 @@ char *flag_string( int bitvector, const char * const flagarray[] )
 }
 
 
-bool can_rmodify( CHAR_DATA *ch, ROOM_INDEX_DATA *room )
+bool can_rmodify( const CHAR_DATA *ch, const ROOM_INDEX_DATA *room )
 {
-	if ( IS_NPC( ch ) )
-	  return FALSE;
-	if ( IS_IMMORTAL( ch ) )
-	  return TRUE;
+  if ( IS_NPC( ch ) )
+    return FALSE;
+  if ( IS_IMMORTAL( ch ) )
+    return TRUE;
 
-	return FALSE;
+  return FALSE;
 }
 
-bool can_omodify( CHAR_DATA *ch, OBJ_DATA *obj )
+bool can_omodify( const CHAR_DATA *ch, const OBJ_DATA *obj )
 {
-	if ( IS_NPC( ch ) )
-	  return FALSE;
-	if ( IS_IMMORTAL( ch )  )
-	  return TRUE;
-	return FALSE;
+  if ( IS_NPC( ch ) )
+    return FALSE;
+  if ( IS_IMMORTAL( ch )  )
+    return TRUE;
+
+  return FALSE;
 }
 
-bool can_oedit( CHAR_DATA *ch, OBJ_INDEX_DATA *obj )
+bool can_oedit( const CHAR_DATA *ch, const OBJ_INDEX_DATA *obj )
 {
-	if ( IS_NPC( ch ) )
-	  return FALSE;
-	if ( IS_IMMORTAL( ch ) )
-	  return TRUE;
-	return FALSE;
+  if ( IS_NPC( ch ) )
+    return FALSE;
+  if ( IS_IMMORTAL( ch ) )
+    return TRUE;
+
+  return FALSE;
 }
 
-
-bool can_mmodify( CHAR_DATA *ch, CHAR_DATA *mob )
+bool can_mmodify( const CHAR_DATA *ch, const CHAR_DATA *mob )
 {
-	if ( mob == ch )
-	  return TRUE;
+  if ( mob == ch )
+    return TRUE;
 
-	if ( !IS_NPC( mob ) )
-	{
-	   if ( IS_IMMORTAL( ch ) && get_trust(ch) > 
-		get_trust( mob ) )
-	     return TRUE;
-	   else
-	     send_to_char( "You can't do that.\r\n", ch );
-	     return FALSE;
-	}
+  if ( !IS_NPC( mob ) )
+    {
+      if ( IS_IMMORTAL( ch ) && get_trust(ch) > 
+	   get_trust( mob ) )
+	return TRUE;
+      else
+	send_to_char( "You can't do that.\r\n", ch );
 
-	if ( IS_NPC( ch ) )
-	  return FALSE;
-	if ( IS_IMMORTAL( ch ) )
-	  return TRUE;
-	return FALSE;
+      return FALSE;
+    }
+
+  if ( IS_NPC( ch ) )
+    return FALSE;
+
+  if ( IS_IMMORTAL( ch ) )
+    return TRUE;
+
+  return FALSE;
 }
 
-bool can_medit( CHAR_DATA *ch, MOB_INDEX_DATA *mob )
+bool can_medit( const CHAR_DATA *ch, const MOB_INDEX_DATA *mob )
 {
-	if ( IS_NPC( ch ) )
-	  return FALSE;
-	if ( IS_IMMORTAL( ch ) )
-	  return TRUE;
-	return FALSE;
+  if ( IS_NPC( ch ) )
+    return FALSE;
+
+  if ( IS_IMMORTAL( ch ) )
+    return TRUE;
+
+  return FALSE;
 }
 
 int get_otype( const char *type )
@@ -581,7 +587,7 @@ void start_editing( CHAR_DATA *ch, char *data )
 	ch->desc->connected = CON_EDITING;
 }
 
-char *copy_buffer( CHAR_DATA *ch )
+char *copy_buffer( const CHAR_DATA *ch )
 {
    char buf[MAX_STRING_LENGTH];
    char tmp[100];
@@ -4148,10 +4154,6 @@ void free_area( AREA_DATA *are )
     are = NULL;
 }
 
-void assign_area( CHAR_DATA *ch )
-{
-}
-
 void do_aassign( CHAR_DATA *ch, char *argument )
 {
 	char buf[MAX_STRING_LENGTH];
@@ -4171,7 +4173,7 @@ void do_aassign( CHAR_DATA *ch, char *argument )
 	||   !str_cmp( "clear", argument ) )
 	{
 	    ch->pcdata->area = NULL;
-	    assign_area( ch );
+
 	    if ( !ch->pcdata->area )
 	      send_to_char( "Area pointer cleared.\r\n", ch );
 	    else
@@ -4319,7 +4321,7 @@ bool DelOExtraProto( OBJ_INDEX_DATA *obj, char *keywords )
     return TRUE;
 }
 
-void fold_area( AREA_DATA *tarea, const char *filename, bool install )
+void fold_area( const AREA_DATA *tarea, const char *filename, bool install )
 {
     ROOM_INDEX_DATA	*room = NULL;
     MPROG_DATA		*mprog = NULL;
