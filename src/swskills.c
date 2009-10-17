@@ -2723,7 +2723,7 @@ void do_landscape ( CHAR_DATA *ch , char *argument )
 
   if ( (ch->pcdata && ch->pcdata->bestowments
 	&&    is_name("build", ch->pcdata->bestowments))
-       || nifty_is_name( ch->name, clan->leaders  ) )
+       || clan_char_is_leader( clan, ch ) )
     ;
   else
     {
@@ -2965,7 +2965,7 @@ void do_construction ( CHAR_DATA *ch , char *argument )
 
     if ( (ch->pcdata && ch->pcdata->bestowments
     &&    is_name("build", ch->pcdata->bestowments))
-    || nifty_is_name( ch->name, clan->leaders  ) )
+	 || clan_char_is_leader( clan, ch ) )
 	;
     else
     {
@@ -3081,7 +3081,7 @@ void do_bridge ( CHAR_DATA *ch , char *argument )
 
     if ( (ch->pcdata && ch->pcdata->bestowments
     &&    is_name("build", ch->pcdata->bestowments))
-    || nifty_is_name( ch->name, clan->leaders  ) )
+	 || clan_char_is_leader( clan, ch ) )
 	;
     else
     {

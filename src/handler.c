@@ -24,119 +24,108 @@ int		 cur_obj_serial;
 bool		 cur_obj_extracted;
 obj_ret		 global_objcode;
 
-bool is_wizvis( CHAR_DATA *ch , CHAR_DATA *victim );
+bool is_wizvis( const CHAR_DATA *ch , const CHAR_DATA *victim );
 
 OBJ_DATA *group_object( OBJ_DATA *obj1, OBJ_DATA *obj2 );
 
-bool is_wizvis( CHAR_DATA *ch , CHAR_DATA *victim )
+bool is_wizvis( const CHAR_DATA *ch , const CHAR_DATA *victim )
 {
-    if ( !IS_NPC(victim)
-    &&   IS_SET(victim->act, PLR_WIZINVIS)
-    &&   get_trust( ch ) < victim->pcdata->wizinvis )
-	return FALSE;
-	
-    return TRUE;
+  if ( !IS_NPC(victim)
+       &&   IS_SET(victim->act, PLR_WIZINVIS)
+       &&   get_trust( ch ) < victim->pcdata->wizinvis )
+    return FALSE;
+
+  return TRUE;
 }
 
-short get_trust( CHAR_DATA *ch )
+short get_trust( const CHAR_DATA *ch )
 {
-    if ( !ch )
-       return 0;
+  if ( !ch )
+    return 0;
 
-    if ( ch->desc ) 
-      if ( ch->desc->original )
-	ch = ch->desc->original;
+  if ( ch->desc ) 
+    if ( ch->desc->original )
+      ch = ch->desc->original;
 
-    if ( ch->trust != 0 )
-	return ch->trust;
+  if ( ch->trust != 0 )
+    return ch->trust;
 
-    if ( IS_NPC(ch)  )
-	return 1;
+  if ( IS_NPC(ch)  )
+    return 1;
 
-    if ( IS_RETIRED( ch ) )
-      return 1;
+  if ( IS_RETIRED( ch ) )
+    return 1;
 
-    return ch->top_level;
+  return ch->top_level;
 }
-
 
 /*
  * Retrieve a character's age.
  */
-short get_age( CHAR_DATA *ch )
+short get_age( const CHAR_DATA *ch )
 {
-    return 17 + ( ch->played + (current_time - ch->logon) ) / 14400;
+  return 17 + ( ch->played + (current_time - ch->logon) ) / 14400;
 }
-
-
 
 /*
  * Retrieve character's current strength.
  */
-short get_curr_str( CHAR_DATA *ch )
+short get_curr_str( const CHAR_DATA *ch )
 {
-    return URANGE( 3, ch->perm_str + ch->mod_str, 25 );
+  return URANGE( 3, ch->perm_str + ch->mod_str, 25 );
 }
-
-
 
 /*
  * Retrieve character's current intelligence.
  */
-short get_curr_int( CHAR_DATA *ch )
+short get_curr_int( const CHAR_DATA *ch )
 {
-    return URANGE( 3, ch->perm_int + ch->mod_int, 25 );
+  return URANGE( 3, ch->perm_int + ch->mod_int, 25 );
 }
-
-
 
 /*
  * Retrieve character's current wisdom.
  */
-short get_curr_wis( CHAR_DATA *ch )
+short get_curr_wis( const CHAR_DATA *ch )
 {
     return URANGE( 3, ch->perm_wis + ch->mod_wis, 25 );
 }
 
-
-
 /*
  * Retrieve character's current dexterity.
  */
-short get_curr_dex( CHAR_DATA *ch )
+short get_curr_dex( const CHAR_DATA *ch )
 {
-    return URANGE( 3, ch->perm_dex + ch->mod_dex, 25 );
+  return URANGE( 3, ch->perm_dex + ch->mod_dex, 25 );
 }
-
-
 
 /*
  * Retrieve character's current constitution.
  */
-short get_curr_con( CHAR_DATA *ch )
+short get_curr_con( const CHAR_DATA *ch )
 {
-    return URANGE( 3, ch->perm_con + ch->mod_con, 25 );
+  return URANGE( 3, ch->perm_con + ch->mod_con, 25 );
 }
 
 /*
  * Retrieve character's current charisma.
  */
-short get_curr_cha( CHAR_DATA *ch )
+short get_curr_cha( const CHAR_DATA *ch )
 {
-    return URANGE( 3, ch->perm_cha + ch->mod_cha, 25 );
+  return URANGE( 3, ch->perm_cha + ch->mod_cha, 25 );
 }
 
 /*
  * Retrieve character's current luck.
  */
-short get_curr_lck( CHAR_DATA *ch )
+short get_curr_lck( const CHAR_DATA *ch )
 {
-    return URANGE( 3, ch->perm_lck + ch->mod_lck, 25 );
+  return URANGE( 3, ch->perm_lck + ch->mod_lck, 25 );
 }
 
-short get_curr_frc( CHAR_DATA *ch )
+short get_curr_frc( const CHAR_DATA *ch )
 {
-    return URANGE( 0 , ch->perm_frc + ch->mod_frc, 25 );
+  return URANGE( 0 , ch->perm_frc + ch->mod_frc, 25 );
 }
 
 
@@ -144,7 +133,7 @@ short get_curr_frc( CHAR_DATA *ch )
  * Retrieve a character's carry capacity.
  * Vastly reduced (finally) due to containers		-Thoric
  */
-int can_carry_n( CHAR_DATA *ch )
+int can_carry_n( const CHAR_DATA *ch )
 {
     int penalty = 0;
 
@@ -172,27 +161,26 @@ int can_carry_n( CHAR_DATA *ch )
 /*
  * Retrieve a character's carry capacity.
  */
-int can_carry_w( CHAR_DATA *ch )
+int can_carry_w( const CHAR_DATA *ch )
 {
-    if ( !IS_NPC(ch) && IS_IMMORTAL(ch)  )
-	return 1000000;
+  if ( !IS_NPC(ch) && IS_IMMORTAL(ch)  )
+    return 1000000;
 
-    if ( IS_NPC(ch) && IS_SET(ch->act, ACT_PET) )
-	return 0;
+  if ( IS_NPC(ch) && IS_SET(ch->act, ACT_PET) )
+    return 0;
 
-    return str_app[get_curr_str(ch)].carry;
+  return str_app[get_curr_str(ch)].carry;
 }
 
 
 /*
  * See if a player/mob can take a piece of prototype eq		-Thoric
  */
-bool can_take_proto( CHAR_DATA *ch )
+bool can_take_proto( const CHAR_DATA *ch )
 {
   if ( IS_IMMORTAL(ch) )
     return TRUE;
-  else
-  if ( IS_NPC(ch) && IS_SET(ch->act, ACT_PROTOTYPE) )
+  else if ( IS_NPC(ch) && IS_SET(ch->act, ACT_PROTOTYPE) )
     return TRUE;
   else
     return FALSE;
@@ -611,15 +599,15 @@ void affect_strip( CHAR_DATA *ch, int sn )
 /*
  * Return true if a char is affected by a spell.
  */
-bool is_affected( CHAR_DATA *ch, int sn )
+bool is_affected( const CHAR_DATA *ch, int sn )
 {
-    AFFECT_DATA *paf;
+  AFFECT_DATA *paf;
 
-    for ( paf = ch->first_affect; paf; paf = paf->next )
-	if ( paf->type == sn )
-	    return TRUE;
+  for ( paf = ch->first_affect; paf; paf = paf->next )
+    if ( paf->type == sn )
+      return TRUE;
 
-    return FALSE;
+  return FALSE;
 }
 
 
@@ -865,7 +853,7 @@ int apply_ac( OBJ_DATA *obj, int iWear )
  * Find a piece of eq on a character.
  * Will pick the top layer if clothing is layered.		-Thoric
  */
-OBJ_DATA *get_eq_char( CHAR_DATA *ch, int iWear )
+OBJ_DATA *get_eq_char( const CHAR_DATA *ch, int iWear )
 {
   OBJ_DATA *obj, *maxobj = NULL;
 
@@ -3199,4 +3187,91 @@ int urange( int mincheck, int check, int maxcheck )
     return maxcheck;
 
   return check;
+}
+
+bool IS_SET( long flag, long bit )
+{
+  return flag & bit;
+}
+
+CHAR_DATA *CH( DESCRIPTOR_DATA *d )
+{
+  return d->original ? d->original : d->character;
+}
+
+bool IS_NPC( const CHAR_DATA *ch )
+{
+  return IS_SET( ch->act, ACT_IS_NPC );
+}
+
+bool IS_IMMORTAL( const CHAR_DATA *ch )
+{
+  return ch->top_level == 200;
+}
+
+bool IS_OFFICIAL( const CHAR_DATA *ch )
+{
+  return is_name(ch->name,sysdata.officials);
+}
+
+bool IS_AFFECTED( const CHAR_DATA *ch, int sn )
+{
+  return IS_SET( ch->affected_by, sn );
+}
+
+bool HAS_BODYPART( const CHAR_DATA *ch, int part )
+{
+  return ch->xflags == 0 || IS_SET( ch->xflags, part );
+}
+
+bool IS_GOOD( const CHAR_DATA *ch )
+{
+  return ch->alignment >= 350;
+}
+
+bool IS_EVIL( const CHAR_DATA *ch )
+{
+  return ch->alignment <= -350;
+}
+
+bool IS_NEUTRAL( const CHAR_DATA *ch )
+{
+  return !IS_GOOD(ch) && !IS_EVIL(ch);
+}
+
+bool IS_AWAKE( const CHAR_DATA *ch )
+{
+  return ch->position > POS_SLEEPING;
+}
+
+short GET_AC( const CHAR_DATA *ch )
+{
+  return ch->armor + ( IS_AWAKE(ch) ? dex_app[get_curr_dex(ch)].defensive : 0);
+}
+
+short GET_HITROLL( const CHAR_DATA *ch )
+{
+  return ch->hitroll + str_app[ get_curr_str( ch ) ].tohit
+    + ( 2 - ( abs( ch->mental_state ) / 10 ) );
+}
+
+short GET_DAMROLL( const CHAR_DATA *ch )
+{
+  return ch->damroll+str_app[get_curr_str(ch)].todam+((ch->mental_state > 5 && ch->mental_state < 15) ? 1 : 0);
+}
+
+bool IS_OUTSIDE( const CHAR_DATA *ch )
+{
+  return !IS_SET( ch->in_room->room_flags,ROOM_INDOORS)
+    && !IS_SET(ch->in_room->room_flags,ROOM_SPACECRAFT);
+}
+
+bool IS_DRUNK( const CHAR_DATA *ch, int drunk )
+{
+  return number_percent() < ch->pcdata->condition[COND_DRUNK] * 2 / drunk;
+}
+
+bool IS_CLANNED( const CHAR_DATA *ch )
+{
+  return !IS_NPC( ch ) && ch->pcdata->clan;
 }

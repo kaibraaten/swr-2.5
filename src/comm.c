@@ -694,7 +694,7 @@ void new_descriptor( int new_desc )
     strcpy( buf, inet_ntoa( sock.sin_addr ) );
 #endif
 
-    sprintf( log_buf, "Sock.sinaddr:  %s, port %hd.",
+    sprintf( log_buf, "Sock.sinaddr:  %s, port %d.",
 		buf, dnew->port );
     log_string_plus( log_buf, LOG_COMM );
 

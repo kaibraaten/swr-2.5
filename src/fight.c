@@ -1908,28 +1908,9 @@ else
 
     if ( victim->pcdata && victim->pcdata->clan )
     {
-       if ( nifty_is_name( victim->name, victim->pcdata->clan->leaders ) )
+      if( clan_char_is_leader( victim->pcdata->clan, victim ) )
        {
-          char tc[MAX_STRING_LENGTH];
-          char on[MAX_STRING_LENGTH];
-          char * leadership = victim->pcdata->clan->leaders;
-          
-          strcpy ( tc , "" );
-          
-          while ( leadership[0] != '\0' )
-          {
-             leadership = one_argument( leadership , on );
-             if ( str_cmp ( victim->name, on ) 
-             && (strlen(on) + strlen(tc)) < (MAX_STRING_LENGTH+1) )
-             {
-               if ( strlen(tc) != 0 )
-                   strcat ( tc , " " );
-               strcat ( tc , on );
-             }
-          }
-          
-          STRFREE( victim->pcdata->clan->leaders );
-          victim->pcdata->clan->leaders = STRALLOC( tc );
+	 clan_remove_leader( victim->pcdata->clan, victim->name );
        }
        
        if ( !NOT_AUTHED(victim) )
