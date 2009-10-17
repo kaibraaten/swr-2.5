@@ -973,17 +973,25 @@ ch_ret move_char( CHAR_DATA *ch, EXIT_DATA *pexit, int fall )
         chars++;
 
       for ( fch = from_room->first_person; fch && ( count < chars ); fch = nextinroom )
-      {
-	nextinroom = fch->next_in_room;
-        count++;
-	if ( fch != ch		/* loop room bug fix here by Thoric */
-	&& fch->master == ch
-	&& fch->position == POS_STANDING )
 	{
-	act( AT_ACTION, "You follow $N.", fch, NULL, ch, TO_CHAR );
-	    move_char( fch, pexit, 0 );
+	  nextinroom = fch->next_in_room;
+	  count++;
+
+	  if ( fch != ch		/* loop room bug fix here by Thoric */
+	       && fch->master == ch
+	       && fch->position == POS_STANDING )
+	    {
+	      if( !get_exit( from_room, door ) )
+		{
+		  act( AT_ACTION, "The entrance closes behind $N, preventing you from following!", fch, NULL, ch, TO_CHAR );
+		  continue;
+		}
+
+
+	      act( AT_ACTION, "You follow $N.", fch, NULL, ch, TO_CHAR );
+	      move_char( fch, pexit, 0 );
+	    }
 	}
-      }
     }
 
 

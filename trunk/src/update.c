@@ -346,244 +346,249 @@ void gain_condition( CHAR_DATA *ch, int iCond, int value )
  */
 void mobile_update( void )
 {
-    char buf[MAX_STRING_LENGTH];
-    CHAR_DATA *ch;
-    EXIT_DATA *pexit;
-    int door;
-    ch_ret     retcode;
+  char buf[MAX_STRING_LENGTH];
+  CHAR_DATA *ch = NULL;
+  EXIT_DATA *pexit = NULL;
+  int door = 0;
+  ch_ret retcode = rNONE;
 
-    retcode = rNONE;
-
-    /* Examine all mobs. */
-    for ( ch = last_char; ch; ch = gch_prev )
+  /* Examine all mobs. */
+  for ( ch = last_char; ch; ch = gch_prev )
     {
-	set_cur_char( ch );
-	if ( ch == first_char && ch->prev )
+      set_cur_char( ch );
+
+      if ( ch == first_char && ch->prev )
 	{
-	    bug( "mobile_update: first_char->prev != NULL... fixed", 0 );
-	    ch->prev = NULL;
+	  bug( "mobile_update: first_char->prev != NULL... fixed", 0 );
+	  ch->prev = NULL;
 	}
 	  
-	gch_prev = ch->prev;
+      gch_prev = ch->prev;
 	
-	if ( gch_prev && gch_prev->next != ch )
+      if ( gch_prev && gch_prev->next != ch )
 	{
-	    sprintf( buf, "FATAL: Mobile_update: %s->prev->next doesn't point to ch.",
-		ch->name );
-	    bug( buf, 0 );	    
-	    bug( "Short-cutting here", 0 );
-	    gch_prev = NULL;
-	    ch->prev = NULL;
+	  sprintf( buf, "FATAL: Mobile_update: %s->prev->next doesn't point to ch.",
+		   ch->name );
+	  bug( buf, 0 );	    
+	  bug( "Short-cutting here", 0 );
+	  gch_prev = NULL;
+	  ch->prev = NULL;
 	}
 
-	if ( !IS_NPC(ch) )
+      if ( !IS_NPC(ch) )
 	{
-	    drunk_randoms(ch);
-	    halucinations(ch);
-	    continue;
+	  drunk_randoms(ch);
+	  halucinations(ch);
+	  continue;
 	}
 
-	if ( !ch->in_room
-	||   IS_AFFECTED(ch, AFF_CHARM)
-	||   IS_AFFECTED(ch, AFF_PARALYSIS) )
-	    continue;
+      if ( !ch->in_room
+	   ||   IS_AFFECTED(ch, AFF_CHARM)
+	   ||   IS_AFFECTED(ch, AFF_PARALYSIS) )
+	continue;
 
-	if ( !IS_SET( ch->act, ACT_RUNNING )
-	&&   !IS_SET( ch->act, ACT_SENTINEL )
-	&&   !ch->fighting && ch->hunting )
+      if ( !IS_SET( ch->act, ACT_RUNNING )
+	   &&   !IS_SET( ch->act, ACT_SENTINEL )
+	   &&   !ch->fighting && ch->hunting )
 	{
 	  if (  ch->top_level < 20 )
-	   WAIT_STATE( ch, 6 * PULSE_PER_SECOND );
+	    WAIT_STATE( ch, 6 * PULSE_PER_SECOND );
 	  else	if (  ch->top_level < 40 )
-	   WAIT_STATE( ch, 5 * PULSE_PER_SECOND );
+	    WAIT_STATE( ch, 5 * PULSE_PER_SECOND );
 	  else if (  ch->top_level < 60 )
-	   WAIT_STATE( ch, 4 * PULSE_PER_SECOND );
+	    WAIT_STATE( ch, 4 * PULSE_PER_SECOND );
 	  else	if (  ch->top_level < 80 )
-	   WAIT_STATE( ch, 3 * PULSE_PER_SECOND );
+	    WAIT_STATE( ch, 3 * PULSE_PER_SECOND );
 	  else	if (  ch->top_level < 100 )
-	   WAIT_STATE( ch, 2 * PULSE_PER_SECOND );
+	    WAIT_STATE( ch, 2 * PULSE_PER_SECOND );
 	  else
-	   WAIT_STATE( ch, 1 * PULSE_PER_SECOND );
+	    WAIT_STATE( ch, 1 * PULSE_PER_SECOND );
+
 	  hunt_victim( ch );
 	  continue;
-	}  
-        else if ( !ch->fighting && !ch->hunting 
-        && !IS_SET( ch->act, ACT_RUNNING)
-        && ch->was_sentinel && ch->position >= POS_STANDING )
+	}
+      else if ( !ch->fighting && !ch->hunting 
+		&& !IS_SET( ch->act, ACT_RUNNING)
+		&& ch->was_sentinel && ch->position >= POS_STANDING )
 	{
-	   act( AT_ACTION, "$n leaves.", ch, NULL, NULL, TO_ROOM );
-	   char_from_room( ch );
-	   char_to_room( ch , ch->was_sentinel );
-	   act( AT_ACTION, "$n arrives.", ch, NULL, NULL, TO_ROOM );
-	   SET_BIT( ch->act , ACT_SENTINEL );            
-	   ch->was_sentinel = NULL;
+	  act( AT_ACTION, "$n leaves.", ch, NULL, NULL, TO_ROOM );
+	  char_from_room( ch );
+	  char_to_room( ch , ch->was_sentinel );
+	  act( AT_ACTION, "$n arrives.", ch, NULL, NULL, TO_ROOM );
+	  SET_BIT( ch->act , ACT_SENTINEL );            
+	  ch->was_sentinel = NULL;
 	}
 	
-	/* Examine call for special procedure */
-	if ( !IS_SET( ch->act, ACT_RUNNING )
-	&&    ch->spec_fun )
+      /* Examine call for special procedure */
+      if ( !IS_SET( ch->act, ACT_RUNNING )
+	   &&    ch->spec_fun )
 	{
-	    if ( (*ch->spec_fun) ( ch ) )
-		continue;
-	    if ( char_died(ch) )
-		continue;
+	  if ( (*ch->spec_fun) ( ch ) )
+	    continue;
+
+	  if ( char_died(ch) )
+	    continue;
 	}
         
-        if ( !IS_SET( ch->act, ACT_RUNNING )
-	&&    ch->spec_2 )
+      if ( !IS_SET( ch->act, ACT_RUNNING )
+	   &&    ch->spec_2 )
 	{
-	    if ( (*ch->spec_2) ( ch ) )
-		continue;
-	    if ( char_died(ch) )
-		continue;
-	}
-
-	/* Check for mudprogram script on mob */
-	if ( IS_SET( ch->pIndexData->progtypes, SCRIPT_PROG ) )
-	{
-	    mprog_script_trigger( ch );
+	  if ( (*ch->spec_2) ( ch ) )
+	    continue;
+	  if ( char_died(ch) )
 	    continue;
 	}
 
-	if ( ch != cur_char )
+      /* Check for mudprogram script on mob */
+      if ( IS_SET( ch->pIndexData->progtypes, SCRIPT_PROG ) )
 	{
-	    bug( "Mobile_update: ch != cur_char after spec_fun", 0 );
-	    continue;
-	}
-
-	/* That's all for sleeping / busy monster */
-	if ( ch->position != POS_STANDING )
-	    continue;
-        
-        
-	if ( IS_SET(ch->act, ACT_MOUNTED ) )
-	{
-	    if ( IS_SET(ch->act, ACT_AGGRESSIVE) )
-	      do_emote( ch, const_char_to_nonconst("snarls and growls." ));
-	    continue;
-	}
-
-	if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE )
-	&&   IS_SET(ch->act, ACT_AGGRESSIVE) )
-	  do_emote( ch, const_char_to_nonconst("glares around and snarls." ));
-
-
-	if ( last_descriptor )
-       	   mprog_random_trigger( ch );
-	if ( char_died(ch) )
-		continue;
-	if ( ch->position < POS_STANDING )
-	        continue;
-
-        /* MOBprogram hour trigger: do something for an hour */
-        mprog_hour_trigger(ch);
-
-	if ( char_died(ch) )
+	  mprog_script_trigger( ch );
 	  continue;
+	}
 
-	rprog_hour_trigger(ch);
-	if ( char_died(ch) )
-	  continue;
-
-	if ( ch->position < POS_STANDING )
-	  continue;
-
-	/* Scavenge */
-	if ( IS_SET(ch->act, ACT_SCAVENGER)
-	&&   ch->in_room->first_content
-	&&   number_bits( 2 ) == 0 )
+      if ( ch != cur_char )
 	{
-	    OBJ_DATA *obj;
-	    OBJ_DATA *obj_best;
-	    int max;
+	  bug( "Mobile_update: ch != cur_char after spec_fun", 0 );
+	  continue;
+	}
 
-	    max         = 1;
-	    obj_best    = NULL;
-	    for ( obj = ch->in_room->first_content; obj; obj = obj->next_content )
+      /* That's all for sleeping / busy monster */
+      if ( ch->position != POS_STANDING )
+	continue;
+
+      if ( IS_SET(ch->act, ACT_MOUNTED ) )
+	{
+	  if ( IS_SET(ch->act, ACT_AGGRESSIVE) )
+	    do_emote( ch, const_char_to_nonconst("snarls and growls." ));
+
+	  continue;
+	}
+
+      if ( IS_SET(ch->in_room->room_flags, ROOM_SAFE )
+	   &&   IS_SET(ch->act, ACT_AGGRESSIVE) )
+	do_emote( ch, const_char_to_nonconst("glares around and snarls." ));
+
+      if ( last_descriptor )
+	mprog_random_trigger( ch );
+
+      if ( char_died(ch) )
+	continue;
+
+      if ( ch->position < POS_STANDING )
+	continue;
+
+      /* MOBprogram hour trigger: do something for an hour */
+      mprog_hour_trigger(ch);
+
+      if ( char_died(ch) )
+	continue;
+
+      rprog_hour_trigger(ch);
+
+      if ( char_died(ch) )
+	continue;
+
+      if ( ch->position < POS_STANDING )
+	continue;
+
+      /* Scavenge */
+      if ( IS_SET(ch->act, ACT_SCAVENGER)
+	   &&   ch->in_room->first_content
+	   &&   number_bits( 2 ) == 0 )
+	{
+	  OBJ_DATA *obj = NULL;
+	  OBJ_DATA *obj_best = NULL;
+	  int max = 0;
+
+	  for ( obj = ch->in_room->first_content; obj;
+		obj = obj->next_content )
 	    {
-		if ( CAN_WEAR(obj, ITEM_TAKE) && obj->cost > max 
-		&& !IS_OBJ_STAT( obj, ITEM_BURRIED ) )
+	      if ( IS_OBJ_STAT( obj, ITEM_PROTOTYPE ) && !IS_SET( ch->act, ACT_PROTOTYPE ) )
+		continue;
+
+	      if ( CAN_WEAR(obj, ITEM_TAKE) && obj->cost > max 
+		   && !IS_OBJ_STAT( obj, ITEM_BURRIED ) )
 		{
-		    obj_best    = obj;
-		    max         = obj->cost;
+		  obj_best    = obj;
+		  max         = obj->cost;
 		}
 	    }
 
-	    if ( obj_best )
+	  if ( obj_best )
 	    {
-		obj_from_room( obj_best );
-		obj_to_char( obj_best, ch );
-		act( AT_ACTION, "$n gets $p.", ch, obj_best, NULL, TO_ROOM );
+	      obj_from_room( obj_best );
+	      obj_to_char( obj_best, ch );
+	      act( AT_ACTION, "$n gets $p.", ch, obj_best, NULL, TO_ROOM );
 	    }
 	}
 
-	/* Wander */
-	if ( !IS_SET(ch->act, ACT_RUNNING)
-	&&   !IS_SET(ch->act, ACT_SENTINEL)
-	&&   !IS_SET(ch->act, ACT_PROTOTYPE)
-	&& ( door = number_bits( 5 ) ) <= 9
-	&& ( pexit = get_exit(ch->in_room, door) ) != NULL
-	&&   pexit->to_room
-	&&   !IS_SET(pexit->exit_info, EX_CLOSED)
-	&&   !IS_SET(pexit->to_room->room_flags, ROOM_NO_MOB)
-	&& ( ch->guard_data || pexit->to_room->sector_type == ch->in_room->sector_type ) )
+      /* Wander */
+      if ( !IS_SET(ch->act, ACT_RUNNING)
+	   &&   !IS_SET(ch->act, ACT_SENTINEL)
+	   &&   !IS_SET(ch->act, ACT_PROTOTYPE)
+	   && ( door = number_bits( 5 ) ) <= 9
+	   && ( pexit = get_exit(ch->in_room, door) ) != NULL
+	   &&   pexit->to_room
+	   &&   !IS_SET(pexit->exit_info, EX_CLOSED)
+	   &&   !IS_SET(pexit->to_room->room_flags, ROOM_NO_MOB)
+	   && ( ch->guard_data || pexit->to_room->sector_type == ch->in_room->sector_type ) )
 	{
-	    retcode = move_char( ch, pexit, 0 );
-						/* If ch changes position due
-						to it's or someother mob's
-						movement via MOBProgs,
-						continue - Kahn */
-	    if ( char_died(ch) )
-	      continue;
-	    if ( retcode != rNONE || IS_SET(ch->act, ACT_SENTINEL)
-	    ||    ch->position < POS_STANDING )
-	        continue;
+	  retcode = move_char( ch, pexit, 0 );
+
+	  /* If ch changes position due
+	     to it's or someother mob's
+	     movement via MOBProgs,
+	     continue - Kahn */
+	  if ( char_died(ch) )
+	    continue;
+
+	  if ( retcode != rNONE || IS_SET(ch->act, ACT_SENTINEL)
+	       ||    ch->position < POS_STANDING )
+	    continue;
 	}
 
-	/* Flee */
-	if ( ch->hit < ch->max_hit / 2
-	&& ( door = number_bits( 4 ) ) <= 9
-	&& ( pexit = get_exit(ch->in_room,door) ) != NULL
-	&&   pexit->to_room
-	&&   !IS_SET(pexit->exit_info, EX_CLOSED)
-	&&   !IS_SET(pexit->to_room->room_flags, ROOM_NO_MOB)
-	&& ( ch->guard_data || pexit->to_room->sector_type == ch->in_room->sector_type ) )
+      /* Flee */
+      if ( ch->hit < ch->max_hit / 2
+	   && ( door = number_bits( 4 ) ) <= 9
+	   && ( pexit = get_exit(ch->in_room,door) ) != NULL
+	   &&   pexit->to_room
+	   &&   !IS_SET(pexit->exit_info, EX_CLOSED)
+	   &&   !IS_SET(pexit->to_room->room_flags, ROOM_NO_MOB)
+	   && ( ch->guard_data || pexit->to_room->sector_type == ch->in_room->sector_type ) )
 	{
-	    CHAR_DATA *rch;
-	    bool found;
+	  CHAR_DATA *rch = NULL;
+	  bool found = FALSE;
 
-	    found = FALSE;
-	    for ( rch  = ch->in_room->first_person;
-		  rch;
-		  rch  = rch->next_in_room )
+	  for ( rch  = ch->in_room->first_person; rch;
+		rch  = rch->next_in_room )
 	    {
-		if ( is_fearing(ch, rch) )
+	      if ( is_fearing(ch, rch) )
 		{
-		    switch( number_bits(2) )
+		  switch( number_bits(2) )
 		    {
-			case 0:
-			  sprintf( buf, "Get away from me, %s!", rch->name );
-			  break;
-			case 1:
-			  sprintf( buf, "Leave me be, %s!", rch->name );
-			  break;
-			case 2:
-			  sprintf( buf, "%s is trying to kill me!  Help!", rch->name );
-			  break;
-			case 3:
-			  sprintf( buf, "Someone save me from %s!", rch->name );
-			  break;
+		    case 0:
+		      sprintf( buf, "Get away from me, %s!", rch->name );
+		      break;
+		    case 1:
+		      sprintf( buf, "Leave me be, %s!", rch->name );
+		      break;
+		    case 2:
+		      sprintf( buf, "%s is trying to kill me!  Help!", rch->name );
+		      break;
+		    case 3:
+		      sprintf( buf, "Someone save me from %s!", rch->name );
+		      break;
 		    }
-		    found = TRUE;
-		    break;
+
+		  found = TRUE;
+		  break;
 		}
 	    }
-	    if ( found )
-		retcode = move_char( ch, pexit, 0 );
+
+	  if ( found )
+	    retcode = move_char( ch, pexit, 0 );
 	}
     }
-
-    return;
 }
 
 void update_taxes( void )
@@ -1467,82 +1472,83 @@ void aggr_update( void )
      * We can check for linkdead victims to mobile_update	-Thoric
      */
     for ( d = first_descriptor; d; d = dnext )
-    {
+      {
 	dnext = d->next;
-	if ( d->connected != CON_PLAYING || (wch=d->character) == NULL )
-	   continue;
+	if ( ( d->connected != CON_PLAYING && d->connected != CON_EDITING )
+	     || (wch=d->character) == NULL )
+	  continue;
 
 	if ( char_died(wch)
-	||   IS_NPC(wch)
-	||   IS_IMMORTAL(wch)
-	||  !wch->in_room )
-	    continue;
+	     ||   IS_NPC(wch)
+	     ||   IS_IMMORTAL(wch)
+	     ||  !wch->in_room )
+	  continue;
 
 	for ( ch = wch->in_room->first_person; ch; ch = ch_next )
-	{
+	  {
 	    int count = 0;
 
 	    ch_next	= ch->next_in_room;
 
 	    if ( !IS_NPC(ch)
-	    ||   ch->fighting
-	    ||   IS_AFFECTED(ch, AFF_CHARM)
-	    ||   !IS_AWAKE(ch)
-	    ||   ( IS_SET(ch->act, ACT_WIMPY) )
-	    ||   !can_see( ch, wch ) )
-		continue;
+		 ||   ch->fighting
+		 ||   IS_AFFECTED(ch, AFF_CHARM)
+		 ||   !IS_AWAKE(ch)
+		 ||   ( IS_SET(ch->act, ACT_WIMPY) )
+		 ||   !can_see( ch, wch ) )
+	      continue;
 
 	    if ( is_hating( ch, wch ) )
-	    {
+	      {
 		found_prey( ch, wch );
 		continue;
-	    }
+	      }
 
 	    if ( !IS_SET(ch->act, ACT_AGGRESSIVE)
-	    ||    IS_SET(ch->act, ACT_MOUNTED)
-	    ||    IS_SET(ch->in_room->room_flags, ROOM_SAFE ) )
-		continue;
+		 ||    IS_SET(ch->act, ACT_MOUNTED)
+		 ||    IS_SET(ch->in_room->room_flags, ROOM_SAFE ) )
+	      continue;
 
 	    victim = wch;
 
 	    if ( !victim )
-	    {
+	      {
 		bug( "Aggr_update: null victim.", count );
 		continue;
-	    }
+	      }
 
             if ( get_timer(victim, TIMER_RECENTFIGHT) > 0 )
-                continue;
+	      continue;
 
 	    if ( IS_NPC(ch) && IS_SET(ch->attacks, ATCK_BACKSTAB ) )
-	    {
+	      {
 		OBJ_DATA *obj = NULL;
 
 		if ( !ch->mount
-    		&& (obj = get_eq_char( ch, WEAR_WIELD )) != NULL
-    		&& obj->value[3] == 11
-		&& !victim->fighting
-		&& victim->hit >= victim->max_hit )
-		{
+		     && (obj = get_eq_char( ch, WEAR_WIELD )) != NULL
+		     && obj->value[3] == 11
+		     && !victim->fighting
+		     && victim->hit >= victim->max_hit )
+		  {
 		    WAIT_STATE( ch, skill_table[gsn_backstab]->beats );
+
 		    if ( !IS_AWAKE(victim)
-		    ||   number_percent( )+5 < ch->top_level )
-		    {
+			 ||   number_percent( )+5 < ch->top_level )
+		      {
 			global_retcode = multi_hit( ch, victim, gsn_backstab );
 			continue;
-		    }
+		      }
 		    else
-		    {
+		      {
 			global_retcode = damage( ch, victim, 0, gsn_backstab );
 			continue;
-		    }
-		}
-	    }
-	    global_retcode = multi_hit( ch, victim, TYPE_UNDEFINED );
-	}
-    }
+		      }
+		  }
+	      }
 
-    return;
+	    global_retcode = multi_hit( ch, victim, TYPE_UNDEFINED );
+	  }
+      }
 }
 
 /* From interp.c */
