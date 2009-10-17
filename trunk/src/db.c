@@ -438,9 +438,7 @@ static void boot_read_area_files( void )
 {
   FILE *fpList = NULL;
 
-  log_string("Reading in area files...");
-
-  if ( ( fpList = fopen( AREA_LIST, "r" ) ) == NULL )
+  if ( ( fpList = fopen( AREA_DIR AREA_LIST, "r" ) ) == NULL )
     {
       shutdown_mud( "Unable to open area list" );
       exit( 1 );
@@ -454,7 +452,6 @@ static void boot_read_area_files( void )
 	break;
 
       load_area_file( last_area, strArea );
-
     }
 
   fclose( fpList );
@@ -4275,8 +4272,11 @@ void fix_area_exits( AREA_DATA *tarea )
     }
 }
 
-void load_area_file( AREA_DATA *tarea, char *filename )
+void load_area_file( AREA_DATA *tarea, const char *filename )
 {
+  char realfilename[MAX_STRING_LENGTH];
+  sprintf( realfilename, "%s%s", AREA_DIR, filename );
+
 /*    FILE *fpin;
     what intelligent person stopped using fpArea?????
     if fpArea isn't being used, then no filename or linenumber
@@ -4284,82 +4284,93 @@ void load_area_file( AREA_DATA *tarea, char *filename )
     (bug uses fpArea)
       --TRI  */
 
-    if ( fBootDb )
-      tarea = last_area;
-    if ( !fBootDb && !tarea )
+  log_printf( "Reading %s", realfilename );
+
+  if ( fBootDb )
+    tarea = last_area;
+
+  if ( !fBootDb && !tarea )
     {
-	bug( "Load_area: null area!" );
-	return;
+      bug( "Load_area: null area!" );
+      return;
     }
 
-    if ( ( fpArea = fopen( filename, "r" ) ) == NULL )
+  if ( ( fpArea = fopen( realfilename, "r" ) ) == NULL )
     {
-	bug( "load_area: error loading file (can't open)" );
-	bug( filename );
-	return;
+      bug( "load_area: error loading file (can't open)" );
+      bug( filename );
+      return;
     }
 
-    for ( ; ; )
+  for ( ; ; )
     {
-	char *word;
+      const char *word;
 
-	if ( fread_letter( fpArea ) != '#' )
+      if ( fread_letter( fpArea ) != '#' )
 	{
-	    bug( filename );
-	    bug( "load_area: # not found." );
-	    exit( 1 );
+	  bug( filename );
+	  bug( "load_area: # not found." );
+	  exit( 1 );
 	}
 
-	word = fread_word( fpArea );
+      word = fread_word( fpArea );
 
-	     if ( word[0] == '$'               )                 break;
-	else if ( !str_cmp( word, "AREA"     ) )
+      if ( word[0] == '$' )
 	{
-		if ( fBootDb )
-		{
-		  load_area    (fpArea);
-		  tarea = last_area;
-		}
-		else
-		{
-		  DISPOSE( tarea->name );
-		  tarea->name = fread_string_nohash( fpArea );
-		}
+	  break;
 	}
-	else if ( !str_cmp( word, "FLAGS"    ) ) load_flags   (tarea, fpArea);
-	else if ( !str_cmp( word, "HELPS"    ) ) load_helps   (tarea, fpArea);
-	else if ( !str_cmp( word, "MOBILES"  ) ) load_mobiles (tarea, fpArea);
-	else if ( !str_cmp( word, "MUDPROGS" ) ) load_mudprogs(tarea, fpArea);
-	else if ( !str_cmp( word, "OBJECTS"  ) ) load_objects (tarea, fpArea);
-	else if ( !str_cmp( word, "OBJPROGS" ) ) load_objprogs(tarea, fpArea);
-	else if ( !str_cmp( word, "ROOMS"    ) ) load_rooms   (tarea, fpArea);
-	else if ( !str_cmp( word, "SHOPS"    ) ) load_shops   (tarea, fpArea);
-	else if ( !str_cmp( word, "REPAIRS"  ) ) load_repairs (tarea, fpArea);
-	else if ( !str_cmp( word, "SPECIALS" ) ) load_specials(tarea, fpArea);
-	else
+      else if ( !str_cmp( word, "AREA"     ) )
 	{
-	    bug( filename );
-	    bug( "load_area: bad section name." );
-	    if ( fBootDb )
+	  if ( fBootDb )
+	    {
+	      load_area    (fpArea);
+	      tarea = last_area;
+	    }
+	  else
+	    {
+	      DISPOSE( tarea->name );
+	      tarea->name = fread_string_nohash( fpArea );
+	    }
+	}
+      else if ( !str_cmp( word, "FLAGS"    ) ) load_flags   (tarea, fpArea);
+      else if ( !str_cmp( word, "HELPS"    ) ) load_helps   (tarea, fpArea);
+      else if ( !str_cmp( word, "MOBILES"  ) ) load_mobiles (tarea, fpArea);
+      else if ( !str_cmp( word, "MUDPROGS" ) ) load_mudprogs(tarea, fpArea);
+      else if ( !str_cmp( word, "OBJECTS"  ) ) load_objects (tarea, fpArea);
+      else if ( !str_cmp( word, "OBJPROGS" ) ) load_objprogs(tarea, fpArea);
+      else if ( !str_cmp( word, "ROOMS"    ) ) load_rooms   (tarea, fpArea);
+      else if ( !str_cmp( word, "SHOPS"    ) ) load_shops   (tarea, fpArea);
+      else if ( !str_cmp( word, "REPAIRS"  ) ) load_repairs (tarea, fpArea);
+      else if ( !str_cmp( word, "SPECIALS" ) ) load_specials(tarea, fpArea);
+      else
+	{
+	  bug( filename );
+	  bug( "load_area: bad section name." );
+
+	  if ( fBootDb )
+	    {
 	      exit( 1 );
-	    else
+	    }
+	  else
 	    {
 	      fclose( fpArea );
 	      return;
 	    }
 	}
     }
-    fclose( fpArea );
-    if ( tarea )
-    {
-	if ( fBootDb )
-	  sort_area( tarea, FALSE );
 
-	fprintf( stderr, "%s\n",
-		 filename);
+  fclose( fpArea );
+
+  if ( tarea )
+    {
+      if ( fBootDb )
+	sort_area( tarea, FALSE );
+
+      fprintf( stderr, "%s\n",
+	       filename);
     }
-    else
-      fprintf( stderr, "(%s)\n", filename );
+  else
+    fprintf( stderr, "(%s)\n", filename );
 }
 
 

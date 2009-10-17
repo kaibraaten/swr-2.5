@@ -23,7 +23,7 @@ libs:
 $(BINARY):	$(OBJ)
 		@echo "Linking" $(BINARY)
 		@$(CC) -o $@ $^ $(LFLAGS)
-		@mv $(BINARY) ../bin
+		@mv $(BINARY) ../
 		@echo "Done."
 
 $(ODIR)/%.o:	 %.c $(DEPS)
