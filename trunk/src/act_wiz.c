@@ -439,7 +439,7 @@ void echo_to_all( short AT_COLOR, const char *argument, short tar )
     return;
 }
 
-void echo_to_area( AREA_DATA *area , short AT_COLOR, const char *argument, short tar )
+void echo_to_area( const AREA_DATA *area , short AT_COLOR, const char *argument, short tar )
 {
     DESCRIPTOR_DATA *d;
 
@@ -516,19 +516,18 @@ void do_echo( CHAR_DATA *ch, char *argument )
     echo_to_all ( color, argument, target );
 }
 
-void echo_to_room( short AT_COLOR, ROOM_INDEX_DATA *room, const char *argument )
+void echo_to_room( short AT_COLOR, const ROOM_INDEX_DATA *room, const char *argument )
 {
-    CHAR_DATA *vic;
+  CHAR_DATA *vic;
     
-    if ( room == NULL )
-    	return;
-    	
-    
-    for ( vic = room->first_person; vic; vic = vic->next_in_room )
+  if ( room == NULL )
+    return;
+  
+  for ( vic = room->first_person; vic; vic = vic->next_in_room )
     {
-	set_char_color( AT_COLOR, vic );
-	send_to_char( argument, vic );
-	send_to_char( "\r\n",   vic );
+      set_char_color( AT_COLOR, vic );
+      send_to_char( argument, vic );
+      send_to_char( "\r\n",   vic );
     }
 }
 
@@ -574,19 +573,19 @@ void do_recho( CHAR_DATA *ch, char *argument )
 
 ROOM_INDEX_DATA *find_location( CHAR_DATA *ch, const char *arg )
 {
-    CHAR_DATA *victim;
-    OBJ_DATA *obj;
+  CHAR_DATA *victim;
+  OBJ_DATA *obj;
 
-    if ( is_number(arg) )
-	return get_room_index( atoi( arg ) );
+  if ( is_number(arg) )
+    return get_room_index( atoi( arg ) );
 
-    if ( ( victim = get_char_world( ch, arg ) ) != NULL )
-	return victim->in_room;
+  if ( ( victim = get_char_world( ch, arg ) ) != NULL )
+    return victim->in_room;
 
-    if ( ( obj = get_obj_world( ch, arg ) ) != NULL )
-	return obj->in_room;
+  if ( ( obj = get_obj_world( ch, arg ) ) != NULL )
+    return obj->in_room;
 
-    return NULL;
+  return NULL;
 }
 
 
@@ -1907,7 +1906,7 @@ void do_oinvoke( CHAR_DATA *ch, char *argument )
     }
 */
 
-    obj = create_object( pObjIndex, level );
+    obj = create_object( pObjIndex );
     if ( CAN_WEAR(obj, ITEM_TAKE) )
     {
 	obj = obj_to_char( obj, ch );
@@ -3145,14 +3144,14 @@ void do_newbieset( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-     obj = create_object( get_obj_index(OBJ_VNUM_SCHOOL_DAGGER), 1 );
+    obj = create_object( get_obj_index(OBJ_VNUM_SCHOOL_DAGGER) );
      obj_to_char(obj, victim);
   
      {
        OBJ_INDEX_DATA *obj_ind = get_obj_index( 23 );
        if ( obj_ind != NULL )
        {
-         obj = create_object( obj_ind, 1 );
+         obj = create_object( obj_ind );
          obj_to_char( obj, victim );
        }
      }
@@ -3165,7 +3164,7 @@ void do_newbieset( CHAR_DATA *ch, char *argument )
        OBJ_INDEX_DATA *obj_ind = get_obj_index( 20 );
        if ( obj_ind != NULL )
        {
-         obj = create_object( obj_ind, 1 );
+         obj = create_object( obj_ind );
          obj_to_char( obj, victim );
        }
      }

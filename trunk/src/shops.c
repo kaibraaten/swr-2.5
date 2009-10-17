@@ -364,7 +364,7 @@ void do_buy( CHAR_DATA *ch, char *argument )
 	{
 	    OBJ_DATA *buy_obj, *bag;
 
-	    buy_obj = create_object( obj->pIndexData, obj->level );
+	    buy_obj = create_object( obj->pIndexData );
 
 	    /*
 	     * Due to grouped objects and carry limitations in SMAUG
@@ -374,7 +374,7 @@ void do_buy( CHAR_DATA *ch, char *argument )
 	     */
 	    if ( noi > 1 )
 	    {
-		bag = create_object( get_obj_index( OBJ_VNUM_SHOPPING_BAG ), 1 );
+		bag = create_object( get_obj_index( OBJ_VNUM_SHOPPING_BAG ) );
 		/* perfect size bag ;) */
 		bag->value[0] = bag->weight + (buy_obj->weight * noi);
 		buy_obj->count = noi;

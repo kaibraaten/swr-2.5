@@ -3402,7 +3402,7 @@ char *	crypt		args( ( const char *key, const char *salt ) );
 
 /* act_comm.c */
 bool character_has_comlink( const CHAR_DATA *ch );
-void    sound_to_room( ROOM_INDEX_DATA *room , const char *argument );
+void    sound_to_room( const ROOM_INDEX_DATA *room , const char *argument );
 bool	circle_follow	args( ( const CHAR_DATA *ch, const CHAR_DATA *victim ) );
 void	add_follower	args( ( CHAR_DATA *ch, CHAR_DATA *master ) );
 void	stop_follower	args( ( CHAR_DATA *ch ) );
@@ -3413,13 +3413,13 @@ void	send_ascii_title args( ( CHAR_DATA *ch ) );
 void	to_channel	args( ( const char *argument, int channel,
 				const char *verb, short level ) );
 void  	talk_auction    args( ( const char *argument ) );
-char *	obj_short	args( ( OBJ_DATA *obj ) );
+char *	obj_short	args( ( const OBJ_DATA *obj ) );
 
 /* act_info.c */
 int	get_door	args( ( const char *arg ) );
-char *	format_obj_to_char	args( ( OBJ_DATA *obj, CHAR_DATA *ch,
+char *	format_obj_to_char	args( ( const OBJ_DATA *obj, CHAR_DATA *ch,
 				    bool fShort ) );
-void	show_list_to_char	args( ( OBJ_DATA *list, CHAR_DATA *ch,
+void	show_list_to_char	args( ( const OBJ_DATA *list, CHAR_DATA *ch,
 				    bool fShort, bool fShowNothing ) );
 void log_printf( const char *fmt, ... );
 void copyover_recover( void );
@@ -3427,29 +3427,28 @@ void copyover_recover( void );
 /* act_move.c */
 void	clear_vrooms	args( ( void ) );
 ED *	find_door	args( ( CHAR_DATA *ch, char *arg, bool quiet ) );
-ED *	get_exit	args( ( ROOM_INDEX_DATA *room, short dir ) );
-ED *	get_exit_to	args( ( ROOM_INDEX_DATA *room, short dir, long vnum ) );
-ED *	get_exit_num	args( ( ROOM_INDEX_DATA *room, short count ) );
+ED *	get_exit	args( ( const ROOM_INDEX_DATA *room, short dir ) );
+ED *	get_exit_to	args( ( const ROOM_INDEX_DATA *room, short dir, long vnum ) );
+ED *	get_exit_num	args( ( const ROOM_INDEX_DATA *room, short count ) );
 ch_ret	move_char	args( ( CHAR_DATA *ch, EXIT_DATA *pexit, int fall ) );
 void	teleport	args( ( CHAR_DATA *ch, short room, int flags ) );
-short	encumbrance	args( ( CHAR_DATA *ch, short move ) );
+short	encumbrance	args( ( const CHAR_DATA *ch, short move ) );
 bool	will_fall	args( ( CHAR_DATA *ch, int fall ) );
-int     wherehome       args( ( CHAR_DATA *ch ) );
+int     wherehome       args( ( const CHAR_DATA *ch ) );
 
 /* act_obj.c */
 
 obj_ret	damage_obj	args( ( OBJ_DATA *obj ) );
-short	get_obj_resistance args( ( OBJ_DATA *obj ) );
-void    save_clan_storeroom args( ( CHAR_DATA *ch, CLAN_DATA *clan ) );
+short	get_obj_resistance args( ( const OBJ_DATA *obj ) );
 void    obj_fall  	args( ( OBJ_DATA *obj, bool through ) );
 
 /* act_wiz.c */
 void              close_area    args( ( AREA_DATA *pArea ) );
 RID *	find_location	args( ( CHAR_DATA *ch, const char *arg ) );
-void    echo_to_room    args( ( short AT_COLOR, ROOM_INDEX_DATA *room, const char *argument ) );
+void    echo_to_room    args( ( short AT_COLOR, const ROOM_INDEX_DATA *room, const char *argument ) );
 void	echo_to_all	args( ( short AT_COLOR, const char *argument,
 				short tar ) );
-void	echo_to_area	args( ( AREA_DATA * area , short AT_COLOR,
+void	echo_to_area	args( ( const AREA_DATA * area , short AT_COLOR,
 				const char *argument,
 				short tar ) );
 void   	get_reboot_string args( ( void ) );
@@ -3463,7 +3462,7 @@ void	add_command	args( ( CMDTYPE *command ) );
 
 /* boards.c */
 void	load_boards	args( ( void ) );
-BD *	get_board	args( ( OBJ_DATA *obj ) );
+BD *	get_board	args( ( const OBJ_DATA *obj ) );
 void	free_note	args( ( NOTE_DATA *pnote ) );
 
 /* build.c */
@@ -3482,53 +3481,51 @@ bool clan_char_is_leader( const CLAN_DATA*, const CHAR_DATA* );
 void clan_decrease_vehicles_owned( CLAN_DATA *clan, const SHIP_DATA *ship );
 CL *	get_clan		args( ( const char *name ) );
 void	load_clans		args( ( void ) );
-void	save_clan		args( ( CLAN_DATA *clan ) );
+void	save_clan		args( ( const CLAN_DATA *clan ) );
 
-/* clans.c */
+/* vote.c */
 void	load_polls		args( ( void ) );
-void	save_poll		args( ( VOTE_DATA *poll ) );
+void	save_poll		args( ( const VOTE_DATA *poll ) );
 
 /* planets.c */
 PLANET_DATA *	get_planet	args( ( const char *name ) );
 void	load_planets		args( ( void ) );
-void	save_planet		args( ( PLANET_DATA *planet ) );
-int     max_population          args( ( PLANET_DATA *planet ) );
-long    get_taxes               args( ( PLANET_DATA *planet ) );
+void	save_planet		args( ( const PLANET_DATA *planet ) );
+int     max_population          args( ( const PLANET_DATA *planet ) );
+long    get_taxes               args( ( const PLANET_DATA *planet ) );
 
 /* space.c */
 SHIP_DATA *ship_create( void );
 SPACE_DATA *starsystem_create(  void );
 SH        *  get_ship          	    args( ( const char *name ) );
 void         load_ships        	    args( ( void ) );
-void         save_ship      	    args( ( SHIP_DATA *ship ) );
+void         save_ship      	    args( ( const SHIP_DATA *ship ) );
 void         load_space             args( ( void ) );
-void         save_starsystem        args( ( SPACE_DATA *starsystem ) );
+void         save_starsystem        args( ( const SPACE_DATA *starsystem ) );
 SPACE_DATA * starsystem_from_name   args( ( const char *name ) );
-SPACE_DATA * starsystem_from_room   args( ( ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_entrance     args( ( ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_room         args( ( ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_pilotseat    args( ( ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_cockpit      args( ( ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_turret       args( ( ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_engine       args( ( ROOM_INDEX_DATA * room ) );
+SPACE_DATA * starsystem_from_room   args( ( const ROOM_INDEX_DATA * room ) );
+SHIP_DATA  * ship_from_entrance     args( ( const ROOM_INDEX_DATA * room ) );
+SHIP_DATA  * ship_from_room         args( ( const ROOM_INDEX_DATA * room ) );
+SHIP_DATA  * ship_from_pilotseat    args( ( const ROOM_INDEX_DATA * room ) );
+SHIP_DATA  * ship_from_cockpit      args( ( const ROOM_INDEX_DATA * room ) );
+SHIP_DATA  * ship_from_turret       args( ( const ROOM_INDEX_DATA * room ) );
+SHIP_DATA  * ship_from_engine       args( ( const ROOM_INDEX_DATA * room ) );
 SHIP_DATA  * ship_from_pilot        args( ( const char *name ) );
-SHIP_DATA  * get_ship_here          args( ( const char *name , SPACE_DATA *starsystem ) );
-void         showstarsystem         args( ( CHAR_DATA *ch , SPACE_DATA *starsystem ) );
+SHIP_DATA  * get_ship_here          args( ( const char *name,
+					    const SPACE_DATA *starsystem ) );
+void         showstarsystem         args( ( CHAR_DATA *ch , const SPACE_DATA *starsystem ) );
 void         update_space           args( ( void ) );
 void         recharge_ships         args( ( void ) );
 void move_missiles( void );
 void         move_ships             args( ( void ) );
 void         update_bus             args( ( void ) );
 void         update_traffic         args( ( void ) );
-bool         check_pilot            args( ( CHAR_DATA *ch , SHIP_DATA *ship ) );
-bool         is_rental              args( ( CHAR_DATA *ch , SHIP_DATA *ship ) );
+bool         check_pilot            args( ( const CHAR_DATA *ch , const SHIP_DATA *ship ) );
 void         echo_to_ship           args( ( int color , const SHIP_DATA *ship , const char *argument ) );
 void         echo_to_cockpit        args( ( int color , const SHIP_DATA *ship , const char *argument ) );
 void         echo_to_system         args( ( int color , const SHIP_DATA *ship , const char *argument , const SHIP_DATA *ignore ) );
 bool         extract_ship           args( ( SHIP_DATA *ship ) );
 bool         ship_to_room           args( ( SHIP_DATA *ship , long vnum ) );
-long         get_ship_value         args( ( SHIP_DATA *ship ) );
-bool         rent_ship              args( ( CHAR_DATA *ch , SHIP_DATA *ship ) );
 void         damage_ship            args( ( SHIP_DATA *ship , int min , int max ) );
 void         damage_ship_ch         args( ( SHIP_DATA *ship , int min , int max , CHAR_DATA *ch ) );
 void         destroy_ship           args( ( SHIP_DATA *ship , CHAR_DATA *ch ) );
@@ -3536,14 +3533,14 @@ void         ship_to_starsystem     args( ( SHIP_DATA *ship , SPACE_DATA *starsy
 void         ship_from_starsystem   args( ( SHIP_DATA *ship , SPACE_DATA *starsystem ) );
 void         new_missile            args( ( SHIP_DATA *ship , SHIP_DATA *target , CHAR_DATA *ch ) );
 void         extract_missile        args( ( MISSILE_DATA *missile ) );
-SHIP_DATA * ship_in_room            args( ( ROOM_INDEX_DATA *room, const char *name ) ); 
+SHIP_DATA * ship_in_room            args( ( const ROOM_INDEX_DATA *room, const char *name ) ); 
 
 /* morespace.c */
 SHIP_PROTOTYPE *  get_ship_prototype        args( ( const char *name ) );
-SHIP_DATA *  make_ship        		    args( ( SHIP_PROTOTYPE *protoype ) );
+SHIP_DATA *  make_ship        		    args( ( const SHIP_PROTOTYPE *protoype ) );
 void         load_prototypes        	    args( ( void ) );
-void         save_ship_protoype      	    args( ( SHIP_PROTOTYPE *prototype ) );
-long int     get_prototype_value      	    args( ( SHIP_PROTOTYPE *prototype ) );
+void         save_ship_protoype      	    args( ( const SHIP_PROTOTYPE *prototype ) );
+long int     get_prototype_value      	    args( ( const SHIP_PROTOTYPE *prototype ) );
 void	     create_ship_rooms		    args( ( SHIP_DATA * ship ) );
 
 /* comm.c */
@@ -3552,14 +3549,12 @@ void	write_to_buffer	args( ( DESCRIPTOR_DATA *d, const char *txt,
 				size_t length ) );
 void	write_to_pager	args( ( DESCRIPTOR_DATA *d, const char *txt,
 				size_t length ) );
-void	send_to_char	args( ( const char *txt, CHAR_DATA *ch ) );
-void	send_to_char_color	args( ( const char *txt, CHAR_DATA *ch ) );
-void	send_to_pager	args( ( const char *txt, CHAR_DATA *ch ) );
-void	send_to_pager_color	args( ( const char *txt, CHAR_DATA *ch ) );
+void	send_to_char_color	args( ( const char *txt, const CHAR_DATA *ch ) );
+void	send_to_pager_color	args( ( const char *txt, const CHAR_DATA *ch ) );
 void	set_char_color  args( ( short AType, CHAR_DATA *ch ) );
 void	set_pager_color	args( ( short AType, CHAR_DATA *ch ) );
-void	ch_printf	args( ( CHAR_DATA *ch, const char *fmt, ... ) );
-void	pager_printf	args( (CHAR_DATA *ch, const char *fmt, ...) );
+void	ch_printf	args( ( const CHAR_DATA *ch, const char *fmt, ... ) );
+void	pager_printf	args( (const CHAR_DATA *ch, const char *fmt, ...) );
 void	act		args( ( short AType, const char *format, CHAR_DATA *ch,
 			    const void *arg1, const void *arg2, int type ) );
 
@@ -3568,13 +3563,13 @@ void	reset_all	args( ( ) );
 
 /* db.c */
 void replace_char( char *buf, char replace, char with );
-void	show_file	args( ( CHAR_DATA *ch, const char *filename ) );
+void	show_file	args( ( const CHAR_DATA *ch, const char *filename ) );
 char *	str_dup		args( ( const char *str ) );
 void	boot_db		args( ( bool fCopyOver ) );
 void	area_update	args( ( void ) );
 void	add_char	args( ( CHAR_DATA *ch ) );
 CD *	create_mobile	args( ( MOB_INDEX_DATA *pMobIndex ) );
-OD *	create_object	args( ( OBJ_INDEX_DATA *pObjIndex, int level ) );
+OD *	create_object	args( ( OBJ_INDEX_DATA *pObjIndex ) );
 void	clear_char	args( ( CHAR_DATA *ch ) );
 void	free_char	args( ( CHAR_DATA *ch ) );
 char *	get_extra_descr	args( ( const char *name, EXTRA_DESCR_DATA *ed ) );
@@ -3812,8 +3807,8 @@ int	get_obj_number	args( ( OBJ_DATA *obj ) );
 int	get_obj_weight	args( ( OBJ_DATA *obj ) );
 bool	room_is_dark	args( ( ROOM_INDEX_DATA *pRoomIndex ) );
 bool	room_is_private	args( ( CHAR_DATA *ch, ROOM_INDEX_DATA *pRoomIndex ) );
-bool	can_see		args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
-bool	can_see_obj	args( ( CHAR_DATA *ch, OBJ_DATA *obj ) );
+bool	can_see		args( ( const CHAR_DATA *ch, const CHAR_DATA *victim ) );
+bool	can_see_obj	args( ( const CHAR_DATA *ch, const OBJ_DATA *obj ) );
 bool	can_drop_obj	args( ( CHAR_DATA *ch, OBJ_DATA *obj ) );
 const char *	item_type_name	args( ( OBJ_DATA *obj ) );
 const char *	affect_loc_name	args( ( int location ) );
@@ -3837,8 +3832,8 @@ bool	char_died	args( ( CHAR_DATA *ch ) );
 void	queue_extracted_char	args( ( CHAR_DATA *ch, bool extract ) );
 void	clean_char_queue	args( ( void ) );
 void	add_timer	args( ( CHAR_DATA *ch, short type, short count, DO_FUN *fun, int value ) );
-TIMER * get_timerptr	args( ( CHAR_DATA *ch, short type ) );
-short	get_timer	args( ( CHAR_DATA *ch, short type ) );
+TIMER * get_timerptr	args( ( const CHAR_DATA *ch, short type ) );
+short	get_timer	args( ( const CHAR_DATA *ch, short type ) );
 void	extract_timer	args( ( CHAR_DATA *ch, TIMER *timer ) );
 void	remove_timer	args( ( CHAR_DATA *ch, short type ) );
 bool	chance  	args( ( CHAR_DATA *ch, short percent ) );

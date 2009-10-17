@@ -3718,7 +3718,7 @@ void do_ocreate( CHAR_DATA *ch, char *argument )
 	log_string( "do_ocreate: make_object failed." );
 	return;
     }
-    obj = create_object( pObjIndex, get_trust(ch) );
+    obj = create_object( pObjIndex );
     obj_to_char( obj, ch );
     act( AT_IMMORT, "$n makes some ancient arcane gestures, and opens $s hands to reveal $p!", ch, obj, NULL, TO_ROOM );
     act( AT_IMMORT, "You make some ancient arcane gestures, and open your hands to reveal $p!", ch, obj, NULL, TO_CHAR );

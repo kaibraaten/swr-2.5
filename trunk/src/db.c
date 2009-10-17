@@ -1707,7 +1707,7 @@ static void create_object_default_values_ammo( OBJ_DATA *obj )
     obj->value[0] = number_fuzzy(495);
 }
 
-static void create_object_default_values_weapon( OBJ_DATA *obj, int level )
+static void create_object_default_values_weapon( OBJ_DATA *obj )
 {
   if ( obj->value[1] && obj->value[2] )
     {
@@ -1715,8 +1715,8 @@ static void create_object_default_values_weapon( OBJ_DATA *obj, int level )
     }
   else
     {
-      obj->value[1] = number_fuzzy( number_fuzzy( 1 + level/20 ) );
-      obj->value[2] = number_fuzzy( number_fuzzy( 10 + level/10 ) );
+      obj->value[1] = number_fuzzy( 6 );
+      obj->value[2] = number_fuzzy( 12 );
     }
 
   if ( obj->value[1] > obj->value[2] )
@@ -1754,7 +1754,7 @@ static void create_object_default_values_money( OBJ_DATA *obj )
 /*
  * Create an instance of an object.
  */
-OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex, int level )
+OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex )
 {
   OBJ_DATA *obj = 0;
 
@@ -1768,7 +1768,7 @@ OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex, int level )
 
   obj->pIndexData	= pObjIndex;
   obj->in_room	= NULL;
-  obj->level		= level;
+  obj->level		= 1;
   obj->wear_loc	= -1;
   obj->count		= 1;
   cur_obj_serial = UMAX((cur_obj_serial + 1 ) & (BV30-1), 1);
@@ -1855,7 +1855,7 @@ OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex, int level )
       break;
         
     case ITEM_WEAPON:
-      create_object_default_values_weapon( obj, level );
+      create_object_default_values_weapon( obj );
       break;
 
     case ITEM_ARMOR:
@@ -3099,7 +3099,7 @@ void boot_log( const char *str, ... )
 /*
  * Dump a text file to a player, a line at a time		-Thoric
  */
-void show_file( CHAR_DATA *ch, const char *filename )
+void show_file( const CHAR_DATA *ch, const char *filename )
 {
   FILE *fp;
 #ifdef AMIGA

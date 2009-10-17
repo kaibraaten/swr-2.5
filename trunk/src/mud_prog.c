@@ -1793,7 +1793,7 @@ void mprog_bribe_trigger( CHAR_DATA *mob, CHAR_DATA *ch, int amount )
       if ( IS_NPC( ch ) && ch->pIndexData == mob->pIndexData )
         return;
 
-      obj = create_object( get_obj_index( OBJ_VNUM_MONEY_SOME ), 0 );
+      obj = create_object( get_obj_index( OBJ_VNUM_MONEY_SOME ) );
       sprintf( buf, obj->short_descr, amount );
       STRFREE( obj->short_descr );
       obj->short_descr = STRALLOC( buf );

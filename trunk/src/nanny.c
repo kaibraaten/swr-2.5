@@ -729,11 +729,11 @@ static void nanny_done_motd( DESCRIPTOR_DATA *d, char *argument )
       SET_BIT( ch->act, PLR_AUTOGOLD );
       SET_BIT( ch->act, PLR_AUTOEXIT );
 
-      obj = create_object( get_obj_index(OBJ_VNUM_SCHOOL_DAGGER), 0 );
+      obj = create_object( get_obj_index(OBJ_VNUM_SCHOOL_DAGGER) );
       obj_to_char( obj, ch );
       equip_char( ch, obj, WEAR_WIELD );
 
-      obj = create_object( get_obj_index(OBJ_VNUM_LIGHT), 0 );
+      obj = create_object( get_obj_index(OBJ_VNUM_LIGHT) );
       obj_to_char( obj, ch );
 
       /* comlink */
@@ -741,7 +741,7 @@ static void nanny_done_motd( DESCRIPTOR_DATA *d, char *argument )
 
       if ( obj_ind != NULL )
 	{
-	  obj = create_object( obj_ind, 0 );
+	  obj = create_object( obj_ind );
 	  obj_to_char( obj, ch );
 	}
 

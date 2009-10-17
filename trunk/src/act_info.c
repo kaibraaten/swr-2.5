@@ -42,7 +42,7 @@ bool	check_blind		args( ( CHAR_DATA *ch ) );
 void    show_condition          args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
 bool 	is_online		args( ( const char * argument ) );
 
-char *format_obj_to_char( OBJ_DATA *obj, CHAR_DATA *ch, bool fShort )
+char *format_obj_to_char( const OBJ_DATA *obj, CHAR_DATA *ch, bool fShort )
 {
   static char buf[MAX_STRING_LENGTH];
 
@@ -149,14 +149,14 @@ const char *halucinated_object( int ms, bool fShort )
  * Show a list to a character.
  * Can coalesce duplicated items.
  */
-void show_list_to_char( OBJ_DATA *list, CHAR_DATA *ch,
+void show_list_to_char( const OBJ_DATA *list, CHAR_DATA *ch,
 			bool fShort, bool fShowNothing )
 {
   char **prgpstrShow;
   int *prgnShow;
   int *pitShow;
   char *pstrShow;
-  OBJ_DATA *obj;
+  const OBJ_DATA *obj;
   int nShow;
   int iShow;
   int count, offcount, tmp, ms, cnt;

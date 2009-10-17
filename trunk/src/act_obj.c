@@ -17,30 +17,28 @@ bool    job_trigger     args( ( CHAR_DATA *victim, CHAR_DATA *ch, OBJ_DATA *obj 
 /*
  * how resistant an object is to damage				-Thoric
  */
-short get_obj_resistance( OBJ_DATA *obj )
+short get_obj_resistance( const OBJ_DATA *obj )
 {
-    short resist;
+  short resist = number_fuzzy(MAX_ITEM_IMPACT);
 
-    resist = number_fuzzy(MAX_ITEM_IMPACT);
+  /* magical items are more resistant */
+  if ( IS_OBJ_STAT( obj, ITEM_MAGIC ) )
+    resist += number_fuzzy(12);
+  /* blessed objects should have a little bonus */
+  if ( IS_OBJ_STAT( obj, ITEM_BLESS ) )
+    resist += number_fuzzy(5);
+  /* lets make store inventory pretty tough */
+  if ( IS_OBJ_STAT( obj, ITEM_INVENTORY ) )
+    resist += 20;
 
-    /* magical items are more resistant */
-    if ( IS_OBJ_STAT( obj, ITEM_MAGIC ) )
-      resist += number_fuzzy(12);
-    /* blessed objects should have a little bonus */
-    if ( IS_OBJ_STAT( obj, ITEM_BLESS ) )
-      resist += number_fuzzy(5);
-    /* lets make store inventory pretty tough */
-    if ( IS_OBJ_STAT( obj, ITEM_INVENTORY ) )
-      resist += 20;
+  /* okay... let's add some bonus/penalty for item level... */
+  resist += (obj->level / 10);
 
-    /* okay... let's add some bonus/penalty for item level... */
-    resist += (obj->level / 10);
+  /* and lasty... take armor or weapon's condition into consideration */
+  if (obj->item_type == ITEM_ARMOR || obj->item_type == ITEM_WEAPON)
+    resist += (obj->value[0]);
 
-    /* and lasty... take armor or weapon's condition into consideration */
-    if (obj->item_type == ITEM_ARMOR || obj->item_type == ITEM_WEAPON)
-      resist += (obj->value[0]);
-
-    return URANGE(10, resist, 99);
+  return URANGE(10, resist, 99);
 }
 
 

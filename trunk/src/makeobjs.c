@@ -20,7 +20,7 @@ void make_scraps( OBJ_DATA *obj )
   CHAR_DATA *ch = NULL;
 
   separate_obj( obj );
-  scraps	= create_object( get_obj_index( OBJ_VNUM_SCRAPS ), 0 );
+  scraps	= create_object( get_obj_index( OBJ_VNUM_SCRAPS ) );
   scraps->timer = number_range( 5, 15 );
 
   /* don't make scraps of scraps of scraps of ... */
@@ -101,9 +101,9 @@ void make_corpse( CHAR_DATA *ch, CHAR_DATA *killer )
     {
 	name		= ch->short_descr;
         if ( IS_SET ( ch->act , ACT_DROID ) )
-           corpse		= create_object(get_obj_index(OBJ_VNUM_DROID_CORPSE), 0);
+           corpse		= create_object(get_obj_index(OBJ_VNUM_DROID_CORPSE));
 	else   
-	   corpse		= create_object(get_obj_index(OBJ_VNUM_CORPSE_NPC), 0);
+	   corpse		= create_object(get_obj_index(OBJ_VNUM_CORPSE_NPC));
 	corpse->timer	= 6;
 	if ( ch->gold > 0 )
 	{
@@ -122,7 +122,7 @@ void make_corpse( CHAR_DATA *ch, CHAR_DATA *killer )
     else
     {
 	name		= ch->name;
-	corpse		= create_object(get_obj_index(OBJ_VNUM_CORPSE_PC), 0);
+	corpse		= create_object(get_obj_index(OBJ_VNUM_CORPSE_PC));
 	corpse->timer	= 40;
         corpse->value[2] = (int)(corpse->timer/8);
 	corpse->value[3] = 0;
@@ -189,11 +189,11 @@ OBJ_DATA *create_money( int amount )
 
     if ( amount == 1 )
     {
-	obj = create_object( get_obj_index( OBJ_VNUM_MONEY_ONE ), 0 );
+	obj = create_object( get_obj_index( OBJ_VNUM_MONEY_ONE ) );
     }
     else
     {
-	obj = create_object( get_obj_index( OBJ_VNUM_MONEY_SOME ), 0 );
+	obj = create_object( get_obj_index( OBJ_VNUM_MONEY_SOME ) );
 	sprintf( buf, obj->short_descr, amount );
 	STRFREE( obj->short_descr );
 	obj->short_descr = STRALLOC( buf );

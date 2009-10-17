@@ -1544,7 +1544,7 @@ void send_to_char( const char *txt, CHAR_DATA *ch )
 /*
  * Same as above, but converts &color codes to ANSI sequences..
  */
-void send_to_char_color( const char *txt, CHAR_DATA *ch )
+void send_to_char_color( const char *txt, const CHAR_DATA *ch )
 {
   DESCRIPTOR_DATA *d;
   const char *colstr;
@@ -1652,7 +1652,7 @@ void send_to_pager( const char *txt, CHAR_DATA *ch )
 
 */
 
-void send_to_pager_color( const char *txt, CHAR_DATA *ch )
+void send_to_pager_color( const char *txt, const CHAR_DATA *ch )
 {
   DESCRIPTOR_DATA *d;
   const char *colstr;
@@ -1740,7 +1740,7 @@ void set_pager_color( short AType, CHAR_DATA *ch )
 
 
 /* source: EOD, by John Booth <???> */
-void ch_printf(CHAR_DATA *ch, const char *fmt, ...)
+void ch_printf(const CHAR_DATA *ch, const char *fmt, ...)
 {
     char buf[MAX_STRING_LENGTH*2];	/* better safe than sorry */
     va_list args;
@@ -1752,7 +1752,7 @@ void ch_printf(CHAR_DATA *ch, const char *fmt, ...)
     send_to_char(buf, ch);
 }
 
-void pager_printf(CHAR_DATA *ch, const char *fmt, ...)
+void pager_printf(const CHAR_DATA *ch, const char *fmt, ...)
 {
     char buf[MAX_STRING_LENGTH*2];
     va_list args;
@@ -1776,16 +1776,17 @@ void log_printf( const char *fmt, ... )
   log_string( buf );
 }
 
-char *obj_short( OBJ_DATA *obj )
+char *obj_short( const OBJ_DATA *obj )
 {
-    static char buf[MAX_STRING_LENGTH];
+  static char buf[MAX_STRING_LENGTH];
 
-    if ( obj->count > 1 )
+  if ( obj->count > 1 )
     {
-	sprintf( buf, "%s (%d)", obj->short_descr, obj->count );
-	return buf;
+      sprintf( buf, "%s (%d)", obj->short_descr, obj->count );
+      return buf;
     }
-    return obj->short_descr;
+
+  return obj->short_descr;
 }
 
 /*
