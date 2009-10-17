@@ -1014,20 +1014,31 @@ bool could_dual( CHAR_DATA *ch )
  */
 bool can_dual( CHAR_DATA *ch )
 {
-   if ( !could_dual(ch) )
-     return FALSE;
+  bool wield = FALSE, nwield = FALSE;
 
-   if ( get_eq_char( ch, WEAR_DUAL_WIELD ) )
-   {
-	send_to_char( "You are already wielding two weapons!\r\n", ch );
-	return FALSE;
-   }
-   if ( get_eq_char( ch, WEAR_HOLD ) )
-   {
-	send_to_char( "You cannot dual wield while holding something!\r\n", ch );
-	return FALSE;
-   }
-   return TRUE;
+  if( !could_dual( ch ) )
+    return FALSE;
+  if( get_eq_char( ch, WEAR_WIELD ) )
+    wield = TRUE;
+  /* Check for missile wield or dual wield */
+  if( get_eq_char( ch, WEAR_MISSILE_WIELD ) || get_eq_char( ch, WEAR_DUAL_WIELD ) )
+    nwield = TRUE;
+  if( wield && nwield )
+    {
+      send_to_char( "You are already wielding two weapons... grow some more arms!\n\r", ch );
+      return FALSE;
+    }
+  if( ( wield || nwield ) && get_eq_char( ch, WEAR_SHIELD ) )
+    {
+      send_to_char( "You cannot dual wield, you're already holding a shield!\n\r", ch );
+      return FALSE;
+    }
+  if( ( wield || nwield ) && get_eq_char( ch, WEAR_HOLD ) )
+    {
+      send_to_char( "You cannot hold another weapon, you're already holding something in that hand!\n\r", ch );
+      return FALSE;
+    }
+  return TRUE;
 }
 
 
@@ -1073,531 +1084,594 @@ bool can_layer( CHAR_DATA *ch, OBJ_DATA *obj, short wear_loc )
  */
 void wear_obj( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace, short wear_bit )
 {
-    char buf[MAX_STRING_LENGTH];
-    OBJ_DATA *tmpobj;
-    short bit, tmp;
+  char buf[MAX_STRING_LENGTH];
+  OBJ_DATA *tmpobj;
+  short bit, tmp;
 
-    separate_obj( obj );
+  separate_obj( obj );
     
-    if ( wear_bit > -1 )
+  if ( wear_bit > -1 )
     {
-	bit = wear_bit;
-	if ( !CAN_WEAR(obj, 1 << bit) )
+      bit = wear_bit;
+
+      if ( !CAN_WEAR(obj, 1 << bit) )
 	{
-	    if ( fReplace )
+	  if ( fReplace )
 	    {
-		switch( 1 << bit )
+	      switch( 1 << bit )
 		{
-		    case ITEM_HOLD:
-			send_to_char( "You cannot hold that.\r\n", ch );
-			break;
-		    case ITEM_WIELD:
-			send_to_char( "You cannot wield that.\r\n", ch );
-			break;
-		    default:
-			sprintf( buf, "You cannot wear that on your %s.\r\n",
-				w_flags[bit] );
-			send_to_char( buf, ch );
+		case ITEM_HOLD:
+		  send_to_char( "You cannot hold that.\r\n", ch );
+		  break;
+		case ITEM_WIELD:
+		  send_to_char( "You cannot wield that.\r\n", ch );
+		  break;
+		default:
+		  sprintf( buf, "You cannot wear that on your %s.\r\n",
+			   w_flags[bit] );
+		  send_to_char( buf, ch );
 		}
 	    }
-	    return;
+	  return;
 	}
     }
-    else
+  else
     {
-	for ( bit = -1, tmp = 1; tmp < 31; tmp++ )
+      for ( bit = -1, tmp = 1; tmp < 31; tmp++ )
 	{
-	    if ( CAN_WEAR(obj, 1 << tmp) )
+	  if ( CAN_WEAR(obj, 1 << tmp) )
 	    {
-		bit = tmp;
-		break;
+	      bit = tmp;
+	      break;
 	    }
 	}
     }
 
-    
-    /* currently cannot have a light in non-light position */
-    if ( obj->item_type == ITEM_LIGHT )
+  /* currently cannot have a light in non-light position */
+  if ( obj->item_type == ITEM_LIGHT )
     {
-	if ( !remove_obj( ch, WEAR_LIGHT, fReplace ) )
-	    return;  
-	if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+      if ( !remove_obj( ch, WEAR_LIGHT, fReplace ) )
+	return;  
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
         {
           if ( !obj->action_desc || obj->action_desc[0]=='\0' )
-  	  {
-  	    act( AT_ACTION, "$n holds $p as a light.", ch, obj, NULL, TO_ROOM );
-	    act( AT_ACTION, "You hold $p as your light.",  ch, obj, NULL, TO_CHAR );
-           }
-	   else
+	    {
+	      act( AT_ACTION, "$n holds $p as a light.", ch, obj, NULL, TO_ROOM );
+	      act( AT_ACTION, "You hold $p as your light.",  ch, obj, NULL, TO_CHAR );
+	    }
+	  else
 	    actiondesc( ch, obj, NULL );
         }
-        equip_char( ch, obj, WEAR_LIGHT );
-        oprog_wear_trigger( ch, obj );
-	return;
+      equip_char( ch, obj, WEAR_LIGHT );
+      oprog_wear_trigger( ch, obj );
+      return;
     }
 
-    if ( bit == -1 )
+  if ( bit == -1 )
     {
-	if ( fReplace )
-	  send_to_char( "You can't wear, wield, or hold that.\r\n", ch );
-	return;
+      if ( fReplace )
+	send_to_char( "You can't wear, wield, or hold that.\r\n", ch );
+      return;
     }
 
-    switch ( 1 << bit )
+  switch ( 1 << bit )
     {
-	default:
-	    bug( "wear_obj: uknown/unused item_wear bit %d", bit );
-	    if ( fReplace )
-	      send_to_char( "You can't wear, wield, or hold that.\r\n", ch );
-	    return;
+    default:
+      bug( "wear_obj: uknown/unused item_wear bit %d", bit );
+      if ( fReplace )
+	send_to_char( "You can't wear, wield, or hold that.\r\n", ch );
+      return;
 
-	case ITEM_WEAR_FINGER:
-	    if ( get_eq_char( ch, WEAR_FINGER_L )
-	    &&   get_eq_char( ch, WEAR_FINGER_R )
-	    &&   !remove_obj( ch, WEAR_FINGER_L, fReplace )
-	    &&   !remove_obj( ch, WEAR_FINGER_R, fReplace ) )
-	      return;
+    case ITEM_WEAR_FINGER:
+      if ( get_eq_char( ch, WEAR_FINGER_L )
+	   &&   get_eq_char( ch, WEAR_FINGER_R )
+	   &&   !remove_obj( ch, WEAR_FINGER_L, fReplace )
+	   &&   !remove_obj( ch, WEAR_FINGER_R, fReplace ) )
+	return;
 
-	    if ( !get_eq_char( ch, WEAR_FINGER_L ) )
+      if ( !get_eq_char( ch, WEAR_FINGER_L ) )
+	{
+	  if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
 	    {
-                if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-                {
-                 if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-                 {  
+	      if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+		{  
                   act( AT_ACTION, "$n slips $s left finger into $p.",    ch, obj, NULL, TO_ROOM );
 		  act( AT_ACTION, "You slip your left finger into $p.",  ch, obj, NULL, TO_CHAR );
-                 }
-        	 else
-	          actiondesc( ch, obj, NULL );
-                }
-		equip_char( ch, obj, WEAR_FINGER_L );
-		oprog_wear_trigger( ch, obj );
-		return;
+		}
+	      else
+		actiondesc( ch, obj, NULL );
 	    }
+	  equip_char( ch, obj, WEAR_FINGER_L );
+	  oprog_wear_trigger( ch, obj );
+	  return;
+	}
 
-	    if ( !get_eq_char( ch, WEAR_FINGER_R ) )
+      if ( !get_eq_char( ch, WEAR_FINGER_R ) )
+	{
+	  if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
 	    {
-                if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-                {
-                 if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-                 {  
+	      if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+		{  
       		  act( AT_ACTION, "$n slips $s right finger into $p.",   ch, obj, NULL, TO_ROOM );
 		  act( AT_ACTION, "You slip your right finger into $p.", ch, obj, NULL, TO_CHAR );
-                 }
-        	 else
-	          actiondesc( ch, obj, NULL );
-                }
-		equip_char( ch, obj, WEAR_FINGER_R );
-		oprog_wear_trigger( ch, obj );
-		return;
+		}
+	      else
+		actiondesc( ch, obj, NULL );
 	    }
+	  equip_char( ch, obj, WEAR_FINGER_R );
+	  oprog_wear_trigger( ch, obj );
+	  return;
+	}
 
-	    bug( "Wear_obj: no free finger.", 0 );
-	    send_to_char( "You already wear something on both fingers.\r\n", ch );
-	    return;
+      bug( "Wear_obj: no free finger.", 0 );
+      send_to_char( "You already wear something on both fingers.\r\n", ch );
+      return;
 
-	case ITEM_WEAR_NECK:
-	    if ( get_eq_char( ch, WEAR_NECK_1 ) != NULL
-	    &&   get_eq_char( ch, WEAR_NECK_2 ) != NULL
-	    &&   !remove_obj( ch, WEAR_NECK_1, fReplace )
-	    &&   !remove_obj( ch, WEAR_NECK_2, fReplace ) )
-	      return;
+    case ITEM_WEAR_NECK:
+      if ( get_eq_char( ch, WEAR_NECK_1 ) != NULL
+	   &&   get_eq_char( ch, WEAR_NECK_2 ) != NULL
+	   &&   !remove_obj( ch, WEAR_NECK_1, fReplace )
+	   &&   !remove_obj( ch, WEAR_NECK_2, fReplace ) )
+	return;
 
-	    if ( !get_eq_char( ch, WEAR_NECK_1 ) )
+      if ( !get_eq_char( ch, WEAR_NECK_1 ) )
+	{
+	  if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
 	    {
-                if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-                {
-                 if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-                 {  
+	      if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+		{  
       		  act( AT_ACTION, "$n wears $p around $s neck.",   ch, obj, NULL, TO_ROOM );
 		  act( AT_ACTION, "You wear $p around your neck.", ch, obj, NULL, TO_CHAR );
-                 }
-        	 else
-	          actiondesc( ch, obj, NULL );
-                }
-		equip_char( ch, obj, WEAR_NECK_1 );
-		oprog_wear_trigger( ch, obj );
-		return;
+		}
+	      else
+		actiondesc( ch, obj, NULL );
 	    }
+	  equip_char( ch, obj, WEAR_NECK_1 );
+	  oprog_wear_trigger( ch, obj );
+	  return;
+	}
 
-	    if ( !get_eq_char( ch, WEAR_NECK_2 ) )
+      if ( !get_eq_char( ch, WEAR_NECK_2 ) )
+	{
+	  if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
 	    {
-                if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-                {
-                 if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-                 {  
+	      if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+		{  
       		  act( AT_ACTION, "$n wears $p around $s neck.",   ch, obj, NULL, TO_ROOM );
 		  act( AT_ACTION, "You wear $p around your neck.", ch, obj, NULL, TO_CHAR );
-                 }
-        	 else
-	          actiondesc( ch, obj, NULL );
-                }
-		equip_char( ch, obj, WEAR_NECK_2 );
-		oprog_wear_trigger( ch, obj );
-		return;
+		}
+	      else
+		actiondesc( ch, obj, NULL );
 	    }
+	  equip_char( ch, obj, WEAR_NECK_2 );
+	  oprog_wear_trigger( ch, obj );
+	  return;
+	}
 
-	    bug( "Wear_obj: no free neck.", 0 );
-	    send_to_char( "You already wear two neck items.\r\n", ch );
-	    return;
+      bug( "Wear_obj: no free neck.", 0 );
+      send_to_char( "You already wear two neck items.\r\n", ch );
+      return;
 
-	case ITEM_WEAR_BODY:
-	/*
-	    if ( !remove_obj( ch, WEAR_BODY, fReplace ) )
-	      return;
-	*/
-	    if ( !can_layer( ch, obj, WEAR_BODY ) )
-	    {
-		send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
-		return;
-	    }
-            if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
+    case ITEM_WEAR_BODY:
+      /*
+	if ( !remove_obj( ch, WEAR_BODY, fReplace ) )
+	return;
+      */
+      if ( !can_layer( ch, obj, WEAR_BODY ) )
+	{
+	  send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
+	  return;
+	}
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+	    {  
       	      act( AT_ACTION, "$n fits $p on $s body.",   ch, obj, NULL, TO_ROOM );
 	      act( AT_ACTION, "You fit $p on your body.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-	      actiondesc( ch, obj, NULL );
-            }
-	    equip_char( ch, obj, WEAR_BODY );
-	    oprog_wear_trigger( ch, obj );
-	    return;
+	    }
+	  else
+	    actiondesc( ch, obj, NULL );
+	}
+      equip_char( ch, obj, WEAR_BODY );
+      oprog_wear_trigger( ch, obj );
+      return;
 
-	case ITEM_WEAR_HEAD:
-	    if ( !remove_obj( ch, WEAR_HEAD, fReplace ) )
-	      return;
-            if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
+    case ITEM_WEAR_HEAD:
+      if ( !remove_obj( ch, WEAR_HEAD, fReplace ) )
+	return;
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+	    {  
       	      act( AT_ACTION, "$n dons $p upon $s head.",   ch, obj, NULL, TO_ROOM );
 	      act( AT_ACTION, "You don $p upon your head.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-	      actiondesc( ch, obj, NULL );
-            }
-	    equip_char( ch, obj, WEAR_HEAD );
-	    oprog_wear_trigger( ch, obj );
-	    return;
+	    }
+	  else
+	    actiondesc( ch, obj, NULL );
+	}
+      equip_char( ch, obj, WEAR_HEAD );
+      oprog_wear_trigger( ch, obj );
+      return;
 
-	case ITEM_WEAR_EYES:
-	    if ( !remove_obj( ch, WEAR_EYES, fReplace ) )
-	      return;
-            if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
+    case ITEM_WEAR_EYES:
+      if ( !remove_obj( ch, WEAR_EYES, fReplace ) )
+	return;
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+	    {  
       	      act( AT_ACTION, "$n places $p on $s eyes.",   ch, obj, NULL, TO_ROOM );
 	      act( AT_ACTION, "You place $p on your eyes.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-	      actiondesc( ch, obj, NULL );
-           }
-	    equip_char( ch, obj, WEAR_EYES );
-	    oprog_wear_trigger( ch, obj );
-	    return;
+	    }
+	  else
+	    actiondesc( ch, obj, NULL );
+	}
+      equip_char( ch, obj, WEAR_EYES );
+      oprog_wear_trigger( ch, obj );
+      return;
 
-	case ITEM_WEAR_EARS:
-	    if ( !remove_obj( ch, WEAR_EARS, fReplace ) )
-	      return;
-            if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
+    case ITEM_WEAR_EARS:
+      if ( !remove_obj( ch, WEAR_EARS, fReplace ) )
+	return;
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+	    {  
       	      act( AT_ACTION, "$n wears $p on $s ears.",   ch, obj, NULL, TO_ROOM );
 	      act( AT_ACTION, "You wear $p on your ears.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-             actiondesc( ch, obj, NULL );
-            }
-	    equip_char( ch, obj, WEAR_EARS );
-	    oprog_wear_trigger( ch, obj );
-	    return;
-
-	case ITEM_WEAR_LEGS:
-/*
-	    if ( !remove_obj( ch, WEAR_LEGS, fReplace ) )
-	      return;
-*/
-	    if ( !can_layer( ch, obj, WEAR_LEGS ) )
-	    {
-		send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
-		return;
 	    }
-            if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
+	  else
+	    actiondesc( ch, obj, NULL );
+	}
+      equip_char( ch, obj, WEAR_EARS );
+      oprog_wear_trigger( ch, obj );
+      return;
+
+    case ITEM_WEAR_LEGS:
+/*
+  if ( !remove_obj( ch, WEAR_LEGS, fReplace ) )
+  return;
+*/
+      if ( !can_layer( ch, obj, WEAR_LEGS ) )
+	{
+	  send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
+	  return;
+	}
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+	    {  
       	      act( AT_ACTION, "$n slips into $p.",   ch, obj, NULL, TO_ROOM );
 	      act( AT_ACTION, "You slip into $p.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-             actiondesc( ch, obj, NULL );
-            }
-	    equip_char( ch, obj, WEAR_LEGS );
-	    oprog_wear_trigger( ch, obj );
-	    return;
-
-	case ITEM_WEAR_FEET:
-/*
-	    if ( !remove_obj( ch, WEAR_FEET, fReplace ) )
-	      return;
-*/
-	    if ( !can_layer( ch, obj, WEAR_FEET ) )
-	    {
-		send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
-		return;
 	    }
-            if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
+	  else
+	    actiondesc( ch, obj, NULL );
+	}
+      equip_char( ch, obj, WEAR_LEGS );
+      oprog_wear_trigger( ch, obj );
+      return;
+
+    case ITEM_WEAR_FEET:
+      /*
+	if ( !remove_obj( ch, WEAR_FEET, fReplace ) )
+	return;
+      */
+      if ( !can_layer( ch, obj, WEAR_FEET ) )
+	{
+	  send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
+	  return;
+	}
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+	    {  
       	      act( AT_ACTION, "$n wears $p on $s feet.",   ch, obj, NULL, TO_ROOM );
 	      act( AT_ACTION, "You wear $p on your feet.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-             actiondesc( ch, obj, NULL );
-            }
-	    equip_char( ch, obj, WEAR_FEET );
-	    oprog_wear_trigger( ch, obj );
-	    return;
-
-	case ITEM_WEAR_HANDS:
-/*
-	    if ( !remove_obj( ch, WEAR_HANDS, fReplace ) )
-	      return;
-*/
-	    if ( !can_layer( ch, obj, WEAR_HANDS ) )
-	    {
-		send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
-		return;
 	    }
-            if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
+	  else
+	    actiondesc( ch, obj, NULL );
+	}
+      equip_char( ch, obj, WEAR_FEET );
+      oprog_wear_trigger( ch, obj );
+      return;
+
+    case ITEM_WEAR_HANDS:
+      /*
+	if ( !remove_obj( ch, WEAR_HANDS, fReplace ) )
+	return;
+      */
+      if ( !can_layer( ch, obj, WEAR_HANDS ) )
+	{
+	  send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
+	  return;
+	}
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+	    {  
       	      act( AT_ACTION, "$n wears $p on $s hands.",   ch, obj, NULL, TO_ROOM );
 	      act( AT_ACTION, "You wear $p on your hands.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-             actiondesc( ch, obj, NULL );
-            }
-	    equip_char( ch, obj, WEAR_HANDS );
-	    oprog_wear_trigger( ch, obj );
-	    return;
-
-	case ITEM_WEAR_ARMS:
-/*
-	    if ( !remove_obj( ch, WEAR_ARMS, fReplace ) )
-	      return;
-*/
-	    if ( !can_layer( ch, obj, WEAR_ARMS ) )
-	    {
-		send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
-		return;
 	    }
-	    if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
+	  else
+	    actiondesc( ch, obj, NULL );
+	}
+      equip_char( ch, obj, WEAR_HANDS );
+      oprog_wear_trigger( ch, obj );
+      return;
+
+    case ITEM_WEAR_ARMS:
+      /*
+	if ( !remove_obj( ch, WEAR_ARMS, fReplace ) )
+	return;
+      */
+      if ( !can_layer( ch, obj, WEAR_ARMS ) )
+	{
+	  send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
+	  return;
+	}
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+	    {  
       	      act( AT_ACTION, "$n wears $p on $s arms.",   ch, obj, NULL, TO_ROOM );
 	      act( AT_ACTION, "You wear $p on your arms.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-             actiondesc( ch, obj, NULL );
-            }
-	    equip_char( ch, obj, WEAR_ARMS );
-	    oprog_wear_trigger( ch, obj );
-	    return;
-
-	case ITEM_WEAR_ABOUT:
-	/*
-	    if ( !remove_obj( ch, WEAR_ABOUT, fReplace ) )
-	      return;
-	*/
-	    if ( !can_layer( ch, obj, WEAR_ABOUT ) )
-	    {
-		send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
-		return;
 	    }
-            if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
+	  else
+	    actiondesc( ch, obj, NULL );
+	}
+      equip_char( ch, obj, WEAR_ARMS );
+      oprog_wear_trigger( ch, obj );
+      return;
+
+    case ITEM_WEAR_ABOUT:
+      /*
+	if ( !remove_obj( ch, WEAR_ABOUT, fReplace ) )
+	return;
+      */
+      if ( !can_layer( ch, obj, WEAR_ABOUT ) )
+	{
+	  send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
+	  return;
+	}
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+	    {  
       	      act( AT_ACTION, "$n wears $p about $s body.",   ch, obj, NULL, TO_ROOM );
 	      act( AT_ACTION, "You wear $p about your body.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-             actiondesc( ch, obj, NULL );
-            }
-	    equip_char( ch, obj, WEAR_ABOUT );
-	    oprog_wear_trigger( ch, obj );
-	    return;
-
-	case ITEM_WEAR_WAIST:
-/*
-	    if ( !remove_obj( ch, WEAR_WAIST, fReplace ) )
-	      return;
-*/
-	    if ( !can_layer( ch, obj, WEAR_WAIST ) )
-	    {
-		send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
-		return;
 	    }
-            if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
+	  else
+	    actiondesc( ch, obj, NULL );
+	}
+      equip_char( ch, obj, WEAR_ABOUT );
+      oprog_wear_trigger( ch, obj );
+      return;
+
+    case ITEM_WEAR_WAIST:
+      /*
+	if ( !remove_obj( ch, WEAR_WAIST, fReplace ) )
+	return;
+      */
+      if ( !can_layer( ch, obj, WEAR_WAIST ) )
+	{
+	  send_to_char( "It won't fit overtop of what you're already wearing.\r\n", ch );
+	  return;
+	}
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+	    {  
       	      act( AT_ACTION, "$n wears $p about $s waist.",   ch, obj, NULL, TO_ROOM );
 	      act( AT_ACTION, "You wear $p about your waist.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-             actiondesc( ch, obj, NULL );
-            }
-	    equip_char( ch, obj, WEAR_WAIST );
-	    oprog_wear_trigger( ch, obj );
-	    return;
+	    }
+	  else
+	    actiondesc( ch, obj, NULL );
+	}
+      equip_char( ch, obj, WEAR_WAIST );
+      oprog_wear_trigger( ch, obj );
+      return;
 
-	case ITEM_WEAR_WRIST:
-	    if ( get_eq_char( ch, WEAR_WRIST_L )
-	    &&   get_eq_char( ch, WEAR_WRIST_R )
-	    &&   !remove_obj( ch, WEAR_WRIST_L, fReplace )
-	    &&   !remove_obj( ch, WEAR_WRIST_R, fReplace ) )
-	       return;
+    case ITEM_WEAR_WRIST:
+      if ( get_eq_char( ch, WEAR_WRIST_L )
+	   &&   get_eq_char( ch, WEAR_WRIST_R )
+	   &&   !remove_obj( ch, WEAR_WRIST_L, fReplace )
+	   &&   !remove_obj( ch, WEAR_WRIST_R, fReplace ) )
+	return;
 
-	    if ( !get_eq_char( ch, WEAR_WRIST_L ) )
+      if ( !get_eq_char( ch, WEAR_WRIST_L ) )
+	{
+	  if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
 	    {
-		if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-		{
-                 if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-                 {  
-      		   act( AT_ACTION, "$n fits $p around $s left wrist.",
-			ch, obj, NULL, TO_ROOM );
-		   act( AT_ACTION, "You fit $p around your left wrist.",
-			ch, obj, NULL, TO_CHAR );
-                 }
-                 else
-                  actiondesc( ch, obj, NULL );
+	      if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+		{  
+		  act( AT_ACTION, "$n fits $p around $s left wrist.",
+		       ch, obj, NULL, TO_ROOM );
+		  act( AT_ACTION, "You fit $p around your left wrist.",
+		       ch, obj, NULL, TO_CHAR );
 		}
-		equip_char( ch, obj, WEAR_WRIST_L );
-		oprog_wear_trigger( ch, obj );
-		return;
+	      else
+		actiondesc( ch, obj, NULL );
 	    }
+	  equip_char( ch, obj, WEAR_WRIST_L );
+	  oprog_wear_trigger( ch, obj );
+	  return;
+	}
 
-	    if ( !get_eq_char( ch, WEAR_WRIST_R ) )
+      if ( !get_eq_char( ch, WEAR_WRIST_R ) )
+	{
+	  if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
 	    {
-              if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-              {
-               if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-               {  
-      		act( AT_ACTION, "$n fits $p around $s right wrist.",
-			ch, obj, NULL, TO_ROOM );
-		act( AT_ACTION, "You fit $p around your right wrist.",
-			ch, obj, NULL, TO_CHAR );
-               }
-               else
+	      if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+		{  
+		  act( AT_ACTION, "$n fits $p around $s right wrist.",
+		       ch, obj, NULL, TO_ROOM );
+		  act( AT_ACTION, "You fit $p around your right wrist.",
+		       ch, obj, NULL, TO_CHAR );
+		}
+	      else
                 actiondesc( ch, obj, NULL );
-              }
-		equip_char( ch, obj, WEAR_WRIST_R );
-		oprog_wear_trigger( ch, obj );
-		return;
 	    }
+	  equip_char( ch, obj, WEAR_WRIST_R );
+	  oprog_wear_trigger( ch, obj );
+	  return;
+	}
 
-	    bug( "Wear_obj: no free wrist.", 0 );
-	    send_to_char( "You already wear two wrist items.\r\n", ch );
-	    return;
+      bug( "Wear_obj: no free wrist.", 0 );
+      send_to_char( "You already wear two wrist items.\r\n", ch );
+      return;
 
-	case ITEM_WEAR_SHIELD:
-	    if ( !remove_obj( ch, WEAR_SHIELD, fReplace ) )
-	      return;
-            if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
+    case ITEM_WEAR_SHIELD:
+      if ( !remove_obj( ch, WEAR_SHIELD, fReplace ) )
+	return;
+      if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
+	    {  
       	      act( AT_ACTION, "$n uses $p as an energy shield.", ch, obj, NULL, TO_ROOM );
 	      act( AT_ACTION, "You use $p as an energy shield.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-              actiondesc( ch, obj, NULL );
-            }
-	    equip_char( ch, obj, WEAR_SHIELD );
-	    oprog_wear_trigger( ch, obj );
-	    return;
-
-	case ITEM_WIELD:
-	    if ( (tmpobj  = get_eq_char( ch, WEAR_WIELD )) != NULL
-	    &&   !could_dual(ch) )
-	    {
-		send_to_char( "You're already wielding something.\r\n", ch );
-		return;
 	    }
+	  else
+	    actiondesc( ch, obj, NULL );
+	}
+      equip_char( ch, obj, WEAR_SHIELD );
+      oprog_wear_trigger( ch, obj );
+      return;
 
-	    if ( tmpobj )
-	    {
-		if ( can_dual(ch) )
+    case ITEM_WIELD:
+      if( !could_dual( ch ) )
+	{
+	  if( !remove_obj( ch, WEAR_MISSILE_WIELD, fReplace ) )
+	    return;
+	  if( !remove_obj( ch, WEAR_WIELD, fReplace ) )
+	    return;
+	  tmpobj = NULL;
+	}
+      else
+	{
+	  OBJ_DATA *mw, *dw, *hd;
+	  tmpobj = get_eq_char( ch, WEAR_WIELD );
+	  mw = get_eq_char( ch, WEAR_MISSILE_WIELD );
+	  dw = get_eq_char( ch, WEAR_DUAL_WIELD );
+	  hd = get_eq_char( ch, WEAR_HOLD );
+
+	  if( tmpobj )
+            {
+	      if( !can_dual( ch ) )
+		return;
+
+	      if( get_obj_weight( obj ) + get_obj_weight( tmpobj ) > str_app[get_curr_str( ch )].wield )
 		{
-		    if ( get_obj_weight( obj ) + get_obj_weight( tmpobj ) > str_app[get_curr_str(ch)].wield )
-		    {
-			send_to_char( "It is too heavy for you to wield.\r\n", ch );
-			return;
-	      	    }
-                    if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-                    {
-                     if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-                     {  
-      	  	      act( AT_ACTION, "$n dual-wields $p.", ch, obj, NULL, TO_ROOM );
-		      act( AT_ACTION, "You dual-wield $p.", ch, obj, NULL, TO_CHAR );
-                     }
-                     else
-                      actiondesc( ch, obj, NULL );
-                    }
-		    equip_char( ch, obj, WEAR_DUAL_WIELD );
-		    oprog_wear_trigger( ch, obj );
+                  send_to_char( "It is too heavy for you to wield.\n\r", ch );
+                  return;
 		}
-	        return;
-	    }
 
-	    if ( get_obj_weight( obj ) > str_app[get_curr_str(ch)].wield )
-	    {
-		send_to_char( "It is too heavy for you to wield.\r\n", ch );
-		return;
-	    }
+	      if( mw || dw )
+		{
+                  send_to_char( "You're already wielding two weapons.\n\r", ch );
+                  return;
+		}
 
-            if ( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-             if ( !obj->action_desc || obj->action_desc[0]=='\0' )  
-             {  
-      	      act( AT_ACTION, "$n wields $p.", ch, obj, NULL, TO_ROOM );
-	      act( AT_ACTION, "You wield $p.", ch, obj, NULL, TO_CHAR );
-             }
-             else
-              actiondesc( ch, obj, NULL );
-            }
-	    equip_char( ch, obj, WEAR_WIELD );
-	    oprog_wear_trigger( ch, obj );
-	    return;
+	      if( hd )
+		{
+                  send_to_char( "You're already wielding a weapon AND holding something.\n\r", ch );
+                  return;
+		}
 
-	case ITEM_HOLD:
-	    if ( get_eq_char( ch, WEAR_DUAL_WIELD ) )
-	    {
-		send_to_char( "You cannot hold something AND two weapons!\r\n", ch );
-		return;
-	    }
-	    if ( !remove_obj( ch, WEAR_HOLD, fReplace ) )
+	      if( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+		{
+                  act( AT_ACTION, "$n dual-wields $p.", ch, obj, NULL, TO_ROOM );
+                  act( AT_ACTION, "You dual-wield $p.", ch, obj, NULL, TO_CHAR );
+		}
+	      if( 1 << bit == ITEM_MISSILE_WIELD )
+		equip_char( ch, obj, WEAR_MISSILE_WIELD );
+	      else
+		equip_char( ch, obj, WEAR_DUAL_WIELD );
+	      oprog_wear_trigger( ch, obj );
 	      return;
-            if ( obj->item_type == ITEM_DEVICE
-               || obj->item_type == ITEM_FOOD 
-               || obj->item_type == ITEM_DRINK_CON 
-               || !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
-            {
-	      act( AT_ACTION, "$n holds $p in $s hands.",   ch, obj, NULL, TO_ROOM );
-	      act( AT_ACTION, "You hold $p in your hands.", ch, obj, NULL, TO_CHAR );
             }
-	    equip_char( ch, obj, WEAR_HOLD );
-	    oprog_wear_trigger( ch, obj );
-	    return;
+
+	  if( mw )
+            {
+	      if( !can_dual( ch ) )
+		return;
+
+	      if( 1 << bit == ITEM_MISSILE_WIELD )
+		{
+                  send_to_char( "You're already wielding a missile weapon.\n\r", ch );
+                  return;
+		}
+
+	      if( get_obj_weight( obj ) + get_obj_weight( mw ) > str_app[get_curr_str( ch )].wield )
+		{
+                  send_to_char( "It is too heavy for you to wield.\n\r", ch );
+                  return;
+		}
+
+	      if( tmpobj || dw )
+		{
+                  send_to_char( "You're already wielding two weapons.\n\r", ch );
+                  return;
+		}
+
+	      if( hd )
+		{
+                  send_to_char( "You're already wielding a weapon AND holding something.\n\r", ch );
+                  return;
+		}
+
+	      if( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+		{
+                  act( AT_ACTION, "$n wields $p.", ch, obj, NULL, TO_ROOM );
+                  act( AT_ACTION, "You wield $p.", ch, obj, NULL, TO_CHAR );
+		}
+	      equip_char( ch, obj, WEAR_WIELD );
+	      oprog_wear_trigger( ch, obj );
+	      return;
+            }
+	}
+
+      if( get_obj_weight( obj ) > str_app[get_curr_str( ch )].wield )
+	{
+	  send_to_char( "It is too heavy for you to wield.\n\r", ch );
+	  return;
+	}
+
+      if( !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  act( AT_ACTION, "$n wields $p.", ch, obj, NULL, TO_ROOM );
+	  act( AT_ACTION, "You wield $p.", ch, obj, NULL, TO_CHAR );
+	}
+      if( 1 << bit == ITEM_MISSILE_WIELD )
+	equip_char( ch, obj, WEAR_MISSILE_WIELD );
+      else
+	equip_char( ch, obj, WEAR_WIELD );
+      oprog_wear_trigger( ch, obj );
+      return;
+
+    case ITEM_HOLD:
+      if( get_eq_char( ch, WEAR_DUAL_WIELD )
+	  || ( get_eq_char( ch, WEAR_WIELD )
+	       && ( get_eq_char( ch, WEAR_MISSILE_WIELD ) ) ) )
+	{
+	  send_to_char( "You cannot hold something AND two weapons!\n\r", ch );
+	  return;
+	}
+
+      if( !remove_obj( ch, WEAR_HOLD, fReplace ) )
+	return;
+
+      if( obj->item_type == ITEM_DEVICE
+	  || obj->item_type == ITEM_FOOD
+	  || obj->item_type == ITEM_DRINK_CON
+	  || !oprog_use_trigger( ch, obj, NULL, NULL, NULL ) )
+	{
+	  act( AT_ACTION, "$n holds $p in $s hands.", ch, obj, NULL, TO_ROOM );
+	  act( AT_ACTION, "You hold $p in your hands.", ch, obj, NULL, TO_CHAR );
+	}
+
+      equip_char( ch, obj, WEAR_HOLD );
+      oprog_wear_trigger( ch, obj );
+      return;
     }
 }
 
