@@ -46,7 +46,7 @@ short get_obj_resistance( OBJ_DATA *obj )
 
 void get_obj( CHAR_DATA *ch, OBJ_DATA *obj, OBJ_DATA *container )
 {
-    int weight;
+    int weight = 0;
 
     if ( !CAN_WEAR(obj, ITEM_TAKE)
        && !IS_IMMORTAL(ch)  )
@@ -56,7 +56,7 @@ void get_obj( CHAR_DATA *ch, OBJ_DATA *obj, OBJ_DATA *container )
     }
 
     if ( IS_OBJ_STAT( obj, ITEM_PROTOTYPE )
-    &&  !can_take_proto( ch ) )
+	 &&  !can_take_proto( ch ) )
     {
 	send_to_char( "A godly force prevents you from getting close to it.\r\n", ch );
 	return;
@@ -74,12 +74,46 @@ void get_obj( CHAR_DATA *ch, OBJ_DATA *obj, OBJ_DATA *container )
     else
       weight = get_obj_weight( obj );
 
-    if ( ch->carry_weight + weight > can_carry_w( ch ) )
-    {
-	act( AT_PLAIN, "$d: you can't carry that much weight.",
-		ch, NULL, obj->name, TO_CHAR );
-	return;
-    }
+    /* Money weight shouldn't count */
+    if( obj->item_type != ITEM_MONEY )
+      {
+	if( obj->in_obj )
+	  {
+	    OBJ_DATA *tobj = obj->in_obj;
+	    int inobj = 1;
+	    bool checkweight = FALSE;
+
+	    /* need to make it check weight if its in a magic container */
+	    if( tobj->item_type == ITEM_CONTAINER && IS_OBJ_STAT( tobj, ITEM_MAGIC ) )
+	      checkweight = TRUE;
+
+	    while( tobj->in_obj )
+	      {
+		tobj = tobj->in_obj;
+		inobj++;
+
+		/* need to make it check weight if its in a magic container */
+		if( tobj->item_type == ITEM_CONTAINER && IS_OBJ_STAT( tobj, ITEM_MAGIC ) )
+		  checkweight = TRUE;
+	      }
+
+	    /* need to check weight if not carried by ch or in a magic container. */
+	    if( !tobj->carried_by || tobj->carried_by != ch || checkweight )
+	      {
+		if( ( ch->carry_weight + weight ) > can_carry_w( ch ) )
+		  {
+		    act( AT_PLAIN, "$d: you can't carry that much weight.", ch, NULL, obj->name, TO_CHAR );
+		    return;
+		  }
+	      }
+	  }
+	else if ( ch->carry_weight + weight > can_carry_w( ch ) )
+	  {
+	    act( AT_PLAIN, "$d: you can't carry that much weight.",
+		 ch, NULL, obj->name, TO_CHAR );
+	    return;
+	  }
+      }
 
     if ( container )
     {
@@ -101,7 +135,7 @@ void get_obj( CHAR_DATA *ch, OBJ_DATA *obj, OBJ_DATA *container )
 
     if ( obj->item_type == ITEM_MONEY )
     {
-	ch->gold += obj->value[0];
+	ch->gold += obj->value[0] * obj->count;
 	extract_obj( obj );
     }
     else

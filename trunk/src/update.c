@@ -1847,8 +1847,7 @@ void reboot_check( time_t reset )
     "SYSTEM: Reboot in 10 minutes.",
   };
   static const int times[] = { 10, 30, 60, 120, 180, 240, 300, 600 };
-  static const int timesize =
-      UMIN(sizeof(times)/sizeof(*times), sizeof(tmsg)/sizeof(*tmsg));
+  static const int timesize = 8;
   char buf[MAX_STRING_LENGTH];
   static int trun;
   static bool init;

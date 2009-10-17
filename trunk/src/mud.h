@@ -2338,9 +2338,13 @@ extern  short  gsn_grip;
 /*
  * Utility macros.
  */
-#define UMIN(a, b)		((a) < (b) ? (a) : (b))
-#define UMAX(a, b)		((a) > (b) ? (a) : (b))
-#define URANGE(a, b, c)		((b) < (a) ? (a) : ((b) > (c) ? (c) : (b)))
+int umin( int check, int ncheck );
+int umax( int check, int ncheck );
+int urange( int mincheck, int check, int maxcheck );
+
+#define UMIN( a, b )      ( umin( (a), (b) ) )
+#define UMAX( a, b )      ( umax( (a), (b) ) )
+#define URANGE(a, b, c )  ( urange( (a), (b), (c) ) )
 #define LOWER(c)		((char) tolower((c)))
 #define UPPER(c)		((char) toupper((c)))
 #define IS_SET(flag, bit)	((flag) & (bit))

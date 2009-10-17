@@ -4536,13 +4536,13 @@ bool DelOExtraProto( OBJ_INDEX_DATA *obj, char *keywords )
 
 void fold_area( AREA_DATA *tarea, const char *filename, bool install )
 {
-    ROOM_INDEX_DATA	*room;
-    MPROG_DATA		*mprog;
-    EXIT_DATA		*xit;
-    EXTRA_DESCR_DATA	*ed;
+    ROOM_INDEX_DATA	*room = NULL;
+    MPROG_DATA		*mprog = NULL;
+    EXIT_DATA		*xit = NULL;
+    EXTRA_DESCR_DATA	*ed = NULL;
     char		 buf[MAX_STRING_LENGTH];
-    FILE		*fpout;
-    long			 vnum;
+    FILE		*fpout = NULL;
+    long		 vnum = 0;
 
     sprintf( buf, "Saving %s...", tarea->filename );
     log_string_plus( buf, LOG_NORMAL );
@@ -5936,7 +5936,7 @@ void save_mobs()
 	||   pMobIndex->hitroll  != 0	||   pMobIndex->damroll    != 0
 	||   pMobIndex->attacks	 != 0	||   pMobIndex->defenses   != 0
 	||   pMobIndex->height	 != 0	||   pMobIndex->weight	   != 0
-	||   pMobIndex->xflags	 != 0   ||   pMobIndex->numattacks != 0 )
+	||   pMobIndex->xflags	 != 0   ||   pMobIndex->numattacks != 1 )
 	  complexmob = TRUE;
 	else
 	  complexmob = FALSE;

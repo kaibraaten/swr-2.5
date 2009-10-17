@@ -1244,8 +1244,8 @@ void actiondesc( CHAR_DATA *ch, OBJ_DATA *obj, void *vo )
 
 void do_hail( CHAR_DATA *ch , char *argument )
 {
-    int vnum;
-    ROOM_INDEX_DATA *room;
+    int vnum = 0;
+    ROOM_INDEX_DATA *room = NULL;
     
     if ( !ch->in_room )
        return;
@@ -1290,8 +1290,9 @@ void do_hail( CHAR_DATA *ch , char *argument )
     
     for ( room = ch->in_room->area->first_room  ;  room  ;  room = room->next_in_area )
     {
-             if ( IS_SET(room->room_flags , ROOM_HOTEL ) )
-                break;   
+      if ( IS_SET(room->room_flags , ROOM_HOTEL )
+	   && !IS_SET( room->room_flags, ROOM_PLR_HOME ))
+	break;
     }
     
     if ( room == NULL || !IS_SET(room->room_flags , ROOM_HOTEL ) )
