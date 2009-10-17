@@ -97,44 +97,6 @@ void interpret( CHAR_DATA *ch, char *argument )
     }
 
     found = FALSE;
-    if ( ch->substate == SUB_REPEATCMD )
-    {
-	DO_FUN *fun;
-
-	if ( (fun=ch->last_cmd) == NULL )
-	{
-	    ch->substate = SUB_NONE;
-	    bug( "interpret: SUB_REPEATCMD with NULL last_cmd", 0 );
-	    return;
-	}
-	else
-	{
-	    int x;
-
-	    /*
-	     * yes... we lose out on the hashing speediness here...
-	     * but the only REPEATCMDS are wizcommands (currently)
-	     */
-	    for ( x = 0; x < 126; x++ )
-	    {
-		for ( cmd = command_hash[x]; cmd; cmd = cmd->next )
-		   if ( cmd->do_fun == fun )
-		   {
-			found = TRUE;
-			break;
-		   }
-		if ( found )
-		   break;
-	    }
-	    if ( !found )
-	    {
-		cmd = NULL;
-		bug( "interpret: SUB_REPEATCMD: last_cmd invalid", 0 );
-		return;
-	    }
-	    sprintf( logline, "(%s) %s", cmd->name, argument );
-	}
-    }
 
     if ( !cmd )
     {

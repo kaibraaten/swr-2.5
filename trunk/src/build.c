@@ -721,7 +721,6 @@ void do_mset( CHAR_DATA *ch, char *argument )
     int value;
     int minattr, maxattr;
     bool lockvictim;
-    char *origarg = argument;
 
     if ( IS_NPC( ch ) )
     {
@@ -770,34 +769,6 @@ void do_mset( CHAR_DATA *ch, char *argument )
     lockvictim = FALSE;
     smash_tilde( argument );
 
-    if ( ch->substate == SUB_REPEATCMD )
-    {
-      victim = (CHAR_DATA*) ch->dest_buf;
-	if ( char_died(victim) )
-	{
-	    send_to_char( "Your victim died!\r\n", ch );
-	    victim = NULL;
-	    argument = const_char_to_nonconst( "done" );
-	}
-	if ( argument[0] == '\0' || !str_cmp( argument, " " )
-	||   !str_cmp( argument, "stat" ) )
-	{
-	    if ( victim )
-		do_mstat( ch, victim->name );
-	    else
-	        send_to_char( "No victim selected.  Type '?' for help.\r\n", ch );
-	    return;
-	}
-	if ( !str_cmp( argument, "done" ) || !str_cmp( argument, "off" ) )
-	{
-	    send_to_char( "Mset mode off.\r\n", ch );
-	    ch->substate = SUB_NONE;
-	    ch->dest_buf = NULL;
-	    if ( ch->pcdata && ch->pcdata->subprompt )
-		STRFREE( ch->pcdata->subprompt );
-	    return;
-	}
-    }
     if ( victim )
     {
 	lockvictim = TRUE;
@@ -812,25 +783,10 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	argument = one_argument( argument, arg2 );
 	strcpy( arg3, argument );
     }
-/*
-    if ( !str_cmp( arg1, "on" ) )
+
+    if ( arg1[0] == '\0' || arg2[0] == '\0' || !str_cmp( arg1, "?" ) )
     {
-	send_to_char( "Syntax: mset <victim|vnum> on.\r\n", ch );
-	return;
-    }
-*/
-    if ( arg1[0] == '\0' || (arg2[0] == '\0' && ch->substate != SUB_REPEATCMD)
-    ||   !str_cmp( arg1, "?" ) )
-    {
-	if ( ch->substate == SUB_REPEATCMD )
-	{
-	    if ( victim )
-		send_to_char( "Syntax: <field>  <value>\r\n",		ch );
-	    else
-		send_to_char( "Syntax: <victim> <field>  <value>\r\n",	ch );
-	}
-	else
-	    send_to_char( "Syntax: mset <victim> <field>  <value>\r\n",	ch );
+      send_to_char( "Syntax: mset <victim> <field>  <value>\r\n",	ch );
 	send_to_char( "\r\n",						ch );
 	send_to_char( "Field being one of:\r\n",			ch );
 	send_to_char( "  str int wis dex con cha lck frc sex\r\n",	ch );
@@ -880,28 +836,6 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	maxattr = 18;
     }
 
-/*
-    if ( !str_cmp( arg2, "on" ) )
-    {
-	CHECK_SUBRESTRICTED( ch );
-	ch_printf( ch, "Mset mode on. (Editing %s).\r\n",
-		victim->name );
-	ch->substate = SUB_REPEATCMD;
-	ch->dest_buf = victim;
-	if ( ch->pcdata )
-	{
-	   if ( ch->pcdata->subprompt )
-		STRFREE( ch->pcdata->subprompt );
-	   if ( IS_NPC(victim) )
-		sprintf( buf, "<&CMset &W#%ld&w> %%i", victim->pIndexData->vnum );
-	   else
-		sprintf( buf, "<&CMset &W%s&w> %%i", victim->name );
-	   ch->pcdata->subprompt = STRALLOC( buf );
-	}
-	return;
-    }
- */
- 
     value = is_number( arg3 ) ? atoi( arg3 ) : -1;
 
     if ( atoi(arg3) < -1 && value == -1 )
@@ -1503,10 +1437,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	   return;
 	}
 	CHECK_SUBRESTRICTED( ch );
-	if ( ch->substate == SUB_REPEATCMD )
-	  ch->tempnum = SUB_REPEATCMD;
-	else
-	  ch->tempnum = SUB_NONE;
+	ch->tempnum = SUB_NONE;
 	ch->substate = SUB_MOB_DESC;
 	ch->dest_buf = victim;
 	start_editing( ch, victim->description );
@@ -2104,16 +2035,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
     /*
      * Generate usage message.
      */
-    if ( ch->substate == SUB_REPEATCMD )
-    {
-	ch->substate = SUB_RESTRICTED;
-	interpret( ch, origarg );
-	ch->substate = SUB_REPEATCMD;
-	ch->last_cmd = do_mset;
-    }
-    else
-      do_mset( ch, const_char_to_nonconst( "" ) );
-    return;
+    do_mset( ch, const_char_to_nonconst( "" ) );
 }
 
 
@@ -2127,7 +2049,6 @@ void do_oset( CHAR_DATA *ch, char *argument )
     OBJ_DATA *obj, *tmpobj;
     EXTRA_DESCR_DATA *ed;
     bool lockobj;
-    char *origarg = argument;
 
     int value, tmp;
 
@@ -2203,35 +2124,6 @@ void do_oset( CHAR_DATA *ch, char *argument )
     obj = NULL;
     smash_tilde( argument );
 
-    if ( ch->substate == SUB_REPEATCMD )
-    {
-      obj = (OBJ_DATA*) ch->dest_buf;
-
-	if ( obj && obj_extracted(obj) )
-	{
-	    send_to_char( "Your object was extracted!\r\n", ch );
-	    obj = NULL;
-	    argument = const_char_to_nonconst( "done" );
-	}
-	if ( argument[0] == '\0' || !str_cmp( argument, " " )
-	||   !str_cmp( argument, "stat" ) )
-	{
-	    if ( obj )
-		do_ostat( ch, obj->name );
-	    else
-	        send_to_char( "No object selected.  Type '?' for help.\r\n", ch );
-	    return;
-	}
-	if ( !str_cmp( argument, "done" ) || !str_cmp( argument, "off" ) )
-	{
-	    send_to_char( "Oset mode off.\r\n", ch );
-	    ch->substate = SUB_NONE;
-	    ch->dest_buf = NULL;
-	    if ( ch->pcdata && ch->pcdata->subprompt )
-		STRFREE( ch->pcdata->subprompt );
-	    return;
-	}
-    }
     if ( obj )
     {
 	lockobj = TRUE;
@@ -2247,25 +2139,9 @@ void do_oset( CHAR_DATA *ch, char *argument )
 	strcpy( arg3, argument );
     }
 
-/*
-    if ( !str_cmp( arg1, "on" ) )
-    {
-	send_to_char( "Syntax: oset <object|vnum> on.\r\n", ch );
-	return;
-    }
-*/
-
     if ( arg1[0] == '\0' || arg2[0] == '\0' || !str_cmp( arg1, "?" ) )
     {
-	if ( ch->substate == SUB_REPEATCMD )
-	{
-	    if ( obj )
-		send_to_char( "Syntax: <field>  <value>\r\n",		ch );
-	    else
-		send_to_char( "Syntax: <object> <field>  <value>\r\n",	ch );
-	}
-	else
-	    send_to_char( "Syntax: oset <object> <field>  <value>\r\n",	ch );
+      send_to_char( "Syntax: oset <object> <field>  <value>\r\n",	ch );
 	send_to_char( "\r\n",						ch );
 	send_to_char( "Field being one of:\r\n",			ch );
 	send_to_char( "  flags wear level weight cost timer\r\n",	ch );
@@ -2298,24 +2174,6 @@ void do_oset( CHAR_DATA *ch, char *argument )
 
     separate_obj( obj );
     value = atoi( arg3 );
-
-/*
-    if ( !str_cmp( arg2, "on" ) )
-    {
-	ch_printf( ch, "Oset mode on. (Editing '%s' vnum %ld).\r\n",
-		obj->name, obj->pIndexData->vnum );
-	ch->substate = SUB_REPEATCMD;
-	ch->dest_buf = obj;
-	if ( ch->pcdata )
-	{
-	   if ( ch->pcdata->subprompt )
-		STRFREE( ch->pcdata->subprompt );
-	   sprintf( buf, "<&COset &W#%d&w> %%i", obj->pIndexData->vnum );
-	   ch->pcdata->subprompt = STRALLOC( buf );
-	}
-	return;
-    }
-*/
 
     if ( !str_cmp( arg2, "value0" ) || !str_cmp( arg2, "v0" ) )
     {
@@ -2592,10 +2450,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
 	   return;
 	}
 	CHECK_SUBRESTRICTED( ch );
-	if ( ch->substate == SUB_REPEATCMD )
-	  ch->tempnum = SUB_REPEATCMD;
-	else
-	  ch->tempnum = SUB_NONE;
+	ch->tempnum = SUB_NONE;
 	if ( lockobj )
 	  ch->spare_ptr = obj;
 	else
@@ -2754,10 +2609,9 @@ void do_oset( CHAR_DATA *ch, char *argument )
 	  ed = SetOExtraProto( obj->pIndexData, arg3 );
 	else
 	  ed = SetOExtra( obj, arg3 );
-	if ( ch->substate == SUB_REPEATCMD )
-	  ch->tempnum = SUB_REPEATCMD;
-	else
-	  ch->tempnum = SUB_NONE;
+
+	ch->tempnum = SUB_NONE;
+
 	if ( lockobj )
 	  ch->spare_ptr = obj;
 	else
@@ -2785,10 +2639,9 @@ void do_oset( CHAR_DATA *ch, char *argument )
 	  ed = SetOExtraProto( obj->pIndexData, obj->name );
 	else
 	  ed = SetOExtra( obj, obj->name );
-	if ( ch->substate == SUB_REPEATCMD )
-	  ch->tempnum = SUB_REPEATCMD;
-	else
-	  ch->tempnum = SUB_NONE;
+
+	ch->tempnum = SUB_NONE;
+
 	if ( lockobj )
 	  ch->spare_ptr = obj;
 	else
@@ -2958,17 +2811,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
     /*
      * Generate usage message.
      */
-    if ( ch->substate == SUB_REPEATCMD )
-    {
-	ch->substate = SUB_RESTRICTED;
-	interpret( ch, origarg );
-	ch->substate = SUB_REPEATCMD;
-	ch->last_cmd = do_oset;
-    }
-    else
-      do_oset( ch, const_char_to_nonconst( "" ) );
-
-    return;
+    do_oset( ch, const_char_to_nonconst( "" ) );
 }
 
 
@@ -3048,7 +2891,6 @@ void do_redit( CHAR_DATA *ch, char *argument )
     int			value;
     int			edir, ekey;
     long		 evnum;
-    char		*origarg = argument;
 
     if ( !ch->desc )
     {
@@ -3091,28 +2933,10 @@ void do_redit( CHAR_DATA *ch, char *argument )
 
     smash_tilde( argument );
     argument = one_argument( argument, arg );
-    if ( ch->substate == SUB_REPEATCMD )
-    {
-	if ( arg[0] == '\0' )
-	{
-	  do_rstat( ch, const_char_to_nonconst( "" ) );
-	    return;
-	}
-	if ( !str_cmp( arg, "done" ) || !str_cmp( arg, "off" ) )
-	{
-	    send_to_char( "Redit mode off.\r\n", ch );
-	    if ( ch->pcdata && ch->pcdata->subprompt )
-		STRFREE( ch->pcdata->subprompt );
-	    ch->substate = SUB_NONE;
-	    return;
-	}
-    }
+
     if ( arg[0] == '\0' || !str_cmp( arg, "?" ) )
     {
-	if ( ch->substate == SUB_REPEATCMD )
-	  send_to_char( "Syntax: <field> value\r\n",			ch );
-	else
-	  send_to_char( "Syntax: redit <field> value\r\n",		ch );
+      send_to_char( "Syntax: redit <field> value\r\n",		ch );
 	send_to_char( "\r\n",						ch );
 	send_to_char( "Field being one of:\r\n",			ch );
 	send_to_char( "  name desc ed rmed\r\n",			ch );
@@ -3124,21 +2948,6 @@ void do_redit( CHAR_DATA *ch, char *argument )
 
     if ( !can_rmodify( ch, location ) )
       return;
-
-/*
-    if ( !str_cmp( arg, "on" ) )
-    {
-	send_to_char( "Redit mode on.\r\n", ch );
-	ch->substate = SUB_REPEATCMD;
-	if ( ch->pcdata )
-	{
-	   if ( ch->pcdata->subprompt )
-		STRFREE( ch->pcdata->subprompt );
-	   ch->pcdata->subprompt = STRALLOC( "<&CRedit &W#%r&w> %i" );
-	}
-	return;
-    }
-*/
 
     if ( !str_cmp( arg, "substate" ) )
     {
@@ -3193,10 +3002,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg, "desc" ) )
     {
-	if ( ch->substate == SUB_REPEATCMD )
-	  ch->tempnum = SUB_REPEATCMD;
-	else
-	  ch->tempnum = SUB_NONE;
+      ch->tempnum = SUB_NONE;
 	ch->substate = SUB_ROOM_DESC;
 	ch->dest_buf = location;
 	start_editing( ch, location->description );
@@ -3226,10 +3032,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
 	}
 	CHECK_SUBRESTRICTED( ch );
 	ed = SetRExtra( location, argument );
-	if ( ch->substate == SUB_REPEATCMD )
-	  ch->tempnum = SUB_REPEATCMD;
-	else
-	  ch->tempnum = SUB_NONE;
+	ch->tempnum = SUB_NONE;
 	ch->substate = SUB_ROOM_EXTRA;
 	ch->dest_buf = ed;
 	start_editing( ch, ed->description );
@@ -3859,17 +3662,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
     /*
      * Generate usage message.
      */
-    if ( ch->substate == SUB_REPEATCMD )
-    {
-	ch->substate = SUB_RESTRICTED;
-	interpret( ch, origarg );
-	ch->substate = SUB_REPEATCMD;
-	ch->last_cmd = do_redit;
-    }
-    else
-      do_redit( ch, const_char_to_nonconst( "" ) );
-
-    return;
+    do_redit( ch, const_char_to_nonconst( "" ) );
 }
 
 void do_ocreate( CHAR_DATA *ch, char *argument )
