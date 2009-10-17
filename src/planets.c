@@ -370,11 +370,23 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
 
     if ( !strcmp( arg2, "name" ) )
     {
-	STRFREE( planet->name );
-	planet->name = STRALLOC( argument );
-	send_to_char( "Done.\r\n", ch );
-	save_planet( planet );
-	return;
+      PLANET_DATA *tplanet;
+      if( !argument || argument[0] == '\0' )
+	{
+	  send_to_char( "You must choose a name.\r\n", ch );
+	  return;
+	}
+      if( ( tplanet = get_planet( argument ) ) != NULL )
+	{
+	  send_to_char( "A planet with that name already Exists!\r\n", ch );
+	  return;
+	}
+
+      STRFREE( planet->name );
+      planet->name = STRALLOC( argument );
+      send_to_char( "Done.\r\n", ch );
+      save_planet( planet );
+      return;
     }
 
     if ( !strcmp( arg2, "sector" ) )
@@ -420,12 +432,37 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
 
     if ( !strcmp( arg2, "filename" ) )
     {
+      /*
 	DISPOSE( planet->filename );
 	planet->filename = str_dup( argument );
 	send_to_char( "Done.\r\n", ch );
 	save_planet( planet );
 	write_planet_list( );
 	return;
+      */
+
+      PLANET_DATA *tplanet;
+
+      if( !argument || argument[0] == '\0' )
+	{
+	  send_to_char( "You must choose a file name.\r\n", ch );
+	  return;
+	}
+      for( tplanet = first_planet; tplanet; tplanet = tplanet->next )
+	{
+          if( !str_cmp( tplanet->filename, argument ) )
+	    {
+              send_to_char( "A planet with that filename already exists!\r\n", ch );
+              return;
+	    }
+	}
+
+      DISPOSE( planet->filename );
+      planet->filename = str_dup( argument );
+      send_to_char( "Done.\r\n", ch );
+      save_planet( planet );
+      write_planet_list(  );
+      return;
     }
 
 

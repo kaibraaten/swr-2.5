@@ -3164,8 +3164,8 @@ void do_launch( CHAR_DATA *ch, char *argument )
 void launchship( SHIP_DATA *ship )
 {   
     char buf[MAX_STRING_LENGTH];
-    SHIP_DATA *source;
-    ROOM_INDEX_DATA * room;
+    SHIP_DATA *source = NULL;
+    ROOM_INDEX_DATA * room = NULL;
     
     ship_to_starsystem( ship, starsystem_from_room( ship->in_room ) );
         
@@ -3205,7 +3205,7 @@ void launchship( SHIP_DATA *ship )
          
     ship_move( ship ); /* move it away */
     
-    echo_to_room( AT_GREEN , get_room_index(ship->location) , "Launch complete.\r\n");	
+    echo_to_room( AT_GREEN , ship->pilotseat, "Launch complete.\r\n");	
     echo_to_ship( AT_YELLOW , ship , "The ship leaves the platform far behind as it flies into space." );
     sprintf( buf ,"%s enters the starsystem at %.0f %.0f %.0f",
 	     ship->name, ship->pos.x, ship->pos.y, ship->pos.z );

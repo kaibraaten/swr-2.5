@@ -1547,7 +1547,7 @@ void send_to_char( const char *txt, CHAR_DATA *ch )
 void send_to_char_color( const char *txt, CHAR_DATA *ch )
 {
   DESCRIPTOR_DATA *d;
-  char *colstr;
+  const char *colstr;
   const char *prevstr = txt;
   char colbuf[20];
   int ln;
@@ -1655,7 +1655,7 @@ void send_to_pager( const char *txt, CHAR_DATA *ch )
 void send_to_pager_color( const char *txt, CHAR_DATA *ch )
 {
   DESCRIPTOR_DATA *d;
-  char *colstr;
+  const char *colstr;
   const char *prevstr = txt;
   char colbuf[20];
   int ln;

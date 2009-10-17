@@ -101,10 +101,10 @@ CHAR_DATA *find_fixer( CHAR_DATA *ch )
 
 int get_cost( CHAR_DATA *ch, CHAR_DATA *keeper, OBJ_DATA *obj, bool fBuy )
 {
-    SHOP_DATA *pShop;
-    int cost;
-    bool richcustomer;
-    int profitmod;
+    SHOP_DATA *pShop = NULL;
+    int cost = 0;
+    bool richcustomer = FALSE;
+    int profitmod = 0;
 
     if ( !obj || ( pShop = keeper->pIndexData->pShop ) == NULL )
 	return 0;

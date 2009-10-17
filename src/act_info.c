@@ -570,61 +570,62 @@ void show_char_to_char_0( CHAR_DATA *victim, CHAR_DATA *ch )
 
 void show_char_to_char_1( CHAR_DATA *victim, CHAR_DATA *ch )
 {
-    OBJ_DATA *obj;
-    int iWear;
-    bool found;
+  OBJ_DATA *obj = NULL;
+  int iWear = 0;
+  bool found = FALSE;
 
-    if ( can_see( victim, ch ) )
+  if ( can_see( victim, ch ) )
     {
-    act( AT_ACTION, "$n looks at you.", ch, NULL, victim, TO_VICT    );
-    act( AT_ACTION, "$n looks at $N.",  ch, NULL, victim, TO_NOTVICT );
+      act( AT_ACTION, "$n looks at you.", ch, NULL, victim, TO_VICT    );
+      act( AT_ACTION, "$n looks at $N.",  ch, NULL, victim, TO_NOTVICT );
     }
 
-    if ( victim->description[0] != '\0' )
+  if ( victim->description[0] != '\0' )
     {
-	send_to_char( victim->description, ch );
+      send_to_char( victim->description, ch );
     }
-    else
+  else
     {
-    act( AT_PLAIN, "You see nothing special about $M.", ch, NULL, victim, TO_CHAR );
+      act( AT_PLAIN, "You see nothing special about $M.", ch, NULL, victim, TO_CHAR );
     }
 
-    show_condition( ch, victim );
+  show_condition( ch, victim );
 
-    found = FALSE;
-    for ( iWear = 0; iWear < MAX_WEAR; iWear++ )
+  found = FALSE;
+  for ( iWear = 0; iWear < MAX_WEAR; iWear++ )
     {
-	if ( ( obj = get_eq_char( victim, iWear ) ) != NULL
-	&&   can_see_obj( ch, obj ) )
+      if ( ( obj = get_eq_char( victim, iWear ) ) != NULL
+	   &&   can_see_obj( ch, obj ) )
 	{
-	    if ( !found )
+	  if ( !found )
 	    {
-		send_to_char( "\r\n", ch );
-		act( AT_PLAIN, "$N is using:", ch, NULL, victim, TO_CHAR );
-		found = TRUE;
+	      send_to_char( "\r\n", ch );
+	      act( AT_PLAIN, "$N is using:", ch, NULL, victim, TO_CHAR );
+	      found = TRUE;
 	    }
-	    send_to_char( where_name[iWear], ch );
-	    send_to_char( format_obj_to_char( obj, ch, TRUE ), ch );
-	    send_to_char( "\r\n", ch );
+	  send_to_char( where_name[iWear], ch );
+	  send_to_char( format_obj_to_char( obj, ch, TRUE ), ch );
+	  send_to_char( "\r\n", ch );
 	}
     }
 
-    /*
-     * Crash fix here by Thoric
-     */
-    if ( IS_NPC(ch) || victim == ch )
-      return;
-
-    if ( number_percent( ) < character_skill_level( ch, gsn_peek ) )
-    {
-	send_to_char( "\r\nYou peek at the inventory:\r\n", ch );
-	show_list_to_char( victim->first_carrying, ch, TRUE, TRUE );
-	learn_from_success( ch, gsn_peek );
-    }
-    else if ( character_skill_level( ch, gsn_peek ) )
-      learn_from_failure( ch, gsn_peek );
-
+  /*
+   * Crash fix here by Thoric
+   */
+  if ( IS_NPC(ch) || victim == ch
+       || ( IS_IMMORTAL(victim) && (victim->top_level > ch->top_level) ) )
     return;
+
+  if ( number_percent( ) < character_skill_level( ch, gsn_peek ) )
+    {
+      send_to_char( "\r\nYou peek at the inventory:\r\n", ch );
+      show_list_to_char( victim->first_carrying, ch, TRUE, TRUE );
+      learn_from_success( ch, gsn_peek );
+    }
+  else if ( character_skill_level( ch, gsn_peek ) )
+    {
+      learn_from_failure( ch, gsn_peek );
+    }
 }
 
 
@@ -1100,13 +1101,12 @@ void do_look
 void show_condition( CHAR_DATA *ch, CHAR_DATA *victim )
 {
     char buf[MAX_STRING_LENGTH];
-    int percent;
+    int percent = 0;
 
-    if ( victim->max_hit > 0 )
-        percent = ( 100 * victim->hit ) / victim->max_hit;
+    if( victim->max_hit > 0 )
+      percent = ( int )( ( 100.0 * ( double )( victim->hit ) ) / ( double )( victim->max_hit ) );
     else
-        percent = -1;
-
+      percent = -1;
 
     strcpy( buf, PERS(victim, ch) );
 

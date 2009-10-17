@@ -1403,7 +1403,8 @@ void do_order( CHAR_DATA *ch, char *argument )
 
       if ( IS_AFFECTED(och, AFF_CHARM)
 	   &&   och->master == ch
-	   && ( fAll || och == victim ) )
+	   && ( fAll || och == victim )
+	   && !IS_IMMORTAL( och ) )
 	{
 	  found = TRUE;
 	  act( AT_ACTION, "$n orders you to '$t'.", ch, argument, och, TO_VICT );

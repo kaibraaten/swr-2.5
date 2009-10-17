@@ -390,9 +390,9 @@ void violence_update( void )
  */
 ch_ret multi_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
 {
-    int     chance;
-    int	    dual_bonus;
-    ch_ret  retcode;
+    int     chance = 0;
+    int	    dual_bonus = 0;
+    ch_ret  retcode = rNONE;
 
     /* add timer if player is attacking another player */
     if ( !IS_NPC(ch) && !IS_NPC(victim) )
@@ -442,13 +442,15 @@ ch_ret multi_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
      */
     if ( IS_NPC(ch) && ch->numattacks > 0 )
     {
-	for ( chance = 0; chance <= ch->numattacks; chance++ )
+      for ( chance = 0; chance < ch->numattacks; chance++ )
 	{
-	   retcode = one_hit( ch, victim, dt );
-	   if ( retcode != rNONE || who_fighting( ch ) != victim )
-	     return retcode;
+	  retcode = one_hit( ch, victim, dt );
+
+	  if ( retcode != rNONE || who_fighting( ch ) != victim )
+	    return retcode;
 	}
-	return retcode;
+
+      return retcode;
     }
 
     chance = IS_NPC(ch) ? 0 : ( character_skill_level( ch, gsn_second_attack ) + dual_bonus / 1.5);
@@ -950,22 +952,24 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
     if ( wield
     &&  !IS_SET(victim->immune, RIS_MAGIC) )
     {
-	AFFECT_DATA *aff;
-	
-	for ( aff = wield->pIndexData->first_affect; aff; aff = aff->next )
-	   if ( aff->location == APPLY_WEAPONSPELL
-	   &&   IS_VALID_SN(aff->modifier)
-	   &&   skill_table[aff->modifier]->spell_fun )
-		retcode = (*skill_table[aff->modifier]->spell_fun) ( aff->modifier, (wield->level+3)/3, ch, victim );
-	if ( retcode != rNONE || char_died(ch) || char_died(victim) )
-		return retcode;
-	for ( aff = wield->first_affect; aff; aff = aff->next )
-	   if ( aff->location == APPLY_WEAPONSPELL
-	   &&   IS_VALID_SN(aff->modifier)
-	   &&   skill_table[aff->modifier]->spell_fun )
-		retcode = (*skill_table[aff->modifier]->spell_fun) ( aff->modifier, (wield->level+3)/3, ch, victim );
-	if ( retcode != rNONE || char_died(ch) || char_died(victim) )
-		return retcode;
+      AFFECT_DATA *aff;
+
+      for( aff = wield->pIndexData->first_affect; aff; aff = aff->next )
+	if( aff->location == APPLY_WEAPONSPELL && IS_VALID_SN( aff->modifier ) && skill_table[aff->modifier]->spell_fun )
+	  retcode = ( *skill_table[aff->modifier]->spell_fun ) ( aff->modifier, ( wield->level + 3 ) / 3, ch, victim );
+
+      if( retcode == rSPELL_FAILED ) retcode = rNONE; // Luc, 6/11/2007
+
+      if( retcode != rNONE || char_died( ch ) || char_died( victim ) )
+	return retcode;
+      for( aff = wield->first_affect; aff; aff = aff->next )
+	if( aff->location == APPLY_WEAPONSPELL && IS_VALID_SN( aff->modifier ) && skill_table[aff->modifier]->spell_fun )
+	  retcode = ( *skill_table[aff->modifier]->spell_fun ) ( aff->modifier, ( wield->level + 3 ) / 3, ch, victim );
+
+      if( retcode == rSPELL_FAILED ) retcode = rNONE; // Luc, 6/11/2007
+
+      if( retcode != rNONE || char_died( ch ) || char_died( victim ) )
+	return retcode;
     }
 
     /*
@@ -1986,11 +1990,11 @@ int align_compute( CHAR_DATA *gch, CHAR_DATA *victim )
 void dam_message( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
 {
     char buf1[256], buf2[256], buf3[256];
-    const char *vs;
-    const char *vp;
-    const char *attack;
-    char punct;
-    short dampc;
+    const char *vs = NULL;
+    const char *vp = NULL;
+    const char *attack = NULL;
+    char punct = 0;
+    int dampc = 0;
     struct skill_type *skill = NULL;
     bool gcflag = FALSE;
     bool gvflag = FALSE;

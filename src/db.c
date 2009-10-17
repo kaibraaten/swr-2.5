@@ -2875,17 +2875,41 @@ bool str_suffix( const char *astr, const char *bstr )
 
 /*
  * Returns an initial-capped string.
+ * Rewritten by FearItself@AvP
  */
 char *capitalize( const char *str )
 {
-    static char strcap[MAX_STRING_LENGTH];
-    int i;
+  static char buf[MAX_STRING_LENGTH];
+  char *dest = buf;
+  enum { Normal, Color } state = Normal;
+  bool bFirst = TRUE;
+  char c;
 
-    for ( i = 0; str[i] != '\0'; i++ )
-	strcap[i] = LOWER(str[i]);
-    strcap[i] = '\0';
-    strcap[0] = UPPER(strcap[0]);
-    return strcap;
+  while( (c = *str++) )
+    {
+      if( state == Normal )
+	{
+	  if( c == '&' || c == '^' || c == '}' )
+	    {
+	      state = Color;
+	    }
+	  else if( isalpha(c) )
+	    {
+	      c = bFirst ? toupper(c) : tolower(c);
+	      bFirst = FALSE;
+	    }
+	}
+      else
+	{
+	  state = Normal;
+	}
+
+      *dest++ = c;
+    }
+
+  *dest = c;
+
+  return buf;
 }
 
 
@@ -4113,7 +4137,7 @@ MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
       pMobIndex->resistant		= 0;
       pMobIndex->immune		= 0;
       pMobIndex->susceptible	= 0;
-      pMobIndex->numattacks		= 0;
+      pMobIndex->numattacks		= 1;
       pMobIndex->attacks		= 0;
       pMobIndex->defenses		= 0;
     }
