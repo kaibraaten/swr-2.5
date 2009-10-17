@@ -3019,58 +3019,64 @@ void append_to_file( const char *file, const char *str )
  */
 void bug( const char *str, ... )
 {
-    char buf[MAX_STRING_LENGTH];
-    FILE *fp;
-    struct stat fst;
+  char buf[MAX_STRING_LENGTH];
+  FILE *fp;
+  struct stat fst;
 
-    if ( fpArea != NULL )
+  if ( fpArea != NULL )
     {
-	int iLine;
-	int iChar;
+      int iLine;
+      int iChar;
 
-	if ( fpArea == stdin )
+      if ( fpArea == stdin )
 	{
-	    iLine = 0;
+	  iLine = 0;
 	}
-	else
+      else
 	{
-	    iChar = ftell( fpArea );
-	    fseek( fpArea, 0, 0 );
-	    for ( iLine = 0; ftell( fpArea ) < iChar; iLine++ )
+	  iChar = ftell( fpArea );
+	  fseek( fpArea, 0, 0 );
+
+	  for ( iLine = 0; ftell( fpArea ) < iChar; iLine++ )
 	    {
-		while ( getc( fpArea ) != '\n' )
-		    ;
+	      int letter;
+
+	      while( ( letter = getc( fpArea ) )
+		     && letter != EOF && letter != '\n' )
+		;
 	    }
-	    fseek( fpArea, iChar, 0 );
+	  fseek( fpArea, iChar, 0 );
 	}
 
-	sprintf( buf, "[*****] FILE: %s LINE: %d", strArea, iLine );
-	log_string( buf );
+      sprintf( buf, "[*****] FILE: %s LINE: %d", strArea, iLine );
+      log_string( buf );
 
-	if ( stat( SHUTDOWN_FILE, &fst ) != -1 )	/* file exists */
+      if ( stat( SHUTDOWN_FILE, &fst ) != -1 )	/* file exists */
 	{
-	    if ( ( fp = fopen( SHUTDOWN_FILE, "a" ) ) != NULL )
+	  if ( ( fp = fopen( SHUTDOWN_FILE, "a" ) ) != NULL )
 	    {
-		fprintf( fp, "[*****] %s\n", buf );
-		fclose( fp );
+	      fprintf( fp, "[*****] %s\n", buf );
+	      fclose( fp );
 	    }
 	}
     }
 
-    strcpy( buf, "[*****] BUG: " );
-    {
-	va_list param;
+  strcpy( buf, "[*****] BUG: " );
+
+  {
+    va_list param;
     
-	va_start(param, str);
-	vsprintf( buf + strlen(buf), str, param );
-	va_end(param);
-    }
-    log_string( buf );
+    va_start(param, str);
+    vsprintf( buf + strlen(buf), str, param );
+    va_end(param);
+  }
 
-    if ( ( fp = fopen( BUG_FILE, "a" ) ) != NULL )
+  log_string( buf );
+
+  if ( ( fp = fopen( BUG_FILE, "a" ) ) != NULL )
     {
-	fprintf( fp, "%s\n", buf );
-	fclose( fp );
+      fprintf( fp, "%s\n", buf );
+      fclose( fp );
     }
 }
 
@@ -4696,4 +4702,42 @@ void replace_char( char *buf, char replace, char with )
 	  buf[i] = with;
 	}
     }
+}
+
+bool is_valid_filename( const CHAR_DATA *ch, const char *direct,
+			const char *filename )
+{
+  char newfilename[256];
+  struct stat fst;
+
+  /* Length restrictions */
+  if( !filename || filename[0] == '\0' || strlen( filename ) < 3 )
+    {
+      if( !filename || !str_cmp( filename, "" ) )
+	send_to_char( "Empty filename is not valid.\r\n", ch );
+      else
+	ch_printf( ch, "%s: Filename is too short.\r\n", filename );
+
+      return FALSE;
+    }
+
+  /* Illegal characters */
+  if( strstr( filename, ".." ) || strstr( filename, "/" )
+      || strstr( filename, "\\" ) )
+    {
+      send_to_char( "A filename may not contain a '..', '/', or '\\' in it.\r\n", ch );
+      return FALSE;
+    }
+
+  /* If that filename is already being used lets not allow it now to be on the safe side */
+  snprintf( newfilename, sizeof( newfilename ), "%s%s", direct, filename );
+
+  if( stat( newfilename, &fst ) != -1 )
+    {
+      ch_printf( ch, "%s is already an existing filename.\r\n", newfilename );
+      return FALSE;
+    }
+
+  /* If we got here assume its valid */
+  return TRUE;
 }

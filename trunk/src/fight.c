@@ -2213,11 +2213,10 @@ void do_murder( CHAR_DATA *ch, char *argument )
       return;
     }
 
-    ch->alignment -= 10;
+    ch->alignment = URANGE( -1000, ch->alignment - 10, 1000 );
     
     WAIT_STATE( ch, 1 * PULSE_VIOLENCE );
     multi_hit( ch, victim, TYPE_UNDEFINED );
-    return;
 }
 
 void do_flee( CHAR_DATA *ch, char *argument )

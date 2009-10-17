@@ -1507,6 +1507,12 @@ void do_rescue( CHAR_DATA *ch, char *argument )
 	return;
     }
         
+    if( who_fighting( victim ) == ch )
+      {
+	send_to_char( "One would imagine THEY don't need your help.\r\n", ch );
+	return;
+      }
+
     ch->alignment = ch->alignment + 5;
     ch->alignment = URANGE( -1000, ch->alignment, 1000 );
     
@@ -2650,6 +2656,14 @@ void do_scan( CHAR_DATA *ch, char *argument )
   short dir = -1;
   short dist;
   short max_dist = 5;
+
+  if( IS_AFFECTED( ch, AFF_BLIND )
+      && ( !IS_AFFECTED( ch, AFF_TRUESIGHT ) ||
+	   ( !IS_NPC( ch ) && !IS_SET( ch->act, PLR_HOLYLIGHT ) ) ) )
+    {
+      send_to_char( "Everything looks the same when you're blind...\r\n", ch );
+      return;
+    }
 
   if ( argument[0] == '\0' )
     return;

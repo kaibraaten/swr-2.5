@@ -551,7 +551,8 @@ ch_ret move_char( CHAR_DATA *ch, EXIT_DATA *pexit, int fall )
 	return rNONE;
     }
 
-    if ( IS_SET(pexit->exit_info, EX_NOMOB)
+    if( ( IS_SET(pexit->exit_info, EX_NOMOB)
+	  || IS_SET( to_room->room_flags, ROOM_NO_MOB ) )
 	&& IS_NPC(ch) )
     {
 	act( AT_PLAIN, "Mobs can't enter there.", ch, NULL, NULL, TO_CHAR );

@@ -529,6 +529,7 @@ void mobile_update( void )
 	   && ( door = number_bits( 5 ) ) <= 9
 	   && ( pexit = get_exit(ch->in_room, door) ) != NULL
 	   &&   pexit->to_room
+	   && !IS_SET( pexit->exit_info, EX_WINDOW )
 	   &&   !IS_SET(pexit->exit_info, EX_CLOSED)
 	   &&   !IS_SET(pexit->to_room->room_flags, ROOM_NO_MOB)
 	   && ( ch->guard_data || pexit->to_room->sector_type == ch->in_room->sector_type ) )
@@ -552,6 +553,7 @@ void mobile_update( void )
 	   && ( door = number_bits( 4 ) ) <= 9
 	   && ( pexit = get_exit(ch->in_room,door) ) != NULL
 	   &&   pexit->to_room
+	   && !IS_SET( pexit->exit_info, EX_WINDOW )
 	   &&   !IS_SET(pexit->exit_info, EX_CLOSED)
 	   &&   !IS_SET(pexit->to_room->room_flags, ROOM_NO_MOB)
 	   && ( ch->guard_data || pexit->to_room->sector_type == ch->in_room->sector_type ) )
