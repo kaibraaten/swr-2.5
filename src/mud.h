@@ -3341,26 +3341,20 @@ char *	crypt		args( ( const char *key, const char *salt ) );
  *   so players can go ahead and telnet to all the other descriptors.
  * Then we close it whenever we need to open a file (e.g. a save file).
  */
-#ifdef AMIGA
-#define UPDIR
-#else
-#define UPDIR ".."
-#endif
-
-#define PLAYER_DIR	UPDIR "/player/" /* Player files		*/
-#define BACKUP_DIR	UPDIR "/backup/" /* Backup Player files		*/
-#define BOARD_DIR	UPDIR "/boards/" /* Board data dir		*/
-#define CLAN_DIR	UPDIR "/clans/"	/* Clan data dir		*/
-#define SHIP_DIR        UPDIR "/spacecraft/"
-#define VOTE_DIR        UPDIR "/voting/"
-#define PROTOTYPE_DIR   UPDIR "/prototypes/"
-#define SPACE_DIR       UPDIR "/planets/"    
-#define PLANET_DIR      UPDIR "/planets/"    
-#define GUARD_DIR       UPDIR "/planets/"    
-#define SYSTEM_DIR	UPDIR "/system/" /* Main system files		*/
+#define PLAYER_DIR	"player/" /* Player files		*/
+#define BACKUP_DIR	"backup/" /* Backup Player files		*/
+#define BOARD_DIR	"boards/" /* Board data dir		*/
+#define CLAN_DIR	"clans/"	/* Clan data dir		*/
+#define SHIP_DIR        "spacecraft/"
+#define VOTE_DIR        "voting/"
+#define PROTOTYPE_DIR   "prototypes/"
+#define SPACE_DIR       "planets/"    
+#define PLANET_DIR      "planets/"    
+#define GUARD_DIR       "planets/"    
+#define SYSTEM_DIR	"system/" /* Main system files		*/
 #define PROG_DIR	"mudprogs/"	/* MUDProg files		*/
-#define CORPSE_DIR	UPDIR "/corpses/" /* Corpses			*/
-
+#define CORPSE_DIR	"corpses/" /* Corpses			*/
+#define AREA_DIR        "area/"
 #define AREA_LIST	"area.lst"	/* List of areas		*/
 #define BAN_LIST        "ban.lst"       /* List of bans                 */
 #define CLAN_LIST	"clan.lst"	/* List of clans		*/
@@ -3373,7 +3367,7 @@ char *	crypt		args( ( const char *key, const char *salt ) );
 #define BOARD_FILE	"boards.txt"		/* For bulletin boards	 */
 #define SHUTDOWN_FILE	"shutdown.txt"		/* For 'shutdown'	 */
 #define COPYOVER_FILE   SYSTEM_DIR "copyover.dat"
-#define EXE_FILE        UPDIR "/bin/swr"
+#define EXE_FILE        "swr"
 #define ANSITITLE_FILE	SYSTEM_DIR "mudtitle.ans"
 #define ASCTITLE_FILE	SYSTEM_DIR "mudtitle.asc"
 #define BOOTLOG_FILE	SYSTEM_DIR "boot.txt"	  /* Boot up error file	 */
@@ -3625,7 +3619,7 @@ MID *	make_mobile	args( ( long vnum, long cvnum, char *name ) );
 ED  *	make_exit	args( ( ROOM_INDEX_DATA *pRoomIndex, ROOM_INDEX_DATA *to_room, short door ) );
 void	add_help	args( ( HELP_DATA *pHelp ) );
 void	fix_area_exits	args( ( AREA_DATA *tarea ) );
-void	load_area_file	args( ( AREA_DATA *tarea, char *filename ) );
+void	load_area_file	args( ( AREA_DATA *tarea, const char *filename ) );
 void	randomize_exits	args( ( ROOM_INDEX_DATA *room, short maxdir ) );
 void	make_wizlist	args( ( void ) );
 bool    delete_room     args( ( ROOM_INDEX_DATA *room ) );

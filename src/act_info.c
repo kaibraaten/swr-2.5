@@ -1739,13 +1739,17 @@ void do_hset( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg1, "save" ) )
     {
-	FILE *fpout;
+	FILE *fpout = NULL;
+	char filename[MAX_STRING_LENGTH];
+	char bak_filename[MAX_STRING_LENGTH];
+	sprintf( filename, "%shelp.are", AREA_DIR );
+	sprintf( bak_filename, "%s.bak", filename );
 
 	log_string_plus( "Saving help.are...", LOG_NORMAL );
 
-	rename( "help.are", "help.are.bak" );
+	rename( filename, bak_filename );
 
-	if ( ( fpout = fopen( "help.are", "w" ) ) == NULL )
+	if ( ( fpout = fopen( filename, "w" ) ) == NULL )
 	{
 	   bug( "hset save: fopen", 0 );
 	   perror( "help.are" );

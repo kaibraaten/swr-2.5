@@ -4668,31 +4668,36 @@ void do_unfoldarea( CHAR_DATA *ch, char *argument )
 
 void do_foldarea( CHAR_DATA *ch, char *argument )
 {
-    AREA_DATA	*tarea;
-    char         arg[MAX_INPUT_LENGTH];
+  AREA_DATA	*tarea;
+  char         arg[MAX_INPUT_LENGTH];
        
-    argument = one_argument( argument, arg );
-    if ( arg[0] == '\0' )
+  argument = one_argument( argument, arg );
+
+  if ( arg[0] == '\0' )
     {
-	send_to_char( "Usage: foldarea <filename> [remproto]\r\n", ch );
-	return;
+      send_to_char( "Usage: foldarea <filename> [remproto]\r\n", ch );
+      return;
     }
 
-    for ( tarea = first_area; tarea; tarea = tarea->next )
+  for ( tarea = first_area; tarea; tarea = tarea->next )
     {
-	if ( !str_cmp( tarea->filename, arg ) )
+      if ( !str_cmp( tarea->filename, arg ) )
 	{
+	  char filename[MAX_STRING_LENGTH];
+	  sprintf( filename, "%s%s", AREA_DIR, tarea->filename );
 	  send_to_char( "Folding...\r\n", ch );
+
 	  if (!strcmp( argument, "remproto") )
-	     fold_area( tarea, tarea->filename, TRUE );
+	    fold_area( tarea, filename, TRUE );
 	  else
-	     fold_area( tarea, tarea->filename, FALSE );
+	    fold_area( tarea, filename, FALSE );
+
 	  send_to_char( "Done.\r\n", ch );
 	  return;
 	}
     }
-    send_to_char( "No such area exists.\r\n", ch );
-    return;
+
+  send_to_char( "No such area exists.\r\n", ch );
 }
 
 extern int top_area;
@@ -4702,7 +4707,7 @@ void write_area_list( )
     AREA_DATA *tarea;
     FILE *fpout;
 
-    fpout = fopen( AREA_LIST, "w" );
+    fpout = fopen( AREA_DIR AREA_LIST, "w" );
     if ( !fpout )
     {
 	bug( "FATAL: cannot open area.lst for writing!\r\n", 0 );
@@ -5899,13 +5904,18 @@ void save_mobs()
     long			 vnum;
     bool		 complexmob;
     int hash;
-    
+    char filename[MAX_STRING_LENGTH];
+    char bakfilename[MAX_STRING_LENGTH];
+
+    sprintf( filename, "%smobiles", AREA_DIR );
+    sprintf( bakfilename, "%s.bak", filename );
+
     sprintf( buf, "Saving Mobiles...." );
     log_string_plus( buf, LOG_NORMAL );
 
-    rename( "mobiles" , "mobiles.bak" );
+    rename( filename, bakfilename );
 
-    if ( ( fpout = fopen( "mobiles", "w" ) ) == NULL )
+    if ( ( fpout = fopen( filename, "w" ) ) == NULL )
     {
 	bug( "save_mobiles: fopen", 0 );
 	perror( "mobiles" );
@@ -6078,13 +6088,18 @@ void save_objects()
     int 		hash, val0, val1, val2, val3, val4, val5;
     AFFECT_DATA         *paf;
     MPROG_DATA		*mprog;
-    
+    char filename[MAX_STRING_LENGTH];
+    char bakfilename[MAX_STRING_LENGTH];
+
+    sprintf( filename, "%sobjects", AREA_DIR );
+    sprintf( bakfilename, "%s.bak", filename );
+
     sprintf( buf, "Saving Objects..." );
     log_string_plus( buf, LOG_NORMAL );
 
-    rename( "objects", "objects.bak" );
+    rename( filename, bakfilename );
 
-    if ( ( fpout = fopen( "objects", "w" ) ) == NULL )
+    if ( ( fpout = fopen( filename, "w" ) ) == NULL )
     {
 	bug( "fold_area: fopen", 0 );
 	perror( "objects" );

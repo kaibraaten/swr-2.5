@@ -19,7 +19,7 @@ while ( 1 )
     date > $logfile
     date > boot.txt
 
-    swr $port >&! $logfile
+    ./swr $port >&! $logfile
 
     if ( -e shutdown.txt ) then
 	rm -f shutdown.txt
