@@ -4,13 +4,6 @@
 #include "mud.h"
 
 /*
- * Make a fire.
- */
-void make_fire(ROOM_INDEX_DATA *in_room, short timer)
-{
-}
-
-/*
  * Turn an object into scraps.		-Thoric
  */
 void make_scraps( OBJ_DATA *obj )
@@ -89,89 +82,79 @@ void make_scraps( OBJ_DATA *obj )
 /*
  * Make a corpse out of a character.
  */
-void make_corpse( CHAR_DATA *ch, CHAR_DATA *killer )
+void make_corpse( const CHAR_DATA *ch )
 {
-    char buf[MAX_STRING_LENGTH];
-    OBJ_DATA *corpse;
-    OBJ_DATA *obj;
-    OBJ_DATA *obj_next;
-    char *name;
+  char buf[MAX_STRING_LENGTH];
+  OBJ_DATA *corpse;
+  OBJ_DATA *obj;
+  OBJ_DATA *obj_next;
+  char *name;
 
-    if ( IS_NPC(ch) )
+  if ( IS_NPC(ch) )
     {
-	name		= ch->short_descr;
-        if ( IS_SET ( ch->act , ACT_DROID ) )
-           corpse		= create_object(get_obj_index(OBJ_VNUM_DROID_CORPSE));
-	else   
-	   corpse		= create_object(get_obj_index(OBJ_VNUM_CORPSE_NPC));
-	corpse->timer	= 6;
-	if ( ch->gold > 0 )
+      name		= ch->short_descr;
+      if ( IS_SET ( ch->act , ACT_DROID ) )
+	corpse		= create_object(get_obj_index(OBJ_VNUM_DROID_CORPSE));
+      else   
+	corpse		= create_object(get_obj_index(OBJ_VNUM_CORPSE_NPC));
+      corpse->timer	= 6;
+
+      if ( ch->gold > 0 )
 	{
-	    obj_to_obj( create_money( ch->gold ), corpse );
-	    ch->gold = 0;
+	  obj_to_obj( create_money( ch->gold ), corpse );
+	  //ch->gold = 0;
 	}
 
-/* Cannot use these!  They are used.
-	corpse->value[0] = (int)ch->pIndexData->vnum;
-	corpse->value[1] = (int)ch->max_hit;
-*/
-/*	Using corpse cost to cheat, since corpses not sellable */
-	corpse->cost     = (-(int)ch->pIndexData->vnum);
-        corpse->value[2] = corpse->timer; 
+      /* Cannot use these!  They are used.
+	 corpse->value[0] = (int)ch->pIndexData->vnum;
+	 corpse->value[1] = (int)ch->max_hit;
+      */
+      /*	Using corpse cost to cheat, since corpses not sellable */
+      corpse->cost     = (-(int)ch->pIndexData->vnum);
+      corpse->value[2] = corpse->timer; 
     }
-    else
+  else
     {
-	name		= ch->name;
-	corpse		= create_object(get_obj_index(OBJ_VNUM_CORPSE_PC));
-	corpse->timer	= 40;
-        corpse->value[2] = (int)(corpse->timer/8);
-	corpse->value[3] = 0;
-	if ( ch->gold > 0 )
+      name		= ch->name;
+      corpse		= create_object(get_obj_index(OBJ_VNUM_CORPSE_PC));
+      corpse->timer	= 40;
+      corpse->value[2] = (int)(corpse->timer/8);
+      corpse->value[3] = 0;
+
+      if ( ch->gold > 0 )
 	{
-	    obj_to_obj( create_money( ch->gold ), corpse );
-	    ch->gold = 0;
+	  obj_to_obj( create_money( ch->gold ), corpse );
+	  //ch->gold = 0;
 	}
     }
 
-    /* Added corpse name - make locate easier , other skills */
-    sprintf( buf, "corpse %s", name );
-    STRFREE( corpse->name );
-    corpse->name = STRALLOC( buf );
+  /* Added corpse name - make locate easier , other skills */
+  sprintf( buf, "corpse %s", name );
+  STRFREE( corpse->name );
+  corpse->name = STRALLOC( buf );
 
-    sprintf( buf, corpse->short_descr, name );
-    STRFREE( corpse->short_descr );
-    corpse->short_descr = STRALLOC( buf );
+  sprintf( buf, corpse->short_descr, name );
+  STRFREE( corpse->short_descr );
+  corpse->short_descr = STRALLOC( buf );
 
-    sprintf( buf, corpse->description, name );
-    STRFREE( corpse->description );
-    corpse->description = STRALLOC( buf );
+  sprintf( buf, corpse->description, name );
+  STRFREE( corpse->description );
+  corpse->description = STRALLOC( buf );
 
-    for ( obj = ch->first_carrying; obj; obj = obj_next )
+  for ( obj = ch->first_carrying; obj; obj = obj_next )
     {
-	obj_next = obj->next_content;
-	obj_from_char( obj );
-	if ( IS_OBJ_STAT( obj, ITEM_INVENTORY )
-	  || IS_OBJ_STAT( obj, ITEM_DEATHROT ) )
-	    extract_obj( obj );
-	else
-	    obj_to_obj( obj, corpse );
+      obj_next = obj->next_content;
+      obj_from_char( obj );
+
+      if ( IS_OBJ_STAT( obj, ITEM_INVENTORY )
+	   || IS_OBJ_STAT( obj, ITEM_DEATHROT ) )
+	extract_obj( obj );
+      else
+	obj_to_obj( obj, corpse );
     }
 
-    obj_to_room( corpse, ch->in_room );
-    return;
+  obj_to_room( corpse, ch->in_room );
 }
-
-
-
-void make_blood( CHAR_DATA *ch )
-{
-}
-
-
-void make_bloodstain( CHAR_DATA *ch )
-{
-}
-
 
 /*
  * make some coinage

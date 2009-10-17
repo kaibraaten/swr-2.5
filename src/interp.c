@@ -29,45 +29,46 @@ SOCIALTYPE *social_index[27];   /* hash table for socials   */
 /*
  * Character not in position for command?
  */
-bool check_pos( CHAR_DATA *ch, short position )
+bool check_pos( const CHAR_DATA *ch, short position )
 {
-    if ( ch->position < position )
+  if ( ch->position < position )
     {
-	switch( ch->position )
+      switch( ch->position )
 	{
 	case POS_DEAD:
-	    send_to_char( "A little difficult to do when you are DEAD...\r\n", ch );
-	    break;
+	  send_to_char( "A little difficult to do when you are DEAD...\r\n", ch );
+	  break;
 
 	case POS_MORTAL:
 	case POS_INCAP:
-	    send_to_char( "You are hurt far too bad for that.\r\n", ch );
-	    break;
+	  send_to_char( "You are hurt far too bad for that.\r\n", ch );
+	  break;
 
 	case POS_STUNNED:
-	    send_to_char( "You are too stunned to do that.\r\n", ch );
-	    break;
+	  send_to_char( "You are too stunned to do that.\r\n", ch );
+	  break;
 
 	case POS_SLEEPING:
-	    send_to_char( "In your dreams, or what?\r\n", ch );
-	    break;
+	  send_to_char( "In your dreams, or what?\r\n", ch );
+	  break;
 
 	case POS_RESTING:
-	    send_to_char( "Nah... You feel too relaxed...\r\n", ch);
-	    break;
+	  send_to_char( "Nah... You feel too relaxed...\r\n", ch);
+	  break;
 
 	case POS_SITTING:
-	    send_to_char( "You can't do that sitting down.\r\n", ch);
-	    break;
+	  send_to_char( "You can't do that sitting down.\r\n", ch);
+	  break;
 
 	case POS_FIGHTING:
-	    send_to_char( "No way!  You are still fighting!\r\n", ch);
-	    break;
-
+	  send_to_char( "No way!  You are still fighting!\r\n", ch);
+	  break;
 	}
-	return FALSE;
+
+      return FALSE;
     }
-    return TRUE;
+
+  return TRUE;
 }
 
 extern char lastplayercmd[MAX_INPUT_LENGTH*2];
@@ -645,21 +646,23 @@ time_t end_timer(struct timeval *stime)
   return (etime.tv_sec*1000000)+etime.tv_usec;
 }
 
-void send_timer(struct timerset *vtime, CHAR_DATA *ch)
+void send_timer(struct timerset *vtime, const CHAR_DATA *ch)
 {
   struct timeval ntime;
   int carry;
   
   if ( vtime->num_uses == 0 )
     return;
+
   ntime.tv_sec  = vtime->total_time.tv_sec / vtime->num_uses;
   carry = (vtime->total_time.tv_sec % vtime->num_uses) * 1000000;
   ntime.tv_usec = (vtime->total_time.tv_usec + carry) / vtime->num_uses;
+
   ch_printf(ch, "Has been used %d times this boot.\r\n", vtime->num_uses);
   ch_printf(ch, "Time (in secs): min %d.%0.6d; avg: %d.%0.6d; max %d.%0.6d"
-      "\r\n", vtime->min_time.tv_sec, vtime->min_time.tv_usec, ntime.tv_sec,
-      ntime.tv_usec, vtime->max_time.tv_sec, vtime->max_time.tv_usec);
-  return;
+	    "\r\n", vtime->min_time.tv_sec, vtime->min_time.tv_usec,
+	    ntime.tv_sec,
+	    ntime.tv_usec, vtime->max_time.tv_sec, vtime->max_time.tv_usec);
 }
 
 void update_userec(struct timeval *time_used, struct timerset *userec)

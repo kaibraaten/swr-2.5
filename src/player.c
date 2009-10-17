@@ -690,27 +690,28 @@ void do_equipment( CHAR_DATA *ch, char *argument )
 
 
 
-void set_title( CHAR_DATA *ch, char *title )
+void set_title( CHAR_DATA *ch, const char *title )
 {
-    char buf[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH];
 
-    if ( IS_NPC(ch) )
+  if ( IS_NPC(ch) )
     {
-	bug( "Set_title: NPC.", 0 );
-	return;
+      bug( "Set_title: NPC.", 0 );
+      return;
     }
 
-    if ( isalpha(title[0]) || isdigit(title[0]) )
+  if ( isalpha(title[0]) || isdigit(title[0]) )
     {
-	buf[0] = ' ';
-	strcpy( buf+1, title );
+      buf[0] = ' ';
+      strcpy( buf+1, title );
     }
-    else
-	strcpy( buf, title );
+  else
+    {
+      strcpy( buf, title );
+    }
 
-    STRFREE( ch->pcdata->title );
-    ch->pcdata->title = STRALLOC( buf );
-    return;
+  STRFREE( ch->pcdata->title );
+  ch->pcdata->title = STRALLOC( buf );
 }
 
 

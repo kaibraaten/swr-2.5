@@ -47,28 +47,19 @@ bool is_wielding_poisoned( CHAR_DATA *ch )
 /*
  * hunting, hating and fearing code				-Thoric
  */
-bool is_hunting( CHAR_DATA *ch, CHAR_DATA *victim )
+bool is_hunting( const CHAR_DATA *ch, const CHAR_DATA *victim )
 {
-    if ( !ch->hunting || ch->hunting->who != victim )
-      return FALSE;
-    
-    return TRUE;    
+  return ch->hunting && ch->hunting->who == victim;
 }
 
-bool is_hating( CHAR_DATA *ch, CHAR_DATA *victim )
+bool is_hating( const CHAR_DATA *ch, const CHAR_DATA *victim )
 {
-    if ( !ch->hating || ch->hating->who != victim )
-      return FALSE;
-    
-    return TRUE;    
+  return ch->hating && ch->hating->who == victim;
 }
 
-bool is_fearing( CHAR_DATA *ch, CHAR_DATA *victim )
+bool is_fearing( const CHAR_DATA *ch, const CHAR_DATA *victim )
 {
-    if ( !ch->fearing || ch->fearing->who != victim )
-      return FALSE;
-    
-    return TRUE;    
+  return ch->fearing && ch->fearing->who == victim;
 }
 
 void stop_hunting( CHAR_DATA *ch )
@@ -138,7 +129,7 @@ void start_fearing( CHAR_DATA *ch, CHAR_DATA *victim )
 }
 
 
-int max_fight( CHAR_DATA *ch )
+int max_fight( const CHAR_DATA *ch )
 {
     return 8;
 }
@@ -1017,24 +1008,27 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
  * Calculate damage based on resistances, immunities and suceptibilities
  *					-Thoric
  */
-short ris_damage( CHAR_DATA *ch, short dam, int ris )
+short ris_damage( const CHAR_DATA *ch, short dam, int ris )
 {
-   short modifier;
+   short modifier = 10;
 
-   modifier = 10;
    if ( IS_SET(ch->immune, ris ) )
      modifier -= 10;
+
    if ( IS_SET(ch->resistant, ris ) )
      modifier -= 2;
+
    if ( IS_SET(ch->susceptible, ris ) )
      modifier += 2;
+
    if ( modifier <= 0 )
      return -1;
+
    if ( modifier == 10 )
      return dam;
+
    return (dam * modifier) / 10;
 }
-
 
 /*
  * Inflict damage from a hit.
@@ -1561,40 +1555,29 @@ ch_ret damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
     return rNONE;
 }
 
-bool is_safe( CHAR_DATA *ch, CHAR_DATA *victim )
+bool is_safe( CHAR_DATA *ch, const CHAR_DATA *victim )
 {
-    if ( !victim )
-        return FALSE;
+  if ( !victim )
+    return FALSE;
 
-    /* Thx Josh! */
-    if ( who_fighting( ch ) == ch )
-	return FALSE;
+  /* Thx Josh! */
+  if ( who_fighting( ch ) == ch )
+    return FALSE;
                  
-    if ( IS_SET( victim->in_room->room_flags, ROOM_SAFE ) )
+  if ( IS_SET( victim->in_room->room_flags, ROOM_SAFE ) )
     {
-	set_char_color( AT_MAGIC, ch );
-	send_to_char( "You'll have to do that elswhere.\r\n", ch );
-	return TRUE;
+      set_char_color( AT_MAGIC, ch );
+      send_to_char( "You'll have to do that elswhere.\r\n", ch );
+      return TRUE;
     }
 
-return FALSE;
-
+  return FALSE;
 }
-
-/* checks is_safe but without the output 
-   cuts out imms and safe rooms as well 
-   for info only */
-
-bool is_safe_nm( CHAR_DATA *ch, CHAR_DATA *victim )
-{
-    return FALSE;
-}
-
 
 /*
  * just verify that a corpse looting is legal
  */
-bool legal_loot( CHAR_DATA *ch, CHAR_DATA *victim )
+bool legal_loot( const CHAR_DATA *ch, const CHAR_DATA *victim )
 {
   /* pc's can now loot .. why not .. death is pretty final */
   if ( !IS_NPC(ch) )
@@ -1705,16 +1688,18 @@ void set_fighting( CHAR_DATA *ch, CHAR_DATA *victim )
 }
 
 
-CHAR_DATA *who_fighting( CHAR_DATA *ch )
+CHAR_DATA *who_fighting( const CHAR_DATA *ch )
 {
-    if ( !ch )
+  if ( !ch )
     {
-	bug( "who_fighting: null ch", 0 );
-	return NULL;
-    }
-    if ( !ch->fighting )
+      bug( "who_fighting: null ch", 0 );
       return NULL;
-    return ch->fighting->who;
+    }
+
+  if ( !ch->fighting )
+    return NULL;
+
+  return ch->fighting->who;
 }
 
 void free_fight( CHAR_DATA *ch )
@@ -1770,16 +1755,6 @@ void stop_fighting( CHAR_DATA *ch, bool fBoth )
     }
     return;
 }
-
-
-
-void death_cry( CHAR_DATA *ch )
-{
-
-    return;
-}
-
-
 
 void raw_kill( CHAR_DATA *ch, CHAR_DATA *victim )
 {
@@ -1853,7 +1828,7 @@ if ( !IS_NPC(victim) || !IS_SET( victim->act, ACT_NOKILL  ) )
       return;
 
 if ( !IS_NPC(victim) || ( !IS_SET( victim->act, ACT_NOKILL  ) && !IS_SET( victim->act, ACT_NOCORPSE ) ) )
-    make_corpse( victim, ch );
+    make_corpse( victim );
 else
 {
   character_extract_carried_objects( victim );
@@ -2244,12 +2219,6 @@ void do_murder( CHAR_DATA *ch, char *argument )
     multi_hit( ch, victim, TYPE_UNDEFINED );
     return;
 }
-
-bool in_arena( CHAR_DATA *ch )
-{
-  return FALSE;
-}
-
 
 void do_flee( CHAR_DATA *ch, char *argument )
 {

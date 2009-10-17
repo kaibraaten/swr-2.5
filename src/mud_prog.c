@@ -1879,8 +1879,6 @@ void mprog_death_trigger( CHAR_DATA *killer, CHAR_DATA *mob )
    {
      mprog_percent_check( mob, killer, NULL, NULL, DEATH_PROG );
    }
- death_cry( mob );
- return;
 }
 
 void mprog_entry_trigger( CHAR_DATA *mob )

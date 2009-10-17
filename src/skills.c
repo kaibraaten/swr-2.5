@@ -139,7 +139,7 @@ extern const char *target_name;	/* from magic.c */
  * Each different section of the skill table is sorted alphabetically
  * Only match skills player knows				-Thoric
  */
-bool check_skill( CHAR_DATA *ch, char *command, char *argument )
+bool check_skill( CHAR_DATA *ch, const char *command, char *argument )
 {
     int sn;
     int first = gsn_first_skill;

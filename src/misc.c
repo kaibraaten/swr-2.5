@@ -1127,7 +1127,7 @@ void do_empty( CHAR_DATA *ch, char *argument )
     }
 }
  
-void actiondesc( CHAR_DATA *ch, OBJ_DATA *obj, void *vo )
+void actiondesc( CHAR_DATA *ch, const OBJ_DATA *obj, void *vo )
 {
   char charbuf[MAX_STRING_LENGTH];
   char roombuf[MAX_STRING_LENGTH];
