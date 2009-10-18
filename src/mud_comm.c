@@ -200,11 +200,10 @@ void do_mpstat( CHAR_DATA *ch, char *argument )
 	victim->top_level,        victim->alignment,
 	GET_AC( victim ),    victim->gold);
 
-    for ( mprg = victim->pIndexData->mudprogs; mprg; mprg = mprg->next )
-	ch_printf( ch, ">%s %s\r\n%s\r\n",
-		mprog_type_to_name( mprg->type ),
-		mprg->arglist,
-		mprg->comlist );
+    for( mprg = victim->pIndexData->mudprogs; mprg; mprg = mprg->next )
+      ch_printf( ch, "%s>%s %s\n\r%s\n\r", ( mprg->fileprog ? "(FILEPROG) " : "" ),
+		 mprog_type_to_name( mprg->type ), mprg->arglist, mprg->comlist );
+
     return;
 }
 
