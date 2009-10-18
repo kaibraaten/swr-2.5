@@ -409,164 +409,255 @@ void show_visible_affects_to_char( CHAR_DATA *victim, CHAR_DATA *ch )
     }
 }
 
-void show_char_to_char_0( CHAR_DATA *victim, CHAR_DATA *ch )
+static void show_char_position_dead( char *buf )
 {
-    char buf[MAX_STRING_LENGTH];
-    char buf1[MAX_STRING_LENGTH];
-
-    buf[0] = '\0';
-
-    if ( IS_NPC(victim) )
-      strcat( buf, " "  );
-      
-    if ( !IS_NPC(victim) && !victim->desc )
-    {
-	if ( !victim->switched )		strcat( buf, "(Link Dead) "  );
-	else
-	if ( !IS_AFFECTED(victim->switched, AFF_POSSESS) )
-						strcat( buf, "(Switched) " );
-    }
-    if ( !IS_NPC(victim)
-    && IS_SET(victim->act, PLR_AFK) )		strcat( buf, "[AFK] ");        
-
-    if ( (!IS_NPC(victim) && IS_SET(victim->act, PLR_WIZINVIS))
-      || (IS_NPC(victim) && IS_SET(victim->act, ACT_MOBINVIS)) ) 
-    {
-        if (!IS_NPC(victim))
-	sprintf( buf1,"(Invis %d) ", victim->pcdata->wizinvis );
-        else sprintf( buf1,"(Mobinvis %d) ", victim->mobinvis);
-	strcat( buf, buf1 );
-    }
-    if ( IS_AFFECTED(victim, AFF_INVISIBLE)   ) strcat( buf, "(Invis) "      );
-    if ( IS_AFFECTED(victim, AFF_HIDE)        ) strcat( buf, "(Hide) "       );
-    if ( IS_AFFECTED(victim, AFF_PASS_DOOR)   ) strcat( buf, "(Translucent) ");
-    if ( IS_AFFECTED(victim, AFF_FAERIE_FIRE) ) strcat( buf, "&P(Pink Aura)&w "  );
-    if ( IS_EVIL(victim)
-    &&   IS_AFFECTED(ch, AFF_DETECT_EVIL)     ) strcat( buf, "&R(Red Aura)&w "   );
-    if ( !IS_NPC(victim) && IS_SET(victim->act, PLR_LITTERBUG  ) )
-						strcat( buf, "(LITTERBUG) "  );
-    if ( IS_NPC(victim) && IS_IMMORTAL(ch)
-	 && IS_SET(victim->act, ACT_PROTOTYPE) ) strcat( buf, "(PROTO) " );
-    if ( victim->desc && victim->desc->connected == CON_EDITING )
-						strcat( buf, "(Writing) " );
-
-    set_char_color( AT_PERSON, ch );
-    if ( victim->position == victim->defposition && victim->long_descr[0] != '\0' )
-    {
-	strcat( buf, victim->long_descr );
-	send_to_char( buf, ch );
-	show_visible_affects_to_char( victim, ch );
-	return;
-    }
-
-   /*   strcat( buf, PERS( victim, ch ) );       old system of titles
-    *    removed to prevent prepending of name to title     -Kuran  
-    *
-    *    But added back bellow so that you can see mobs too :P   -Durga 
-    */
-    
-    if ( !IS_NPC(victim) && !IS_SET(ch->act, PLR_BRIEF) )
-	strcat( buf, victim->pcdata->title );
-    else
-        strcat( buf, PERS( victim, ch ) );  
-    
-    switch ( victim->position )
-    {
-    case POS_DEAD:     strcat( buf, " is DEAD!!" );			break;
-    case POS_MORTAL:   strcat( buf, " is mortally wounded." );		break;
-    case POS_INCAP:    strcat( buf, " is incapacitated." );		break;
-    case POS_STUNNED:  strcat( buf, " is lying here stunned." );	break;
-    case POS_SLEEPING:
-        if (ch->position == POS_SITTING
-        ||  ch->position == POS_RESTING )
-            strcat( buf, " is sleeping nearby." );
-	else
-            strcat( buf, " is deep in slumber here." );
-        break;
-    case POS_RESTING:
-        if (ch->position == POS_RESTING)
-            strcat ( buf, " is sprawled out alongside you." );
-        else
-	if (ch->position == POS_MOUNTED)
-	    strcat ( buf, " is sprawled out at the foot of your mount." );
-	else
-            strcat (buf, " is sprawled out here." );
-        break;
-    case POS_SITTING:
-        if (ch->position == POS_SITTING)
-            strcat( buf, " sits here with you." );
-        else
-        if (ch->position == POS_RESTING)
-            strcat( buf, " sits nearby as you lie around." );
-        else
-            strcat( buf, " sits upright here." );
-        break;
-    case POS_STANDING:
-	if ( IS_IMMORTAL(victim) )
-            strcat( buf, " is here before you." );
-	else
-        if ( ( victim->in_room->sector_type == SECT_UNDERWATER )
-        && !IS_AFFECTED(victim, AFF_AQUA_BREATH) && !IS_NPC(victim) )
-            strcat( buf, " is drowning here." );
-	else
-	if ( victim->in_room->sector_type == SECT_UNDERWATER )
-            strcat( buf, " is here in the water." );
-	else
-	if ( ( victim->in_room->sector_type == SECT_OCEANFLOOR )
-	&& !IS_AFFECTED(victim, AFF_AQUA_BREATH) && !IS_NPC(victim) )
-	    strcat( buf, " is drowning here." );
-	else
-	if ( victim->in_room->sector_type == SECT_OCEANFLOOR )
-	    strcat( buf, " is standing here in the water." );
-	else
-	if ( IS_AFFECTED(victim, AFF_FLOATING)
-        || IS_AFFECTED(victim, AFF_FLYING) )
-          strcat( buf, " is hovering here." );
-        else
-          strcat( buf, " is standing here." );
-        break;
-    case POS_SHOVE:    strcat( buf, " is being shoved around." );	break;
-    case POS_DRAG:     strcat( buf, " is being dragged around." );	break;
-    case POS_MOUNTED:
-	strcat( buf, " is here, upon " );
-	if ( !victim->mount )
-	    strcat( buf, "thin air???" );
-	else
-	if ( victim->mount == ch )
-	    strcat( buf, "your back." );
-	else
-	if ( victim->in_room == victim->mount->in_room )
-	{
-	    strcat( buf, PERS( victim->mount, ch ) );
-	    strcat( buf, "." );
-	}
-	else
-	    strcat( buf, "someone who left??" );
-	break;
-    case POS_FIGHTING:
-	strcat( buf, " is here, fighting " );
-	if ( !victim->fighting )
-	    strcat( buf, "thin air???" );
-	else if ( who_fighting( victim ) == ch )
-	    strcat( buf, "YOU!" );
-	else if ( victim->in_room == victim->fighting->who->in_room )
-	{
-	    strcat( buf, PERS( victim->fighting->who, ch ) );
-	    strcat( buf, "." );
-	}
-	else
-	    strcat( buf, "someone who left??" );
-	break;
-    }
-
-    strcat( buf, "\r\n" );
-    buf[0] = UPPER(buf[0]);
-    send_to_char( buf, ch );
-    show_visible_affects_to_char( victim, ch );
-    return;
+  strcat( buf, " is DEAD!!" );
 }
 
+static void show_char_position_mortal( char *buf )
+{
+  strcat( buf, " is mortally wounded." );
+}
 
+static void show_char_position_incap( char *buf )
+{
+  strcat( buf, " is incapacitated." );
+}
+
+static void show_char_position_stunned( char *buf )
+{
+  strcat( buf, " is lying here stunned." );
+}
+
+static void show_char_position_sleeping( char *buf, const CHAR_DATA *ch )
+{
+  if (ch->position == POS_SITTING
+      ||  ch->position == POS_RESTING )
+    strcat( buf, " is sleeping nearby." );
+  else
+    strcat( buf, " is deep in slumber here." );
+}
+
+static void show_char_position_resting( char *buf, const CHAR_DATA *ch )
+{
+  if (ch->position == POS_RESTING)
+    strcat ( buf, " is sprawled out alongside you." );
+  else if (ch->position == POS_MOUNTED)
+    strcat ( buf, " is sprawled out at the foot of your mount." );
+  else
+    strcat (buf, " is sprawled out here." );
+}
+
+static void show_char_position_sitting( char *buf, const CHAR_DATA *ch )
+{
+  if (ch->position == POS_SITTING)
+    strcat( buf, " sits here with you." );
+  else if (ch->position == POS_RESTING)
+    strcat( buf, " sits nearby as you lie around." );
+  else
+    strcat( buf, " sits upright here." );
+}
+
+static void show_char_position_standing( char *buf, const CHAR_DATA *ch,
+					 const CHAR_DATA *victim )
+{
+  if ( IS_IMMORTAL(victim) )
+    strcat( buf, " is here before you." );
+  else if ( ( victim->in_room->sector_type == SECT_UNDERWATER )
+	    && !IS_AFFECTED(victim, AFF_AQUA_BREATH) && !IS_NPC(victim) )
+    strcat( buf, " is drowning here." );
+  else if ( victim->in_room->sector_type == SECT_UNDERWATER )
+    strcat( buf, " is here in the water." );
+  else if ( ( victim->in_room->sector_type == SECT_OCEANFLOOR )
+	    && !IS_AFFECTED(victim, AFF_AQUA_BREATH) && !IS_NPC(victim) )
+    strcat( buf, " is drowning here." );
+  else if ( victim->in_room->sector_type == SECT_OCEANFLOOR )
+    strcat( buf, " is standing here in the water." );
+  else if ( IS_AFFECTED(victim, AFF_FLOATING)
+	    || IS_AFFECTED(victim, AFF_FLYING) )
+    strcat( buf, " is hovering here." );
+  else
+    strcat( buf, " is standing here." );
+}
+
+static void show_char_position_shove( char *buf )
+{
+  strcat( buf, " is being shoved around." );
+}
+
+static void show_char_position_drag( char *buf )
+{
+  strcat( buf, " is being dragged around." );
+}
+
+static void show_char_position_mounted( char *buf, const CHAR_DATA *ch,
+					const CHAR_DATA *victim )
+{
+  strcat( buf, " is here, upon " );
+
+  if ( !victim->mount )
+    strcat( buf, "thin air???" );
+  else if ( victim->mount == ch )
+    strcat( buf, "your back." );
+  else if ( victim->in_room == victim->mount->in_room )
+    {
+      strcat( buf, PERS( victim->mount, ch ) );
+      strcat( buf, "." );
+    }
+  else
+    strcat( buf, "someone who left??" );
+}
+
+static void show_char_position_fighting( char *buf, const CHAR_DATA *ch,
+					 const CHAR_DATA *victim )
+{
+  strcat( buf, " is here, fighting " );
+  if ( !victim->fighting )
+    strcat( buf, "thin air???" );
+  else if ( who_fighting( victim ) == ch )
+    strcat( buf, "YOU!" );
+  else if ( victim->in_room == victim->fighting->who->in_room )
+    {
+      strcat( buf, PERS( victim->fighting->who, ch ) );
+      strcat( buf, "." );
+    }
+  else
+    strcat( buf, "someone who left??" );
+}
+
+void show_char_to_char_0( CHAR_DATA *victim, CHAR_DATA *ch )
+{
+  char buf[MAX_STRING_LENGTH];
+  char buf1[MAX_STRING_LENGTH];
+
+  buf[0] = '\0';
+
+  if ( IS_NPC(victim) )
+    strcat( buf, " "  );
+      
+  if ( !IS_NPC(victim) && !victim->desc )
+    {
+      if ( !victim->switched )		strcat( buf, "(Link Dead) "  );
+      else if ( !IS_AFFECTED(victim->switched, AFF_POSSESS) )
+	strcat( buf, "(Switched) " );
+    }
+
+  if ( !IS_NPC(victim) && IS_SET(victim->act, PLR_AFK) )
+    strcat( buf, "[AFK] ");        
+
+  if ( (!IS_NPC(victim) && IS_SET(victim->act, PLR_WIZINVIS))
+       || (IS_NPC(victim) && IS_SET(victim->act, ACT_MOBINVIS)) ) 
+    {
+      if (!IS_NPC(victim))
+	sprintf( buf1,"(Invis %d) ", victim->pcdata->wizinvis );
+      else sprintf( buf1,"(Mobinvis %d) ", victim->mobinvis);
+      strcat( buf, buf1 );
+    }
+
+  if ( IS_AFFECTED(victim, AFF_INVISIBLE)   )
+    strcat( buf, "(Invis) "      );
+
+  if ( IS_AFFECTED(victim, AFF_HIDE)        )
+    strcat( buf, "(Hide) "       );
+
+  if ( IS_AFFECTED(victim, AFF_PASS_DOOR)   )
+    strcat( buf, "(Translucent) ");
+
+  if ( IS_AFFECTED(victim, AFF_FAERIE_FIRE) )
+    strcat( buf, "&P(Pink Aura)&w "  );
+
+  if ( IS_EVIL(victim)
+       &&   IS_AFFECTED(ch, AFF_DETECT_EVIL)     )
+    strcat( buf, "&R(Red Aura)&w "   );
+
+  if ( !IS_NPC(victim) && IS_SET(victim->act, PLR_LITTERBUG  ) )
+    strcat( buf, "(LITTERBUG) "  );
+
+  if ( IS_NPC(victim) && IS_IMMORTAL(ch)
+       && IS_SET(victim->act, ACT_PROTOTYPE) )
+    strcat( buf, "(PROTO) " );
+
+  if ( victim->desc && victim->desc->connected == CON_EDITING )
+    strcat( buf, "(Writing) " );
+
+  set_char_color( AT_PERSON, ch );
+
+  if ( victim->position == victim->defposition
+       && victim->long_descr[0] != '\0' )
+    {
+      strcat( buf, victim->long_descr );
+      send_to_char( buf, ch );
+      show_visible_affects_to_char( victim, ch );
+      return;
+    }
+
+  /*   strcat( buf, PERS( victim, ch ) );       old system of titles
+   *    removed to prevent prepending of name to title     -Kuran  
+   *
+   *    But added back bellow so that you can see mobs too :P   -Durga 
+   */
+    
+  if ( !IS_NPC(victim) && !IS_SET(ch->act, PLR_BRIEF) )
+    strcat( buf, victim->pcdata->title );
+  else
+    strcat( buf, PERS( victim, ch ) );  
+    
+  switch ( victim->position )
+    {
+    case POS_DEAD:
+      show_char_position_dead( buf );
+      break;
+
+    case POS_MORTAL:
+      show_char_position_mortal( buf );
+      break;
+
+    case POS_INCAP:
+      show_char_position_incap( buf );
+      break;
+
+    case POS_STUNNED:
+      show_char_position_stunned( buf );
+      break;
+
+    case POS_SLEEPING:
+      show_char_position_sleeping( buf, ch );
+      break;
+
+    case POS_RESTING:
+      show_char_position_resting( buf, ch );
+      break;
+
+    case POS_SITTING:
+      show_char_position_sitting( buf, ch );
+      break;
+
+    case POS_STANDING:
+      show_char_position_standing( buf, ch, victim );
+      break;
+
+    case POS_SHOVE:
+      show_char_position_shove( buf );
+      break;
+
+    case POS_DRAG:
+      show_char_position_drag( buf );
+      break;
+
+    case POS_MOUNTED:
+      show_char_position_mounted( buf, ch, victim );
+      break;
+
+    case POS_FIGHTING:
+      show_char_position_fighting( buf, ch, victim );
+      break;
+    }
+
+  strcat( buf, "\r\n" );
+  buf[0] = UPPER(buf[0]);
+  send_to_char( buf, ch );
+  show_visible_affects_to_char( victim, ch );
+}
 
 void show_char_to_char_1( CHAR_DATA *victim, CHAR_DATA *ch )
 {
