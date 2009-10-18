@@ -2137,6 +2137,93 @@ char fread_letter( FILE *fp )
   return c;
 }
 
+/*
+ * Read a float number from a file. Turn the result into a float value.
+ */
+float fread_float( FILE *fp )
+{
+  float number;
+  bool sign, decimal;
+  char c;
+  double place = 0;
+
+   do
+     {
+       if( feof( fp ) )
+	 {
+	   bug( "%s: EOF encountered on read.", __FUNCTION__ );
+	   if( fBootDb )
+	     {
+	       shutdown_mud( "Corrupt file somewhere." );
+	       exit( 1 );
+	     }
+	   return 0;
+	 }
+       c = getc( fp );
+     }
+   while( isspace( c ) );
+
+   number = 0;
+
+   sign = FALSE;
+   decimal = FALSE;
+
+   if( c == '+' )
+     c = getc( fp );
+   else if( c == '-' )
+     {
+       sign = TRUE;
+       c = getc( fp );
+     }
+
+   if( !isdigit( c ) )
+     {
+       bug( "%s: bad format. (%c)", __FUNCTION__, c );
+       if( fBootDb )
+         exit( 1 );
+       return 0;
+     }
+
+   while( 1 )
+     {
+       if( c == '.' || isdigit( c ) )
+	 {
+	   if( c == '.' )
+	     {
+	       decimal = TRUE;
+	       c = getc( fp );
+	     }
+
+	   if( feof( fp ) )
+	     {
+	       bug( "%s: EOF encountered on read.", __FUNCTION__ );
+	       if( fBootDb )
+		 exit( 1 );
+	       return number;
+	     }
+	   if( !decimal )
+	     number = number * 10 + c - '0';
+	   else
+	     {
+	       place++;
+	       number += pow( 10, ( -1 * place ) ) * ( c - '0' );
+	     }
+	   c = getc( fp );
+	 }
+       else
+         break;
+     }
+
+   if( sign )
+     number = 0 - number;
+
+   if( c == '|' )
+     number += fread_float( fp );
+   else if( c != ' ' )
+     ungetc( c, fp );
+
+   return number;
+}
 
 
 /*
@@ -3104,12 +3191,12 @@ void boot_log( const char *str, ... )
  */
 void show_file( const CHAR_DATA *ch, const char *filename )
 {
-  FILE *fp;
+  FILE *fp = NULL;
 #ifdef AMIGA
   signed
 #endif
   char buf[MAX_STRING_LENGTH];
-  int c;
+  int c = 0;
   int num = 0;
 
   if ( (fp = fopen( filename, "r" )) != NULL )
@@ -3130,6 +3217,8 @@ void show_file( const CHAR_DATA *ch, const char *filename )
 	  send_to_pager( buf, ch );
 	  num = 0;
 	}
+
+      fclose( fp );
     }
 }
 

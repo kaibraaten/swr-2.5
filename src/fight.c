@@ -1452,7 +1452,8 @@ ch_ret damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
      */
     if ( victim->position == POS_DEAD )
     {
-        
+      CHAR_DATA *gch = NULL;
+
 	if ( !npcvict )
 	{
 	    sprintf( log_buf, "%s killed by %s at %ld",
@@ -1464,8 +1465,17 @@ ch_ret damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
 
 	}
 	else
-	if ( !IS_NPC(ch) )		/* keep track of mob vnum killed */
+	  if ( !IS_NPC(ch) && IS_NPC( victim ) )
+	  {
 	    add_kill( ch, victim );
+
+	    /*
+	     * Add to kill tracker for grouped chars, as well. -Halcyon
+	     */
+	    for( gch = ch->in_room->first_person; gch; gch = gch->next_in_room )
+	      if( is_same_group( gch, ch ) && !IS_NPC(gch) && gch != ch )
+		add_kill( gch, victim );
+	  }
 
 	if ( !IS_NPC(victim) || !IS_SET( victim->act, ACT_NOKILL )  )
 	   loot = legal_loot( ch, victim );
