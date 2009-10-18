@@ -147,7 +147,7 @@ void copyover_recover( void )
         /* Write something, and check if it goes error-free */
      if (!write_to_descriptor (desc, "\r\nThe surge of Light passes leaving you unscathed and your world reshaped anew\r\n", 0))
        {
-         close (desc); /* nope */
+         closesocket(desc); /* nope */
          continue;
         }
 

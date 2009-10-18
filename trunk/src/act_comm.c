@@ -1165,7 +1165,7 @@ static void send_title( CHAR_DATA *ch, const char *filename )
 
       fclose( rpfile );
       buf[num] = 0;
-      write_to_buffer( ch->desc, buf, num );
+      write_to_buffer( ch->desc, (const char*) buf, num );
     }
 }
 

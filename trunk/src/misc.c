@@ -10,7 +10,8 @@ void do_buyhome( CHAR_DATA *ch, char *argument )
 {
      ROOM_INDEX_DATA *room;
      AREA_DATA *pArea;
-     
+     char filename[256];
+
      if ( !ch->in_room )
          return;
 
@@ -68,8 +69,8 @@ void do_buyhome( CHAR_DATA *ch, char *argument )
      REMOVE_BIT( room->room_flags , ROOM_EMPTY_HOME );
      SET_BIT( room->room_flags , ROOM_PLR_HOME );
      SET_BIT( room->room_flags , ROOM_HOTEL );
-     
-     fold_area( room->area, room->area->filename, FALSE );
+     sprintf( filename, "%s%s", AREA_DIR, room->area->filename );
+     fold_area( room->area, filename, FALSE );
 
      ch->plr_home = room;
      do_save( ch , const_char_to_nonconst( "" ) );

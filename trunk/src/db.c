@@ -10,6 +10,7 @@
 #endif
 #include <dirent.h>
 #include "mud.h"
+#include "os.h"
 
 extern	int	_filbuf		args( (FILE *) );
 
@@ -3214,7 +3215,7 @@ void show_file( const CHAR_DATA *ch, const char *filename )
 	  buf[num++] = '\n';
 	  buf[num++] = '\r';
 	  buf[num  ] = '\0';
-	  send_to_pager( buf, ch );
+	  send_to_pager( (const char*) buf, ch );
 	  num = 0;
 	}
 

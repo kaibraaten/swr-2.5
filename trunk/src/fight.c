@@ -1799,7 +1799,7 @@ void raw_kill( CHAR_DATA *ch, CHAR_DATA *victim )
 {
     
     CHAR_DATA *victmp;
-    
+    char filename[256];
     char buf[MAX_STRING_LENGTH];
     char buf2[MAX_STRING_LENGTH];
     char arg[MAX_STRING_LENGTH];    
@@ -1917,7 +1917,10 @@ else
       SET_BIT( room->room_flags , ROOM_EMPTY_HOME );
      
       if ( room->area )
-          fold_area( room->area, room->area->filename, FALSE );      
+	{
+	  sprintf( filename, "%s%s", AREA_DIR, room->area->filename );
+          fold_area( room->area, filename, FALSE );      
+	}
     }
 
     if ( victim->pcdata && victim->pcdata->clan )

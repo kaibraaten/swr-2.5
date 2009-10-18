@@ -711,7 +711,8 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
 	}   
                   
       save_planet( planet );
-      fold_area( pArea , pArea->filename , FALSE );
+      sprintf( filename, "%s%s", AREA_DIR, pArea->filename );
+      fold_area( pArea , filename , FALSE );
       write_area_list();
       write_planet_list();
       sprintf( buf , "%d" , top_r_vnum - 17 );
@@ -882,7 +883,8 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
   /* save them now just in case... */
 
   save_planet( planet );
-  fold_area( pArea , pArea->filename , FALSE );
+  sprintf( filename, "%s%s", AREA_DIR, pArea->filename );
+  fold_area( pArea , filename , FALSE );
   write_area_list();
   write_planet_list();
 

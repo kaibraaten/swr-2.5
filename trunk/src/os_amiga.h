@@ -28,6 +28,7 @@
 #include <utility/tagitem.h>
 #include <exec/exec.h>
 #include <proto/exec.h>
+#include <proto/dos.h>
 #include <lineread.h>
 #include <unistd.h>
 #include <sys/types.h>
@@ -37,6 +38,10 @@
 #include <sys/ioctl.h>
 #include <netdb.h>
 #include <sys/time.h>
+
+#if defined( __STORMGCC__ ) && defined( __cplusplus )
+#define unlink(name) !DeleteFile((STRPTR)(name))
+#endif
 
 typedef int ssize_t;
 typedef LONG socklen_t;

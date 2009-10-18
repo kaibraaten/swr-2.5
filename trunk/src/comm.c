@@ -915,8 +915,13 @@ bool read_from_descriptor( DESCRIPTOR_DATA *d )
 
   for ( ; ; )
     {
+#ifdef AMIGA
+      ssize_t nRead = recv( d->descriptor, (UBYTE*)( d->inbuf + iStart ),
+			    sizeof( d->inbuf ) - 10 - iStart, 0 );
+#else
       ssize_t nRead = recv( d->descriptor, d->inbuf + iStart,
 			    sizeof(d->inbuf) - 10 - iStart, 0 );
+#endif
 
       if( nRead == 0 )
 	{

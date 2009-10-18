@@ -6115,13 +6115,15 @@ void save_objects()
 void save_some_areas( )
 {
   AREA_DATA * area;
-     
+  char filename[256];
+
   for ( area = first_area ; area ; area = area->next )
     {
       if ( IS_SET( area->flags , AFLAG_MODIFIED ) )
 	{
 	  REMOVE_BIT( area->flags , AFLAG_MODIFIED );
-	  fold_area( area , area->filename, FALSE );
+	  sprintf( filename, "%s%s", AREA_DIR, area->filename );
+	  fold_area( area , filename, FALSE );
 	}
     }
 }
