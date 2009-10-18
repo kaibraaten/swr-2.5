@@ -1958,7 +1958,7 @@ char *default_prompt( CHAR_DATA *ch )
 int getcolor(char clr)
 {
   static const char *colors = "xrgObpcwzRGYBPCW";
-  int r = 0;
+  size_t r = 0;
   
   for ( r = 0; r < strlen( colors ); r++ )
     if ( clr == colors[r] )
@@ -2130,8 +2130,8 @@ int make_color_sequence(const char *col, char *buf, DESCRIPTOR_DATA *d)
   int ln = 0;
   const char *ctype = col;
   unsigned char cl = 0;
-  CHAR_DATA *och = och = (d->original ? d->original : d->character);
-  bool ansi = ansi = (!IS_NPC(och) && IS_SET(och->act, PLR_ANSI));
+  CHAR_DATA *och = (d->original ? d->original : d->character);
+  bool ansi = (!IS_NPC(och) && IS_SET(och->act, PLR_ANSI));
 
   col++;
   if ( !*col )

@@ -460,7 +460,7 @@ static void boot_read_area_files( void )
  */
 void boot_db( bool fCopyOver )
 {
-  size_t x = 0;
+  int x = 0;
   show_hash( 32 );
   unlink( BOOTLOG_FILE );
   boot_log( "---------------------[ Boot Log ]--------------------" );

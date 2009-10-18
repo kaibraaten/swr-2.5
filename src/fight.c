@@ -444,7 +444,7 @@ ch_ret multi_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
       return retcode;
     }
 
-    chance = IS_NPC(ch) ? 0 : ( character_skill_level( ch, gsn_second_attack ) + dual_bonus / 1.5);
+    chance = IS_NPC(ch) ? 0 : ( character_skill_level( ch, gsn_second_attack ) + (int)(dual_bonus / 1.5));
 
     if ( number_percent( ) < chance )
     {
@@ -456,7 +456,7 @@ ch_ret multi_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
     else
 	learn_from_failure( ch, gsn_second_attack );
 
-    chance = IS_NPC(ch) ? 0 : ( character_skill_level( ch, gsn_third_attack )+(dual_bonus*1.5))/2;
+    chance = IS_NPC(ch) ? 0 : ( character_skill_level( ch, gsn_third_attack )+(int)(dual_bonus*1.5))/2;
     if ( number_percent( ) < chance )
     {
 	learn_from_success( ch, gsn_third_attack );
