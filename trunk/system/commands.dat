@@ -2855,6 +2855,14 @@ Log         0
 End
 
 #COMMAND
+Name        vnums~
+Code        do_vnums
+Position    0
+Level       200
+Log         0
+End
+
+#COMMAND
 Name        west~
 Code        do_west
 Position    8
