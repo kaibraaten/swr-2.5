@@ -2663,7 +2663,8 @@ void do_landscape ( CHAR_DATA *ch , char *argument )
   ROOM_INDEX_DATA * location;
   int chance;
   char arg[MAX_INPUT_LENGTH];
-    
+  char filename[256];
+
   if ( IS_NPC(ch) || !ch->pcdata )
     return;
 
@@ -2702,7 +2703,8 @@ void do_landscape ( CHAR_DATA *ch , char *argument )
       SET_BIT( location->area->flags , AFLAG_MODIFIED );
       room_extract_contents( ch->in_room );
       echo_to_room( AT_WHITE, location , "The construction crew finishes its work." );
-      fold_area( location->area, location->area->filename, TRUE );
+      sprintf( filename, "%s%s", AREA_DIR, location->area->filename );
+      fold_area( location->area, filename, TRUE );
       return;
     }
      

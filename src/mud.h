@@ -7,7 +7,7 @@
 #include <sys/time.h>
 #include <math.h>
 
-#ifdef AMIGA
+#ifdef __STORMGCC__
 typedef long clock_t;
 #endif
 
@@ -58,8 +58,10 @@ typedef int				bool;
 typedef unsigned char			bool;
 #endif
 #else
+#ifndef __STORMGCC__
 #define TRUE true
 #define FALSE false
+#endif /* StormC4 */
 #endif /* __cplusplus */
 
 #if     !defined(BERR)
