@@ -1446,6 +1446,18 @@ typedef enum
 #define ROOM_AUCTION            BV31
 
 /*
+ * Colony room types
+ */
+#define COLONY_ROOM_FIRST                  1
+#define COLONY_ROOM_SUPPLY_SHOP           12
+#define COLONY_ROOM_COLONIZATION_CENTER   13
+#define COLONY_ROOM_SHUTTLE_PLATFORM      14
+#define COLONY_ROOM_HOTEL                 18
+#define COLONY_ROOM_LAST                  25
+
+static const int COLONY_COST = 100000;
+
+/*
  * Directions.
  * Used in #ROOMS.
  */
