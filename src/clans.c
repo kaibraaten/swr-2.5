@@ -571,8 +571,7 @@ void do_setclan( CHAR_DATA *ch, char *argument )
       if( !is_valid_filename( ch, CLAN_DIR, argument ) )
 	return;
 
-      snprintf( filename, sizeof( filename ), "%s%s", CLAN_DIR,
-		clan->filename );
+      sprintf( filename, "%s%s", CLAN_DIR, clan->filename );
 
       if( remove( filename ) )
 	send_to_char( "Old clan file deleted.\r\n", ch );

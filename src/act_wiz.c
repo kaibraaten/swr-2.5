@@ -617,7 +617,7 @@ void transfer_char( CHAR_DATA *ch, CHAR_DATA *victim, ROOM_INDEX_DATA *location 
     {
       char buf[MAX_STRING_LENGTH];
 
-      snprintf( buf, MAX_STRING_LENGTH, "Mptransfer - unauthed char (%s)", victim->name );
+      sprintf( buf, "Mptransfer - unauthed char (%s)", victim->name );
       progbug( buf, ch );
       return;
     }

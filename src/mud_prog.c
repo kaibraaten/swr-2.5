@@ -128,7 +128,7 @@ void uphold_supermob( int *curr_serial, int serial, ROOM_INDEX_DATA **supermob_r
           STRFREE( supermob->short_descr );
           STRFREE( supermob->description );
           supermob->short_descr = QUICKLINK( supermob_obj->short_descr );
-          snprintf( buf, 128, "Object #%ld", supermob_obj->pIndexData->vnum );
+          sprintf( buf, "Object #%ld", supermob_obj->pIndexData->vnum );
           supermob->description = STRALLOC( buf );
 	}
       else
@@ -140,7 +140,7 @@ void uphold_supermob( int *curr_serial, int serial, ROOM_INDEX_DATA **supermob_r
 	  if( supermob->description )
             STRFREE( supermob->description );
 	  supermob->short_descr = QUICKLINK( (*supermob_room)->name );
-	  snprintf( buf, 128, "Room #%ld", (*supermob_room)->vnum );
+	  sprintf( buf, "Room #%ld", (*supermob_room)->vnum );
 	  supermob->description = STRALLOC( buf );
 	}
       *curr_serial = serial;

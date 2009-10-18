@@ -1419,8 +1419,7 @@ void do_bset( CHAR_DATA *ch, char *argument )
       if( !is_valid_filename( ch, BOARD_DIR, argument ) )
 	return;
 
-      snprintf( filename, sizeof( filename ), "%s%s",
-		BOARD_DIR, board->note_file );
+      sprintf( filename, "%s%s", BOARD_DIR, board->note_file );
       if( !remove( filename ) )
 	send_to_char( "Old board file deleted.\r\n", ch );
 

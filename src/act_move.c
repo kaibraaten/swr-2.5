@@ -1512,7 +1512,7 @@ void do_bashdoor( CHAR_DATA *ch, char *argument )
   if ( ( pexit = find_door( ch, arg, FALSE ) ) != NULL )
     {
       ROOM_INDEX_DATA *to_room = NULL;
-      EXIT_DATA       *pexit_rev = NULL;;
+      EXIT_DATA       *pexit_rev = NULL;
       int              chance = 0;
       const char	    *keyword = NULL;
 
