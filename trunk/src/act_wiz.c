@@ -4156,28 +4156,38 @@ void do_sedit( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg2, "name" ) )
     {
-	bool relocate;
+      bool relocate = FALSE;
 
-	one_argument( argument, arg1 );
-	if ( arg1[0] == '\0' )
+      one_argument( argument, arg1 );
+
+      if ( arg1[0] == '\0' )
 	{
-	    send_to_char( "Cannot clear name field!\r\n", ch );
-	    return;
+	  send_to_char( "Cannot clear name field!\r\n", ch );
+	  return;
 	}
-	if ( arg1[0] != social->name[0] )
+
+      if( find_social( arg1 ) )
 	{
-	    unlink_social( social );
-	    relocate = TRUE;
+	  ch_printf( ch, "That name is already in use.\r\n" );
+	  return;
 	}
-	else
-	    relocate = FALSE;
-	if ( social->name )
-	    DISPOSE( social->name );
-	social->name = str_dup( arg1 );
-	if ( relocate )
-	    add_social( social );
-	send_to_char( "Done.\r\n", ch );
-	return;
+
+      if ( arg1[0] != social->name[0] )
+	{
+	  unlink_social( social );
+	  relocate = TRUE;
+	}
+
+      if ( social->name )
+	DISPOSE( social->name );
+
+      social->name = str_dup( arg1 );
+
+      if ( relocate )
+	add_social( social );
+
+      send_to_char( "Done.\r\n", ch );
+      return;
     }
 
     /* display usage message */
@@ -4422,28 +4432,38 @@ void do_cedit( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg2, "name" ) )
     {
-	bool relocate;
+      bool relocate = FALSE;
 
-	one_argument( argument, arg1 );
-	if ( arg1[0] == '\0' )
+      one_argument( argument, arg1 );
+
+      if ( arg1[0] == '\0' )
 	{
-	    send_to_char( "Cannot clear name field!\r\n", ch );
-	    return;
+	  send_to_char( "Cannot clear name field!\r\n", ch );
+	  return;
 	}
-	if ( arg1[0] != command->name[0] )
+
+      if( find_command( arg1 ) )
 	{
-	    unlink_command( command );
-	    relocate = TRUE;
+	  ch_printf( ch, "A command with that name already exists.\r\n" );
+	  return;
 	}
-	else
-	    relocate = FALSE;
-	if ( command->name )
-	    DISPOSE( command->name );
-	command->name = str_dup( arg1 );
-	if ( relocate )
-	    add_command( command );
-	send_to_char( "Done.\r\n", ch );
-	return;
+
+      if ( arg1[0] != command->name[0] )
+	{
+	  unlink_command( command );
+	  relocate = TRUE;
+	}
+
+      if ( command->name )
+	DISPOSE( command->name );
+
+      command->name = str_dup( arg1 );
+
+      if ( relocate )
+	add_command( command );
+
+      send_to_char( "Done.\r\n", ch );
+      return;
     }
 
     /* display usage message */

@@ -574,6 +574,18 @@ void do_setprototype( CHAR_DATA *ch, char *argument )
 
   if ( !str_cmp( arg2, "name" ) )
     {
+      if( *argument == '\0' )
+	{
+	  ch_printf( ch, "Blank name not permitted.\r\n" );
+	  return;
+	}
+
+      if( get_ship_prototype( argument ) )
+	{
+	  ch_printf( ch, "A prototype with that name already exists.\r\n" );
+	  return;
+	}
+
       STRFREE( prototype->name );
       prototype->name = STRALLOC( argument );
       send_to_char( "Done.\r\n", ch );

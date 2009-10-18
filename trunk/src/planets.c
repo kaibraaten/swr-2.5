@@ -370,13 +370,13 @@ void do_setplanet( CHAR_DATA *ch, char *argument )
 
     if ( !strcmp( arg2, "name" ) )
     {
-      PLANET_DATA *tplanet;
       if( !argument || argument[0] == '\0' )
 	{
 	  send_to_char( "You must choose a name.\r\n", ch );
 	  return;
 	}
-      if( ( tplanet = get_planet( argument ) ) != NULL )
+
+      if( get_planet( argument ) )
 	{
 	  send_to_char( "A planet with that name already Exists!\r\n", ch );
 	  return;

@@ -1347,6 +1347,12 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	if ( !can_mmodify( ch, victim ) )
 	  return;
 
+	if( *arg3 == '\0' )
+	  {
+	    ch_printf( ch, "Blank name not accepted.\r\n" );
+	    return;
+	  }
+
 	STRFREE( victim->name );
 	victim->name = STRALLOC( arg3 );
 	if ( IS_NPC(victim) && IS_SET( victim->act, ACT_PROTOTYPE ) )
@@ -2380,6 +2386,13 @@ void do_oset( CHAR_DATA *ch, char *argument )
     {
 	if ( !can_omodify( ch, obj ) )
 	  return;
+
+	if( *arg3 == '\0' )
+	  {
+	    ch_printf( ch, "Blank name not accepted.\r\n" );
+	    return;
+	  }
+
 	STRFREE( obj->name );
 	obj->name = STRALLOC( arg3 );
 	if ( IS_OBJ_STAT( obj, ITEM_PROTOTYPE ) )

@@ -861,10 +861,22 @@ void do_sset( CHAR_DATA *ch, char *argument )
 	}
 	if ( !str_cmp( arg2, "name" ) )
 	{
-	    DISPOSE(skill->name);
-	    skill->name = str_dup( argument );
-	    send_to_char( "Ok.\r\n", ch );
-	    return;
+	  if( *argument == '\0' )
+	    {
+	      ch_printf( ch, "Blank name not accepted.\r\n" );
+	      return;
+	    }
+
+	  if( get_skill( argument ) )
+	    {
+	      ch_printf( ch, "A skill with that name already exists.\r\n" );
+	      return;
+	    }
+
+	  DISPOSE(skill->name);
+	  skill->name = str_dup( argument );
+	  send_to_char( "Ok.\r\n", ch );
+	  return;
 	}
 	if ( !str_cmp( arg2, "dammsg" ) )
 	{

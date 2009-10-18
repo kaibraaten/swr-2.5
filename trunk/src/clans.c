@@ -545,15 +545,13 @@ void do_setclan( CHAR_DATA *ch, char *argument )
     
     if ( !strcmp( arg2, "name" ) )
     {
-      CLAN_DATA *uclan = NULL;
-
       if( !argument || argument[0] == '\0' )
 	{
 	  send_to_char( "You can't name a clan nothing.\r\n", ch );
 	  return;
 	}
 
-      if( ( uclan = get_clan( argument ) ) )
+      if( get_clan( argument ) )
 	{
 	  send_to_char( "There is already another clan with that name.\r\n", ch );
 	  return;

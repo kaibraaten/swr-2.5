@@ -1224,11 +1224,23 @@ void do_setstarsystem( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg2, "name" ) )
     {
-	STRFREE( starsystem->name );
-	starsystem->name = STRALLOC( argument );
-	send_to_char( "Done.\r\n", ch );
-	save_starsystem( starsystem );
-	return;
+      if( *argument == '\0' )
+	{
+	  ch_printf( ch, "You must choose a name.\r\n" );
+	  return;
+	}
+
+      if( starsystem_from_name( argument ) )
+	{
+	  ch_printf( ch, "A starsystem with that name already exists.\r\n" );
+	  return;
+	}
+
+      STRFREE( starsystem->name );
+      starsystem->name = STRALLOC( argument );
+      send_to_char( "Done.\r\n", ch );
+      save_starsystem( starsystem );
+      return;
     }
     
     if ( !str_cmp( arg2, "star1" ) )
@@ -2131,11 +2143,23 @@ void do_setship( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg2, "name" ) )
     {
-	STRFREE( ship->name );
-	ship->name = STRALLOC( argument );
-	send_to_char( "Done.\r\n", ch );
-	save_ship( ship );
-	return;
+      if( *argument == '\0' )
+	{
+	  ch_printf( ch, "Blank name not allowed.\r\n" );
+	  return;
+	}
+
+      if( get_ship( argument ) )
+	{
+	  ch_printf( ch, "A ship with that name already exists.\r\n" );
+	  return;
+	}
+
+      STRFREE( ship->name );
+      ship->name = STRALLOC( argument );
+      send_to_char( "Done.\r\n", ch );
+      save_ship( ship );
+      return;
     }
 
     if ( !str_cmp( arg2, "manuever" ) )
