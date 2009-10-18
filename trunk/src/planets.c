@@ -525,6 +525,116 @@ void do_showplanet( CHAR_DATA *ch, char *argument )
     return;
 }
 
+static void make_colony_supply_shop( PLANET_DATA *planet,
+				     ROOM_INDEX_DATA *location )
+{
+  static const char *room_descr =
+    "This visible part of this shop consists of a long desk with a couple\r\n"
+    "of computer terminals located along its length. A large set of sliding\r\n"
+    "doors conceals the supply room behind. In front of the main desk a\r\n"
+    "smaller circular desk houses several mail terminals as the shop also\r\n"
+    "doubles as a post office. This shop stocks an assortment of basic\r\n"
+    "supplies useful to both travellers and settlers. The shopkeeper will\r\n"
+    "also purchase some items that might have some later resale or trade\r\n"
+    "value.\r\n";
+
+  location->name = STRALLOC( "Supply Shop" );
+  location->description = STRALLOC( room_descr );
+  location->sector_type = SECT_INSIDE;
+  SET_BIT( location->room_flags , ROOM_INDOORS );
+  SET_BIT( location->room_flags , ROOM_NO_MOB );
+  SET_BIT( location->room_flags , ROOM_SAFE );
+  SET_BIT( location->room_flags , ROOM_NOPEDIT );
+  SET_BIT( location->room_flags , ROOM_MAIL );
+  SET_BIT( location->room_flags , ROOM_TRADE );
+  SET_BIT( location->room_flags , ROOM_BANK );
+  planet->citysize++;
+}
+
+static void make_colony_center( PLANET_DATA *planet, ROOM_INDEX_DATA *location )
+{
+  char buf[MAX_STRING_LENGTH];
+  *buf = '\0';
+
+  strcpy( buf , planet->name );
+  strcat( buf , ": Colonization Center" );
+  location->name = STRALLOC( buf );
+  strcpy( buf , "You stand in the main foyer of the colonization center. This is one of\r\n" );
+  strcat( buf , "many similar buildings scattered on planets throughout the galaxy. It and\r\n" );
+  strcat( buf , "the others like it serve two main purposes. The first is as an initial\r\n" );
+  strcat( buf , "living and working space for early settlers to the planet. It provides\r\n" );
+  strcat( buf , "a center of operations during the early stages of a colony while the\r\n" );
+  strcat( buf , "surrounding area is being developed. Its second purpose after the\r\n" );
+  strcat( buf , "initial community has been settled is to provide an information center\r\n" );
+  strcat( buf , "for new citizens and for tourists. Food, transportation, shelter, \r\n" );
+  strcat( buf , "supplies, and information are all contained in one area making it easy\r\n" );
+  strcat( buf , "for those unfamiliar with the planet to adjust. This also makes it a\r\n" );
+  strcat( buf , "very crowded place at times.\r\n" );
+
+  location->description = STRALLOC(buf);
+  location->sector_type = SECT_INSIDE;
+  SET_BIT( location->room_flags , ROOM_INDOORS );
+  SET_BIT( location->room_flags , ROOM_NO_MOB );
+  SET_BIT( location->room_flags , ROOM_SAFE );
+  SET_BIT( location->room_flags , ROOM_NOPEDIT );
+  SET_BIT( location->room_flags , ROOM_INFO );
+  planet->citysize++;
+}
+
+static void make_colony_shuttle_platform( PLANET_DATA *planet, ROOM_INDEX_DATA *location )
+{
+  char buf[MAX_STRING_LENGTH];
+  *buf = '\0';
+
+  location->name = STRALLOC( "Community Shuttle Platform" );
+  strcpy( buf , "This platform is large enough for several spacecraft to land and take off\r\n" );
+  strcat( buf , "from. Its surface is a hard glossy substance that is mostly smooth except\r\n" );
+  strcat( buf , "a few ripples and impressions that suggest its liquid origin. Power boxes\r\n" );
+  strcat( buf , "are scattered about the platform strung together by long strands of thick\r\n" );
+  strcat( buf , "power cables and fuel hoses. Glowing strips divide the platform into\r\n" );
+  strcat( buf , "multiple landing areas. Hard rubber pathways mark pathways for pilots and\r\n" );
+  strcat( buf , "passengers, leading from the various landing areas to the Colonization\r\n" );
+  strcat( buf , "Center.\r\n" );
+  location->description = STRALLOC(buf);
+  location->sector_type = SECT_CITY;
+  SET_BIT( location->room_flags , ROOM_SHIPYARD );
+  SET_BIT( location->room_flags , ROOM_CAN_LAND );
+  SET_BIT( location->room_flags , ROOM_NO_MOB );
+  SET_BIT( location->room_flags , ROOM_NOPEDIT );
+  planet->citysize++;
+}
+
+static void make_colony_hotel( PLANET_DATA *planet, ROOM_INDEX_DATA *location )
+{
+  char buf[MAX_STRING_LENGTH];
+  *buf = '\0';
+
+  strcpy( buf , planet->name );
+  strcat( buf , ": Center Hotel" );
+  location->name = STRALLOC( buf );
+  strcpy( buf , "This part of the center serves as a temporary home for new settlers\r\n" );
+  strcat( buf , "until a more permanent residence is found. It is also used as a hotel\r\n" );
+  strcat( buf , "for tourists and visitors. the shape of the hotel is circular with rooms\r\n" );
+  strcat( buf , "located around the perimeter extending several floors above ground level.\r\n" );
+  strcat( buf , "\r\nThis is a good place to rest. You may safely leave and reenter the\r\n" );
+  strcat( buf , "game from here.\r\n" );
+  location->description = STRALLOC(buf);
+  location->sector_type = SECT_INSIDE;
+  SET_BIT( location->room_flags , ROOM_INDOORS );
+  SET_BIT( location->room_flags , ROOM_HOTEL );
+  SET_BIT( location->room_flags , ROOM_SAFE );
+  SET_BIT( location->room_flags , ROOM_NO_MOB );
+  SET_BIT( location->room_flags , ROOM_NOPEDIT );
+  planet->citysize++;
+}
+
+static void make_colony_wilderness( PLANET_DATA *planet, ROOM_INDEX_DATA *location, const char *description )
+{
+  location->description = STRALLOC(description);
+  location->name = STRALLOC( planet->name );
+  location->sector_type = planet->sector;
+  planet->wilderness++;
+}
 
 void do_makeplanet( CHAR_DATA *ch, char *argument )
 {
@@ -566,7 +676,7 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
       if ( !destok )
 	return;
          
-      for ( rnum = 1 ; rnum <= 25 ; rnum ++ )
+      for ( rnum = COLONY_ROOM_FIRST ; rnum <= COLONY_ROOM_LAST ; rnum ++ )
 	{
 	  location = make_room( ++top_r_vnum );
 	  planet->size++;
@@ -581,104 +691,35 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
 	  STRFREE( location->description );
 	  STRFREE( location->name );
 	     
-	  if ( rnum == 12 )
+	  if ( rnum == COLONY_ROOM_SUPPLY_SHOP )
 	    {
-	      location->name = STRALLOC( "Supply Shop" );
-	      strcpy( buf , "This visible part of this shop consists of a long desk with a couple\r\n" );
-	      strcat( buf , "of computer terminals located along its length. A large set of sliding\r\n" );
-	      strcat( buf , "doors conceals the supply room behind. In front of the main desk a\r\n" );
-	      strcat( buf , "smaller circular desk houses several mail terminals as the shop also\r\n" );
-	      strcat( buf , "doubles as a post office. This shop stocks an assortment of basic\r\n" );
-	      strcat( buf , "supplies useful to both travellers and settlers. The shopkeeper will\r\n" );
-	      strcat( buf , "also purchase some items that might have some later resale or trade\r\n" );
-	      strcat( buf , "value.\r\n" );
-	      location->description = STRALLOC(buf);
-	      location->sector_type = SECT_INSIDE;
-	      SET_BIT( location->room_flags , ROOM_INDOORS );
-	      SET_BIT( location->room_flags , ROOM_NO_MOB );
-	      SET_BIT( location->room_flags , ROOM_SAFE );
-	      SET_BIT( location->room_flags , ROOM_NOPEDIT );
-	      SET_BIT( location->room_flags , ROOM_MAIL );
-	      SET_BIT( location->room_flags , ROOM_TRADE );
-	      SET_BIT( location->room_flags , ROOM_BANK );
-	      planet->citysize++;
+	      make_colony_supply_shop( planet, location );
 	    }
-	  else if ( rnum == 13 )
+	  else if ( rnum == COLONY_ROOM_COLONIZATION_CENTER )
 	    {
-	      strcpy( buf , planet->name );
-	      strcat( buf , ": Colonization Center" );
-	      location->name = STRALLOC( buf );
-	      strcpy( buf , "You stand in the main foyer of the colonization center. This is one of\r\n" );
-	      strcat( buf , "many similar buildings scattered on planets throughout the galaxy. It and\r\n" );
-	      strcat( buf , "the others like it serve two main purposes. The first is as an initial\r\n" );
-	      strcat( buf , "living and working space for early settlers to the planet. It provides\r\n" );
-	      strcat( buf , "a center of operations during the early stages of a colony while the\r\n" );
-	      strcat( buf , "surrounding area is being developed. Its second purpose after the\r\n" );
-	      strcat( buf , "initial community has been settled is to provide an information center\r\n" );
-	      strcat( buf , "for new citizens and for tourists. Food, transportation, shelter, \r\n" );
-	      strcat( buf , "supplies, and information are all contained in one area making it easy\r\n" );
-	      strcat( buf , "for those unfamiliar with the planet to adjust. This also makes it a\r\n" );
-	      strcat( buf , "very crowded place at times.\r\n" );
-	      location->description = STRALLOC(buf);
-	      location->sector_type = SECT_INSIDE;
-	      SET_BIT( location->room_flags , ROOM_INDOORS );
-	      SET_BIT( location->room_flags , ROOM_NO_MOB );
-	      SET_BIT( location->room_flags , ROOM_SAFE );
-	      SET_BIT( location->room_flags , ROOM_NOPEDIT );
-	      SET_BIT( location->room_flags , ROOM_INFO );
-	      planet->citysize++;
+	      make_colony_center( planet, location );
 	    }
-	  else if ( rnum == 14 ) 
+	  else if ( rnum == COLONY_ROOM_SHUTTLE_PLATFORM ) 
 	    {
-	      location->name = STRALLOC( "Community Shuttle Platform" );
-	      strcpy( buf , "This platform is large enough for several spacecraft to land and take off\r\n" );
-	      strcat( buf , "from. Its surface is a hard glossy substance that is mostly smooth except\r\n" );
-	      strcat( buf , "a few ripples and impressions that suggest its liquid origin. Power boxes\r\n" );
-	      strcat( buf , "are scattered about the platform strung together by long strands of thick\r\n" );
-	      strcat( buf , "power cables and fuel hoses. Glowing strips divide the platform into\r\n" );
-	      strcat( buf , "multiple landing areas. Hard rubber pathways mark pathways for pilots and\r\n" );
-	      strcat( buf , "passengers, leading from the various landing areas to the Colonization\r\n" );
-	      strcat( buf , "Center.\r\n" );
-	      location->description = STRALLOC(buf);
-	      location->sector_type = SECT_CITY;
-	      SET_BIT( location->room_flags , ROOM_SHIPYARD );
-	      SET_BIT( location->room_flags , ROOM_CAN_LAND );
-	      SET_BIT( location->room_flags , ROOM_NO_MOB );
-	      SET_BIT( location->room_flags , ROOM_NOPEDIT );
-	      planet->citysize++;
+	      make_colony_shuttle_platform( planet, location );
 	    }
-	  else if ( rnum == 18 )
+	  else if ( rnum == COLONY_ROOM_HOTEL )
 	    {
-	      strcpy( buf , planet->name );
-	      strcat( buf , ": Center Hotel" );
-	      location->name = STRALLOC( buf );
-	      strcpy( buf , "This part of the center serves as a temporary home for new settlers\r\n" );
-	      strcat( buf , "until a more permanent residence is found. It is also used as a hotel\r\n" );
-	      strcat( buf , "for tourists and visitors. the shape of the hotel is circular with rooms\r\n" );
-	      strcat( buf , "located around the perimeter extending several floors above ground level.\r\n" );
-	      strcat( buf , "\r\nThis is a good place to rest. You may safely leave and reenter the\r\n" );
-	      strcat( buf , "game from here.\r\n" );
-	      location->description = STRALLOC(buf);
-	      location->sector_type = SECT_INSIDE;
-	      SET_BIT( location->room_flags , ROOM_INDOORS );
-	      SET_BIT( location->room_flags , ROOM_HOTEL );
-	      SET_BIT( location->room_flags , ROOM_SAFE );
-	      SET_BIT( location->room_flags , ROOM_NO_MOB );
-	      SET_BIT( location->room_flags , ROOM_NOPEDIT );
-	      planet->citysize++;
+	      make_colony_hotel( planet, location );
 	    }
 	  else
 	    { 
-	      location->description = STRALLOC(description);
-	      location->name = STRALLOC( planet->name );
-	      location->sector_type = planet->sector;
-	      planet->wilderness++;
+	      make_colony_wilderness( planet, location, description );
 	    }
 	  
 	  LINK( location , pArea->first_room , pArea->last_room , next_in_area , prev_in_area );
           
-	  if ( rnum > 5 && rnum != 23 && rnum != 17 && rnum != 19
-	       && rnum != 12 && rnum != 14 ) 
+	  if ( rnum > 5
+	       && rnum != 23
+	       && rnum != 17
+	       && rnum != 19
+	       && rnum != COLONY_ROOM_SUPPLY_SHOP
+	       && rnum != 14 ) 
 	    {
 	      troom = get_room_index( top_r_vnum - 5 );
 	      xit = make_exit( location, troom, 0 );
@@ -692,9 +733,16 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
 	      xit->key		= -1;
 	      xit->exit_info		= 0;
 	    }
-	  if ( rnum != 1 && rnum != 6 && rnum != 11 && rnum != 16
-	       && rnum != 21 && rnum != 12 && rnum != 15 
-	       && rnum != 18 && rnum != 19 ) 
+
+	  if ( rnum != 1
+	       && rnum != 6
+	       && rnum != 11
+	       && rnum != 16
+	       && rnum != 21
+	       && rnum != COLONY_ROOM_SUPPLY_SHOP
+	       && rnum != 15 
+	       && rnum != COLONY_ROOM_HOTEL
+	       && rnum != 19 ) 
 	    {
 	      troom = get_room_index( top_r_vnum - 1 );
 	      xit = make_exit( location, troom, 3 );
@@ -731,9 +779,10 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
       return;
     }    
 
-  if ( ch->gold < 100000 )
+  if ( ch->gold < COLONY_COST )
     {
-      send_to_char( "It costs 100000 credits to launch an exploration probe.\r\n", ch );
+      ch_printf( ch, "It costs %d credits to launch an exploration probe.\r\n",
+		 COLONY_COST );
       return;
     }    
 
@@ -807,9 +856,11 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
         }
     }
 
-  ch->gold -= 100000;
+  ch->gold -= COLONY_COST;
 	  
-  send_to_char( "You spend 100000 credits to launch an explorer probe.\r\n", ch );	
+  ch_printf( ch, "You spend %d  credits to launch an explorer probe.\r\n",
+	     COLONY_COST );
+
   echo_to_room( AT_WHITE , ch->in_room, "A small probe lifts off into space." );
 
   if (  number_percent() < 20 )
