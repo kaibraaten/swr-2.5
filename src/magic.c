@@ -315,58 +315,53 @@ void failed_casting( SKILLTYPE *skill, CHAR_DATA *ch,
 void immune_casting( SKILLTYPE *skill, CHAR_DATA *ch,
 		     CHAR_DATA *victim, OBJ_DATA *obj )
 {
-    short chitroom = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_ACTION);
-    short chit	    = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HIT);
-    short chitme   = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HITME);
+  short chitroom = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_ACTION);
+  short chit	    = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HIT);
+  short chitme   = (skill->type == SKILL_SPELL ? AT_MAGIC : AT_HITME);
 
-    if ( skill->target != TAR_CHAR_OFFENSIVE )
+  if ( skill->target != TAR_CHAR_OFFENSIVE )
     {
-	chit = chitroom;
-	chitme = chitroom;
+      chit = chitroom;
+      chitme = chitroom;
     }
 
-    if ( ch && ch != victim )
+  if ( ch && ch != victim )
     {
-	if ( skill->imm_char && skill->imm_char[0] != '\0' )
-	  act( chit, skill->imm_char, ch, obj, victim, TO_CHAR );
-	else
-	if ( skill->miss_char && skill->miss_char[0] != '\0' )
-	  act( chit, skill->hit_char, ch, obj, victim, TO_CHAR );
-	else
-	if ( skill->type == SKILL_SPELL || skill->type == SKILL_SKILL )
-          act( chit, "That appears to have no effect.", ch, NULL, NULL, TO_CHAR );
+      if ( skill->imm_char && skill->imm_char[0] != '\0' )
+	act( chit, skill->imm_char, ch, obj, victim, TO_CHAR );
+      else if ( skill->miss_char && skill->miss_char[0] != '\0' )
+	act( chit, skill->miss_char, ch, obj, victim, TO_CHAR );
+      else if ( skill->type == SKILL_SPELL || skill->type == SKILL_SKILL )
+	act( chit, "That appears to have no effect.", ch, NULL, NULL, TO_CHAR );
     }
-    if ( ch && skill->imm_room && skill->imm_room[0] != '\0' )
-      act( chitroom, skill->imm_room, ch, obj, victim, TO_NOTVICT );
-    else
-    if ( ch && skill->miss_room && skill->miss_room[0] != '\0' )
-      act( chitroom, skill->miss_room, ch, obj, victim, TO_NOTVICT );
-    if ( ch && victim && skill->imm_vict && skill->imm_vict[0] != '\0' )
+
+  if ( ch && skill->imm_room && skill->imm_room[0] != '\0' )
+    act( chitroom, skill->imm_room, ch, obj, victim, TO_NOTVICT );
+  else if ( ch && skill->miss_room && skill->miss_room[0] != '\0' )
+    act( chitroom, skill->miss_room, ch, obj, victim, TO_NOTVICT );
+
+  if ( ch && victim && skill->imm_vict && skill->imm_vict[0] != '\0' )
     {
-	if ( ch != victim )
-	  act( chitme, skill->imm_vict, ch, obj, victim, TO_VICT );
-	else
-	  act( chitme, skill->imm_vict, ch, obj, victim, TO_CHAR );
+      if ( ch != victim )
+	act( chitme, skill->imm_vict, ch, obj, victim, TO_VICT );
+      else
+	act( chitme, skill->imm_vict, ch, obj, victim, TO_CHAR );
     }
-    else
-    if ( ch && victim && skill->miss_vict && skill->miss_vict[0] != '\0' )
+  else if ( ch && victim && skill->miss_vict && skill->miss_vict[0] != '\0' )
     {
-	if ( ch != victim )
-	  act( chitme, skill->miss_vict, ch, obj, victim, TO_VICT );
-	else
-	  act( chitme, skill->miss_vict, ch, obj, victim, TO_CHAR );
+      if ( ch != victim )
+	act( chitme, skill->miss_vict, ch, obj, victim, TO_VICT );
+      else
+	act( chitme, skill->miss_vict, ch, obj, victim, TO_CHAR );
     }
-    else
-    if ( ch && ch == victim )
+  else if ( ch && ch == victim )
     {
-	if ( skill->imm_char && skill->imm_char[0] != '\0' )
-	  act( chit, skill->imm_char, ch, obj, victim, TO_CHAR );
-	else
-	if ( skill->miss_char && skill->miss_char[0] != '\0' )
-	  act( chit, skill->hit_char, ch, obj, victim, TO_CHAR );
-	else
-	if ( skill->type == SKILL_SPELL || skill->type == SKILL_SKILL )
-          act( chit, "That appears to have no affect.", ch, NULL, NULL, TO_CHAR );
+      if ( skill->imm_char && skill->imm_char[0] != '\0' )
+	act( chit, skill->imm_char, ch, obj, victim, TO_CHAR );
+      else if ( skill->miss_char && skill->miss_char[0] != '\0' )
+	act( chit, skill->miss_char, ch, obj, victim, TO_CHAR );
+      else if ( skill->type == SKILL_SPELL || skill->type == SKILL_SKILL )
+	act( chit, "That appears to have no affect.", ch, NULL, NULL, TO_CHAR );
     }
 }
 

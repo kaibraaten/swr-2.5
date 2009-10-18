@@ -15,6 +15,7 @@ void	wear_obj	args( ( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace, short wear_bi
 bool    job_trigger     args( ( CHAR_DATA *victim, CHAR_DATA *ch, OBJ_DATA *obj ) );                              
 void wear_obj_dispatch_fun( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace,
                             int wear_loc );
+void write_corpses( CHAR_DATA *ch, char *name );
 
 /*
  * how resistant an object is to damage				-Thoric
@@ -345,20 +346,24 @@ void do_get( CHAR_DATA *ch, char *argument )
 	    found = FALSE;
 	    for ( obj = container->first_content; obj; obj = obj_next )
 	    {
-		obj_next = obj->next_content;
-		if ( ( fAll || nifty_is_name( chk, obj->name ) )
-		&&   can_see_obj( ch, obj ) )
+	      obj_next = obj->next_content;
+	      if( ( fAll || nifty_is_name( chk, obj->name ) ) && can_see_obj( ch, obj ) )
 		{
-		    found = TRUE;
-		    if ( number && (cnt + obj->count) > number )
-			split_obj( obj, number - cnt );
-		    cnt += obj->count;
-		    get_obj( ch, obj, container );
-		    if ( char_died(ch)
-		    ||   ch->carry_number >= can_carry_n( ch )
-		    ||   ch->carry_weight >= can_carry_w( ch )
-		    ||   (number && cnt >= number) )
+		  found = TRUE;
+		  if( number && ( cnt + obj->count ) > number )
+		    split_obj( obj, number - cnt );
+		  cnt += obj->count;
+		  get_obj( ch, obj, container );
+		  if( char_died( ch )
+		      || ch->carry_number >= can_carry_n( ch )
+		      || ch->carry_weight >= can_carry_w( ch ) || ( number && cnt >= number ) )
+		    {
+		      if( container->item_type == ITEM_CORPSE_PC )
+			write_corpses( NULL, container->short_descr + 14 );
+		      if( found && IS_SET( sysdata.save_flags, SV_GET ) )
+			save_char_obj( ch );
 		      return;
+		    }
 		}
 	    }
 

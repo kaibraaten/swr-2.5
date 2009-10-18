@@ -1387,24 +1387,52 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	if ( arg3[0] == '\0' )
-	{
+	if( !arg3 || arg3[0] == '\0' )
+	  {
+	    /*
+	     * Crash bug fix, oops guess I should have caught this one :)
+	     * * But it was early in the morning :P --Shaddai 
+	     */
+	    if( victim->pcdata->clan == NULL )
+	      return;
+	    /*
+	     * Added a check on immortals so immortals don't take up
+	     * * any membership space. --Shaddai
+	     */
+	    if( !IS_IMMORTAL( victim ) ) 
+	      {
+		--victim->pcdata->clan->members;
+		if( victim->pcdata->clan->members < 0 )
+		  victim->pcdata->clan->members = 0;
+		save_clan( victim->pcdata->clan );
+	      }
 	    STRFREE( victim->pcdata->clan_name );
-	    victim->pcdata->clan_name	= STRALLOC( "" );
-	    victim->pcdata->clan	= NULL;
-	    send_to_char( "Removed from clan.\r\nPlease make sure you adjust that clan's members accordingly.\r\nAlso be sure to remove any bestowments they have been given.\r\n", ch );
+	    victim->pcdata->clan_name = STRALLOC( "" );
+	    victim->pcdata->clan = NULL;
 	    return;
-	}
+	  }
 	clan = get_clan( arg3 );
-	if ( !clan )
-	{
-	   send_to_char( "No such clan.\r\n", ch );
-	   return;
-	}
+	if( !clan )
+	  {
+	    send_to_char( "No such clan.\n\r", ch );
+	    return;
+	  }
+	if( victim->pcdata->clan != NULL && !IS_IMMORTAL( victim ) )
+	  {
+	    --victim->pcdata->clan->members;
+	    if( victim->pcdata->clan->members < 0 )
+	      victim->pcdata->clan->members = 0;
+	    save_clan( victim->pcdata->clan );
+	  }
 	STRFREE( victim->pcdata->clan_name );
 	victim->pcdata->clan_name = QUICKLINK( clan->name );
 	victim->pcdata->clan = clan;
-	send_to_char( "Done.\r\nPlease make sure you adjust that clan's members accordingly.\r\n", ch );
+	if( !IS_IMMORTAL( victim ) )
+	  {
+	    ++victim->pcdata->clan->members;
+	    save_clan( victim->pcdata->clan );
+	  }
+	send_to_char( "Done.\n\r", ch );
 	return;
     }
 
