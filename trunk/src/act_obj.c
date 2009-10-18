@@ -895,6 +895,61 @@ void do_give( CHAR_DATA *ch, char *argument )
     return;
 }
 
+static obj_ret damage_obj_default( OBJ_DATA *obj )
+{
+  make_scraps( obj );
+  return rOBJ_SCRAPPED;
+}
+
+static obj_ret damage_obj_armor( OBJ_DATA *obj )
+{
+  obj_ret objcode = rNONE;
+  CHAR_DATA *ch = obj->carried_by;
+
+  if ( ch && obj->value[0] >= 1 )
+    {
+      ch->armor += apply_ac( obj, obj->wear_loc );
+    }
+
+  if (--obj->value[0] <= 0)
+    {
+      make_scraps( obj );
+      objcode = rOBJ_SCRAPPED;
+    }
+  else if ( ch && obj->value[0] >= 1 )
+    {
+      ch->armor -= apply_ac( obj, obj->wear_loc );
+    }
+
+  return objcode;
+}
+
+static obj_ret damage_obj_container( OBJ_DATA *obj )
+{
+  obj_ret objcode = rNONE;
+
+  if (--obj->value[3] <= 0)
+    {
+      make_scraps( obj );
+      objcode = rOBJ_SCRAPPED;
+    }
+
+  return objcode;
+}
+
+static obj_ret damage_obj_weapon( OBJ_DATA *obj )
+{
+  obj_ret objcode = rNONE;
+
+  if (--obj->value[0] <= 0)
+    {
+      make_scraps( obj );
+      objcode = rOBJ_SCRAPPED;
+    }
+
+  return objcode;
+}
+
 /*
  * Damage an object.						-Thoric
  * Affect player's AC if necessary.
@@ -903,61 +958,47 @@ void do_give( CHAR_DATA *ch, char *argument )
  */
 obj_ret damage_obj( OBJ_DATA *obj )
 {
-    CHAR_DATA *ch;
-    obj_ret objcode;
-
-    ch = obj->carried_by;
-    objcode = rNONE;
+  CHAR_DATA *ch = obj->carried_by;
+  obj_ret objcode = rNONE;
   
-    separate_obj( obj );
-    if ( ch )
+  separate_obj( obj );
+
+  if ( ch )
+    {
       act( AT_OBJECT, "($p gets damaged)", ch, obj, NULL, TO_CHAR );
-    else
-    if ( obj->in_room && ( ch = obj->in_room->first_person ) != NULL )
+    }
+  else if ( obj->in_room && ( ch = obj->in_room->first_person ) != NULL )
     {
-	act( AT_OBJECT, "($p gets damaged)", ch, obj, NULL, TO_ROOM );
-	act( AT_OBJECT, "($p gets damaged)", ch, obj, NULL, TO_CHAR );
-	ch = NULL;
+      act( AT_OBJECT, "($p gets damaged)", ch, obj, NULL, TO_ROOM );
+      act( AT_OBJECT, "($p gets damaged)", ch, obj, NULL, TO_CHAR );
+      ch = NULL;
     }
 
-    oprog_damage_trigger(ch, obj);
-    if ( obj_extracted(obj) )
-      return global_objcode;
+  oprog_damage_trigger(ch, obj);
 
-    switch( obj->item_type )
+  if ( obj_extracted(obj) )
+    return global_objcode;
+
+  switch( obj->item_type )
     {
-	default:
-	  make_scraps( obj );
-	  objcode = rOBJ_SCRAPPED;
-	  break;
-	case ITEM_CONTAINER:
-	  if (--obj->value[3] <= 0) 
-	  {
-		make_scraps( obj );
-		objcode = rOBJ_SCRAPPED;
-	  }
-	  break;
-	case ITEM_ARMOR:
-	  if ( ch && obj->value[0] >= 1 )
-	    ch->armor += apply_ac( obj, obj->wear_loc );
-	  if (--obj->value[0] <= 0)
-	  {
-		make_scraps( obj );
-		objcode = rOBJ_SCRAPPED;
-	  }
-	  else
-	  if ( ch && obj->value[0] >= 1 )
-	    ch->armor -= apply_ac( obj, obj->wear_loc );
-	  break;
-	case ITEM_WEAPON:
-	  if (--obj->value[0] <= 0)
-	  {
-		make_scraps( obj );
-		objcode = rOBJ_SCRAPPED;
-	  }
-	  break;
+    default:
+      objcode = damage_obj_default( obj );
+      break;
+
+    case ITEM_CONTAINER:
+      objcode = damage_obj_container( obj );
+      break;
+
+    case ITEM_ARMOR:
+      objcode = damage_obj_armor( obj );
+      break;
+
+    case ITEM_WEAPON:
+      objcode = damage_obj_weapon( obj );
+      break;
     }
-    return objcode;
+
+  return objcode;
 }
 
 
