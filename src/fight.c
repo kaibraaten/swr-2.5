@@ -495,31 +495,60 @@ ch_ret multi_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
  */
 int weapon_prof_bonus_check( CHAR_DATA *ch, OBJ_DATA *wield, int *gsn_ptr )
 {
-    int bonus;
+  int bonus = 0;;
 
-    bonus = 0;	*gsn_ptr = -1;
-    if ( !IS_NPC(ch) && wield )   
+  *gsn_ptr = -1;
+
+  if ( !IS_NPC(ch) && wield )   
     {
-	switch(wield->value[3])
+      switch(wield->value[3])
 	{
-	   default:	*gsn_ptr = -1;			break;
-           case 3:      *gsn_ptr = gsn_lightsabers;     break;
-           case 2:	*gsn_ptr = gsn_vibro_blades;	break;
-           case 4:	*gsn_ptr = gsn_flexible_arms;	break;
-           case 5:	*gsn_ptr = gsn_talonous_arms;	break;
-           case 6:	*gsn_ptr = gsn_blasters;	break;
-           case 8:	*gsn_ptr = gsn_bludgeons;	break;
-           case 9:	*gsn_ptr = gsn_bowcasters;	break;
-           case 11:	*gsn_ptr = gsn_force_pikes;	break;
+	default: /* WEAPON_NONE or other invalid */
+	  *gsn_ptr = -1;
+	  break;
+
+	case WEAPON_LIGHTSABER:
+	  *gsn_ptr = gsn_lightsabers;
+	  break;
+
+	case WEAPON_VIBRO_BLADE:
+	  *gsn_ptr = gsn_vibro_blades;
+	  break;
+
+	case 4:
+	  *gsn_ptr = gsn_flexible_arms;
+	  break;
+
+	case 5:
+	  *gsn_ptr = gsn_talonous_arms;
+	  break;
+
+	case WEAPON_BLASTER:
+	  *gsn_ptr = gsn_blasters;
+	  break;
+
+	case 8:
+	  *gsn_ptr = gsn_bludgeons;
+	  break;
+
+	case 9:
+	  *gsn_ptr = gsn_bowcasters;
+	  break;
+
+	case 11:
+	  *gsn_ptr = gsn_force_pikes;
+	  break;
 
 	}
-	if ( *gsn_ptr != -1 )
-	  bonus = character_skill_level( ch, *gsn_ptr );
 
+      if ( *gsn_ptr != -1 )
+	bonus = character_skill_level( ch, *gsn_ptr );
     }
-    if ( IS_NPC(ch) && wield )   
-          bonus = get_trust(ch);
-    return bonus;
+
+  if ( IS_NPC(ch) && wield )   
+    bonus = get_trust(ch);
+
+  return bonus;
 }
 
 /*
