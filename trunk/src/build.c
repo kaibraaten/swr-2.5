@@ -1556,10 +1556,11 @@ void do_mset( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg2, "flags" ) )
     {
-        bool pcflag;
+        bool pcflag = FALSE;
 
 	if ( !can_mmodify( ch, victim ) )
 	  return;
+
 	if ( !argument || argument[0] == '\0' )
 	{
 	   send_to_char( "Usage: mset <victim> flags <flag> [flag]...\r\n", ch );
@@ -1567,6 +1568,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	   send_to_char( "deadly, mountable, guardian, nokill, scholar, noassist, droid, nocorpse,\r\n", ch );
 	   return;
 	}
+
 	while ( argument[0] != '\0' )
 	{
            pcflag = FALSE;
@@ -1574,33 +1576,42 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	   value = IS_NPC( victim) ? get_actflag( arg3 ) : get_plrflag( arg3 );
 
 	   if ( !IS_NPC( victim ) && ( value < 0 || value > 31 ) )
-           {
-             pcflag = TRUE;
-	     value = get_pcflag( arg3 );
-           }
-	   if ( value < 0 || value > 31 )
-	     ch_printf( ch, "Unknown flag: %s\r\n", arg3 );
-	   else
-	   {
-	     if ( IS_NPC(victim) && 1 << value == ACT_IS_NPC )
-	       send_to_char( "If that could be changed, it would cause many problems.\r\n", ch );
-	     else
-	     if ( IS_NPC(victim) && 1 << value == ACT_POLYMORPHED )
-	       send_to_char( "Changing that would be a _bad_ thing.\r\n", ch);
-	     else
 	     {
-		if ( pcflag )
-		  TOGGLE_BIT( victim->pcdata->flags, 1 << value );
-		else
-		{ 
-		  TOGGLE_BIT( victim->act, 1 << value );
-		  /* NPC check added by Gorog */
-		  if ( IS_NPC(victim) && (1 << value == ACT_PROTOTYPE) )
-		    victim->pIndexData->act = victim->act;
-		}
+	       pcflag = TRUE;
+	       value = get_pcflag( arg3 );
 	     }
-	   }
+
+	   if ( value < 0 || value > 31 )
+	     {
+	       ch_printf( ch, "Unknown flag: %s\r\n", arg3 );
+	     }
+	   else
+	     {
+	       if ( 1 << value == ACT_IS_NPC )
+		 {
+		   send_to_char( "If that could be changed, it would cause many problems.\r\n", ch );
+		 }
+	       else if ( IS_NPC(victim) && 1 << value == ACT_POLYMORPHED )
+		 {
+		   send_to_char( "Changing that would be a _bad_ thing.\r\n", ch);
+		 }
+	       else
+		 {
+		   if ( pcflag )
+		     {
+		       TOGGLE_BIT( victim->pcdata->flags, 1 << value );
+		     }
+		   else
+		     { 
+		       TOGGLE_BIT( victim->act, 1 << value );
+		       /* NPC check added by Gorog */
+		       if ( IS_NPC(victim) && (1 << value == ACT_PROTOTYPE) )
+			 victim->pIndexData->act = victim->act;
+		     }
+		 }
+	     }
 	}
+
 	if ( IS_NPC(victim) && IS_SET( victim->act, ACT_PROTOTYPE ) )
 	  victim->pIndexData->act = victim->act; 
 	return;

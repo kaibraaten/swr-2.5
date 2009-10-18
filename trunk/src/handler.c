@@ -2362,6 +2362,9 @@ void clean_obj( OBJ_INDEX_DATA *obj )
 	obj->value[1]		= 0;
 	obj->value[2]		= 0;
 	obj->value[3]		= 0;
+	obj->value[4] = 0;
+	obj->value[5] = 0;
+
 	for ( paf = obj->first_affect; paf; paf = paf_next )
 	{
 	    paf_next    = paf->next;
