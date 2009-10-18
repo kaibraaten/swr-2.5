@@ -826,7 +826,7 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
     
   planet = planet_create();
   LINK( planet, first_planet, last_planet, next, prev );
-  planet->name		= STRALLOC( capitalize(pname) );
+  planet->name		= STRALLOC( pname );
   planet->sector = sector;
   vector_randomize( &planet->pos, -10000, 10000 );
   
@@ -840,7 +840,7 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
     {
       starsystem = starsystem_create();
       LINK( starsystem, first_starsystem, last_starsystem, next, prev );
-      starsystem->name		= STRALLOC( capitalize(arg1) );
+      starsystem->name		= STRALLOC( arg1 );
       starsystem->star1            = STRALLOC( arg1 );  
       starsystem->star2            = STRALLOC( "" );
       starsystem->first_planet = planet;
@@ -858,14 +858,14 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
   pArea->last_room	= NULL;
   pArea->planet       = NULL;
   pArea->planet       = planet;
-  pArea->name	        = STRALLOC( capitalize(pname) );
+  pArea->name	        = STRALLOC( pname );
 
   planet->area = pArea;
 
   LINK( pArea, first_area, last_area, next, prev );
   top_area++;
 
-  pArea->filename	= str_dup( capitalize(arg3) );
+  pArea->filename	= str_dup( arg3 );
   sprintf( filename, "%s.planet" , strlower(arg3) );
   replace_char( filename, ' ', '-' );
   planet->filename = str_dup( filename );
