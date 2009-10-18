@@ -241,10 +241,7 @@ MPROG_DATA *	oprog_file_read 	args ( ( char* f, MPROG_DATA* mprg,
 						OBJ_INDEX_DATA *pObjIndex ) );
 /* int 		rprog_name_to_type	args ( ( char* name ) ); */
 MPROG_DATA *	rprog_file_read 	args ( ( char* f, MPROG_DATA* mprg,
-						ROOM_INDEX_DATA *pRoomIndex ) );
-void		load_mudprogs           args ( ( AREA_DATA *tarea, FILE* fp ) );
-void		load_objprogs           args ( ( AREA_DATA *tarea, FILE* fp ) );
-void		load_roomprogs          args ( ( AREA_DATA *tarea, FILE* fp ) );
+						 ROOM_INDEX_DATA* ) );
 void   		mprog_read_programs     args ( ( FILE* fp,
 						MOB_INDEX_DATA *pMobIndex) );
 void   		oprog_read_programs     args ( ( FILE* fp,
@@ -3224,210 +3221,112 @@ int mprog_name_to_type ( char *name )
    return( ERROR_PROG );
 }
 
-MPROG_DATA *mprog_file_read( char *f, MPROG_DATA *mprg,
-			    MOB_INDEX_DATA *pMobIndex )
+void mobprog_file_read( MOB_INDEX_DATA *mob, char *f )
 {
+  MPROG_DATA *mprg = NULL;
+  char MUDProgfile[256];
+  FILE *progfile;
+  char letter;
 
-  char        MUDProgfile[ MAX_INPUT_LENGTH ];
-  FILE       *progfile;
-  char        letter;
-  MPROG_DATA *mprg_next, *mprg2;
-  bool        done = FALSE;
+  snprintf( MUDProgfile, 256, "%s%s", PROG_DIR, f );
 
-  sprintf( MUDProgfile, "%s%s", PROG_DIR, f );
-
-  progfile = fopen( MUDProgfile, "r" );
-  if ( !progfile )
-  {
-     bug( "Mob: %ld couldn't open mudprog file", pMobIndex->vnum );
-     exit( 1 );
-  }
-
-  mprg2 = mprg;
-  switch ( letter = fread_letter( progfile ) )
-  {
-    case '>':
-     break;
-    case '|':
-       bug( "empty mudprog file." );
-       exit( 1 );
-     break;
-    default:
-       bug( "in mudprog file syntax error." );
-       exit( 1 );
-     break;
-  }
-
-  while ( !done )
-  {
-    mprg2->type = mprog_name_to_type( fread_word( progfile ) );
-    switch ( mprg2->type )
+  if( !( progfile = fopen( MUDProgfile, "r" ) ) )
     {
-     case ERROR_PROG:
-	bug( "mudprog file type error" );
-	exit( 1 );
-      break;
-     case IN_FILE_PROG:
-	bug( "mprog file contains a call to file." );
-	exit( 1 );
-      break;
-     default:
-	pMobIndex->progtypes = pMobIndex->progtypes | mprg2->type;
-	mprg2->arglist       = fread_string( progfile );
-	mprg2->comlist       = fread_string( progfile );
-	switch ( letter = fread_letter( progfile ) )
-	{
-	  case '>':
-	     CREATE( mprg_next, MPROG_DATA, 1 );
-	     mprg_next->next = mprg2;
-	     mprg2 = mprg_next;
-	   break;
-	  case '|':
-	     done = TRUE;
-	   break;
-	  default:
-	     bug( "in mudprog file syntax error." );
-	     exit( 1 );
-	   break;
-	}
-      break;
-    }
-  }
-  fclose( progfile );
-  return mprg2;
-}
-
-/* Load a MUDprogram section from the area file.
- */
-void load_mudprogs( AREA_DATA *tarea, FILE *fp )
-{
-  MOB_INDEX_DATA *iMob;
-  MPROG_DATA     *original;
-  MPROG_DATA     *working;
-  char            letter;
-  long             value;
-
-  for ( ; ; )
-    switch ( letter = fread_letter( fp ) )
-    {
-    default:
-      bug( "Load_mudprogs: bad command '%c'.",letter);
-      exit(1);
-      break;
-    case 'S':
-    case 's':
-      fread_to_eol( fp );
+      bug( "%s: couldn't open mudprog file", __FUNCTION__ );
       return;
-    case '*':
-      fread_to_eol( fp );
-      break;
-    case 'M':
-    case 'm':
-      value = fread_number( fp );
-      if ( ( iMob = get_mob_index( value ) ) == NULL )
-      {
-	bug( "Load_mudprogs: vnum %ld doesnt exist", value );
-	exit( 1 );
-      }
-
-      /* Go to the end of the prog command list if other commands
-	 exist */
-
-      if ( (original = iMob->mudprogs) != NULL )
-	for ( ; original->next; original = original->next );
-
-      CREATE( working, MPROG_DATA, 1 );
-      if ( original )
-	original->next = working;
-      else
-	iMob->mudprogs = working;
-      working = mprog_file_read( fread_word( fp ), working, iMob );
-      working->next = NULL;
-      fread_to_eol( fp );
-      break;
     }
 
-  return;
+  for(;; )
+    {
+      letter = fread_letter( progfile );
 
+      if( letter == '|' )
+	break;
+
+      if( letter != '>' )
+	{
+	  bug( "%s: MUDPROG char", __FUNCTION__ );
+	  break;
+	}
+
+      CREATE( mprg, MPROG_DATA, 1 );
+      mprg->type = mprog_name_to_type( fread_word( progfile ) );
+      switch( mprg->type )
+	{
+	case ERROR_PROG:
+	  bug( "%s: mudprog file type error", __FUNCTION__ );
+	  DISPOSE( mprg );
+	  continue;
+
+	case IN_FILE_PROG:
+	  bug( "%s: Nested file programs are not allowed.", __FUNCTION__ );
+	  DISPOSE( mprg );
+	  continue;
+
+	default:
+	  mprg->arglist = fread_string( progfile );
+	  mprg->comlist = fread_string( progfile );
+	  mprg->fileprog = TRUE;
+	  SET_BIT( mob->progtypes, mprg->type );
+	  mprg->next = mob->mudprogs;
+	  mob->mudprogs = mprg;
+	  break;
+	}
+    }
+  fclose( progfile );
+  progfile = NULL;
+  return;
 }
 
 /* This procedure is responsible for reading any in_file MUDprograms.
  */
-
-void mprog_read_programs( FILE *fp, MOB_INDEX_DATA *pMobIndex)
+void mprog_read_programs( FILE *fp, MOB_INDEX_DATA *mob )
 {
   MPROG_DATA *mprg;
-  char        letter;
-  bool        done = FALSE;
+  char letter;
+  char *word;
 
-  if ( ( letter = fread_letter( fp ) ) != '>' )
-  {
-      bug( "Load_mobiles: vnum %ld MUDPROG char", pMobIndex->vnum );
-      exit( 1 );
-  }
-  CREATE( mprg, MPROG_DATA, 1 );
-  pMobIndex->mudprogs = mprg;
-
-  while ( !done )
-  {
-    mprg->type = mprog_name_to_type( fread_word( fp ) );
-    switch ( mprg->type )
+  for( ;; )
     {
-     case ERROR_PROG:
-	bug( "Load_mobiles: vnum %ld MUDPROG type.", pMobIndex->vnum );
-	exit( 1 );
-      break;
-     case IN_FILE_PROG:
-	mprg = mprog_file_read( fread_string( fp ), mprg,pMobIndex );
-	fread_to_eol( fp );
-	switch ( letter = fread_letter( fp ) )
+      letter = fread_letter( fp );
+
+      if( letter == '|' )
+	return;
+
+      if( letter != '>' )
 	{
-	  case '>':
-	     CREATE( mprg->next, MPROG_DATA, 1 );
-	     mprg = mprg->next;
-	   break;
-	  case '|':
-	     mprg->next = NULL;
-	     fread_to_eol( fp );
-	     done = TRUE;
-	   break;
-	  default:
-	     bug( "Load_mobiles: vnum %ld bad MUDPROG.", pMobIndex->vnum );
-	     exit( 1 );
-	   break;
+	  bug( "%s: vnum %d MUDPROG char", __FUNCTION__, mob->vnum );
+	  exit( 1 );
 	}
-      break;
-     default:
-	pMobIndex->progtypes = pMobIndex->progtypes | mprg->type;
-	mprg->arglist        = fread_string( fp );
-	fread_to_eol( fp );
-	mprg->comlist        = fread_string( fp );
-	fread_to_eol( fp );
-	switch ( letter = fread_letter( fp ) )
+      CREATE( mprg, MPROG_DATA, 1 );
+      mprg->next = mob->mudprogs;
+      mob->mudprogs = mprg;
+
+      word = fread_word( fp );
+      mprg->type = mprog_name_to_type( word );
+
+      switch( mprg->type )
 	{
-	  case '>':
-	     CREATE( mprg->next, MPROG_DATA, 1 );
-	     mprg = mprg->next;
-	   break;
-	  case '|':
-	     mprg->next = NULL;
-	     fread_to_eol( fp );
-	     done = TRUE;
-	   break;
-	  default:
-	     bug( "Load_mobiles: vnum %ld bad MUDPROG.", pMobIndex->vnum );
-	     exit( 1 );
-	   break;
+	case ERROR_PROG:
+	  bug( "%s: vnum %d MUDPROG type.", __FUNCTION__, mob->vnum );
+	  exit( 1 );
+
+	case IN_FILE_PROG:
+	  mprg->arglist = fread_string( fp );
+	  mprg->fileprog = FALSE;
+	  mobprog_file_read( mob, mprg->arglist );
+	  break;
+
+	default:
+	  SET_BIT( mob->progtypes, mprg->type );
+	  mprg->fileprog = FALSE;
+	  mprg->arglist = fread_string( fp );
+	  mprg->comlist = fread_string( fp );
+	  break;
 	}
-      break;
     }
-  }
-
   return;
-
 }
-
-
 
 /*************************************************************/
 /* obj prog functions */
@@ -3437,209 +3336,111 @@ void mprog_read_programs( FILE *fp, MOB_INDEX_DATA *pMobIndex)
  */
 
 /* This routine reads in scripts of OBJprograms from a file */
-
-
-MPROG_DATA *oprog_file_read( char *f, MPROG_DATA *mprg,
-			    OBJ_INDEX_DATA *pObjIndex )
+void objprog_file_read( OBJ_INDEX_DATA *obj, char *f )
 {
+  MPROG_DATA *mprg = NULL;
+  char MUDProgfile[256];
+  FILE *progfile;
+  char letter;
 
-  char        MUDProgfile[ MAX_INPUT_LENGTH ];
-  FILE       *progfile;
-  char        letter;
-  MPROG_DATA *mprg_next, *mprg2;
-  bool        done = FALSE;
+  snprintf( MUDProgfile, 256, "%s%s", PROG_DIR, f );
 
-  sprintf( MUDProgfile, "%s%s", PROG_DIR, f );
-
-  progfile = fopen( MUDProgfile, "r" );
-  if ( !progfile )
-  {
-     bug( "Obj: %d couldnt open mudprog file", pObjIndex->vnum );
-     exit( 1 );
-  }
-
-  mprg2 = mprg;
-  switch ( letter = fread_letter( progfile ) )
-  {
-    case '>':
-     break;
-    case '|':
-       bug( "empty objprog file." );
-       exit( 1 );
-     break;
-    default:
-       bug( "in objprog file syntax error." );
-       exit( 1 );
-     break;
-  }
-
-  while ( !done )
-  {
-    mprg2->type = mprog_name_to_type( fread_word( progfile ) );
-    switch ( mprg2->type )
+  if( !( progfile = fopen( MUDProgfile, "r" ) ) )
     {
-     case ERROR_PROG:
-	bug( "objprog file type error" );
-	exit( 1 );
-      break;
-     case IN_FILE_PROG:
-	bug( "objprog file contains a call to file." );
-	exit( 1 );
-      break;
-     default:
-	pObjIndex->progtypes = pObjIndex->progtypes | mprg2->type;
-	mprg2->arglist       = fread_string( progfile );
-	mprg2->comlist       = fread_string( progfile );
-	switch ( letter = fread_letter( progfile ) )
-	{
-	  case '>':
-	     CREATE( mprg_next, MPROG_DATA, 1 );
-	     mprg_next->next = mprg2;
-	     mprg2 = mprg_next;
-	   break;
-	  case '|':
-	     done = TRUE;
-	   break;
-	  default:
-	     bug( "in objprog file syntax error." );
-	     exit( 1 );
-	   break;
-	}
-      break;
-    }
-  }
-  fclose( progfile );
-  return mprg2;
-}
-
-/* Load a MUDprogram section from the area file.
- */
-void load_objprogs( AREA_DATA *tarea, FILE *fp )
-{
-  OBJ_INDEX_DATA *iObj;
-  MPROG_DATA     *original;
-  MPROG_DATA     *working;
-  char            letter;
-  long             value;
-
-  for ( ; ; )
-    switch ( letter = fread_letter( fp ) )
-    {
-    default:
-      bug( "Load_objprogs: bad command '%c'.",letter);
-      exit(1);
-      break;
-    case 'S':
-    case 's':
-      fread_to_eol( fp );
+      bug( "%s: couldn't open mudprog file", __FUNCTION__ );
       return;
-    case '*':
-      fread_to_eol( fp );
-      break;
-    case 'M':
-    case 'm':
-      value = fread_number( fp );
-      if ( ( iObj = get_obj_index( value ) ) == NULL )
-      {
-	bug( "Load_objprogs: vnum %ld doesnt exist", value );
-	exit( 1 );
-      }
-
-      /* Go to the end of the prog command list if other commands
-	 exist */
-
-      if ( (original = iObj->mudprogs) != NULL )
-	for ( ; original->next; original = original->next );
-
-      CREATE( working, MPROG_DATA, 1 );
-      if ( original )
-	original->next = working;
-      else
-	iObj->mudprogs = working;
-      working = oprog_file_read( fread_word( fp ), working, iObj );
-      working->next = NULL;
-      fread_to_eol( fp );
-      break;
     }
 
-  return;
+  for(;; )
+    {
+      letter = fread_letter( progfile );
 
+      if( letter == '|' )
+	break;
+
+      if( letter != '>' )
+	{
+	  bug( "%s: MUDPROG char", __FUNCTION__ );
+	  break;
+	}
+
+      CREATE( mprg, MPROG_DATA, 1 );
+      mprg->type = mprog_name_to_type( fread_word( progfile ) );
+      switch( mprg->type )
+	{
+	case ERROR_PROG:
+	  bug( "%s: mudprog file type error", __FUNCTION__ );
+	  DISPOSE( mprg );
+	  continue;
+
+	case IN_FILE_PROG:
+	  bug( "%s: Nested file programs are not allowed.", __FUNCTION__ );
+	  DISPOSE( mprg );
+	  continue;
+
+	default:
+	  mprg->arglist = fread_string( progfile );
+	  mprg->comlist = fread_string( progfile );
+	  mprg->fileprog = TRUE;
+	  SET_BIT( obj->progtypes, mprg->type );
+	  mprg->next = obj->mudprogs;
+	  obj->mudprogs = mprg;
+	  break;
+	}
+    }
+  fclose( progfile );
+  progfile = NULL;
+  return;
 }
 
 /* This procedure is responsible for reading any in_file OBJprograms.
  */
-
-void oprog_read_programs( FILE *fp, OBJ_INDEX_DATA *pObjIndex)
+void oprog_read_programs( FILE *fp, OBJ_INDEX_DATA *obj )
 {
   MPROG_DATA *mprg;
-  char        letter;
-  bool        done = FALSE;
+  char letter;
+  char *word;
 
-  if ( ( letter = fread_letter( fp ) ) != '>' )
-  {
-      bug( "Load_objects: vnum %ld OBJPROG char", pObjIndex->vnum );
-      exit( 1 );
-  }
-  CREATE( mprg, MPROG_DATA, 1 );
-  pObjIndex->mudprogs = mprg;
-
-  while ( !done )
-  {
-    mprg->type = mprog_name_to_type( fread_word( fp ) );
-    switch ( mprg->type )
+  for(;; )
     {
-     case ERROR_PROG:
-	bug( "Load_objects: vnum %ld OBJPROG type.", pObjIndex->vnum );
-	exit( 1 );
-      break;
-     case IN_FILE_PROG:
-	mprg = oprog_file_read( fread_string( fp ), mprg,pObjIndex );
-	fread_to_eol( fp );
-	switch ( letter = fread_letter( fp ) )
+      letter = fread_letter( fp );
+
+      if( letter == '|' )
+	return;
+
+      if( letter != '>' )
 	{
-	  case '>':
-	     CREATE( mprg->next, MPROG_DATA, 1 );
-	     mprg = mprg->next;
-	   break;
-	  case '|':
-	     mprg->next = NULL;
-	     fread_to_eol( fp );
-	     done = TRUE;
-	   break;
-	  default:
-	     bug( "Load_objects: vnum %ld bad OBJPROG.", pObjIndex->vnum );
-	     exit( 1 );
-	   break;
+	  bug( "%s: vnum %d MUDPROG char", __FUNCTION__, obj->vnum );
+	  exit( 1 );
 	}
-      break;
-     default:
-	pObjIndex->progtypes = pObjIndex->progtypes | mprg->type;
-	mprg->arglist        = fread_string( fp );
-	fread_to_eol( fp );
-	mprg->comlist        = fread_string( fp );
-	fread_to_eol( fp );
-	switch ( letter = fread_letter( fp ) )
+      CREATE( mprg, MPROG_DATA, 1 );
+      mprg->next = obj->mudprogs;
+      obj->mudprogs = mprg;
+
+      word = fread_word( fp );
+      mprg->type = mprog_name_to_type( word );
+
+      switch( mprg->type )
 	{
-	  case '>':
-	     CREATE( mprg->next, MPROG_DATA, 1 );
-	     mprg = mprg->next;
-	   break;
-	  case '|':
-	     mprg->next = NULL;
-	     fread_to_eol( fp );
-	     done = TRUE;
-	   break;
-	  default:
-	     bug( "Load_objects: vnum %ld bad OBJPROG.", pObjIndex->vnum );
-	     exit( 1 );
-	   break;
+	case ERROR_PROG:
+	  bug( "%s: vnum %d MUDPROG type.", __FUNCTION__, obj->vnum );
+	  exit( 1 );
+
+	case IN_FILE_PROG:
+	  mprg->arglist = fread_string( fp );
+	  mprg->fileprog = FALSE;
+	  objprog_file_read( obj, mprg->arglist );
+	  break;
+
+	default:
+	  SET_BIT( obj->progtypes, mprg->type );
+	  mprg->fileprog = FALSE;
+	  mprg->arglist = fread_string( fp );
+	  mprg->comlist = fread_string( fp );
+	  break;
 	}
-      break;
     }
-  }
-
   return;
-
 }
 
 
@@ -3651,209 +3452,113 @@ void oprog_read_programs( FILE *fp, OBJ_INDEX_DATA *pObjIndex)
  */
 
 /* This routine reads in scripts of OBJprograms from a file */
-MPROG_DATA *rprog_file_read( char *f, MPROG_DATA *mprg,
-			    ROOM_INDEX_DATA *RoomIndex )
+void roomprog_file_read( ROOM_INDEX_DATA *room, char *f )
 {
+  MPROG_DATA *mprg = NULL;
+  char MUDProgfile[256];
+  FILE *progfile;
+  char letter;
 
-  char        MUDProgfile[ MAX_INPUT_LENGTH ];
-  FILE       *progfile;
-  char        letter;
-  MPROG_DATA *mprg_next, *mprg2;
-  bool        done = FALSE;
+  snprintf( MUDProgfile, 256, "%s%s", PROG_DIR, f );
 
-  sprintf( MUDProgfile, "%s%s", PROG_DIR, f );
-
-  progfile = fopen( MUDProgfile, "r" );
-  if ( !progfile )
-  {
-     bug( "Room: %ld couldnt open roomprog file", RoomIndex->vnum );
-     exit( 1 );
-  }
-
-  mprg2 = mprg;
-  switch ( letter = fread_letter( progfile ) )
-  {
-    case '>':
-     break;
-    case '|':
-       bug( "empty roomprog file." );
-       exit( 1 );
-     break;
-    default:
-       bug( "in roomprog file syntax error." );
-       exit( 1 );
-     break;
-  }
-
-  while ( !done )
-  {
-    mprg2->type = mprog_name_to_type( fread_word( progfile ) );
-    switch ( mprg2->type )
+  if( !( progfile = fopen( MUDProgfile, "r" ) ) )
     {
-     case ERROR_PROG:
-	bug( "roomprog file type error" );
-	exit( 1 );
-      break;
-     case IN_FILE_PROG:
-	bug( "roomprog file contains a call to file." );
-	exit( 1 );
-      break;
-     default:
-	RoomIndex->progtypes = RoomIndex->progtypes | mprg2->type;
-	mprg2->arglist       = fread_string( progfile );
-	mprg2->comlist       = fread_string( progfile );
-	switch ( letter = fread_letter( progfile ) )
-	{
-	  case '>':
-	     CREATE( mprg_next, MPROG_DATA, 1 );
-	     mprg_next->next = mprg2;
-	     mprg2 = mprg_next;
-	   break;
-	  case '|':
-	     done = TRUE;
-	   break;
-	  default:
-	     bug( "in roomprog file syntax error." );
-	     exit( 1 );
-	   break;
-	}
-      break;
-    }
-  }
-  fclose( progfile );
-  return mprg2;
-}
-
-/* Load a ROOMprogram section from the area file.
- */
-void load_roomprogs( AREA_DATA *tarea, FILE *fp )
-{
-  ROOM_INDEX_DATA *iRoom;
-  MPROG_DATA     *original;
-  MPROG_DATA     *working;
-  char            letter;
-  long             value;
-
-  for ( ; ; )
-    switch ( letter = fread_letter( fp ) )
-    {
-    default:
-      bug( "Load_objprogs: bad command '%c'.",letter);
-      exit(1);
-      break;
-    case 'S':
-    case 's':
-      fread_to_eol( fp );
+      bug( "%s: couldn't open mudprog file", __FUNCTION__ );
       return;
-    case '*':
-      fread_to_eol( fp );
-      break;
-    case 'M':
-    case 'm':
-      value = fread_number( fp );
-      if ( ( iRoom = get_room_index( value ) ) == NULL )
-      {
-	bug( "Load_roomprogs: vnum %ld doesnt exist", value );
-	exit( 1 );
-      }
-
-      /* Go to the end of the prog command list if other commands
-	 exist */
-
-      if ( (original = iRoom->mudprogs) != NULL )
-	for ( ; original->next; original = original->next );
-
-      CREATE( working, MPROG_DATA, 1 );
-      if ( original )
-	original->next = working;
-      else
-	iRoom->mudprogs = working;
-      working = rprog_file_read( fread_word( fp ), working, iRoom );
-      working->next = NULL;
-      fread_to_eol( fp );
-      break;
     }
 
-  return;
+  for(;; )
+    {
+      letter = fread_letter( progfile );
 
+      if( letter == '|' )
+	break;
+
+      if( letter != '>' )
+	{
+	  bug( "%s: MUDPROG char", __FUNCTION__ );
+	  break;
+	}
+
+      CREATE( mprg, MPROG_DATA, 1 );
+      mprg->type = mprog_name_to_type( fread_word( progfile ) );
+      switch( mprg->type )
+	{
+	case ERROR_PROG:
+	  bug( "%s: mudprog file type error", __FUNCTION__ );
+	  DISPOSE( mprg );
+	  continue;
+
+	case IN_FILE_PROG:
+	  bug( "%s: Nested file programs are not allowed.", __FUNCTION__ );
+	  DISPOSE( mprg );
+	  continue;
+
+	default:
+	  mprg->arglist = fread_string( progfile );
+	  mprg->comlist = fread_string( progfile );
+	  mprg->fileprog = TRUE;
+	  SET_BIT( room->progtypes, mprg->type );
+	  mprg->next = room->mudprogs;
+	  room->mudprogs = mprg;
+	  break;
+	}
+    }
+  fclose( progfile );
+  progfile = NULL;
+  return;
 }
+
 
 /* This procedure is responsible for reading any in_file ROOMprograms.
  */
-
-void rprog_read_programs( FILE *fp, ROOM_INDEX_DATA *pRoomIndex)
+void rprog_read_programs( FILE *fp, ROOM_INDEX_DATA *room )
 {
   MPROG_DATA *mprg;
-  char        letter;
-  bool        done = FALSE;
+  char letter;
+  char *word;
 
-  if ( ( letter = fread_letter( fp ) ) != '>' )
-  {
-      bug( "Load_rooms: vnum %ld ROOMPROG char", pRoomIndex->vnum );
-      exit( 1 );
-  }
-  CREATE( mprg, MPROG_DATA, 1 );
-  pRoomIndex->mudprogs = mprg;
-
-  while ( !done )
-  {
-    mprg->type = mprog_name_to_type( fread_word( fp ) );
-    switch ( mprg->type )
+  for( ;; )
     {
-     case ERROR_PROG:
-	bug( "Load_rooms: vnum %ld ROOMPROG type.", pRoomIndex->vnum );
-	exit( 1 );
-      break;
-     case IN_FILE_PROG:
-	mprg = rprog_file_read( fread_string( fp ), mprg,pRoomIndex );
-	fread_to_eol( fp );
-	switch ( letter = fread_letter( fp ) )
+      letter = fread_letter( fp );
+
+      if( letter == '|' )
+	return;
+
+      if( letter != '>' )
 	{
-	  case '>':
-	     CREATE( mprg->next, MPROG_DATA, 1 );
-	     mprg = mprg->next;
-	   break;
-	  case '|':
-	     mprg->next = NULL;
-	     fread_to_eol( fp );
-	     done = TRUE;
-	   break;
-	  default:
-	     bug( "Load_rooms: vnum %ld bad ROOMPROG.", pRoomIndex->vnum );
-	     exit( 1 );
-	   break;
+	  bug( "%s: vnum %d MUDPROG char", __FUNCTION__, room->vnum );
+	  exit( 1 );
 	}
-      break;
-     default:
-	pRoomIndex->progtypes = pRoomIndex->progtypes | mprg->type;
-	mprg->arglist        = fread_string( fp );
-	fread_to_eol( fp );
-	mprg->comlist        = fread_string( fp );
-	fread_to_eol( fp );
-	switch ( letter = fread_letter( fp ) )
+      CREATE( mprg, MPROG_DATA, 1 );
+      mprg->next = room->mudprogs;
+      room->mudprogs = mprg;
+
+      word = fread_word( fp );
+      mprg->type = mprog_name_to_type( word );
+
+      switch( mprg->type )
 	{
-	  case '>':
-	     CREATE( mprg->next, MPROG_DATA, 1 );
-	     mprg = mprg->next;
-	   break;
-	  case '|':
-	     mprg->next = NULL;
-	     fread_to_eol( fp );
-	     done = TRUE;
-	   break;
-	  default:
-	     bug( "Load_rooms: vnum %ld bad ROOMPROG.", pRoomIndex->vnum );
-	     exit( 1 );
-	   break;
+	case ERROR_PROG:
+	  bug( "%s: vnum %d MUDPROG type.", __FUNCTION__, room->vnum );
+	  exit( 1 );
+
+	case IN_FILE_PROG:
+	  mprg->arglist = fread_string( fp );
+	  mprg->fileprog = FALSE;
+	  roomprog_file_read( room, mprg->arglist );
+	  break;
+
+	default:
+	  SET_BIT( room->progtypes, mprg->type );
+	  mprg->fileprog = FALSE;
+	  mprg->arglist = fread_string( fp );
+	  mprg->comlist = fread_string( fp );
+	  break;
 	}
-      break;
     }
-  }
-
   return;
-
 }
-
 
 /*************************************************************/
 /* Function to delete a room index.  Called from do_rdelete in build.c
@@ -4365,9 +4070,7 @@ void load_area_file( AREA_DATA *tarea, const char *filename )
       else if ( !str_cmp( word, "FLAGS"    ) ) load_flags   (tarea, fpArea);
       else if ( !str_cmp( word, "HELPS"    ) ) load_helps   (tarea, fpArea);
       else if ( !str_cmp( word, "MOBILES"  ) ) load_mobiles (tarea, fpArea);
-      else if ( !str_cmp( word, "MUDPROGS" ) ) load_mudprogs(tarea, fpArea);
       else if ( !str_cmp( word, "OBJECTS"  ) ) load_objects (tarea, fpArea);
-      else if ( !str_cmp( word, "OBJPROGS" ) ) load_objprogs(tarea, fpArea);
       else if ( !str_cmp( word, "ROOMS"    ) ) load_rooms   (tarea, fpArea);
       else if ( !str_cmp( word, "SHOPS"    ) ) load_shops   (tarea, fpArea);
       else if ( !str_cmp( word, "REPAIRS"  ) ) load_repairs (tarea, fpArea);

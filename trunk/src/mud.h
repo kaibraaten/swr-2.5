@@ -562,12 +562,13 @@ struct	mob_prog_act_list
 
 struct	mob_prog_data
 {
-    MPROG_DATA * next;
-    int		 type;
-    bool	 triggered;
-    int		 resetdelay;
-    char *	 arglist;
-    char *	 comlist;
+  MPROG_DATA * next;
+  int		 type;
+  bool	 triggered;
+  int		 resetdelay;
+  char *	 arglist;
+  char *	 comlist;
+  bool fileprog;
 };
 
 extern bool MOBtrigger;

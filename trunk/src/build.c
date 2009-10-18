@@ -4441,15 +4441,31 @@ void fold_area( const AREA_DATA *tarea, const char *filename, bool install )
 					      , room->map->y
 					      , room->map->entry );
 	}
-	if ( room->mudprogs )
-	{
-	  for ( mprog = room->mudprogs; mprog; mprog = mprog->next )
-		fprintf( fpout, "> %s %s~\n%s~\n",
-				mprog_type_to_name( mprog->type ),
-				mprog->arglist, strip_cr(mprog->comlist) );
-	  fprintf( fpout, "|\n" );	  
-	}
-	fprintf( fpout, "S\n" );
+
+	if( room->mudprogs )
+	  {
+	    int count = 0;
+	    for( mprog = room->mudprogs; mprog; mprog = mprog->next )
+	      {
+		if( ( mprog->arglist && mprog->arglist[0] != '\0' ) )
+		  {
+		    if( mprog->type == IN_FILE_PROG )
+		      {
+			fprintf( fpout, "> %s %s~\n", mprog_type_to_name( mprog->type ), mprog->arglist );
+			count++;
+		      }
+		    // Don't let it save progs which came from files. That would be silly.
+		    else if( mprog->comlist && mprog->comlist[0] != '\0' && !mprog->fileprog )
+		      {
+			fprintf( fpout, "> %s %s~\n%s~\n", mprog_type_to_name( mprog->type ),
+				 mprog->arglist, strip_cr( mprog->comlist ) );
+			count++;
+		      }
+		  }
+	      }
+	    if( count > 0 )
+	      fprintf( fpout, "%s", "|\n" );
+	  }
     }
     fprintf( fpout, "#0\n\n\n" );
 
@@ -5861,14 +5877,31 @@ void save_mobs()
 					pMobIndex->defenses );
 	fprintf( fpout, "0 0 0 0 0 0 0 0\n" );
 	}
-	if ( pMobIndex->mudprogs )
-	{
-	  for ( mprog = pMobIndex->mudprogs; mprog; mprog = mprog->next )
-		fprintf( fpout, "> %s %s~\n%s~\n",
-				mprog_type_to_name( mprog->type ),
-				mprog->arglist, strip_cr(mprog->comlist) );
-	  fprintf( fpout, "|\n" );	  
-	}
+	if( pMobIndex->mudprogs )
+	  {
+	    int count = 0;
+	    for( mprog = pMobIndex->mudprogs; mprog; mprog = mprog->next )
+	      {
+		if( ( mprog->arglist && mprog->arglist[0] != '\0' ) )
+		  {
+		    if( mprog->type == IN_FILE_PROG )
+		      {
+			fprintf( fpout, "> %s %s~\n", mprog_type_to_name( mprog->type ), mprog->arglist );
+			count++;
+		      }
+		    // Don't let it save progs which came from files. That would be silly.
+		    else if( mprog->comlist && mprog->comlist[0] != '\0' && !mprog->fileprog )
+		      {
+			fprintf( fpout, "> %s %s~\n%s~\n", mprog_type_to_name( mprog->type ),
+				 mprog->arglist, strip_cr( mprog->comlist ) );
+			count++;
+		      }
+		  }
+	      }
+	    if( count > 0 )
+	      fprintf( fpout, "%s", "|\n" );
+	  }
+
     }
     fprintf( fpout, "#0\n\n\n" );
 
@@ -5947,39 +5980,38 @@ void save_mobs()
 
 void save_objects()
 {
-    OBJ_INDEX_DATA	*pObjIndex;
-    EXTRA_DESCR_DATA	*ed;
-    char		 buf[MAX_STRING_LENGTH];
-    FILE		*fpout;
-    long			 vnum;
-    int 		hash, val0, val1, val2, val3, val4, val5;
-    AFFECT_DATA         *paf;
-    MPROG_DATA		*mprog;
-    char filename[MAX_STRING_LENGTH];
-    char bakfilename[MAX_STRING_LENGTH];
+  OBJ_INDEX_DATA	*pObjIndex;
+  EXTRA_DESCR_DATA	*ed;
+  char		 buf[MAX_STRING_LENGTH];
+  FILE		*fpout;
+  long			 vnum;
+  int 		hash, val0, val1, val2, val3, val4, val5;
+  AFFECT_DATA         *paf;
+  MPROG_DATA		*mprog;
+  char filename[MAX_STRING_LENGTH];
+  char bakfilename[MAX_STRING_LENGTH];
 
-    sprintf( filename, "%sobjects", AREA_DIR );
-    sprintf( bakfilename, "%s.bak", filename );
+  sprintf( filename, "%sobjects", AREA_DIR );
+  sprintf( bakfilename, "%s.bak", filename );
 
-    sprintf( buf, "Saving Objects..." );
-    log_string_plus( buf, LOG_NORMAL );
+  sprintf( buf, "Saving Objects..." );
+  log_string_plus( buf, LOG_NORMAL );
 
-    rename( filename, bakfilename );
+  rename( filename, bakfilename );
 
-    if ( ( fpout = fopen( filename, "w" ) ) == NULL )
+  if ( ( fpout = fopen( filename, "w" ) ) == NULL )
     {
-	bug( "fold_area: fopen", 0 );
-	perror( "objects" );
-	return;
+      bug( "fold_area: fopen", 0 );
+      perror( "objects" );
+      return;
     }
     
-
-    fprintf( fpout, "#OBJECTS\n" );
-    for ( hash = 0; hash < MAX_KEY_HASH; hash++ )
-     for ( pObjIndex = obj_index_hash[hash];
-	      pObjIndex;
-	      pObjIndex = pObjIndex->next )
-    {
+  fprintf( fpout, "#OBJECTS\n" );
+  for ( hash = 0; hash < MAX_KEY_HASH; hash++ )
+    for ( pObjIndex = obj_index_hash[hash];
+	  pObjIndex;
+	  pObjIndex = pObjIndex->next )
+      {
 	vnum = pObjIndex->vnum;
 	fprintf( fpout, "#%ld\n",	vnum				);
 	fprintf( fpout, "%s~\n",	pObjIndex->name			);
@@ -5988,13 +6020,13 @@ void save_objects()
 	fprintf( fpout, "%s~\n",	pObjIndex->action_desc		);
 	if ( pObjIndex->layers )
 	  fprintf( fpout, "%d %d %d %d\n",	pObjIndex->item_type,
-						pObjIndex->extra_flags,
-						pObjIndex->wear_flags,
-						pObjIndex->layers	);
+		   pObjIndex->extra_flags,
+		   pObjIndex->wear_flags,
+		   pObjIndex->layers	);
 	else
 	  fprintf( fpout, "%d %d %d\n",	pObjIndex->item_type,
-					pObjIndex->extra_flags,
-					pObjIndex->wear_flags		);
+		   pObjIndex->extra_flags,
+		   pObjIndex->wear_flags		);
 
 	val0 = pObjIndex->value[0];
 	val1 = pObjIndex->value[1];
@@ -6003,54 +6035,70 @@ void save_objects()
 	val4 = pObjIndex->value[4];
 	val5 = pObjIndex->value[5];
 	switch ( pObjIndex->item_type )
-	{
-	case ITEM_DEVICE:
+	  {
+	  case ITEM_DEVICE:
 	    if ( IS_VALID_SN(val3) ) val3 = skill_table[val3]->slot;
 	    break;
-	}
+	  }
 	if ( val4 || val5 )
 	  fprintf( fpout, "%d %d %d %d %d %d\n",val0, 
-						val1,
-						val2,
-						val3,
-						val4,
-						val5 );
+		   val1,
+		   val2,
+		   val3,
+		   val4,
+		   val5 );
 	else
 	  fprintf( fpout, "%d %d %d %d\n",	val0, 
-						val1,
-						val2,
-						val3 );
+		   val1,
+		   val2,
+		   val3 );
 
 	fprintf( fpout, "%d %d 0\n",	pObjIndex->weight,
-					pObjIndex->cost );
+		 pObjIndex->cost );
 
 	for ( ed = pObjIndex->first_extradesc; ed; ed = ed->next )
-	   fprintf( fpout, "E\n%s~\n%s~\n",
-			ed->keyword, strip_cr( ed->description )	);
+	  fprintf( fpout, "E\n%s~\n%s~\n",
+		   ed->keyword, strip_cr( ed->description )	);
 
 	for ( paf = pObjIndex->first_affect; paf; paf = paf->next )
-	   fprintf( fpout, "A\n%d %d\n", paf->location,
-	     ((paf->location == APPLY_WEAPONSPELL
-	    || paf->location == APPLY_WEARSPELL
-	    || paf->location == APPLY_REMOVESPELL
-	    || paf->location == APPLY_STRIPSN)
-	    && IS_VALID_SN(paf->modifier))
-	    ? skill_table[paf->modifier]->slot : paf->modifier		);
+	  fprintf( fpout, "A\n%d %d\n", paf->location,
+		   ((paf->location == APPLY_WEAPONSPELL
+		     || paf->location == APPLY_WEARSPELL
+		     || paf->location == APPLY_REMOVESPELL
+		     || paf->location == APPLY_STRIPSN)
+		    && IS_VALID_SN(paf->modifier))
+		   ? skill_table[paf->modifier]->slot : paf->modifier		);
 
-	if ( pObjIndex->mudprogs )
-	{
-	  for ( mprog = pObjIndex->mudprogs; mprog; mprog = mprog->next )
-		fprintf( fpout, "> %s %s~\n%s~\n",
-				mprog_type_to_name( mprog->type ),
-				mprog->arglist, strip_cr(mprog->comlist) );
-	  fprintf( fpout, "|\n" );	  
-	}
-    }
-    fprintf( fpout, "#0\n\n\n" );
+	if( pObjIndex->mudprogs )
+	  {
+	    int count = 0;
+	    for( mprog = pObjIndex->mudprogs; mprog; mprog = mprog->next )
+	      {
+		if( ( mprog->arglist && mprog->arglist[0] != '\0' ) )
+		  {
+		    if( mprog->type == IN_FILE_PROG )
+		      {
+			fprintf( fpout, "> %s %s~\n", mprog_type_to_name( mprog->type ), mprog->arglist );
+			count++;
+		      }
+		    // Don't let it save progs which came from files. That would be silly.
+		    else if( mprog->comlist && mprog->comlist[0] != '\0' && !mprog->fileprog )
+		      {
+			fprintf( fpout, "> %s %s~\n%s~\n", mprog_type_to_name( mprog->type ),
+				 mprog->arglist, strip_cr( mprog->comlist ) );
+			count++;
+		      }
+		  }
+	      }
+	    if( count > 0 )
+	      fprintf( fpout, "%s", "|\n" );
+	  }
+      }
+  fprintf( fpout, "#0\n\n\n" );
 
-    /* END */
-    fprintf( fpout, "#$\n" );
-    fclose( fpout );
+  /* END */
+  fprintf( fpout, "#$\n" );
+  fclose( fpout );
 }
 
 void save_some_areas( )
