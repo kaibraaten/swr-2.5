@@ -4375,115 +4375,127 @@ bool DelOExtraProto( OBJ_INDEX_DATA *obj, char *keywords )
 
 void fold_area( const AREA_DATA *tarea, const char *filename, bool install )
 {
-    ROOM_INDEX_DATA	*room = NULL;
-    MPROG_DATA		*mprog = NULL;
-    EXIT_DATA		*xit = NULL;
-    EXTRA_DESCR_DATA	*ed = NULL;
-    char		 buf[MAX_STRING_LENGTH];
-    FILE		*fpout = NULL;
-    long		 vnum = 0;
+  ROOM_INDEX_DATA	*room = NULL;
+  MPROG_DATA		*mprog = NULL;
+  EXIT_DATA		*xit = NULL;
+  EXTRA_DESCR_DATA	*ed = NULL;
+  char		 buf[MAX_STRING_LENGTH];
+  FILE		*fpout = NULL;
+  long		 vnum = 0;
 
-    sprintf( buf, "Saving %s...", tarea->filename );
-    log_string_plus( buf, LOG_NORMAL );
+  sprintf( buf, "Saving %s...", tarea->filename );
+  log_string_plus( buf, LOG_NORMAL );
 
-    sprintf( buf, "%s.bak", filename );
-    rename( filename, buf );
+  sprintf( buf, "%s.bak", filename );
+  rename( filename, buf );
 
-    if ( ( fpout = fopen( filename, "w" ) ) == NULL )
+  if ( ( fpout = fopen( filename, "w" ) ) == NULL )
     {
-	bug( "fold_area: fopen", 0 );
-	perror( filename );
-	return;
+      bug( "fold_area: fopen", 0 );
+      perror( filename );
+      return;
     }
     
-    fprintf( fpout, "#AREA   %s~\n\n\n\n", tarea->name );
+  fprintf( fpout, "#AREA   %s~\n\n\n\n", tarea->name );
 
-    /* save rooms   */
-    fprintf( fpout, "#ROOMS\n" );
-    for ( room = tarea->first_room ; room ; room = room->next_in_area )
+  /* save rooms   */
+  fprintf( fpout, "#ROOMS\n" );
+
+  for ( room = tarea->first_room ; room ; room = room->next_in_area )
     {
-	vnum = room->vnum;
-	if ( install )
-	{
-	    room_extract_mobiles( room );
-	    room_extract_contents( room );
-	}
-	fprintf( fpout, "#%ld\n",	vnum				);
-	fprintf( fpout, "%s~\n",	room->name			);
-	fprintf( fpout, "%s~\n",	strip_cr( room->description )	);
-	if ( (room->tele_delay > 0 && room->tele_vnum > 0) || room->tunnel > 0 )
-	  fprintf( fpout, "0 %d %d %d %ld %d\n",	room->room_flags,
-						room->sector_type,
-						room->tele_delay,
-						room->tele_vnum,
-						room->tunnel		);
-	else
-	  fprintf( fpout, "0 %d %d\n",	room->room_flags,
-					room->sector_type	);
-	for ( xit = room->first_exit; xit; xit = xit->next )
-	{
-	   if ( IS_SET(xit->exit_info, EX_PORTAL) ) /* don't fold portals */
-		continue;
-	   fprintf( fpout, "D%d\n",		xit->vdir );
-	   fprintf( fpout, "%s~\n",		strip_cr( xit->description ) );
-	   fprintf( fpout, "%s~\n",		strip_cr( xit->keyword ) );
-	   if ( xit->distance > 1 )
-	     fprintf( fpout, "%d %d %ld %d\n",	xit->exit_info & ~EX_BASHED,
-	   					xit->key,
-	   					xit->vnum,
-	   					xit->distance );
-	   else
-	     fprintf( fpout, "%d %d %ld\n",	xit->exit_info & ~EX_BASHED,
-	   					xit->key,
-	   					xit->vnum );
-	}	
-	for ( ed = room->first_extradesc; ed; ed = ed->next )
-	   fprintf( fpout, "E\n%s~\n%s~\n",
-			ed->keyword, strip_cr( ed->description ));
+      vnum = room->vnum;
 
-	if ( room->map )   /* maps */
+      if ( install )
+	{
+	  room_extract_mobiles( room );
+	  room_extract_contents( room );
+	}
+
+      fprintf( fpout, "#%ld\n",	vnum				);
+      fprintf( fpout, "%s~\n",	room->name			);
+      fprintf( fpout, "%s~\n",	strip_cr( room->description )	);
+
+      if ( (room->tele_delay > 0 && room->tele_vnum > 0) || room->tunnel > 0 )
+	fprintf( fpout, "0 %d %d %d %ld %d\n",	room->room_flags,
+		 room->sector_type,
+		 room->tele_delay,
+		 room->tele_vnum,
+		 room->tunnel		);
+      else
+	fprintf( fpout, "0 %d %d\n",	room->room_flags,
+		 room->sector_type	);
+
+      for ( xit = room->first_exit; xit; xit = xit->next )
+	{
+	  if ( IS_SET(xit->exit_info, EX_PORTAL) ) /* don't fold portals */
+	    continue;
+
+	  fprintf( fpout, "D%d\n",		xit->vdir );
+	  fprintf( fpout, "%s~\n",		strip_cr( xit->description ) );
+	  fprintf( fpout, "%s~\n",		strip_cr( xit->keyword ) );
+
+	  if ( xit->distance > 1 )
+	    fprintf( fpout, "%d %d %ld %d\n",	xit->exit_info & ~EX_BASHED,
+		     xit->key,
+		     xit->vnum,
+		     xit->distance );
+	  else
+	    fprintf( fpout, "%d %d %ld\n",	xit->exit_info & ~EX_BASHED,
+		     xit->key,
+		     xit->vnum );
+	}
+
+      for ( ed = room->first_extradesc; ed; ed = ed->next )
+	fprintf( fpout, "E\n%s~\n%s~\n",
+		 ed->keyword, strip_cr( ed->description ));
+
+      if ( room->map )   /* maps */
 	{
 #ifdef OLDMAPS
-	   fprintf( fpout, "M\n" );
-	   fprintf( fpout, "%s~\n", strip_cr( room->map )	);
+	  fprintf( fpout, "M\n" );
+	  fprintf( fpout, "%s~\n", strip_cr( room->map )	);
 #endif
-	   fprintf( fpout, "M %ld %d %d %c\n",	room->map->vnum
-					      , room->map->x
-					      , room->map->y
-					      , room->map->entry );
+	  fprintf( fpout, "M %ld %d %d %c\n",	room->map->vnum
+		   , room->map->x
+		   , room->map->y
+		   , room->map->entry );
 	}
 
-	if( room->mudprogs )
-	  {
-	    int count = 0;
-	    for( mprog = room->mudprogs; mprog; mprog = mprog->next )
-	      {
-		if( ( mprog->arglist && mprog->arglist[0] != '\0' ) )
-		  {
-		    if( mprog->type == IN_FILE_PROG )
-		      {
-			fprintf( fpout, "> %s %s~\n", mprog_type_to_name( mprog->type ), mprog->arglist );
-			count++;
-		      }
-		    // Don't let it save progs which came from files. That would be silly.
-		    else if( mprog->comlist && mprog->comlist[0] != '\0' && !mprog->fileprog )
-		      {
-			fprintf( fpout, "> %s %s~\n%s~\n", mprog_type_to_name( mprog->type ),
-				 mprog->arglist, strip_cr( mprog->comlist ) );
-			count++;
-		      }
-		  }
-	      }
-	    if( count > 0 )
-	      fprintf( fpout, "%s", "|\n" );
-	  }
-    }
-    fprintf( fpout, "#0\n\n\n" );
+      if( room->mudprogs )
+	{
+	  int count = 0;
+	  for( mprog = room->mudprogs; mprog; mprog = mprog->next )
+	    {
+	      if( ( mprog->arglist && mprog->arglist[0] != '\0' ) )
+		{
+		  if( mprog->type == IN_FILE_PROG )
+		    {
+		      fprintf( fpout, "> %s %s~\n", mprog_type_to_name( mprog->type ), mprog->arglist );
+		      count++;
+		    }
+		  // Don't let it save progs which came from files. That would be silly.
+		  else if( mprog->comlist && mprog->comlist[0] != '\0' && !mprog->fileprog )
+		    {
+		      fprintf( fpout, "> %s %s~\n%s~\n", mprog_type_to_name( mprog->type ),
+			       mprog->arglist, strip_cr( mprog->comlist ) );
+		      count++;
+		    }
+		}
+	    }
 
-    /* END */
-    fprintf( fpout, "#$\n" );
-    fclose( fpout );
-    return;
+	  if( count > 0 )
+	    fprintf( fpout, "%s", "|\n" );
+	}
+
+      fprintf( fpout, "%s", "S\n" );
+    }
+
+  fprintf( fpout, "#0\n\n\n" );
+
+  /* END */
+  fprintf( fpout, "#$\n" );
+  fclose( fpout );
+  return;
 }
 
 void do_savearea( CHAR_DATA *ch, char *argument )
