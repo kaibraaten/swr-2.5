@@ -25,8 +25,6 @@
 
 const   char    go_ahead_str    [] = { IAC, GA, '\0' };
 
-void    save_sysdata args( ( SYSTEM_DATA sys ) );
-
 /*  from act_info?  */
 void    show_condition( CHAR_DATA *ch, CHAR_DATA *victim );
 void        write_ship_list args( ( void ) );
@@ -750,7 +748,7 @@ void new_descriptor( int new_desc )
 	sprintf( log_buf, "Broke all-time maximum player record: %d", sysdata.alltimemax );
 	log_string_plus( log_buf, LOG_COMM );
 	to_channel( log_buf, CHANNEL_MONITOR, "Monitor", 2 );
-	save_sysdata( sysdata );
+	save_sysdata();
     }
     set_alarm(0);
     return;
