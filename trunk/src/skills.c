@@ -856,7 +856,7 @@ void do_sset( CHAR_DATA *ch, char *argument )
 		/* Sanitize the flag input for the modifier if needed -- Samson */
 		if( modval < 0 )
 		  modval = 0;
-		snprintf( modifier, MAX_INPUT_LENGTH, "%d", modval );
+		sprintf( modifier, "%d", modval );
 	      }
 	    aff->modifier = str_dup( modifier );
 	    aff->bitvector = bit;

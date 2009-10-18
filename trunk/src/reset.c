@@ -627,8 +627,8 @@ static void reset_random_colonists( ROOM_INDEX_DATA *pRoomIndex )
 	  if ( (pMobIndex = get_mob_index(MOB_VNUM_VENDOR)) )
 	    {
 	      int rep = 0;
-	      mob = create_mobile(pMobIndex);
 	      OBJ_INDEX_DATA *pObjIndex = NULL;
+	      mob = create_mobile(pMobIndex);
 
 	      SET_BIT ( mob->act , ACT_CITIZEN );
 	      char_to_room(mob, pRoomIndex);
@@ -659,8 +659,8 @@ static void reset_random_colonists( ROOM_INDEX_DATA *pRoomIndex )
 	{
 	  if ( (pMobIndex = get_mob_index(MOB_VNUM_DEALER)) )
 	    {
-	      mob = create_mobile(pMobIndex);
 	      OBJ_INDEX_DATA *pObjIndex = NULL;
+	      mob = create_mobile(pMobIndex);
 
 	      SET_BIT ( mob->act , ACT_CITIZEN );
 	      char_to_room(mob, pRoomIndex);

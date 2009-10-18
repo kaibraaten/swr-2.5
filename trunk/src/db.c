@@ -3317,7 +3317,7 @@ void mobprog_file_read( MOB_INDEX_DATA *mob, char *f )
   FILE *progfile;
   char letter;
 
-  snprintf( MUDProgfile, 256, "%s%s", PROG_DIR, f );
+  sprintf( MUDProgfile, "%s%s", PROG_DIR, f );
 
   if( !( progfile = fopen( MUDProgfile, "r" ) ) )
     {
@@ -3432,7 +3432,7 @@ void objprog_file_read( OBJ_INDEX_DATA *obj, char *f )
   FILE *progfile;
   char letter;
 
-  snprintf( MUDProgfile, 256, "%s%s", PROG_DIR, f );
+  sprintf( MUDProgfile, "%s%s", PROG_DIR, f );
 
   if( !( progfile = fopen( MUDProgfile, "r" ) ) )
     {
@@ -3548,7 +3548,7 @@ void roomprog_file_read( ROOM_INDEX_DATA *room, char *f )
   FILE *progfile;
   char letter;
 
-  snprintf( MUDProgfile, 256, "%s%s", PROG_DIR, f );
+  sprintf( MUDProgfile, "%s%s", PROG_DIR, f );
 
   if( !( progfile = fopen( MUDProgfile, "r" ) ) )
     {
@@ -4522,7 +4522,7 @@ bool is_valid_filename( const CHAR_DATA *ch, const char *direct,
     }
 
   /* If that filename is already being used lets not allow it now to be on the safe side */
-  snprintf( newfilename, sizeof( newfilename ), "%s%s", direct, filename );
+  sprintf( newfilename, "%s%s", direct, filename );
 
   if( stat( newfilename, &fst ) != -1 )
     {
