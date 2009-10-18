@@ -4297,10 +4297,11 @@ void do_zones( CHAR_DATA *ch, char *argument )
 /*
  * Save system info to data file
  */
-void save_sysdata( SYSTEM_DATA sys )
+void save_sysdata( void )
 {
     FILE *fp;
     char filename[MAX_INPUT_LENGTH];
+    log_string( "Saving systemdata..." );
 
     sprintf( filename, "%ssysdata.dat", SYSTEM_DIR );
     
@@ -4311,13 +4312,13 @@ void save_sysdata( SYSTEM_DATA sys )
     else
     {
 	fprintf( fp, "#SYSTEM\n" );
-	fprintf( fp, "Highplayers    %d\n", sys.alltimemax		);
-	fprintf( fp, "Highplayertime %s~\n", sys.time_of_max		);
-	fprintf( fp, "Nameresolving  %d\n", sys.NO_NAME_RESOLVING	);
-	fprintf( fp, "Waitforauth    %d\n", sys.WAIT_FOR_AUTH		);
-	fprintf( fp, "Saveflags      %d\n", sys.save_flags		);
-	fprintf( fp, "Savefreq       %d\n", sys.save_frequency		);
-	fprintf( fp, "Officials      %s~\n", sys.officials		);
+	fprintf( fp, "Highplayers    %d\n", sysdata.alltimemax		);
+	fprintf( fp, "Highplayertime %s~\n", sysdata.time_of_max		);
+	fprintf( fp, "Nameresolving  %d\n", sysdata.NO_NAME_RESOLVING	);
+	fprintf( fp, "Waitforauth    %d\n", sysdata.WAIT_FOR_AUTH		);
+	fprintf( fp, "Saveflags      %d\n", sysdata.save_flags		);
+	fprintf( fp, "Savefreq       %d\n", sysdata.save_frequency		);
+	fprintf( fp, "Officials      %s~\n", sysdata.officials		);
 	fprintf( fp, "End\n\n"						);
 	fprintf( fp, "#END\n"						);
     }

@@ -3562,6 +3562,7 @@ void	act		args( ( short AType, const char *format, CHAR_DATA *ch,
 void	reset_all	args( ( ) );
 
 /* db.c */
+void save_sysdata( void );
 bool is_valid_filename( const CHAR_DATA *ch, const char *direct,
 			const char *filename );
 void replace_char( char *buf, char replace, char with );

@@ -3769,10 +3769,10 @@ void do_for (CHAR_DATA *ch, char *argument)
 	} /* if strchr */
 } /* do_for */
 
-void save_sysdata  args( ( SYSTEM_DATA sys ) );
-
 void do_cset( CHAR_DATA *ch, char *argument )
 {
+  save_sysdata();
+  ch_printf( ch, "System data saved.\r\n" );
 }
 
 void get_reboot_string(void)
