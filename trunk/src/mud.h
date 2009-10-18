@@ -238,6 +238,10 @@ typedef enum
 #define WT_AVATAR 1
 #define WT_NEWBIE 3
 
+typedef enum
+  {
+    DISASTER_ALIEN_INVASION
+  } disaster_types;
 /*
  * do_who output structure -- Narn
  */ 
