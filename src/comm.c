@@ -34,27 +34,27 @@ void        write_ship_list args( ( void ) );
 /*
  * Global variables.
  */
-DESCRIPTOR_DATA *   first_descriptor;	/* First descriptor		*/
-DESCRIPTOR_DATA *   last_descriptor;	/* Last descriptor		*/
-DESCRIPTOR_DATA *   d_next;		/* Next descriptor in loop	*/
-int		    num_descriptors;
-bool		    mud_down;		/* Shutdown			*/
-bool		    wizlock;		/* Game is wizlocked		*/
-time_t              boot_time;
+DESCRIPTOR_DATA *   first_descriptor = NULL; /* First descriptor	*/
+DESCRIPTOR_DATA *   last_descriptor = NULL;	/* Last descriptor	*/
+DESCRIPTOR_DATA *   d_next = NULL;		/* Next descriptor in loop*/
+int		    num_descriptors = 0;
+bool		    mud_down = FALSE;		/* Shutdown		*/
+bool		    wizlock = FALSE;		/* Game is wizlocked	*/
+time_t              boot_time = 0;
 HOUR_MIN_SEC  	    set_boot_time_struct;
-HOUR_MIN_SEC *      set_boot_time;
-struct tm *         new_boot_time;
+HOUR_MIN_SEC *      set_boot_time = NULL;
+struct tm *         new_boot_time = NULL;
 struct tm           new_boot_struct;
 char		    str_boot_time[MAX_INPUT_LENGTH];
 char		    lastplayercmd[MAX_INPUT_LENGTH*2];
-time_t		    current_time;	/* Time of this pulse		*/
-int		    control;		/* Controlling descriptor	*/
-int port;
-int		    newdesc;		/* New descriptor		*/
+time_t		    current_time = 0;	/* Time of this pulse		*/
+int		    control = 0;	/* Controlling descriptor	*/
+int port = 0;
+int		    newdesc = 0;	/* New descriptor		*/
 fd_set		    in_set;		/* Set of desc's for reading	*/
 fd_set		    out_set;		/* Set of desc's for writing	*/
 fd_set		    exc_set;		/* Set of desc's with errors	*/
-int 		    maxdesc;
+int 		    maxdesc = 0;
 
 /*
  * OS-dependent local functions.
@@ -209,11 +209,11 @@ int init_socket( int port )
 {
   char hostname[64];
   struct sockaddr_in	 sa;
-  struct hostent	*hp;
-  struct servent	*sp;
+  struct hostent	*hp = NULL;
+  struct servent	*sp = NULL;
   int optval = 1;
   socklen_t optlen = sizeof( optval );
-  int fd;
+  int fd = 0;
 
   gethostname(hostname, sizeof(hostname));
 
@@ -327,7 +327,7 @@ bool check_bad_desc( int desc )
 void accept_new( int ctrl )
 {
   static struct timeval null_time;
-  DESCRIPTOR_DATA *d;
+  DESCRIPTOR_DATA *d = NULL;
   int result = 0;
 
   /*
@@ -380,7 +380,7 @@ void game_loop( )
 {
   struct timeval	  last_time;
   char cmdline[MAX_INPUT_LENGTH];
-  DESCRIPTOR_DATA *d;
+  DESCRIPTOR_DATA *d = NULL;
 
 #ifndef AMIGA
   signal( SIGPIPE, SIG_IGN );
@@ -562,8 +562,8 @@ void game_loop( )
        */
       {
 	struct timeval now_time;
-	long secDelta;
-	long usecDelta;
+	long secDelta = 0;
+	long usecDelta = 0;
 
 	gettimeofday( &now_time, NULL );
 	usecDelta	= ((int) last_time.tv_usec) - ((int) now_time.tv_usec)
@@ -635,12 +635,12 @@ void init_descriptor( DESCRIPTOR_DATA *dnew, int desc )
 void new_descriptor( int new_desc )
 {
     char buf[MAX_STRING_LENGTH];
-    DESCRIPTOR_DATA *dnew;
-    struct hostent  *from;
-    char *hostname;
+    DESCRIPTOR_DATA *dnew = NULL;
+    struct hostent  *from = NULL;
+    const char *hostname = NULL;
     struct sockaddr_in sock;
-    int desc;
-    socklen_t size;
+    int desc = 0;
+    socklen_t size = 0;
 #ifdef AMIGA
     char optval = 1;
 #endif
@@ -717,7 +717,7 @@ void new_descriptor( int new_desc )
 
     if ( !last_descriptor && first_descriptor )
     {
-	DESCRIPTOR_DATA *d;
+	DESCRIPTOR_DATA *d = NULL;
 
 	bug( "New_descriptor: last_desc is NULL, but first_desc is not! ...fixing" );
 	for ( d = first_descriptor; d; d = d->next )
@@ -772,8 +772,8 @@ void free_desc( DESCRIPTOR_DATA *d )
 
 void close_socket( DESCRIPTOR_DATA *dclose, bool force )
 {
-    CHAR_DATA *ch;
-    DESCRIPTOR_DATA *d;
+    CHAR_DATA *ch = NULL;
+    DESCRIPTOR_DATA *d = NULL;
     bool DoNotUnlink = FALSE;
 
     /* flush outbuf */
@@ -809,10 +809,10 @@ void close_socket( DESCRIPTOR_DATA *dclose, bool force )
     /* sanity check :( */
     if ( !dclose->prev && dclose != first_descriptor )
     {
-	DESCRIPTOR_DATA *dp, *dn;
+	DESCRIPTOR_DATA *dp = NULL, *dn = NULL;
 	bug( "Close_socket: %s desc:%p != first_desc:%p and desc->prev = NULL!",
 		ch ? ch->name : d->host, dclose, first_descriptor );
-	dp = NULL;
+
 	for ( d = first_descriptor; d; d = dn )
 	{
 	   dn = d->next;
@@ -834,10 +834,10 @@ void close_socket( DESCRIPTOR_DATA *dclose, bool force )
     }
     if ( !dclose->next && dclose != last_descriptor )
     {
-	DESCRIPTOR_DATA *dp, *dn;
+	DESCRIPTOR_DATA *dp = NULL, *dn = NULL;
 	bug( "Close_socket: %s desc:%p != last_desc:%p and desc->next = NULL!",
 		ch ? ch->name : d->host, dclose, last_descriptor );
-	dn = NULL;
+
 	for ( d = last_descriptor; d; d = dp )
 	{
 	   dp = d->prev;
@@ -975,7 +975,7 @@ bool read_from_descriptor( DESCRIPTOR_DATA *d )
  */
 void read_from_buffer( DESCRIPTOR_DATA *d )
 {
-  int i, j, k;
+  int i = 0, j = 0, k = 0;
 
   /*
    * Hold horses if pending command already.
@@ -1081,7 +1081,7 @@ void read_from_buffer( DESCRIPTOR_DATA *d )
 bool flush_buffer( DESCRIPTOR_DATA *d, bool fPrompt )
 {
     char buf[MAX_INPUT_LENGTH];
-    CHAR_DATA *ch;
+    CHAR_DATA *ch = NULL;
     
     ch = d->original ? d->original : d->character;
     if( ch && ch->fighting && ch->fighting->who )
@@ -1278,9 +1278,7 @@ bool write_to_descriptor( int desc, const char *txt, int length )
 
 void show_title( DESCRIPTOR_DATA *d )
 {
-    CHAR_DATA *ch;
-
-    ch = d->character;
+    CHAR_DATA *ch = d->character;
 
     if ( !IS_SET( ch->pcdata->flags, PCFLAG_NOINTRO ) )
     {
@@ -1323,8 +1321,8 @@ bool check_parse_name( const char *name )
      * Lock out IllIll twits.
      */
     {
-      const char *pc;
-	bool fIll;
+      const char *pc = NULL;
+      bool fIll = FALSE;
 
 	fIll = TRUE;
 	for ( pc = name; *pc != '\0'; pc++ )
@@ -1355,7 +1353,7 @@ bool check_parse_name( const char *name )
  */
 bool check_reconnect( DESCRIPTOR_DATA *d, const char *name, bool fConn )
 {
-    CHAR_DATA *ch;
+    CHAR_DATA *ch = NULL;
 
     for ( ch = first_char; ch; ch = ch->next )
     {
@@ -1411,53 +1409,33 @@ bool check_reconnect( DESCRIPTOR_DATA *d, const char *name, bool fConn )
  
 bool check_multi( DESCRIPTOR_DATA *d , const char *name )
 {
-  DESCRIPTOR_DATA *dold;
+  DESCRIPTOR_DATA *dold = NULL;
         
-    for ( dold = first_descriptor; dold; dold = dold->next )
+  for ( dold = first_descriptor; dold; dold = dold->next )
     {
-	if ( dold != d
-	&& (  dold->character || dold->original )
-	&&   str_cmp( name, dold->original
-		 ? dold->original->name : dold->character->name ) 
-        && !str_cmp(dold->host , d->host ) )
+      if ( dold != d
+	   && (  dold->character || dold->original )
+	   &&   str_cmp( name, dold->original
+			 ? dold->original->name : dold->character->name ) 
+	   && !str_cmp(dold->host , d->host ) )
 	{
-	        const char *ok = "194.234.177";
-	        const char *ok2 = "209.183.133.229";
-	        int iloop;
-	        
-		for ( iloop = 0 ; iloop < 11 ; iloop++ )
-	        {
-	            if ( ok[iloop] != d->host[iloop] )
-	              break;
-	        }
-	        if ( iloop >= 10 )
-	           return FALSE; 
-		for ( iloop = 0 ; iloop < 11 ; iloop++ )
-	        {
-	            if ( ok2[iloop] != d->host[iloop] )
-	              break;
-	        }
-	        if ( iloop >= 10 )
-	           return FALSE; 
-		write_to_buffer( d, "Sorry multi-playing is not allowed ... have you other character quit first.\r\n", 0 );
-		sprintf( log_buf, "%s attempting to multiplay with %s.", dold->original ? dold->original->name : dold->character->name , d->character->name );
-		log_string_plus( log_buf, LOG_COMM );	
-	        d->character = NULL;
-	        free_char( d->character );
-	        return TRUE;
+	  write_to_buffer( d, "Sorry multi-playing is not allowed ... have you other character quit first.\r\n", 0 );
+	  sprintf( log_buf, "%s attempting to multiplay with %s.", dold->original ? dold->original->name : dold->character->name , d->character->name );
+	  log_string_plus( log_buf, LOG_COMM );	
+	  d->character = NULL;
+	  free_char( d->character );
+	  return TRUE;
 	}
     }
 
-    return FALSE;
-
+  return FALSE;
 }                
 
 bool check_playing( DESCRIPTOR_DATA *d, const char *name, bool kick )
 {
-    CHAR_DATA *ch;
-
-    DESCRIPTOR_DATA *dold;
-    int	cstate;
+  CHAR_DATA *ch = NULL;
+  DESCRIPTOR_DATA *dold = NULL;
+  int	cstate = 0;
 
     for ( dold = first_descriptor; dold; dold = dold->next )
     {
@@ -1523,34 +1501,16 @@ void stop_idling( CHAR_DATA *ch )
     return;
 }
 
-
-
-/*
- * Write to one char. Commented out in favour of colour
- *
-void send_to_char( const char *txt, CHAR_DATA *ch )
-{
-    if ( !ch )
-    {
-      bug( "Send_to_char: NULL *ch" );
-      return;
-    }
-    if ( txt && ch->desc )
-	write_to_buffer( ch->desc, txt, strlen(txt) );
-    return;
-}
-*/
-
 /*
  * Same as above, but converts &color codes to ANSI sequences..
  */
 void send_to_char_color( const char *txt, const CHAR_DATA *ch )
 {
-  DESCRIPTOR_DATA *d;
-  const char *colstr;
+  DESCRIPTOR_DATA *d = NULL;
+  const char *colstr = NULL;
   const char *prevstr = txt;
   char colbuf[20];
-  int ln;
+  int ln = 0;
   
   if ( !ch )
   {
@@ -1626,39 +1586,13 @@ void write_to_pager( DESCRIPTOR_DATA *d, const char *txt, size_t length )
   return;
 }
 
-/* commented out in favour of colour routine
-
-void send_to_pager( const char *txt, CHAR_DATA *ch )
-{
-  if ( !ch )
-  {
-    bug( "Send_to_pager: NULL *ch" );
-    return;
-  }
-  if ( txt && ch->desc )
-  {
-    DESCRIPTOR_DATA *d = ch->desc;
-    
-    ch = d->original ? d->original : d->character;
-    if ( IS_NPC(ch) || !IS_SET(ch->pcdata->flags, PCFLAG_PAGERON) )
-    {
-	send_to_char(txt, d->character);
-	return;
-    }
-    write_to_pager(d, txt, 0);
-  }
-  return;
-}
-
-*/
-
 void send_to_pager_color( const char *txt, const CHAR_DATA *ch )
 {
-  DESCRIPTOR_DATA *d;
-  const char *colstr;
+  DESCRIPTOR_DATA *d = NULL;
+  const char *colstr = NULL;
   const char *prevstr = txt;
   char colbuf[20];
-  int ln;
+  int ln = 0;
   
   if ( !ch )
   {
@@ -1698,7 +1632,7 @@ void send_to_pager_color( const char *txt, const CHAR_DATA *ch )
 void set_char_color( short AType, CHAR_DATA *ch )
 {
     char buf[16];
-    CHAR_DATA *och;
+    CHAR_DATA *och = NULL;
     
     if ( !ch || !ch->desc )
       return;
@@ -1719,7 +1653,7 @@ void set_char_color( short AType, CHAR_DATA *ch )
 void set_pager_color( short AType, CHAR_DATA *ch )
 {
     char buf[16];
-    CHAR_DATA *och;
+    CHAR_DATA *och = NULL;
     
     if ( !ch || !ch->desc )
       return;
@@ -1804,7 +1738,7 @@ char *act_string(const char *format, CHAR_DATA *to, CHAR_DATA *ch,
   char fname[MAX_INPUT_LENGTH];
   char *point = buf;
   const char *str = format;
-  const char *i;
+  const char *i = NULL;
   CHAR_DATA *vch = (CHAR_DATA *) arg2;
   OBJ_DATA *obj1 = (OBJ_DATA  *) arg1;
   OBJ_DATA *obj2 = (OBJ_DATA  *) arg2;
@@ -1917,8 +1851,8 @@ char *act_string(const char *format, CHAR_DATA *to, CHAR_DATA *ch,
   
 void act( short AType, const char *format, CHAR_DATA *ch, const void *arg1, const void *arg2, int type )
 {
-    char *txt;
-    CHAR_DATA *to;
+    char *txt = NULL;
+    CHAR_DATA *to = NULL;
     CHAR_DATA *vch = (CHAR_DATA *)arg2;
 
     /*
@@ -1966,7 +1900,7 @@ void act( short AType, const char *format, CHAR_DATA *ch, const void *arg1, cons
 
     if ( MOBtrigger && type != TO_CHAR && type != TO_VICT && to )
     {
-      OBJ_DATA *to_obj;
+      OBJ_DATA *to_obj = NULL;
       
       txt = act_string(format, NULL, ch, arg1, arg2);
       if ( IS_SET(to->in_room->progtypes, ACT_PROG) )
@@ -2024,9 +1958,9 @@ char *default_prompt( CHAR_DATA *ch )
 int getcolor(char clr)
 {
   static const char *colors = "xrgObpcwzRGYBPCW";
-  int r;
+  int r = 0;
   
-  for ( r = 0; r < 16; r++ )
+  for ( r = 0; r < strlen( colors ); r++ )
     if ( clr == colors[r] )
       return r;
   return -1;
@@ -2037,10 +1971,10 @@ void display_prompt( DESCRIPTOR_DATA *d )
   CHAR_DATA *ch = d->character;
   CHAR_DATA *och = (d->original ? d->original : d->character);
   bool ansi = (!IS_NPC(och) && IS_SET(och->act, PLR_ANSI));
-  const char *prompt;
+  const char *prompt = NULL;
   char buf[MAX_STRING_LENGTH];
   char *pbuf = buf;
-  unsigned int stat;
+  unsigned int stat = 0;
 
   if ( !ch )
   {
@@ -2193,14 +2127,12 @@ void display_prompt( DESCRIPTOR_DATA *d )
 
 int make_color_sequence(const char *col, char *buf, DESCRIPTOR_DATA *d)
 {
-  int ln;
+  int ln = 0;
   const char *ctype = col;
-  unsigned char cl;
-  CHAR_DATA *och;
-  bool ansi;
-  
-  och = (d->original ? d->original : d->character);
-  ansi = (!IS_NPC(och) && IS_SET(och->act, PLR_ANSI));
+  unsigned char cl = 0;
+  CHAR_DATA *och = och = (d->original ? d->original : d->character);
+  bool ansi = ansi = (!IS_NPC(och) && IS_SET(och->act, PLR_ANSI));
+
   col++;
   if ( !*col )
     ln = -1;
@@ -2236,7 +2168,7 @@ int make_color_sequence(const char *col, char *buf, DESCRIPTOR_DATA *d)
       }
     case '^':
       {
-        int newcol;
+        int newcol = 0;
         
         if ( (newcol = getcolor(*col)) < 0 )
         {
@@ -2301,11 +2233,11 @@ void set_pager_input( DESCRIPTOR_DATA *d, char *argument )
 
 bool pager_output( DESCRIPTOR_DATA *d )
 {
-  register char *last;
-  CHAR_DATA *ch;
-  int pclines;
-  register int lines;
-  bool ret;
+  register char *last = NULL;
+  CHAR_DATA *ch = NULL;
+  int pclines = 0;
+  register int lines = 0;
+  bool ret = FALSE;
 
   if ( !d || !d->pagepoint || d->pagecmd == -1 )
     return TRUE;
