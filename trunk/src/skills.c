@@ -841,18 +841,28 @@ void do_sset( CHAR_DATA *ch, char *argument )
 		else
 		  bit |= (1 << tmpbit);
 	    }
+
 	    CREATE( aff, SMAUG_AFF, 1 );
-	    if ( !str_cmp( duration, "0" ) )
+	    if( !str_cmp( duration, "0" ) )
 	      duration[0] = '\0';
-	    if ( !str_cmp( modifier, "0" ) )
+	    if( !str_cmp( modifier, "0" ) )
 	      modifier[0] = '\0';
 	    aff->duration = str_dup( duration );
 	    aff->location = loc;
+	    if( loc == APPLY_AFFECT || loc == APPLY_RESISTANT || loc == APPLY_IMMUNE || loc == APPLY_SUSCEPTIBLE )
+	      {
+		int modval = get_aflag( modifier );
+
+		/* Sanitize the flag input for the modifier if needed -- Samson */
+		if( modval < 0 )
+		  modval = 0;
+		snprintf( modifier, MAX_INPUT_LENGTH, "%d", modval );
+	      }
 	    aff->modifier = str_dup( modifier );
 	    aff->bitvector = bit;
 	    aff->next = skill->affects;
 	    skill->affects = aff;
-	    send_to_char( "Ok.\r\n", ch );
+	    send_to_char( "Ok.\n\r", ch );
 	    return;
 	}
 	if ( !str_cmp( arg2, "adept" ) )
