@@ -28,6 +28,7 @@
 
 struct Library *SocketBase = NULL;
 struct Library *UserGroupBase = NULL;
+struct UtilityBase *UtilityBase = NULL;
 
 void network_startup( void )
 {
@@ -37,10 +38,36 @@ void network_startup( void )
 	       __FUNCTION__, __FILE__, __LINE__ );
       exit( 1 );
     }
+
+  if( !( UserGroupBase = OpenLibrary( "usergroup.library", 0 ) ) )
+    {
+      fprintf( stderr, "%s (%s:%d) - Failed to open usergroup.library\n",
+	       __FUNCTION__, __FILE__, __LINE__ );
+      exit( 1 );
+    }
+
+  if( !( UtilityBase = (struct UtilityBase*) OpenLibrary( "utility.library", 0 ) ) )
+    {
+      fprintf( stderr, "%s (%s:%d) - Failed to open utility.library\n",
+	       __FUNCTION__, __FILE__, __LINE__ );
+      exit( 1 );
+    }
 }
 
 void network_teardown( void )
 {
+  if( UtilityBase )
+    {
+      CloseLibrary( (struct Library*) UtilityBase );
+      UtilityBase = NULL;
+    }
+
+  if( UserGroupBase )
+    {
+      CloseLibrary( UserGroupBase );
+      UserGroupBase = NULL;
+    }
+
   if( SocketBase )
     {
       CloseLibrary( SocketBase );
