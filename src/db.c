@@ -16,46 +16,46 @@ void init_supermob();
  * Globals.
  */
 
-WIZENT *	first_wiz;
-WIZENT *	last_wiz;
+WIZENT *	first_wiz = NULL;
+WIZENT *	last_wiz = NULL;
 
 time_t                  last_restore_all_time = 0;
 
-HELP_DATA *		first_help;
-HELP_DATA *		last_help;
+HELP_DATA *		first_help = NULL;
+HELP_DATA *		last_help = NULL;
 
-SHOP_DATA *		first_shop;
-SHOP_DATA *		last_shop;
+SHOP_DATA *		first_shop = NULL;
+SHOP_DATA *		last_shop = NULL;
 
-REPAIR_DATA *		first_repair;
-REPAIR_DATA *		last_repair;
+REPAIR_DATA *		first_repair = NULL;
+REPAIR_DATA *		last_repair = NULL;
 
-TELEPORT_DATA *		first_teleport;
-TELEPORT_DATA *		last_teleport;
+TELEPORT_DATA *		first_teleport = NULL;
+TELEPORT_DATA *		last_teleport = NULL;
 
-OBJ_DATA *		extracted_obj_queue;
-EXTRACT_CHAR_DATA *	extracted_char_queue;
+OBJ_DATA *		extracted_obj_queue = NULL;
+EXTRACT_CHAR_DATA *	extracted_char_queue = NULL;
 
 char			bug_buf		[2*MAX_INPUT_LENGTH];
-CHAR_DATA *		first_char;
-CHAR_DATA *		last_char;
-char *			help_greeting;
+CHAR_DATA *		first_char = NULL;
+CHAR_DATA *		last_char = NULL;
+char *			help_greeting = NULL;
 char			log_buf		[2*MAX_INPUT_LENGTH];
 
-OBJ_DATA *		first_object;
-OBJ_DATA *		last_object;
+OBJ_DATA *		first_object = NULL;
+OBJ_DATA *		last_object = NULL;
 TIME_INFO_DATA		time_info;
 WEATHER_DATA		weather_info;
 
-int			cur_qobjs;
-int			cur_qchars;
-int			nummobsloaded;
-int			numobjsloaded;
-int			physicalobjects;
+int			cur_qobjs = 0;
+int			cur_qchars = 0;
+int			nummobsloaded = 0;
+int			numobjsloaded = 0;
+int			physicalobjects = 0;
 
-MAP_INDEX_DATA  *       first_map;	/* maps */
+MAP_INDEX_DATA  *       first_map = NULL;	/* maps */
 
-AUCTION_DATA    * 	auction;	/* auctions */
+AUCTION_DATA    * 	auction = NULL;	/* auctions */
 OBJ_DATA *supermob_obj = NULL;
 
 /* criminals */
@@ -195,8 +195,8 @@ int			top_vroom;
 /*
  * Semi-locals.
  */
-bool			fBootDb;
-FILE *			fpArea;
+bool			fBootDb = FALSE;
+FILE *			fpArea = NULL;
 char			strArea[MAX_INPUT_LENGTH];
 
 bool MOBtrigger = TRUE;
@@ -244,8 +244,8 @@ void   		mprog_read_programs     args ( ( FILE* fp,
 void   		oprog_read_programs     args ( ( FILE* fp,
 						OBJ_INDEX_DATA *pObjIndex) );
 void   		rprog_read_programs     args ( ( FILE* fp,
-						ROOM_INDEX_DATA *pRoomIndex) );
-
+						 ROOM_INDEX_DATA *pRoomIndex) );
+void unlink_social( SOCIALTYPE *social );
 
 void shutdown_mud( const char *reason )
 {
@@ -636,9 +636,7 @@ void add_help( HELP_DATA *pHelp )
 	   && strcmp(pHelp->keyword, tHelp->keyword) == 0 )
 	{
 	  bug( "add_help: duplicate: %s.  Deleting.", pHelp->keyword );
-	  STRFREE( pHelp->text );
-	  STRFREE( pHelp->keyword );
-	  DISPOSE( pHelp );
+	  free_help( pHelp );
 	  return;
 	}
       else if ( (match=strcmp(pHelp->keyword[0]=='\'' ? pHelp->keyword+1 : pHelp->keyword, tHelp->keyword[0]=='\'' ? tHelp->keyword+1 : tHelp->keyword)) < 0
@@ -685,9 +683,7 @@ void load_helps( AREA_DATA *tarea, FILE *fp )
 
       if ( pHelp->keyword[0] == '\0' )
 	{
-	  STRFREE( pHelp->text );
-	  STRFREE( pHelp->keyword );
-	  DISPOSE( pHelp );
+	  free_help( pHelp );
 	  continue;
 	}
 
@@ -1943,73 +1939,75 @@ void clear_char( CHAR_DATA *ch )
  */
 void free_char( CHAR_DATA *ch )
 {
-    AFFECT_DATA *paf;
-    TIMER *timer;
-    MPROG_ACT_LIST *mpact, *mpact_next;
+  AFFECT_DATA *paf = NULL;
+  TIMER *timer = NULL;
+  MPROG_ACT_LIST *mpact = NULL, *mpact_next = NULL;
 
-    if ( !ch )
+  if ( !ch )
     {
       bug( "Free_char: null ch!" );
       return;
     }
 
-    if ( ch->desc )
-      bug( "Free_char: char still has descriptor." );
+  if ( ch->desc )
+    bug( "Free_char: char still has descriptor." );
 
-    character_extract_carried_objects( ch );
+  character_extract_carried_objects( ch );
 
-    while ( (paf = ch->last_affect) != NULL )
-	affect_remove( ch, paf );
+  while ( (paf = ch->last_affect) != NULL )
+    affect_remove( ch, paf );
 
-    while ( (timer = ch->first_timer) != NULL )
-	extract_timer( ch, timer );
+  while ( (timer = ch->first_timer) != NULL )
+    extract_timer( ch, timer );
 	
-    STRFREE( ch->name		);
-    STRFREE( ch->short_descr	);
-    STRFREE( ch->long_descr	);
-    STRFREE( ch->description	);
-    if ( ch->editor )
-      stop_editing( ch );
+  STRFREE( ch->name		);
+  STRFREE( ch->short_descr	);
+  STRFREE( ch->long_descr	);
+  STRFREE( ch->description	);
 
-    if ( ch->inter_editing )
-      DISPOSE( ch->inter_editing );
+  if ( ch->editor )
+    stop_editing( ch );
 
-    stop_hunting( ch );
-    stop_hating ( ch );
-    stop_fearing( ch );
-    free_fight  ( ch );
+  if ( ch->inter_editing )
+    DISPOSE( ch->inter_editing );
 
-    if ( ch->pnote )
-	free_note( ch->pnote );
+  stop_hunting( ch );
+  stop_hating ( ch );
+  stop_fearing( ch );
+  free_fight  ( ch );
 
-    if ( ch->pcdata )
+  if ( ch->pnote )
+    free_note( ch->pnote );
+
+  if ( ch->pcdata )
     {
-	STRFREE( ch->pcdata->clan_name	);
-        DISPOSE( ch->pcdata->pwd	);  /* no hash */
-	DISPOSE( ch->pcdata->email	);  /* no hash */
-	DISPOSE( ch->pcdata->bamfin	);  /* no hash */
-	DISPOSE( ch->pcdata->bamfout	);  /* no hash */
-	DISPOSE( ch->pcdata->rank	);
-	STRFREE( ch->pcdata->title	);
-	STRFREE( ch->pcdata->bio	); 
-	DISPOSE( ch->pcdata->bestowments ); /* no hash */
-	DISPOSE( ch->pcdata->homepage	);  /* no hash */
-	STRFREE( ch->pcdata->authed_by	);
-	STRFREE( ch->pcdata->prompt	);
-	if ( ch->pcdata->subprompt )
-	   STRFREE( ch->pcdata->subprompt );
-	DISPOSE( ch->pcdata );
-     }
+      STRFREE( ch->pcdata->clan_name	);
+      DISPOSE( ch->pcdata->pwd	);  /* no hash */
+      DISPOSE( ch->pcdata->email	);  /* no hash */
+      DISPOSE( ch->pcdata->bamfin	);  /* no hash */
+      DISPOSE( ch->pcdata->bamfout	);  /* no hash */
+      DISPOSE( ch->pcdata->rank	);
+      STRFREE( ch->pcdata->title	);
+      STRFREE( ch->pcdata->bio	); 
+      DISPOSE( ch->pcdata->bestowments ); /* no hash */
+      DISPOSE( ch->pcdata->homepage	);  /* no hash */
+      STRFREE( ch->pcdata->authed_by	);
+      STRFREE( ch->pcdata->prompt	);
 
-    for ( mpact = ch->mpact; mpact; mpact = mpact_next )
-    {
-	mpact_next = mpact->next;
-	DISPOSE( mpact->buf );
-	DISPOSE( mpact	    );
+      if ( ch->pcdata->subprompt )
+	STRFREE( ch->pcdata->subprompt );
+
+      DISPOSE( ch->pcdata );
     }
 
-    DISPOSE( ch );
-    return;
+  for ( mpact = ch->mpact; mpact; mpact = mpact_next )
+    {
+      mpact_next = mpact->next;
+      DISPOSE( mpact->buf );
+      DISPOSE( mpact	    );
+    }
+
+  DISPOSE( ch );
 }
 
 
@@ -4445,10 +4443,10 @@ bool load_systemdata( SYSTEM_DATA *sys )
 
 void load_banlist( void )
 {
-  BAN_DATA *pban;
-  FILE *fp;
-  int number;
-  char letter;
+  BAN_DATA *pban = NULL;
+  FILE *fp = NULL;
+  int number = 0;
+  char letter = 0;
   
   if ( !(fp = fopen( SYSTEM_DIR BAN_LIST, "r" )) )
     return;
@@ -4530,4 +4528,262 @@ bool is_valid_filename( const CHAR_DATA *ch, const char *direct,
 
   /* If we got here assume its valid */
   return TRUE;
+}
+
+void free_ban( BAN_DATA *ban )
+{
+  DISPOSE( ban->name );
+  DISPOSE( ban->ban_time );
+  DISPOSE( ban );
+}
+
+static void free_ban_list( void )
+{
+  BAN_DATA *ban = NULL;
+  BAN_DATA *ban_next = NULL;
+
+  for( ban = first_ban; ban; ban = ban_next )
+    {
+      ban_next = ban->next;
+      UNLINK( ban, first_ban, last_ban, next, prev );
+      free_ban( ban );
+    }
+
+  first_ban = NULL;
+  last_ban = NULL;
+}
+
+static void free_all_descriptors( void )
+{
+  DESCRIPTOR_DATA *d = NULL;
+  DESCRIPTOR_DATA *d_next = NULL;
+
+  for ( d = first_descriptor; d; d = d_next )
+    {
+      d_next = d->next;
+      close_socket( d, FALSE );
+    }
+}
+
+void free_help( HELP_DATA *help )
+{
+  STRFREE( help->text );
+  STRFREE( help->keyword );
+  DISPOSE( help );
+}
+
+static void free_help_list( void )
+{
+  HELP_DATA *help = NULL;
+  HELP_DATA *help_next = NULL;
+
+  for( help = first_help; help; help = help_next )
+    {
+      help_next = help->next;
+      UNLINK( help, first_help, last_help, next, prev );
+      free_help( help );
+    }
+}
+
+void free_repair( REPAIR_DATA *repair )
+{
+  DISPOSE( repair );
+}
+
+void free_shop( SHOP_DATA *shop )
+{
+  DISPOSE( shop );
+}
+
+void free_space_data( SPACE_DATA *starsystem )
+{
+  if( starsystem->filename )
+    {
+      STRFREE( starsystem->filename );
+    }
+
+  if( starsystem->name )
+    {
+      STRFREE( starsystem->name );
+    }
+
+  if( starsystem->star1 )
+    {
+      STRFREE( starsystem->star1 );
+    }
+
+  if( starsystem->star2 )
+    {
+      STRFREE( starsystem->star2 );
+    }
+
+  DISPOSE( starsystem );
+}
+
+static void free_space_data_list( void )
+{
+  SPACE_DATA *s = NULL;
+  SPACE_DATA *s_next = NULL;
+
+  for( s = first_starsystem; s; s = s_next )
+    {
+      s_next = s->next;
+      UNLINK( s, first_starsystem, last_starsystem, next, prev );
+      free_space_data( s );
+    }
+}
+
+static void free_command_list( void )
+{
+  int hash = 0;
+
+  for( hash = 0; hash < 126; hash++ )
+    {
+      CMDTYPE *command = NULL;
+      CMDTYPE *cmd_next = NULL;
+
+      for( command = command_hash[hash]; command; command = cmd_next )
+	{
+	  cmd_next = command->next;
+	  unlink_command( command );
+	  free_command( command );
+	}
+    }
+}
+
+static void free_social_list( void )
+{
+  int hash = 0;
+
+  for( hash = 0; hash < 27; hash++ )
+    {
+      SOCIALTYPE *social = NULL;
+      SOCIALTYPE *s_next = NULL;
+
+      for( social = social_index[hash]; social; social = s_next )
+	{
+	  s_next = social->next;
+	  unlink_social( social );
+	  free_social( social );
+	}
+    }
+}
+
+static void free_sysdata( void )
+{
+  if( sysdata.time_of_max )
+    {
+      DISPOSE( sysdata.time_of_max );
+    }
+
+  if( sysdata.officials )
+    {
+      STRFREE( sysdata.officials );
+    }
+}
+
+void free_smaug_affect( SMAUG_AFF *aff )
+{
+  if( aff->duration )
+    DISPOSE( aff->duration );
+
+  if( aff->modifier )
+    DISPOSE( aff->modifier );
+
+  DISPOSE( aff );
+}
+
+void free_skill( SKILLTYPE *skill )
+{
+  SMAUG_AFF *aff = NULL;
+  SMAUG_AFF *aff_next = NULL;
+
+  for( aff = skill->affects; aff; aff = aff_next )
+    {
+      aff_next = aff->next;
+      free_smaug_affect( aff );
+    }
+
+  if( skill->components )
+    DISPOSE( skill->components );
+
+  if( skill->noun_damage )
+    DISPOSE( skill->noun_damage );
+
+  if( skill->dice )
+    DISPOSE( skill->dice );
+
+  if( skill->die_char )
+    DISPOSE( skill->die_char );
+
+  if( skill->die_room )
+    DISPOSE( skill->die_room );
+
+  if( skill->die_vict )
+    DISPOSE( skill->die_vict );
+
+  if( skill->hit_char )
+    DISPOSE( skill->hit_char );
+
+  if( skill->hit_room )
+    DISPOSE( skill->hit_room );
+
+  if( skill->hit_vict )
+    DISPOSE( skill->hit_vict );
+
+  if( skill->imm_char )
+    DISPOSE( skill->imm_char );
+
+  if( skill->imm_room )
+    DISPOSE( skill->imm_room );
+
+  if( skill->imm_vict )
+    DISPOSE( skill->imm_vict );
+
+  if( skill->miss_char )
+    DISPOSE( skill->miss_char );
+
+  if( skill->miss_room )
+    DISPOSE( skill->miss_room );
+
+  if( skill->miss_vict )
+    DISPOSE( skill->miss_vict );
+
+  if( skill->name )
+    DISPOSE( skill->name );
+
+  if( skill->msg_off )
+    DISPOSE( skill->msg_off );
+
+  DISPOSE( skill );
+}
+
+static void free_skill_list( void )
+{
+  int sn = 0;
+  SKILLTYPE *skill = NULL;
+
+  for( sn = 0; sn < top_sn && skill_table[sn] && skill_table[sn]->name; sn++ )
+    {
+      skill = skill_table[sn];
+
+      if( skill )
+	{
+	  free_skill( skill );
+	  skill_table[sn] = NULL;
+	}
+    }
+}
+
+void free_memory( void )
+{
+  free_ban_list();
+  free_help_list();
+  free_space_data_list();
+  free_command_list();
+  free_social_list();
+  free_skill_list();
+  free_sysdata();
+
+  free_all_descriptors();
 }

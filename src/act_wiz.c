@@ -2636,19 +2636,19 @@ void do_peace( CHAR_DATA *ch, char *argument )
 
 
 
-BAN_DATA *		first_ban;
-BAN_DATA *		last_ban;
-BAN_DATA *		first_tban;
-BAN_DATA *		last_tban;
+BAN_DATA *		first_ban = NULL;
+BAN_DATA *		last_ban = NULL;
+BAN_DATA *		first_tban = NULL;
+BAN_DATA *		last_tban = NULL;
 
 void save_banlist( void )
 {
-  BAN_DATA *pban;
-  FILE *fp;
+  BAN_DATA *pban = NULL;
+  FILE *fp = NULL;
 
   if ( !(fp = fopen( SYSTEM_DIR BAN_LIST, "w" )) )
   {
-    bug( "Save_banlist: Cannot open " BAN_LIST, 0 );
+    bug( "Save_banlist: Cannot open %s", BAN_LIST );
     perror(BAN_LIST);
     return;
   }
@@ -2659,76 +2659,79 @@ void save_banlist( void )
   fprintf( fp, "-1\n" );
   fclose( fp );
 }
-  
-  
 
 void do_ban( CHAR_DATA *ch, char *argument )
 {
-    char buf[MAX_STRING_LENGTH];
-    char arg[MAX_INPUT_LENGTH];
-    BAN_DATA *pban;
-    int bnum;
+  char buf[MAX_STRING_LENGTH];
+  char arg[MAX_INPUT_LENGTH];
+  BAN_DATA *pban = NULL;
+  int bnum = 0;
 
-    if ( IS_NPC(ch) )
-	return;
+  if ( IS_NPC(ch) )
+    return;
 
-    argument = one_argument( argument, arg );
+  argument = one_argument( argument, arg );
 
-    set_pager_color( AT_PLAIN, ch );
-    if ( arg[0] == '\0' )
+  set_pager_color( AT_PLAIN, ch );
+
+  if ( arg[0] == '\0' )
     {
-	send_to_pager( "Banned sites:\r\n", ch );
-	send_to_pager( "[ #] (Lv) Time                     Site\r\n", ch );
-	send_to_pager( "---- ---- ------------------------ ---------------\r\n", ch );
-	for ( pban = first_ban, bnum = 1; pban; pban = pban->next, bnum++ )
-	    pager_printf(ch, "[%2d] (%2d) %-24s %s\r\n", bnum,
-	            pban->level, pban->ban_time, pban->name);
-	return;
+      send_to_pager( "Banned sites:\r\n", ch );
+      send_to_pager( "[ #] (Lv) Time                     Site\r\n", ch );
+      send_to_pager( "---- ---- ------------------------ ---------------\r\n", ch );
+      for ( pban = first_ban, bnum = 1; pban; pban = pban->next, bnum++ )
+	pager_printf(ch, "[%2d] (%2d) %-24s %s\r\n", bnum,
+		     pban->level, pban->ban_time, pban->name);
+      return;
     }
     
-    /* People are gonna need .# instead of just # to ban by just last
-       number in the site ip.                               -- Altrag */
-    if ( is_number(arg) )
+  /* People are gonna need .# instead of just # to ban by just last
+     number in the site ip.                               -- Altrag */
+  if ( is_number(arg) )
     {
       for ( pban = first_ban, bnum = 1; pban; pban = pban->next, bnum++ )
         if ( bnum == atoi(arg) )
           break;
+
       if ( !pban )
-      {
-        do_ban(ch, const_char_to_nonconst( "" ));
-        return;
-      }
+	{
+	  do_ban(ch, const_char_to_nonconst( "" ));
+	  return;
+	}
+
       argument = one_argument(argument, arg);
+
       if ( arg[0] == '\0' )
-      {
-        do_ban( ch, const_char_to_nonconst( "help" ) );
-        return;
-      }
+	{
+	  do_ban( ch, const_char_to_nonconst( "help" ) );
+	  return;
+	}
       else if ( !str_cmp(arg, "newban") )
-      {
-        pban->level = 1;
-        send_to_char( "New characters banned.\r\n", ch );
-      }
+	{
+	  pban->level = 1;
+	  send_to_char( "New characters banned.\r\n", ch );
+	}
       else if ( !str_cmp(arg, "mortal") )
-      {
-        pban->level = 2;
-        send_to_char( "All mortals banned.\r\n", ch );
-      }
+	{
+	  pban->level = 2;
+	  send_to_char( "All mortals banned.\r\n", ch );
+	}
       else if ( !str_cmp(arg, "total") )
-      {
-        pban->level = 200;
-        send_to_char( "Everyone banned.\r\n", ch );
-      }
+	{
+	  pban->level = 200;
+	  send_to_char( "Everyone banned.\r\n", ch );
+	}
       else
-      {
-        do_ban(ch, const_char_to_nonconst( "help" ));
-        return;
-      }
+	{
+	  do_ban(ch, const_char_to_nonconst( "help" ));
+	  return;
+	}
+
       save_banlist( );
       return;
     }
-    
-    if ( !str_cmp(arg, "help") )
+
+  if ( !str_cmp(arg, "help") )
     {
       send_to_char( "Syntax: ban <site address>\r\n", ch );
       send_to_char( "Syntax: ban <ban number> <newban|mortal|"
@@ -2736,60 +2739,52 @@ void do_ban( CHAR_DATA *ch, char *argument )
       return;
     }
 
-    for ( pban = first_ban; pban; pban = pban->next )
+  for ( pban = first_ban; pban; pban = pban->next )
     {
-	if ( !str_cmp( arg, pban->name ) )
+      if ( !str_cmp( arg, pban->name ) )
 	{
-	    send_to_char( "That site is already banned!\r\n", ch );
-	    return;
+	  send_to_char( "That site is already banned!\r\n", ch );
+	  return;
 	}
     }
 
-    CREATE( pban, BAN_DATA, 1 );
-    LINK( pban, first_ban, last_ban, next, prev );
-    pban->name	= str_dup( arg );
-    pban->level = 2;
-    sprintf(buf, "%24.24s", ctime(&current_time));
-    pban->ban_time = str_dup( buf );
-    save_banlist( );
-    send_to_char( "Ban created.  Mortals banned from site.\r\n", ch );
-    return;
+  CREATE( pban, BAN_DATA, 1 );
+  LINK( pban, first_ban, last_ban, next, prev );
+  pban->name	= str_dup( arg );
+  pban->level = 2;
+  sprintf(buf, "%24.24s", ctime(&current_time));
+  pban->ban_time = str_dup( buf );
+  save_banlist( );
+  send_to_char( "Ban created.  Mortals banned from site.\r\n", ch );
 }
-
 
 void do_allow( CHAR_DATA *ch, char *argument )
 {
-    char arg[MAX_INPUT_LENGTH];
-    BAN_DATA *pban;
+  char arg[MAX_INPUT_LENGTH];
+  BAN_DATA *pban = NULL;
 
-    one_argument( argument, arg );
+  one_argument( argument, arg );
 
-    if ( arg[0] == '\0' )
+  if ( arg[0] == '\0' )
     {
-	send_to_char( "Remove which site from the ban list?\r\n", ch );
-	return;
+      send_to_char( "Remove which site from the ban list?\r\n", ch );
+      return;
     }
 
-    for ( pban = first_ban; pban; pban = pban->next )
+  for ( pban = first_ban; pban; pban = pban->next )
     {
-	if ( !str_cmp( arg, pban->name ) )
+      if ( !str_cmp( arg, pban->name ) )
 	{
-	    UNLINK( pban, first_ban, last_ban, next, prev );
-	    if ( pban->ban_time )
-	      DISPOSE(pban->ban_time);
-	    DISPOSE( pban->name );
-	    DISPOSE( pban );
-	    save_banlist( );
-	    send_to_char( "Site no longer banned.\r\n", ch );
-	    return;
+	  UNLINK( pban, first_ban, last_ban, next, prev );
+	  free_ban( pban );
+	  save_banlist( );
+	  send_to_char( "Site no longer banned.\r\n", ch );
+	  return;
 	}
     }
 
-    send_to_char( "Site is not banned.\r\n", ch );
-    return;
+  send_to_char( "Site is not banned.\r\n", ch );
 }
-
-
 
 void do_wizlock( CHAR_DATA *ch, char *argument )
 {
@@ -4472,84 +4467,86 @@ void do_cedit( CHAR_DATA *ch, char *argument )
 
 void do_arrest( CHAR_DATA *ch, char *argument )
 {
-    char buf[MAX_STRING_LENGTH];
-    char arg1[MAX_INPUT_LENGTH];
-    ROOM_INDEX_DATA *location;
-    DESCRIPTOR_DATA *d;
-    CHAR_DATA *victim;
-    BAN_DATA *tban;
-    
-    argument = one_argument( argument, arg1 );
+  char buf[MAX_STRING_LENGTH];
+  char arg1[MAX_INPUT_LENGTH];
+  ROOM_INDEX_DATA *location = NULL;
+  DESCRIPTOR_DATA *d = NULL;
+  CHAR_DATA *victim = NULL;
+  BAN_DATA *tban = NULL;
 
-    if ( arg1[0] == '\0' )
+  argument = one_argument( argument, arg1 );
+
+  if ( arg1[0] == '\0' )
     {
-	send_to_char( "Arrest who?\r\n", ch );
-	return;
+      send_to_char( "Arrest who?\r\n", ch );
+      return;
     }
 
-    if ( !IS_OFFICIAL(ch) )
+  if ( !IS_OFFICIAL(ch) )
     {
-	send_to_char( "Nice try...\r\n", ch );
-	return;
+      send_to_char( "Nice try...\r\n", ch );
+      return;
     }
 
-	if ( ( location = get_room_index( ROOM_VNUM_JAIL) ) == NULL )
+  if ( ( location = get_room_index( ROOM_VNUM_JAIL) ) == NULL )
+    {
+      send_to_char( "The jail is missing...\r\n", ch );
+      return;
+    }
+
+  for ( d = last_descriptor; d; d = d->prev )
+    {
+      victim   = d->original ? d->original : d->character;
+
+      if ( str_cmp( arg1, victim->name ) )
 	{
-	    send_to_char( "The jail is missing...\r\n", ch );
-	    return;
+	  victim = NULL;
+	  continue;
 	}
 
-    for ( d = last_descriptor; d; d = d->prev )
-    {
-         victim   = d->original ? d->original : d->character;
-         if ( str_cmp( arg1, victim->name ) )
-         {
-              victim = NULL;
-              continue;
-         }
-         if ( d->connected != CON_PLAYING )
-  	 {
-	    send_to_char( "Please wait till they are done editing...\r\n", ch );
-	    return;
-	 }
-         break;
-    }        
+      if ( d->connected != CON_PLAYING )
+	{
+	  send_to_char( "Please wait till they are done editing...\r\n", ch );
+	  return;
+	}
 
-    if ( victim == NULL )
-    {
-	send_to_char( "They aren't logged in right now.\r\n", ch );
-	return;
+      break;
     }
 
-    if ( !victim->in_room )
+  if ( victim == NULL )
     {
-	send_to_char( "They are in limbo.\r\n", ch );
-	return;
+      send_to_char( "They aren't logged in right now.\r\n", ch );
+      return;
     }
 
-    if ( victim->fighting )
-	stop_fighting( victim, TRUE );
-    act( AT_MAGIC, "$n disappears in a cloud of swirling colors.", victim, NULL, NULL, TO_ROOM );
-    victim->retran = victim->in_room->vnum;
-    char_from_room( victim );
-    char_to_room( victim, location );
-    act( AT_MAGIC, "$n arrives from a puff of smoke.", victim, NULL, NULL, TO_ROOM );
-    if ( ch != victim )
+  if ( !victim->in_room )
+    {
+      send_to_char( "They are in limbo.\r\n", ch );
+      return;
+    }
+
+  if ( victim->fighting )
+    stop_fighting( victim, TRUE );
+
+  act( AT_MAGIC, "$n disappears in a cloud of swirling colors.", victim, NULL, NULL, TO_ROOM );
+  victim->retran = victim->in_room->vnum;
+  char_from_room( victim );
+  char_to_room( victim, location );
+  act( AT_MAGIC, "$n arrives from a puff of smoke.", victim, NULL, NULL, TO_ROOM );
+  if ( ch != victim )
     act( AT_IMMORT, "$n has ordered your arrest.", ch, NULL, victim, TO_VICT );
-    do_look( victim, const_char_to_nonconst( "auto" ) );
-    send_to_char( "Player sent to jail. New characters temporarily banned from address.\r\n", ch );
+  do_look( victim, const_char_to_nonconst( "auto" ) );
+  send_to_char( "Player sent to jail. New characters temporarily banned from address.\r\n", ch );
 
-    SET_BIT( victim->act, PLR_SILENCE );
-    SET_BIT( victim->act, PLR_NO_EMOTE );
-    SET_BIT( victim->act, PLR_NO_TELL );
-    SET_BIT( victim->act, PLR_NICE );
+  SET_BIT( victim->act, PLR_SILENCE );
+  SET_BIT( victim->act, PLR_NO_EMOTE );
+  SET_BIT( victim->act, PLR_NO_TELL );
+  SET_BIT( victim->act, PLR_NICE );
 
-    CREATE( tban, BAN_DATA, 1 );
-    LINK( tban, first_tban, last_tban, next, prev );
-    tban->name	= str_dup( d->host );
-    tban->level = 1;
-    sprintf(buf, "%24.24s", ctime(&current_time));
-    tban->ban_time = str_dup( buf );
-
+  CREATE( tban, BAN_DATA, 1 );
+  LINK( tban, first_tban, last_tban, next, prev );
+  tban->name	= str_dup( d->host );
+  tban->level = 1;
+  sprintf(buf, "%24.24s", ctime(&current_time));
+  tban->ban_time = str_dup( buf );
 }
-

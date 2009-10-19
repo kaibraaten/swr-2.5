@@ -7,14 +7,14 @@
 #include "vector3.h"
 #include "vector3_aux.h"
 
-SHIP_DATA * first_ship;
-SHIP_DATA * last_ship;
+SHIP_DATA * first_ship = NULL;
+SHIP_DATA * last_ship = NULL;
 
-MISSILE_DATA * first_missile;
-MISSILE_DATA * last_missile;
+MISSILE_DATA * first_missile = NULL;
+MISSILE_DATA * last_missile = NULL;
 
-SPACE_DATA * first_starsystem;
-SPACE_DATA * last_starsystem;
+SPACE_DATA * first_starsystem = NULL;
+SPACE_DATA * last_starsystem = NULL;
 
 
 /* local routines */
@@ -986,11 +986,11 @@ void fread_starsystem( SPACE_DATA *starsystem, FILE *fp )
 	    break;
 	    
 	case 'F':
-	    KEY( "Filename",	starsystem->filename,		fread_string_nohash( fp ) );
+	    KEY( "Filename", starsystem->filename, fread_string( fp ) );
 	    break;
         
 	case 'N':
-	    KEY( "Name",	starsystem->name,		fread_string( fp ) );
+	  KEY( "Name", starsystem->name, fread_string( fp ) );
 	    break;
         
        	

@@ -348,7 +348,6 @@ struct	descriptor_data
   CHAR_DATA *character;
   CHAR_DATA *original;
   char *host;
-  char *hostip;
   int port;
   SOCKET descriptor;
   short connected;
@@ -375,8 +374,6 @@ struct	descriptor_data
   int newstate;
   unsigned char	prevcolor;
 };
-
-
 
 /*
  * Attribute bonus structures.
@@ -3563,6 +3560,9 @@ void	act		args( ( short AType, const char *format, CHAR_DATA *ch,
 void	reset_all	args( ( ) );
 
 /* db.c */
+void free_shop( SHOP_DATA* );
+void free_help( HELP_DATA* );
+void free_ban( BAN_DATA* );
 void save_sysdata( void );
 bool is_valid_filename( const CHAR_DATA *ch, const char *direct,
 			const char *filename );
