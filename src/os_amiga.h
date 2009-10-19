@@ -38,6 +38,7 @@
 #include <sys/ioctl.h>
 #include <netdb.h>
 #include <sys/time.h>
+#include <db.h>
 
 #if defined( __STORMGCC__ ) && defined( __cplusplus )
 #define unlink(name) !DeleteFile((STRPTR)(name))

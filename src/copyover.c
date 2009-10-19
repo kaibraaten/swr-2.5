@@ -33,7 +33,6 @@
 #include <signal.h>
 #include <stdarg.h>
 #include "mud.h"
-#include "os.h"
 
 /*
  * Socket and TCP/IP stuff.
@@ -49,15 +48,15 @@
 /*
  * OS-dependent local functions.
  */
-int	init_socket		args( ( int port ) );
-void	new_descriptor		args( ( int new_desc ) );
-bool	read_from_descriptor	args( ( DESCRIPTOR_DATA *d ) );
-bool	write_to_descriptor	args( ( int desc, const char *txt, int length ) );
-void    init_descriptor		args( ( DESCRIPTOR_DATA *dnew, int desc) );
+SOCKET init_socket( int port );
+void new_descriptor( SOCKET new_desc );
+bool read_from_descriptor( DESCRIPTOR_DATA *d );
+bool write_to_descriptor( SOCKET desc, const char *txt, int length );
+void init_descriptor( DESCRIPTOR_DATA *dnew, SOCKET desc );
 
 /*  Warm reboot stuff, gotta make sure to thank Erwin for this :) */
 extern int port;               /* Port number to be used       */
-extern int control;		/* Controlling descriptor	*/
+extern SOCKET control;		/* Controlling descriptor	*/
 
 void do_copyover (CHAR_DATA *ch, char * argument)
 {
@@ -118,37 +117,38 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 /* Recover from a copyover - load players */
 void copyover_recover( void )
 {
-  DESCRIPTOR_DATA *d;
-  FILE *fp;
+  DESCRIPTOR_DATA *d = NULL;
+  FILE *fp = NULL;
   char name [100];
   char host[MAX_STRING_LENGTH];
-  int desc;
-  bool fOld;
-/*  CHAR_DATA *ch; */ /* Uncomment This Line if putting functions in comm.c -Iczer */
+  SOCKET desc = 0;
+  bool fOld = FALSE;
+
   log_string ("Copyover recovery initiated");
 
   fp = fopen (COPYOVER_FILE, "r");
 
   if (!fp) /* there are some descriptors open which will hang forever then ? */
-        {
-          perror ("copyover_recover:fopen");
-          log_string("Copyover file not found. Exitting.\r\n");
-           exit (1);
-        }
+    {
+      perror ("copyover_recover:fopen");
+      log_string("Copyover file not found. Exitting.\r\n");
+      exit (1);
+    }
 
   unlink (COPYOVER_FILE); /* In case something crashes
-                              - doesn't prevent reading */
+			     - doesn't prevent reading */
   for (;;)
-   {
-     fscanf (fp, "%d %s %s\n", &desc, name, host);
-     if (desc == -1)
-       break;
+    {
+      fscanf (fp, "%d %s %s\n", &desc, name, host);
 
-        /* Write something, and check if it goes error-free */
-     if (!write_to_descriptor (desc, "\r\nThe surge of Light passes leaving you unscathed and your world reshaped anew\r\n", 0))
-       {
-         closesocket(desc); /* nope */
-         continue;
+      if (desc == -1)
+	break;
+
+      /* Write something, and check if it goes error-free */
+      if (!write_to_descriptor (desc, "\r\nThe surge of Light passes leaving you unscathed and your world reshaped anew\r\n", 0))
+	{
+	  closesocket(desc); /* nope */
+	  continue;
         }
 
       CREATE(d, DESCRIPTOR_DATA, 1);
@@ -160,34 +160,33 @@ void copyover_recover( void )
       d->connected = CON_COPYOVER_RECOVER; /* negative so close_socket
                                               will cut them off */
 
-        /* Now, find the pfile */
-
+      /* Now, find the pfile */
       fOld = load_char_obj (d, name, FALSE);
 
       if (!fOld) /* Player file not found?! */
-       {
+	{
           write_to_descriptor (desc, "\r\nSomehow, your character was lost in the copyover sorry.\r\n", 0);
           close_socket (d, FALSE);
-       }
+	}
       else /* ok! */
-       {
+	{
           write_to_descriptor (desc, "\r\nWarmboot recovery complete.\r\n",0);
 
-           /* Just In Case,  Someone said this isn't necassary, but _why_
-              do we want to dump someone in limbo? */
-           if (!d->character->in_room)
-                d->character->in_room = get_room_index (ROOM_VNUM_SCHOOL);
+	  /* Just In Case,  Someone said this isn't necassary, but _why_
+	     do we want to dump someone in limbo? */
+	  if (!d->character->in_room)
+	    d->character->in_room = get_room_index (ROOM_VNUM_SCHOOL);
 
-           /* Insert in the char_list */
-           LINK( d->character, first_char, last_char, next, prev );
+	  /* Insert in the char_list */
+	  LINK( d->character, first_char, last_char, next, prev );
 
-           char_to_room (d->character, d->character->in_room);
-           do_look (d->character, const_char_to_nonconst("auto noprog"));
-	   load_home(d->character);	
-           act (AT_ACTION, "$n materializes!", d->character, NULL, NULL, TO_ROOM);
-           d->connected = CON_PLAYING;
-       }
+	  char_to_room (d->character, d->character->in_room);
+	  do_look (d->character, const_char_to_nonconst("auto noprog"));
+	  load_home(d->character);	
+	  act (AT_ACTION, "$n materializes!", d->character, NULL, NULL, TO_ROOM);
+	  d->connected = CON_PLAYING;
+	}
+    }
 
-   }
    fclose (fp);
 }

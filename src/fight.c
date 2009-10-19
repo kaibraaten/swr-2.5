@@ -3,9 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
-#ifdef AMIGA
-#include <db.h>
-#endif
 #include <sys/stat.h>
 #include <sys/dir.h>
 #include "mud.h"

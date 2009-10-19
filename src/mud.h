@@ -14,6 +14,7 @@ typedef long clock_t;
 #include <time.h>
 
 #include "vector3.h"
+#include "os.h"
 
 typedef	int				ch_ret;
 typedef	int				obj_ret;
@@ -341,38 +342,38 @@ typedef enum
  */
 struct	descriptor_data
 {
-    DESCRIPTOR_DATA *	next;
-    DESCRIPTOR_DATA *	prev;
-    DESCRIPTOR_DATA *	snoop_by;
-    CHAR_DATA *		character;
-    CHAR_DATA *		original;
-    char *		host;
-    char *              hostip;
-    int			port;
-    int			descriptor;
-    short		connected;
-    short		idle;
-    short		lines;
-    short		scrlen;
-    bool		fcommand;
-    char		inbuf		[MAX_INBUF_SIZE];
-    char		incomm		[MAX_INPUT_LENGTH];
-    char		inlast		[MAX_INPUT_LENGTH];
-    int			repeat;
-    char *		outbuf;
-    unsigned long	outsize;
-    int			outtop;
-    char *		pagebuf;
-    unsigned long	pagesize;
-    int			pagetop;
-    char *		pagepoint;
+  DESCRIPTOR_DATA *next;
+  DESCRIPTOR_DATA *prev;
+  DESCRIPTOR_DATA *snoop_by;
+  CHAR_DATA *character;
+  CHAR_DATA *original;
+  char *host;
+  char *hostip;
+  int port;
+  SOCKET descriptor;
+  short connected;
+  short	idle;
+  short	lines;
+  short	scrlen;
+  bool fcommand;
+  char inbuf[MAX_INBUF_SIZE];
+  char incomm[MAX_INPUT_LENGTH];
+  char inlast[MAX_INPUT_LENGTH];
+  int repeat;
+  char *outbuf;
+  unsigned long	outsize;
+  int outtop;
+  char *pagebuf;
+  unsigned long	pagesize;
+  int pagetop;
+  char *pagepoint;
 #ifdef AMIGA
   signed
 #endif
-    char		pagecmd;
-    char		pagecolor;
-    int			newstate;
-    unsigned char	prevcolor;
+  char pagecmd;
+  char pagecolor;
+  int newstate;
+  unsigned char	prevcolor;
 };
 
 

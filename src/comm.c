@@ -9,7 +9,6 @@
 #include <signal.h>
 #include <stdarg.h>
 #include "mud.h"
-#include "os.h"
 
 /*
  * Socket and TCP/IP stuff.
@@ -46,9 +45,9 @@ struct tm           new_boot_struct;
 char		    str_boot_time[MAX_INPUT_LENGTH];
 char		    lastplayercmd[MAX_INPUT_LENGTH*2];
 time_t		    current_time = 0;	/* Time of this pulse		*/
-int		    control = 0;	/* Controlling descriptor	*/
+SOCKET		    control = 0;	/* Controlling descriptor	*/
 int port = 0;
-int		    newdesc = 0;	/* New descriptor		*/
+SOCKET		    newdesc = 0;	/* New descriptor		*/
 fd_set		    in_set;		/* Set of desc's for reading	*/
 fd_set		    out_set;		/* Set of desc's for writing	*/
 fd_set		    exc_set;		/* Set of desc's with errors	*/
@@ -57,12 +56,11 @@ int 		    maxdesc = 0;
 /*
  * OS-dependent local functions.
  */
-void	game_loop		args( ( ) );
-int	init_socket		args( ( int port ) );
-void	new_descriptor		args( ( int new_desc ) );
-bool	read_from_descriptor	args( ( DESCRIPTOR_DATA *d ) );
-bool	write_to_descriptor	args( ( int desc, const char *txt, int length ) );
-
+void game_loop( void );
+SOCKET init_socket( int port );
+void new_descriptor( SOCKET new_desc );
+bool read_from_descriptor( DESCRIPTOR_DATA *d );
+bool write_to_descriptor( SOCKET desc, const char *txt, int length );
 
 /*
  * Other local functions (OS-independent).
@@ -83,12 +81,7 @@ int	make_color_sequence	args( ( const char *col, char *buf,
 void	set_pager_input		args( ( DESCRIPTOR_DATA *d,
 					char *argument ) );
 bool	pager_output		args( ( DESCRIPTOR_DATA *d ) );
-
-
-
 void	mail_count		args( ( CHAR_DATA *ch ) );
-
-
 
 int main( int argc, char **argv )
 {
@@ -98,112 +91,107 @@ int main( int argc, char **argv )
   network_startup();
   atexit( network_teardown );
 
-    /*
-     * Memory debugging if needed.
-     */
-#if defined(MALLOC_DEBUG)
-    malloc_debug( 2 );
-#endif
+  num_descriptors		= 0;
+  first_descriptor		= NULL;
+  last_descriptor		= NULL;
+  sysdata.NO_NAME_RESOLVING	= TRUE;
+  sysdata.WAIT_FOR_AUTH	= TRUE;
 
-    num_descriptors		= 0;
-    first_descriptor		= NULL;
-    last_descriptor		= NULL;
-    sysdata.NO_NAME_RESOLVING	= TRUE;
-    sysdata.WAIT_FOR_AUTH	= TRUE;
+  /*
+   * Init time.
+   */
+  gettimeofday( &now_time, NULL );
+  current_time = (time_t) now_time.tv_sec;
+  /*  gettimeofday( &boot_time, NULL);   okay, so it's kludgy, sue me :) */
+  boot_time = time(0);         /*  <-- I think this is what you wanted */
+  strcpy( str_boot_time, ctime( &current_time ) );
 
-    /*
-     * Init time.
-     */
-    gettimeofday( &now_time, NULL );
-    current_time = (time_t) now_time.tv_sec;
-/*  gettimeofday( &boot_time, NULL);   okay, so it's kludgy, sue me :) */
-    boot_time = time(0);         /*  <-- I think this is what you wanted */
-    strcpy( str_boot_time, ctime( &current_time ) );
-
-    /*
-     * Init boot time.
-     */
-    set_boot_time = &set_boot_time_struct;
+  /*
+   * Init boot time.
+   */
+  set_boot_time = &set_boot_time_struct;
   /*  set_boot_time->hour   = 6;
-    set_boot_time->min    = 0;
-    set_boot_time->sec    = 0;*/
-    set_boot_time->manual = 0;
+      set_boot_time->min    = 0;
+      set_boot_time->sec    = 0;*/
+  set_boot_time->manual = 0;
     
-    new_boot_time = update_time(localtime(&current_time));
-    /* Copies *new_boot_time to new_boot_struct, and then points
-       new_boot_time to new_boot_struct again. -- Alty */
-    new_boot_struct = *new_boot_time;
-    new_boot_time = &new_boot_struct;
+  new_boot_time = update_time(localtime(&current_time));
+  /* Copies *new_boot_time to new_boot_struct, and then points
+     new_boot_time to new_boot_struct again. -- Alty */
+  new_boot_struct = *new_boot_time;
+  new_boot_time = &new_boot_struct;
+  new_boot_time->tm_mday += 1;
+
+  if(new_boot_time->tm_hour > 12)
     new_boot_time->tm_mday += 1;
-    if(new_boot_time->tm_hour > 12)
-    new_boot_time->tm_mday += 1;
-    new_boot_time->tm_sec = 0;
-    new_boot_time->tm_min = 0;
-    new_boot_time->tm_hour = 6;
 
-    /* Update new_boot_time (due to day increment) */
-    new_boot_time = update_time(new_boot_time);
-    new_boot_struct = *new_boot_time;
-    new_boot_time = &new_boot_struct;
+  new_boot_time->tm_sec = 0;
+  new_boot_time->tm_min = 0;
+  new_boot_time->tm_hour = 6;
 
-    /* Set reboot time string for do_time */
-    get_reboot_string();
+  /* Update new_boot_time (due to day increment) */
+  new_boot_time = update_time(new_boot_time);
+  new_boot_struct = *new_boot_time;
+  new_boot_time = &new_boot_struct;
 
-    /*
-     * Get the port number.
-     */
-    port = 4000;
+  /* Set reboot time string for do_time */
+  get_reboot_string();
 
-    if ( argc > 1 )
-      {
-	if ( !is_number( argv[1] ) )
-	  {
-	    fprintf( stderr, "Usage: %s [port #]\n", argv[0] );
-	    exit( 1 );
-	  }
-	else if ( ( port = atoi( argv[1] ) ) <= 1024 )
-	  {
-	    fprintf( stderr, "Port number must be above 1024.\n" );
-	    exit( 1 );
-	  }
+  /*
+   * Get the port number.
+   */
+  port = 4000;
 
-	if( argv[2] && argv[2][0] )
-	  {
-	    fCopyOver = TRUE;
-	    control = atoi( argv[3] );
-	  }
-	else
-	  {
-	    fCopyOver = FALSE;
-	  }
-      }
+  if ( argc > 1 )
+    {
+      if ( !is_number( argv[1] ) )
+	{
+	  fprintf( stderr, "Usage: %s [port #]\n", argv[0] );
+	  exit( 1 );
+	}
+      else if ( ( port = atoi( argv[1] ) ) <= 1024 )
+	{
+	  fprintf( stderr, "Port number must be above 1024.\n" );
+	  exit( 1 );
+	}
 
-    /*
-     * Run the game.
-     */
-    log_string("Booting Database");
-    boot_db( fCopyOver );
-    log_string("Initializing socket");
+      if( argv[2] && argv[2][0] )
+	{
+	  fCopyOver = TRUE;
+	  control = atoi( argv[3] );
+	}
+      else
+	{
+	  fCopyOver = FALSE;
+	}
+    }
 
-    if( !fCopyOver )
-      {
-	control  = init_socket( port );
-      }
+  /*
+   * Run the game.
+   */
+  log_string("Booting Database");
+  boot_db( fCopyOver );
+  log_string("Initializing socket");
 
-    sprintf( log_buf, "SWR 2.0 ready on port %d.", port );
-    log_string( log_buf );
-    game_loop();
-    closesocket( control );
+  if( !fCopyOver )
+    {
+      control  = init_socket( port );
+    }
 
-    /*
-     * That's all, folks.
-     */
-    log_string( "Normal termination of game." );
-    exit( 0 ); // network_teardown automatically called
+  sprintf( log_buf, "SWR 2.0 ready on port %d.", port );
+  log_string( log_buf );
+  game_loop();
+  closesocket( control );
+
+  /*
+   * That's all, folks.
+   */
+  log_string( "Normal termination of game." );
+  exit( 0 ); // network_teardown automatically called
 }
 
 
-int init_socket( int port )
+SOCKET init_socket( int port )
 {
   char hostname[64];
   struct sockaddr_in	 sa;
@@ -211,7 +199,7 @@ int init_socket( int port )
   struct servent	*sp = NULL;
   int optval = 1;
   socklen_t optlen = sizeof( optval );
-  int fd = 0;
+  SOCKET fd = 0;
 
   gethostname(hostname, sizeof(hostname));
 
@@ -230,43 +218,43 @@ int init_socket( int port )
     }
 
 #if defined(SO_DONTLINGER) && !defined(SYSV)
-    {
-	struct	linger	ld;
+  {
+    struct	linger	ld;
 
-	ld.l_onoff  = 1;
-	ld.l_linger = 1000;
+    ld.l_onoff  = 1;
+    ld.l_linger = 1000;
 
-	if ( setsockopt( fd, SOL_SOCKET, SO_DONTLINGER,
-			(void *) &ld, sizeof(ld) ) == SOCKET_ERROR )
-	{
-	    perror( "Init_socket: SO_DONTLINGER" );
-	    closesocket( fd );
-	    exit( 1 );
-	}
-    }
+    if ( setsockopt( fd, SOL_SOCKET, SO_DONTLINGER,
+		     (void *) &ld, sizeof(ld) ) == SOCKET_ERROR )
+      {
+	perror( "Init_socket: SO_DONTLINGER" );
+	closesocket( fd );
+	exit( 1 );
+      }
+  }
 #endif
 
-    hp = gethostbyname( hostname );
-    sp = getservbyname( "service", "mud" );
-    memset(&sa, '\0', sizeof(sa));
-    sa.sin_family   = AF_INET; /* hp->h_addrtype; */
-    sa.sin_port	    = htons( port );
+  hp = gethostbyname( hostname );
+  sp = getservbyname( "service", "mud" );
+  memset(&sa, '\0', sizeof(sa));
+  sa.sin_family   = AF_INET; /* hp->h_addrtype; */
+  sa.sin_port	    = htons( port );
 
-    if ( bind( fd, (struct sockaddr *) &sa, sizeof(sa) ) == SOCKET_ERROR )
+  if ( bind( fd, (struct sockaddr *) &sa, sizeof(sa) ) == SOCKET_ERROR )
     {
-	perror( "Init_socket: bind" );
-	closesocket( fd );
-	exit( 1 );
+      perror( "Init_socket: bind" );
+      closesocket( fd );
+      exit( 1 );
     }
 
-    if ( listen( fd, 50 ) == SOCKET_ERROR )
+  if ( listen( fd, 50 ) == SOCKET_ERROR )
     {
-	perror( "Init_socket: listen" );
-	closesocket( fd );
-	exit( 1 );
+      perror( "Init_socket: listen" );
+      closesocket( fd );
+      exit( 1 );
     }
 
-    return fd;
+  return fd;
 }
 
 /*
@@ -309,7 +297,7 @@ static void caught_alarm( int foo )
     exit( 0 );
 }
 
-bool check_bad_desc( int desc )
+bool check_bad_desc( SOCKET desc )
 {
     if ( FD_ISSET( desc, &exc_set ) )
     {
@@ -322,7 +310,7 @@ bool check_bad_desc( int desc )
 }
 
 
-void accept_new( int ctrl )
+void accept_new( SOCKET ctrl )
 {
   static struct timeval null_time;
   DESCRIPTOR_DATA *d = NULL;
@@ -376,7 +364,7 @@ void accept_new( int ctrl )
 
 void game_loop( )
 {
-  struct timeval	  last_time;
+  struct timeval last_time;
   char cmdline[MAX_INPUT_LENGTH];
   DESCRIPTOR_DATA *d = NULL;
 
@@ -613,7 +601,7 @@ void game_loop( )
     }
 }
 
-void init_descriptor( DESCRIPTOR_DATA *dnew, int desc )
+void init_descriptor( DESCRIPTOR_DATA *dnew, SOCKET desc )
 {
   dnew->next = NULL;
   dnew->descriptor = desc;
@@ -630,14 +618,14 @@ void init_descriptor( DESCRIPTOR_DATA *dnew, int desc )
   CREATE( dnew->outbuf, char, dnew->outsize );
 }
 
-void new_descriptor( int new_desc )
+void new_descriptor( SOCKET new_desc )
 {
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *dnew = NULL;
     struct hostent  *from = NULL;
     const char *hostname = NULL;
     struct sockaddr_in sock;
-    int desc = 0;
+    SOCKET desc = 0;
     socklen_t size = 0;
 #ifdef AMIGA
     char optval = 1;
@@ -751,7 +739,6 @@ void new_descriptor( int new_desc )
 	save_sysdata();
     }
     set_alarm(0);
-    return;
 }
 
 void free_desc( DESCRIPTOR_DATA *d )
@@ -944,29 +931,6 @@ bool read_from_descriptor( DESCRIPTOR_DATA *d )
 
       if( d->inbuf[iStart-1] == '\n' || d->inbuf[iStart-1] == '\r' )
 	break;
-
-      /*
-      if ( nRead > 0 )
-	{
-	  iStart += nRead;
-	  if ( d->inbuf[iStart-1] == '\n' || d->inbuf[iStart-1] == '\r' )
-	    break;
-	}
-      else if ( nRead == 0 )
-	{
-	  log_string_plus( "EOF encountered on read.", LOG_COMM );
-	  return FALSE;
-	}
-      else if ( errno == EWOULDBLOCK )
-	{
-	  break;
-	}
-      else
-	{
-	  perror( "Read_from_descriptor" );
-	  return FALSE;
-	}
-      */
     }
 
   d->inbuf[iStart] = '\0';
@@ -1254,7 +1218,7 @@ void write_to_buffer( DESCRIPTOR_DATA *d, const char *txt, size_t length )
  * If this gives errors on very long blocks (like 'ofind all'),
  *   try lowering the max block size.
  */
-bool write_to_descriptor( int desc, const char *txt, int length )
+bool write_to_descriptor( SOCKET desc, const char *txt, int length )
 {
   int iStart = 0;
   ssize_t nWrite = 0;
@@ -1276,8 +1240,6 @@ bool write_to_descriptor( int desc, const char *txt, int length )
 
   return TRUE;
 }
-
-
 
 void show_title( DESCRIPTOR_DATA *d )
 {

@@ -3992,7 +3992,7 @@ void do_autorecharge(CHAR_DATA *ch, char *argument )
            return;	
         }
     
-    act( AT_PLAIN, "$n flips a switch on the control panell.", ch,
+    act( AT_PLAIN, "$n flips a switch on the control panel.", ch,
          NULL, argument , TO_ROOM );
 
     if ( !str_cmp(argument,"on" ) )
@@ -4065,7 +4065,7 @@ void do_autopilot(CHAR_DATA *ch, char *argument )
        	     }
   
         
-    act( AT_PLAIN, "$n flips a switch on the control panell.", ch,
+    act( AT_PLAIN, "$n flips a switch on the control panel.", ch,
          NULL, argument , TO_ROOM );
 
         if (ship->autopilot == TRUE)
@@ -5654,19 +5654,51 @@ ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship, EXIT_DATA  *pexit , int fall 
 	  }
 
       switch( door )
-      {
-      default: dtxt = "somewhere";	break;
-      case 0:  dtxt = "the south";	break;
-      case 1:  dtxt = "the west";	break;
-      case 2:  dtxt = "the north";	break;
-      case 3:  dtxt = "the east";	break;
-      case 4:  dtxt = "below";		break;
-      case 5:  dtxt = "above";		break;
-      case 6:  dtxt = "the south-west";	break;
-      case 7:  dtxt = "the south-east";	break;
-      case 8:  dtxt = "the north-west";	break;
-      case 9:  dtxt = "the north-east";	break;
-      }
+	{
+	default:
+	  dtxt = "somewhere";
+	  break;
+
+	case 0:
+	  dtxt = "the south";
+	  break;
+
+	case 1:
+	  dtxt = "the west";
+	  break;
+
+	case 2:
+	  dtxt = "the north";
+	  break;
+
+	case 3:
+	  dtxt = "the east";
+	  break;
+
+	case 4:
+	  dtxt = "below";
+	  break;
+
+	case 5:
+	  dtxt = "above";
+	  break;
+
+	case 6:
+	  dtxt = "the south-west";
+	  break;
+
+	case 7:
+	  dtxt = "the south-east";
+	  break;
+
+	case 8:
+	  dtxt = "the north-west";
+	  break;
+
+	case 9:
+	  dtxt = "the north-east";
+	  break;
+	}
 
     sprintf( buf, "%s %s from %s.", ship->name, txt, dtxt );
     echo_to_room( AT_ACTION , get_room_index(ship->location) , buf );
@@ -5681,29 +5713,8 @@ ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship, EXIT_DATA  *pexit , int fall 
         char_from_room( rch );
         char_to_room( rch, original );
     }
-    
-/*
-    if (  CHECK FOR FALLING HERE
-    &&   fall > 0 )
-    {
-	if (!IS_AFFECTED( ch, AFF_FLOATING )
-	|| ( ch->mount && !IS_AFFECTED( ch->mount, AFF_FLOATING ) ) )
-	{
-	  set_char_color( AT_HURT, ch );
-	  send_to_char( "OUCH! You hit the ground!\r\n", ch );
-	  WAIT_STATE( ch, 20 );
-	  retcode = damage( ch, ch, 50 * fall, TYPE_UNDEFINED );
-	}
-	else
-	{
-	  set_char_color( AT_MAGIC, ch );
-	  send_to_char( "You lightly float down to the ground.\r\n", ch );
-	}
-    }
 
-*/    
     return retcode;
-
 }
 
 void do_bomb( CHAR_DATA *ch, char *argument )
