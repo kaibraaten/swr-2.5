@@ -5,12 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#ifdef AMIGA
-#include <db.h>
-#endif
 #include <dirent.h>
 #include "mud.h"
-#include "os.h"
 
 extern	int	_filbuf		args( (FILE *) );
 

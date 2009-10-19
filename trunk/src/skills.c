@@ -141,202 +141,226 @@ extern const char *target_name;	/* from magic.c */
  */
 bool check_skill( CHAR_DATA *ch, const char *command, char *argument )
 {
-    int sn;
-    int first = gsn_first_skill;
-    int top   = gsn_first_weapon-1;
-    struct timeval time_used;
-    int mana;
+  int sn = 0;
+  int first = gsn_first_skill;
+  int top   = gsn_first_weapon-1;
+  struct timeval time_used;
+  int mana = 0;
     
-    /* bsearch for the skill */
-    for (;;)
+  /* bsearch for the skill */
+  for (;;)
     {
-	sn = (first + top) >> 1;
+      sn = (first + top) >> 1;
 
-	if ( LOWER(command[0]) == LOWER(skill_table[sn]->name[0])
-	&&  !str_prefix(command, skill_table[sn]->name)
-	&&  (skill_table[sn]->skill_fun || skill_table[sn]->spell_fun != spell_null)
-	&&  (IS_NPC(ch)
-	     ||  ( character_skill_level( ch, sn ) > 0 )) )
-		break;
-	if (first >= top)
-	    return FALSE;
-    	if (strcmp( command, skill_table[sn]->name) < 1)
-	    top = sn - 1;
-    	else
-	    first = sn + 1;
+      if ( LOWER(command[0]) == LOWER(skill_table[sn]->name[0])
+	   && !str_prefix(command, skill_table[sn]->name)
+	   && (skill_table[sn]->skill_fun
+	       || skill_table[sn]->spell_fun != spell_null)
+	   && (IS_NPC(ch)
+	       ||  ( character_skill_level( ch, sn ) > 0 )) )
+	break;
+
+      if (first >= top)
+	return FALSE;
+
+      if (strcmp( command, skill_table[sn]->name) < 1)
+	top = sn - 1;
+      else
+	first = sn + 1;
     }
 
-    if ( !check_pos( ch, skill_table[sn]->minimum_position ) )
-	return TRUE;
+  if ( !check_pos( ch, skill_table[sn]->minimum_position ) )
+    return TRUE;
 
-    if ( IS_NPC(ch)
-    &&  (IS_AFFECTED( ch, AFF_CHARM ) || IS_AFFECTED( ch, AFF_POSSESS )) )
+  if ( IS_NPC(ch)
+       && (IS_AFFECTED( ch, AFF_CHARM )
+	   || IS_AFFECTED( ch, AFF_POSSESS )) )
     {
-	send_to_char( "For some reason, you seem unable to perform that...\r\n", ch );
-	act( AT_GREY,"$n looks around.", ch, NULL, NULL, TO_ROOM );
-	return TRUE;
+      send_to_char( "For some reason, you seem unable to perform that...\r\n",
+		    ch );
+      act( AT_GREY,"$n looks around.", ch, NULL, NULL, TO_ROOM );
+      return TRUE;
     }
 
-    /* check if mana is required */
-    if ( skill_table[sn]->min_mana )
+  /* check if mana is required */
+  if ( skill_table[sn]->min_mana )
     {
-	mana = IS_NPC(ch) ? 0 : skill_table[sn]->min_mana;
+      mana = IS_NPC(ch) ? 0 : skill_table[sn]->min_mana;
 
-	if ( !IS_NPC(ch) && ch->mana < mana )
+      if ( !IS_NPC(ch) && ch->mana < mana )
 	{
-	    send_to_char( "You need to rest before using the Force any more.\r\n", ch );
-	    return TRUE;
+	  send_to_char( "You need to rest before using the Force any more.\r\n", ch );
+	  return TRUE;
 	}
     }
-    else
+  else
     {
-	mana = 0;
+      mana = 0;
     }
     
-    /*
-     * Is this a real do-fun, or a really a spell?
-     */
-    if ( !skill_table[sn]->skill_fun )
+  /*
+   * Is this a real do-fun, or a really a spell?
+   */
+  if ( !skill_table[sn]->skill_fun )
     {
-	ch_ret retcode = rNONE;
-	void *vo = NULL;
-	CHAR_DATA *victim = NULL;
-	OBJ_DATA *obj = NULL;
+      ch_ret retcode = rNONE;
+      void *vo = NULL;
+      CHAR_DATA *victim = NULL;
+      OBJ_DATA *obj = NULL;
 
-	target_name = "";
+      target_name = "";
 
-	switch ( skill_table[sn]->target )
+      switch ( skill_table[sn]->target )
 	{
 	default:
-	    bug( "Check_skill: bad target for sn %d.", sn );
-	    send_to_char( "Something went wrong...\r\n", ch );
-	    return TRUE;
+	  bug( "Check_skill: bad target for sn %d.", sn );
+	  send_to_char( "Something went wrong...\r\n", ch );
+	  return TRUE;
 
 	case TAR_IGNORE:
-	    vo = NULL;
-	    if ( argument[0] == '\0' )
+	  vo = NULL;
+
+	  if ( argument[0] == '\0' )
 	    {
-		if ( (victim=who_fighting(ch)) != NULL )
-		    target_name = victim->name;
+	      if ( (victim=who_fighting(ch)) != NULL )
+		target_name = victim->name;
 	    }
-	    else
-		target_name = argument;
-	    break;
+	  else
+	    {
+	      target_name = argument;
+	    }
+
+	  break;
 
 	case TAR_CHAR_OFFENSIVE:
-	    if ( argument[0] == '\0'
-	    &&  (victim=who_fighting(ch)) == NULL )
+	  if ( argument[0] == '\0'
+	       && (victim=who_fighting(ch)) == NULL )
 	    {
-		ch_printf( ch, "%s who?\r\n", capitalize( skill_table[sn]->name ) );
-		return TRUE;
+	      ch_printf( ch, "%s who?\r\n",
+			 capitalize( skill_table[sn]->name ) );
+	      return TRUE;
 	    }
-	    else
-	    if ( argument[0] != '\0'
-	    &&  (victim=get_char_room(ch, argument)) == NULL )
+	  else if ( argument[0] != '\0'
+		    && (victim=get_char_room(ch, argument)) == NULL )
 	    {
-		send_to_char( "They aren't here.\r\n", ch );
-		return TRUE;
+	      send_to_char( "They aren't here.\r\n", ch );
+	      return TRUE;
 	    }
-	    if ( is_safe( ch, victim ) )
-		return TRUE;
-	    vo = (void *) victim;
-	    break;
+
+	  if ( is_safe( ch, victim ) )
+	    return TRUE;
+
+	  vo = (void *) victim;
+	  break;
 
 	case TAR_CHAR_DEFENSIVE:
-	    if ( argument[0] != '\0'
-	    &&  (victim=get_char_room(ch, argument)) == NULL )
+	  if ( argument[0] != '\0'
+	       && (victim=get_char_room(ch, argument)) == NULL )
 	    {
-		send_to_char( "They aren't here.\r\n", ch );
-		return TRUE;
+	      send_to_char( "They aren't here.\r\n", ch );
+	      return TRUE;
 	    }
-	    if ( !victim )
-		victim = ch;
-	    vo = (void *) victim;
-	    break;
+
+	  if ( !victim )
+	    victim = ch;
+
+	  vo = (void *) victim;
+	  break;
 
 	case TAR_CHAR_SELF:
-	    vo = (void *) ch;
-	    break;
+	  vo = (void *) ch;
+	  break;
 
 	case TAR_OBJ_INV:
-	    if ( (obj=get_obj_carry(ch, argument)) == NULL )
+	  if ( (obj=get_obj_carry(ch, argument)) == NULL )
 	    {
-		send_to_char( "You can't find that.\r\n", ch );
-		return TRUE;
+	      send_to_char( "You can't find that.\r\n", ch );
+	      return TRUE;
 	    }
-	    vo = (void *) obj;
-	    break;
+
+	  vo = (void *) obj;
+	  break;
 	}
 
-	/* waitstate */
-	WAIT_STATE( ch, skill_table[sn]->beats );
-	/* check for failure */
-	if ( (number_percent( ) + skill_table[sn]->difficulty * 5)
-	     > (IS_NPC(ch) ? 75 : character_skill_level( ch, sn ) ) )
+      /* waitstate */
+      WAIT_STATE( ch, skill_table[sn]->beats );
+
+      /* check for failure */
+      if ( (number_percent( ) + skill_table[sn]->difficulty * 5)
+	   > (IS_NPC(ch) ? 75 : character_skill_level( ch, sn ) ) )
 	{
 	  failed_casting( skill_table[sn], ch, (CHAR_DATA*) vo, obj );
-	    learn_from_failure( ch, sn );
-	    if ( mana )
+	  learn_from_failure( ch, sn );
+
+	  if ( mana )
 	    {
-		  ch->mana -= mana/2;
+	      ch->mana -= mana/2;
 	    }
-	    return TRUE;
+
+	  return TRUE;
 	}
-	if ( mana )
+
+      if ( mana )
 	{
-		ch->mana -= mana;
+	  ch->mana -= mana;
 	}
-	start_timer(&time_used);
-	retcode = (*skill_table[sn]->spell_fun) ( sn, ch->top_level, ch, vo );
-	end_timer(&time_used);
-	update_userec(&time_used, &skill_table[sn]->userec);
-	
-	if ( retcode == rCHAR_DIED || retcode == rERROR )
-	    return TRUE;
 
-	if ( char_died(ch) )
-	    return TRUE;
+      start_timer(&time_used);
+      retcode = (*skill_table[sn]->spell_fun) ( sn, ch->top_level, ch, vo );
+      end_timer(&time_used);
+      update_userec(&time_used, &skill_table[sn]->userec);
 
-	if ( retcode == rSPELL_FAILED )
+      if ( retcode == rCHAR_DIED || retcode == rERROR )
+	return TRUE;
+
+      if ( char_died(ch) )
+	return TRUE;
+
+      if ( retcode == rSPELL_FAILED )
 	{
-	    learn_from_failure( ch, sn );
-	    retcode = rNONE;
+	  learn_from_failure( ch, sn );
+	  retcode = rNONE;
 	}
-	else
-	    learn_from_success( ch, sn );
-
-	if ( skill_table[sn]->target == TAR_CHAR_OFFENSIVE
-	&&   victim != ch
-	&&  !char_died(victim) )
+      else
 	{
-	    CHAR_DATA *vch;
-	    CHAR_DATA *vch_next;
+	  learn_from_success( ch, sn );
+	}
 
-	    for ( vch = ch->in_room->first_person; vch; vch = vch_next )
+      if ( skill_table[sn]->target == TAR_CHAR_OFFENSIVE
+	   && victim != ch
+	   && !char_died(victim) )
+	{
+	  CHAR_DATA *vch = NULL;
+	  CHAR_DATA *vch_next = NULL;
+
+	  for ( vch = ch->in_room->first_person; vch; vch = vch_next )
 	    {
-		vch_next = vch->next_in_room;
-		if ( victim == vch && !victim->fighting && victim->master != ch )
+	      vch_next = vch->next_in_room;
+
+	      if ( victim == vch && !victim->fighting && victim->master != ch )
 		{
-		    retcode = multi_hit( victim, ch, TYPE_UNDEFINED );
-		    break;
+		  retcode = multi_hit( victim, ch, TYPE_UNDEFINED );
+		  break;
 		}
 	    }
 	}
-	return TRUE;
+
+      return TRUE;
     }
 
-    if ( mana )
+  if ( mana )
     {
-	  ch->mana -= mana;
+      ch->mana -= mana;
     }
-    ch->prev_cmd = ch->last_cmd;    /* haus, for automapping */
-    ch->last_cmd = skill_table[sn]->skill_fun;
-    start_timer(&time_used);
-    (*skill_table[sn]->skill_fun) ( ch, argument );
-    end_timer(&time_used);
-    update_userec(&time_used, &skill_table[sn]->userec);
 
-    return TRUE;
+  ch->prev_cmd = ch->last_cmd;    /* haus, for automapping */
+  ch->last_cmd = skill_table[sn]->skill_fun;
+  start_timer(&time_used);
+  (*skill_table[sn]->skill_fun) ( ch, argument );
+  end_timer(&time_used);
+  update_userec(&time_used, &skill_table[sn]->userec);
+
+  return TRUE;
 }
 
 /*
@@ -345,170 +369,207 @@ bool check_skill( CHAR_DATA *ch, const char *command, char *argument )
  */
 void do_slookup( CHAR_DATA *ch, char *argument )
 {
-    char buf[MAX_STRING_LENGTH];
-    char arg[MAX_INPUT_LENGTH];
-    int sn;
-    SKILLTYPE *skill = NULL;
+  char buf[MAX_STRING_LENGTH];
+  char arg[MAX_INPUT_LENGTH];
+  int sn = 0;
+  SKILLTYPE *skill = NULL;
 
-    one_argument( argument, arg );
-    if ( arg[0] == '\0' )
+  one_argument( argument, arg );
+
+  if ( arg[0] == '\0' )
     {
-	send_to_char( "Slookup what?\r\n", ch );
-	return;
+      send_to_char( "Slookup what?\r\n", ch );
+      return;
     }
 
-    if ( !str_cmp( arg, "all" ) )
+  if ( !str_cmp( arg, "all" ) )
     {
-	for ( sn = 0; sn < top_sn && skill_table[sn] && skill_table[sn]->name; sn++ )
-	    pager_printf( ch, "Sn: %4d Slot: %4d Skill/spell: '%-20s' Damtype: %s\r\n",
-		sn, skill_table[sn]->slot, skill_table[sn]->name,
-		spell_damage[SPELL_DAMAGE( skill_table[sn] )] );
+      for ( sn = 0; sn < top_sn && skill_table[sn] && skill_table[sn]->name;
+	    sn++ )
+	pager_printf( ch, "Sn: %4d Slot: %4d Skill/spell: '%-20s' Damtype: %s\r\n",
+		      sn, skill_table[sn]->slot, skill_table[sn]->name,
+		      spell_damage[SPELL_DAMAGE( skill_table[sn] )] );
     }
-    else
+  else
     {
-	SMAUG_AFF *aff;
-	int cnt = 0;
+      SMAUG_AFF *aff = NULL;
+      int cnt = 0;
 
-	if ( is_number(arg) )
+      if ( is_number(arg) )
 	{
-	    sn = atoi(arg);
-	    if ( (skill=get_skilltype(sn)) == NULL )
+	  sn = atoi(arg);
+
+	  if ( (skill=get_skilltype(sn)) == NULL )
 	    {
-		send_to_char( "Invalid sn.\r\n", ch );
-		return;
+	      send_to_char( "Invalid sn.\r\n", ch );
+	      return;
 	    }
-	    sn %= 1000;
+
+	  sn %= 1000;
 	}
-	else
-	if ( ( sn = skill_lookup( arg ) ) >= 0 )
-	    skill = skill_table[sn];
-	else
+      else if ( ( sn = skill_lookup( arg ) ) >= 0 )
 	{
-	    send_to_char( "No such skill, spell or proficiency.\r\n", ch );
-	    return;
+	  skill = skill_table[sn];
 	}
-	if ( !skill )
+      else
 	{
-	    send_to_char( "Not created yet.\r\n", ch );
-	    return;
+	  send_to_char( "No such skill, spell or proficiency.\r\n", ch );
+	  return;
 	}
 
-	ch_printf( ch, "Sn: %4d Slot: %4d %s: '%-20s'\r\n",
-	    sn, skill->slot, skill_tname[skill->type], skill->name );
-	if ( skill->flags )
+      if ( !skill )
 	{
-	    int x;
+	  send_to_char( "Not created yet.\r\n", ch );
+	  return;
+	}
 
-	    ch_printf( ch, "Damtype: %s  Acttype: %s   Classtype: %s   Powertype: %s\r\n",
-		spell_damage[SPELL_DAMAGE( skill )],
-		spell_action[SPELL_ACTION( skill )],
-		spell_class[SPELL_CLASS( skill )],
-		spell_power[SPELL_POWER( skill )] );
-	    strcpy( buf, "Flags:" );
-	    for ( x = 11; x < 32; x++ )
+      ch_printf( ch, "Sn: %4d Slot: %4d %s: '%-20s'\r\n",
+		 sn, skill->slot, skill_tname[skill->type], skill->name );
+
+      if ( skill->flags )
+	{
+	  int x = 0;
+
+	  ch_printf( ch, "Damtype: %s  Acttype: %s   Classtype: %s   Powertype: %s\r\n",
+		     spell_damage[SPELL_DAMAGE( skill )],
+		     spell_action[SPELL_ACTION( skill )],
+		     spell_class[SPELL_CLASS( skill )],
+		     spell_power[SPELL_POWER( skill )] );
+	  strcpy( buf, "Flags:" );
+
+	  for ( x = 11; x < 32; x++ )
+	    {
 	      if ( SPELL_FLAG( skill, 1 << x ) )
-	      {
-		strcat( buf, " " );
-		strcat( buf, spell_flag[x-11] );
-	      }
-	    strcat( buf, "\r\n" );
-	    send_to_char( buf, ch );
-	}
-	ch_printf( ch, "Saves: %s\r\n", spell_saves[(int) skill->saves] );
-
-	if ( skill->difficulty != '\0' )
-	    ch_printf( ch, "Difficulty: %d\r\n", (int) skill->difficulty );
-
-	ch_printf( ch, "Type: %s  Target: %s  Minpos: %d  Mana: %d  Beats: %d\r\n",
-		skill_tname[skill->type],
-		target_type[URANGE(TAR_IGNORE, skill->target, TAR_OBJ_INV)],
-		skill->minimum_position,
-		skill->min_mana,
-		skill->beats );
-	ch_printf( ch, "Flags: %d  Code: %s\r\n",
-		skill->flags,
-		skill->skill_fun ? skill_name(skill->skill_fun)
-					   : spell_name(skill->spell_fun));
-	ch_printf( ch, "Dammsg: %s\r\nWearoff: %s\n",
-		skill->noun_damage,
-		skill->msg_off ? skill->msg_off : "(none set)" );
-	if ( skill->dice && skill->dice[0] != '\0' )
-	    ch_printf( ch, "Dice: %s\r\n", skill->dice );
-	if ( skill->components && skill->components[0] != '\0' )
-	    ch_printf( ch, "Components: %s\r\n", skill->components );
-	if ( skill->participants )
-	    ch_printf( ch, "Participants: %d\r\n", (int) skill->participants );
-	if ( skill->userec.num_uses )
-	    send_timer(&skill->userec, ch);
-	for ( aff = skill->affects; aff; aff = aff->next )
-	{
-	    if ( aff == skill->affects )
-	      send_to_char( "\r\n", ch );
-	    sprintf( buf, "Affect %d", ++cnt );
-	    if ( aff->location )
-	    {
-		strcat( buf, " modifies " );
-		strcat( buf, a_types[aff->location % REVERSE_APPLY] );
-		strcat( buf, " by '" );
-		strcat( buf, aff->modifier );
-		if ( aff->bitvector )
-		  strcat( buf, "' and" );
-		else
-		  strcat( buf, "'" );
+		{
+		  strcat( buf, " " );
+		  strcat( buf, spell_flag[x-11] );
+		}
 	    }
-	    if ( aff->bitvector )
-	    {
-		int x;
 
-		strcat( buf, " applies" );
-		for ( x = 0; x < 32; x++ )
+	  strcat( buf, "\r\n" );
+	  send_to_char( buf, ch );
+	}
+
+      ch_printf( ch, "Saves: %s\r\n", spell_saves[(int) skill->saves] );
+
+      if ( skill->difficulty != '\0' )
+	ch_printf( ch, "Difficulty: %d\r\n", (int) skill->difficulty );
+
+      ch_printf( ch, "Type: %s  Target: %s  Minpos: %d  Mana: %d  Beats: %d\r\n",
+		 skill_tname[skill->type],
+		 target_type[URANGE(TAR_IGNORE, skill->target, TAR_OBJ_INV)],
+		 skill->minimum_position,
+		 skill->min_mana,
+		 skill->beats );
+      ch_printf( ch, "Flags: %d  Code: %s\r\n",
+		 skill->flags,
+		 skill->skill_fun ? skill_name(skill->skill_fun)
+		 : spell_name(skill->spell_fun));
+      ch_printf( ch, "Dammsg: %s\r\nWearoff: %s\n",
+		 skill->noun_damage,
+		 skill->msg_off ? skill->msg_off : "(none set)" );
+      if ( skill->dice && skill->dice[0] != '\0' )
+	ch_printf( ch, "Dice: %s\r\n", skill->dice );
+
+      if ( skill->components && skill->components[0] != '\0' )
+	ch_printf( ch, "Components: %s\r\n", skill->components );
+
+      if ( skill->participants )
+	ch_printf( ch, "Participants: %d\r\n", (int) skill->participants );
+
+      if ( skill->userec.num_uses )
+	send_timer(&skill->userec, ch);
+
+      for ( aff = skill->affects; aff; aff = aff->next )
+	{
+	  if ( aff == skill->affects )
+	    send_to_char( "\r\n", ch );
+	  sprintf( buf, "Affect %d", ++cnt );
+
+	  if ( aff->location )
+	    {
+	      strcat( buf, " modifies " );
+	      strcat( buf, a_types[aff->location % REVERSE_APPLY] );
+	      strcat( buf, " by '" );
+	      strcat( buf, aff->modifier );
+
+	      if ( aff->bitvector )
+		strcat( buf, "' and" );
+	      else
+		strcat( buf, "'" );
+	    }
+
+	  if ( aff->bitvector )
+	    {
+	      int x = 0;
+
+	      strcat( buf, " applies" );
+
+	      for ( x = 0; x < 32; x++ )
+		{
 		  if ( IS_SET(aff->bitvector, 1 << x) )
-		  {
+		    {
 		      strcat( buf, " " );
 		      strcat( buf, a_flags[x] );
-		  }
+		    }
+		}
 	    }
-	    if ( aff->duration[0] != '\0' && aff->duration[0] != '0' )
-	    {
-		strcat( buf, " for '" );
-		strcat( buf, aff->duration );
-		strcat( buf, "' rounds" );
-	    }
-	    if ( aff->location >= REVERSE_APPLY )
-		strcat( buf, " (affects caster only)" );
-	    strcat( buf, "\r\n" );
-	    send_to_char( buf, ch );
-	    if ( !aff->next )
-	      send_to_char( "\r\n", ch );
-	}
-	if ( skill->hit_char && skill->hit_char[0] != '\0' )
-	    ch_printf( ch, "Hitchar   : %s\r\n", skill->hit_char );
-	if ( skill->hit_vict && skill->hit_vict[0] != '\0' )
-	    ch_printf( ch, "Hitvict   : %s\r\n", skill->hit_vict );
-	if ( skill->hit_room && skill->hit_room[0] != '\0' )
-	    ch_printf( ch, "Hitroom   : %s\r\n", skill->hit_room );
-	if ( skill->miss_char && skill->miss_char[0] != '\0' )
-	    ch_printf( ch, "Misschar  : %s\r\n", skill->miss_char );
-	if ( skill->miss_vict && skill->miss_vict[0] != '\0' )
-	    ch_printf( ch, "Missvict  : %s\r\n", skill->miss_vict );
-	if ( skill->miss_room && skill->miss_room[0] != '\0' )
-	    ch_printf( ch, "Missroom  : %s\r\n", skill->miss_room );
-	if ( skill->die_char && skill->die_char[0] != '\0' )
-	    ch_printf( ch, "Diechar   : %s\r\n", skill->die_char );
-	if ( skill->die_vict && skill->die_vict[0] != '\0' )
-	    ch_printf( ch, "Dievict   : %s\r\n", skill->die_vict );
-	if ( skill->die_room && skill->die_room[0] != '\0' )
-	    ch_printf( ch, "Dieroom   : %s\r\n", skill->die_room );
-	if ( skill->imm_char && skill->imm_char[0] != '\0' )
-	    ch_printf( ch, "Immchar   : %s\r\n", skill->imm_char );
-	if ( skill->imm_vict && skill->imm_vict[0] != '\0' )
-	    ch_printf( ch, "Immvict   : %s\r\n", skill->imm_vict );
-	if ( skill->imm_room && skill->imm_room[0] != '\0' )
-	    ch_printf( ch, "Immroom   : %s\r\n", skill->imm_room );
-	send_to_char( "\r\n", ch );
-    }
 
-    return;
+	  if ( aff->duration[0] != '\0' && aff->duration[0] != '0' )
+	    {
+	      strcat( buf, " for '" );
+	      strcat( buf, aff->duration );
+	      strcat( buf, "' rounds" );
+	    }
+
+	  if ( aff->location >= REVERSE_APPLY )
+	    strcat( buf, " (affects caster only)" );
+
+	  strcat( buf, "\r\n" );
+	  send_to_char( buf, ch );
+
+	  if ( !aff->next )
+	    send_to_char( "\r\n", ch );
+	}
+
+      if ( skill->hit_char && skill->hit_char[0] != '\0' )
+	ch_printf( ch, "Hitchar   : %s\r\n", skill->hit_char );
+
+      if ( skill->hit_vict && skill->hit_vict[0] != '\0' )
+	ch_printf( ch, "Hitvict   : %s\r\n", skill->hit_vict );
+
+      if ( skill->hit_room && skill->hit_room[0] != '\0' )
+	ch_printf( ch, "Hitroom   : %s\r\n", skill->hit_room );
+
+      if ( skill->miss_char && skill->miss_char[0] != '\0' )
+	ch_printf( ch, "Misschar  : %s\r\n", skill->miss_char );
+
+      if ( skill->miss_vict && skill->miss_vict[0] != '\0' )
+	ch_printf( ch, "Missvict  : %s\r\n", skill->miss_vict );
+
+      if ( skill->miss_room && skill->miss_room[0] != '\0' )
+	ch_printf( ch, "Missroom  : %s\r\n", skill->miss_room );
+
+      if ( skill->die_char && skill->die_char[0] != '\0' )
+	ch_printf( ch, "Diechar   : %s\r\n", skill->die_char );
+
+      if ( skill->die_vict && skill->die_vict[0] != '\0' )
+	ch_printf( ch, "Dievict   : %s\r\n", skill->die_vict );
+
+      if ( skill->die_room && skill->die_room[0] != '\0' )
+	ch_printf( ch, "Dieroom   : %s\r\n", skill->die_room );
+
+      if ( skill->imm_char && skill->imm_char[0] != '\0' )
+	ch_printf( ch, "Immchar   : %s\r\n", skill->imm_char );
+
+      if ( skill->imm_vict && skill->imm_vict[0] != '\0' )
+	ch_printf( ch, "Immvict   : %s\r\n", skill->imm_vict );
+
+      if ( skill->imm_room && skill->imm_room[0] != '\0' )
+	ch_printf( ch, "Immroom   : %s\r\n", skill->imm_room );
+
+      send_to_char( "\r\n", ch );
+    }
 }
 
 /*
