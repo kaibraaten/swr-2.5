@@ -1990,9 +1990,7 @@ void do_hset( CHAR_DATA *ch, char *argument )
     if ( !str_cmp( arg1, "remove" ) )
     {
 	UNLINK( pHelp, first_help, last_help, next, prev );
-	STRFREE( pHelp->text );
-	STRFREE( pHelp->keyword );
-	DISPOSE( pHelp );
+	free_help( pHelp );
 	send_to_char( "Removed.\r\n", ch );
 	return;
     }
@@ -2073,8 +2071,8 @@ void do_hlist( CHAR_DATA *ch, char *argument )
 
 /* 
  * New do_who	
- 
-  with WHO REQUEST, clan and homepage support.  -Thoric
+ *
+ * with WHO REQUEST, clan and homepage support.  -Thoric
  *
  * Latest version of do_who eliminates redundant code by using linked lists.
  * Shows imms separately, indicates guest and retired immortals.
@@ -2082,137 +2080,129 @@ void do_hlist( CHAR_DATA *ch, char *argument )
  */
 void do_who( CHAR_DATA *ch, char *argument )
 {
-    char buf[MAX_STRING_LENGTH];
-    char clan_name[MAX_INPUT_LENGTH];
-    char invis_str[MAX_INPUT_LENGTH];
-    char char_name[MAX_INPUT_LENGTH];
-    char extra_title[MAX_STRING_LENGTH];
-    DESCRIPTOR_DATA *d;
-    int iLevelLower;
-    int iLevelUpper;
-    int nNumber;
-    int nMatch;
-    bool fImmortalOnly;
-    bool fShowHomepage;
-    bool fClanMatch; /* SB who clan */
-    CLAN_DATA *pClan = 0;
-    FILE *whoout = 0;
+  char buf[MAX_STRING_LENGTH];
+  char clan_name[MAX_INPUT_LENGTH];
+  char invis_str[MAX_INPUT_LENGTH];
+  char char_name[MAX_INPUT_LENGTH];
+  char extra_title[MAX_STRING_LENGTH];
+  DESCRIPTOR_DATA *d = NULL;
+  int iLevelLower = 0;
+  int iLevelUpper = 200;
+  int nNumber = 0;
+  int nMatch = 0;
+  bool fImmortalOnly = FALSE;
+  bool fShowHomepage = FALSE;
+  bool fClanMatch = FALSE; /* SB who clan */
+  CLAN_DATA *pClan = 0;
+  FILE *whoout = 0;
 
-    WHO_DATA *cur_who = NULL;
-    WHO_DATA *next_who = NULL;
-    WHO_DATA *first_mortal = NULL;
-    WHO_DATA *first_imm = NULL;
+  WHO_DATA *cur_who = NULL;
+  WHO_DATA *next_who = NULL;
+  WHO_DATA *first_mortal = NULL;
+  WHO_DATA *first_imm = NULL;
 
-    /*
-     * Set default arguments.
-     */
-    iLevelLower    = 0;
-    iLevelUpper    = 200;
-    fImmortalOnly  = FALSE;
-    fShowHomepage  = FALSE;
-    fClanMatch	   = FALSE; /* SB who clan  */
-
-    /*
-     * Parse arguments.
-     */
-    nNumber = 0;
-    for ( ;; )
+  /*
+   * Parse arguments.
+   */
+  for ( ;; )
     {
-	char arg[MAX_STRING_LENGTH];
+      char arg[MAX_STRING_LENGTH];
 
-	argument = one_argument( argument, arg );
-	if ( arg[0] == '\0' )
-	    break;
+      argument = one_argument( argument, arg );
 
-	if ( is_number( arg ) )
+      if ( arg[0] == '\0' )
+	break;
+
+      if ( is_number( arg ) )
 	{
-	    switch ( ++nNumber )
+	  switch ( ++nNumber )
 	    {
 	    case 1: iLevelLower = atoi( arg ); break;
 	    case 2: iLevelUpper = atoi( arg ); break;
 	    default:
-		send_to_char( "Only two level numbers allowed.\r\n", ch );
-		return;
+	      send_to_char( "Only two level numbers allowed.\r\n", ch );
+	      return;
 	    }
 	}
-	else
+      else
 	{
-	    if ( strlen(arg) < 3 )
+	  if ( strlen(arg) < 3 )
 	    {
-		send_to_char( "Be a little more specific please.\r\n", ch );
-		return;
+	      send_to_char( "Be a little more specific please.\r\n", ch );
+	      return;
 	    }
 
-	    /*
-	     * Look for classes to turn on.
-	     */
+	  /*
+	   * Look for classes to turn on.
+	   */
             
-	    if ( !str_cmp( arg, "imm" ) || !str_cmp( arg, "gods" ) )
-		fImmortalOnly = TRUE;
-	    else
-	    if ( !str_cmp( arg, "www" ) )
-		fShowHomepage = TRUE;
-            else		 /* SB who clan (order), guild */
-             if  ( ( pClan = get_clan (arg) ) )
-	   	fClanMatch = TRUE;
-	    else
+	  if ( !str_cmp( arg, "imm" ) || !str_cmp( arg, "gods" ) )
+	    fImmortalOnly = TRUE;
+	  else if ( !str_cmp( arg, "www" ) )
+	    fShowHomepage = TRUE;
+	  else if  ( ( pClan = get_clan (arg) ) )
+	    fClanMatch = TRUE;
+	  else
 	    {
-		    send_to_char( "That's not an organization.\r\n", ch );
-		    return;
+	      send_to_char( "That's not an organization.\r\n", ch );
+	      return;
 	    }
 	}
     }
 
-    /*
-     * Now find matching chars.
-     */
-    nMatch = 0;
-    buf[0] = '\0';
-    if ( ch )
-	set_pager_color( AT_GREEN, ch );
-    else
+  /*
+   * Now find matching chars.
+   */
+  nMatch = 0;
+  buf[0] = '\0';
+
+  if ( ch )
+    set_pager_color( AT_GREEN, ch );
+  else
     {
-	if ( fShowHomepage )
-	  whoout = fopen( WEBWHO_FILE, "w" );
-	else
-	  whoout = fopen( WHO_FILE, "w" );
+      if ( fShowHomepage )
+	whoout = fopen( WEBWHO_FILE, "w" );
+      else
+	whoout = fopen( WHO_FILE, "w" );
     }
 
-/* start from last to first to get it in the proper order */
-    for ( d = last_descriptor; d; d = d->prev )
+  /* start from last to first to get it in the proper order */
+  for ( d = last_descriptor; d; d = d->prev )
     {
-	CHAR_DATA *wch;
+      CHAR_DATA *wch = NULL;
 
-	if ( (d->connected != CON_PLAYING && d->connected != CON_EDITING)
-	|| ( !can_see( ch, d->character ) && IS_IMMORTAL( d->character ) )
-	|| d->original)
-	    continue;
-	wch   = d->original ? d->original : d->character;
-	if ( wch->top_level < iLevelLower
-	||   wch->top_level > iLevelUpper 
-	|| ( fImmortalOnly  && !IS_IMMORTAL(wch) )
-	|| ( fClanMatch && ( pClan != wch->pcdata->clan ))  /* SB */ )
-	    continue;
+      if ( (d->connected != CON_PLAYING && d->connected != CON_EDITING)
+	   || ( !can_see( ch, d->character ) && IS_IMMORTAL( d->character ) )
+	   || d->original)
+	continue;
 
-	nMatch++;
+      wch   = d->original ? d->original : d->character;
 
-	if ( fShowHomepage
-	&&   wch->pcdata->homepage
-	&&   wch->pcdata->homepage[0] != '\0' )
-	  sprintf( char_name, "<A HREF=\"%s\">%s</A>",
-		show_tilde( wch->pcdata->homepage ), wch->name );
-	else
-	  strcpy( char_name, "" );
+      if ( wch->top_level < iLevelLower
+	   ||   wch->top_level > iLevelUpper 
+	   || ( fImmortalOnly  && !IS_IMMORTAL(wch) )
+	   || ( fClanMatch && ( pClan != wch->pcdata->clan ))  /* SB */ )
+	continue;
 
-        if ( !nifty_is_name(wch->name, wch->pcdata->title) && ch->top_level > wch->top_level )
-          sprintf( extra_title , " [%s]" , wch->name );
-        else
-          strcpy(extra_title, "");
-        
-	if ( wch->pcdata->clan )
+      nMatch++;
+
+      if ( fShowHomepage
+	   &&   wch->pcdata->homepage
+	   &&   wch->pcdata->homepage[0] != '\0' )
+	sprintf( char_name, "<A HREF=\"%s\">%s</A>",
+		 show_tilde( wch->pcdata->homepage ), wch->name );
+      else
+	strcpy( char_name, "" );
+
+      if ( !nifty_is_name(wch->name, wch->pcdata->title)
+	   && ch->top_level > wch->top_level )
+	sprintf( extra_title , " [%s]" , wch->name );
+      else
+	strcpy(extra_title, "");
+
+      if ( wch->pcdata->clan )
 	{
           CLAN_DATA *pclan = wch->pcdata->clan;
-	    
 	  strcpy( clan_name, " (" );
 
 	  if( clan_char_is_leader( pclan, wch ) )
@@ -2221,75 +2211,68 @@ void do_who( CHAR_DATA *ch, char *argument )
 	  strcat( clan_name, pclan->name );
 	  strcat( clan_name, ")" );
 	}
-	else
-	  clan_name[0] = '\0';
+      else
+	clan_name[0] = '\0';
 
+      if ( IS_SET(wch->act, PLR_WIZINVIS) )
+	sprintf( invis_str, "(%d) ", wch->pcdata->wizinvis );
+      else
+	invis_str[0] = '\0';
 
-	if ( IS_SET(wch->act, PLR_WIZINVIS) )
-	  sprintf( invis_str, "(%d) ", wch->pcdata->wizinvis );
-	else
-	  invis_str[0] = '\0';
-	
-	if ( wch->desc->connected == CON_EDITING )
-						strcat( invis_str, "[Writing] " );
-	
-	sprintf( buf, "%s%s%s%s %s%s%s\r\n",
-	    invis_str,
-	    IS_SET(wch->act, PLR_AFK) ? "[AFK] " : "",
-	    char_name,
-	    wch->pcdata->title,
-            extra_title,
-	    clan_name,
-	    IS_IMMORTAL(wch) ? "&R [&WCoder&R/&WImmortal&R]&W" : "&W" );
+      if ( wch->desc->connected == CON_EDITING )
+	strcat( invis_str, "[Writing] " );
 
-          /*  
-           * This is where the old code would display the found player to the ch.
-           * What we do instead is put the found data into a linked list
-           */ 
+      sprintf( buf, "%s%s%s%s %s%s%s\r\n",
+	       invis_str,
+	       IS_SET(wch->act, PLR_AFK) ? "[AFK] " : "",
+	       char_name,
+	       wch->pcdata->title,
+	       extra_title,
+	       clan_name,
+	       IS_IMMORTAL(wch) ? "&R [&WCoder&R/&WImmortal&R]&W" : "&W" );
 
-          /* First make the structure. */
-          CREATE( cur_who, WHO_DATA, 1 );
-          cur_who->text = str_dup( buf );
+      /*  
+       * This is where the old code would display the found player to the ch.
+       * What we do instead is put the found data into a linked list
+       */ 
 
+      /* First make the structure. */
+      CREATE( cur_who, WHO_DATA, 1 );
+      cur_who->text = str_dup( buf );
 
-          if ( IS_OFFICIAL( wch ) )
-            cur_who->type = WT_IMM;
-          else
-            cur_who->type = WT_MORTAL;
-          
-          /* Then put it into the appropriate list. */
-          switch ( cur_who->type )
-          {
-            case WT_MORTAL:
-              cur_who->next = first_mortal;
-              first_mortal = cur_who;
-              break;
-            case WT_IMM:
-              cur_who->next = first_imm;
-              first_imm = cur_who;
-              break;
-            
-          }
+      if ( IS_OFFICIAL( wch ) )
+	cur_who->type = WT_IMM;
+      else
+	cur_who->type = WT_MORTAL;
 
+      /* Then put it into the appropriate list. */
+      switch ( cur_who->type )
+	{
+	case WT_MORTAL:
+	  cur_who->next = first_mortal;
+	  first_mortal = cur_who;
+	  break;
+	case WT_IMM:
+	  cur_who->next = first_imm;
+	  first_imm = cur_who;
+	  break;
+	}
     }
 
+  /* Ok, now we have three separate linked lists and what remains is to 
+   * display the information and clean up.
+   */
 
-    /* Ok, now we have three separate linked lists and what remains is to 
-     * display the information and clean up.
-     */
-
-     /* Deadly list removed for swr ... now only 2 lists */
-
-
-    if ( first_mortal )
+  /* Deadly list removed for swr ... now only 2 lists */
+  if ( first_mortal )
     {
       if ( !ch )
         fprintf( whoout,"\r\n--------------------------------[ Galactic Citizens ]-------------------------\r\n\r\n" );
       else
-       send_to_pager( "\r\n&R--------------------------------[ &YGalactic Citizens&R ]-------------------------&W\r\n\r\n", ch );
+	send_to_pager( "\r\n&R--------------------------------[ &YGalactic Citizens&R ]-------------------------&W\r\n\r\n", ch );
     }
 
-    for ( cur_who = first_mortal; cur_who; cur_who = next_who )
+  for ( cur_who = first_mortal; cur_who; cur_who = next_who )
     {
       if ( !ch )
         fprintf( whoout, "%s", cur_who->text );
@@ -2301,37 +2284,36 @@ void do_who( CHAR_DATA *ch, char *argument )
       DISPOSE( cur_who ); 
     } 
 
-    if ( first_imm )
+  if ( first_imm )
     {
       if ( !ch )
         fprintf( whoout, "%s", "\r\n--------------------------------[ Elected Officials ]-------------------------\r\n\r\n" );
       else
-       send_to_pager(  "\r\n&R--------------------------------[ &YElected Officials&R ]-------------------------&W\r\n\r\n", ch );
+	send_to_pager(  "\r\n&R--------------------------------[ &YElected Officials&R ]-------------------------&W\r\n\r\n", ch );
     }
 
-    for ( cur_who = first_imm; cur_who; cur_who = next_who )
+  for ( cur_who = first_imm; cur_who; cur_who = next_who )
     {
       if ( !ch )
         fprintf( whoout, "%s", cur_who->text );
       else
         send_to_pager( cur_who->text, ch );
+
       next_who = cur_who->next;
       DISPOSE( cur_who->text );
       DISPOSE( cur_who ); 
-    } 
-
-    if ( !ch )
-    {
-	fprintf( whoout, "%d player%s.\r\n", nMatch, nMatch == 1 ? "" : "s" );
-	fclose( whoout );
-	return;
     }
 
-    set_char_color( AT_YELLOW, ch );
-    ch_printf( ch, "\r\n%d player%s.\r\n", nMatch, nMatch == 1 ? "" : "s" );
-    return;
-}
+  if ( !ch )
+    {
+      fprintf( whoout, "%d player%s.\r\n", nMatch, nMatch == 1 ? "" : "s" );
+      fclose( whoout );
+      return;
+    }
 
+  set_char_color( AT_YELLOW, ch );
+  ch_printf( ch, "\r\n%d player%s.\r\n", nMatch, nMatch == 1 ? "" : "s" );
+}
 
 void do_compare( CHAR_DATA *ch, char *argument )
 {
@@ -3438,7 +3420,7 @@ void do_whois( CHAR_DATA *ch, char *argument)
     }
     if ( victim->desc && victim->desc->host[0]!='\0' )   /* added by Gorog */
     {
-      sprintf (buf2, "%s's IP info: %s ", victim->name, victim->desc->hostip);
+      sprintf (buf2, "%s's IP info: %s ", victim->name, victim->desc->host);
       if ( IS_IMMORTAL(ch) )
       {
         strcat (buf2, victim->desc->host);

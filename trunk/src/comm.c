@@ -82,6 +82,13 @@ void	set_pager_input		args( ( DESCRIPTOR_DATA *d,
 					char *argument ) );
 bool	pager_output		args( ( DESCRIPTOR_DATA *d ) );
 void	mail_count		args( ( CHAR_DATA *ch ) );
+void free_memory( void );
+
+static void execute_on_exit( void )
+{
+  free_memory();
+  network_teardown();
+}
 
 int main( int argc, char **argv )
 {
@@ -89,7 +96,7 @@ int main( int argc, char **argv )
   bool fCopyOver = FALSE;
 
   network_startup();
-  atexit( network_teardown );
+  atexit( execute_on_exit );
 
   num_descriptors		= 0;
   first_descriptor		= NULL;
@@ -743,16 +750,15 @@ void new_descriptor( SOCKET new_desc )
 
 void free_desc( DESCRIPTOR_DATA *d )
 {
-    closesocket( d->descriptor );
-    STRFREE( d->host );
-    DISPOSE( d->outbuf );
+  closesocket( d->descriptor );
+  STRFREE( d->host );
+  DISPOSE( d->outbuf );
 
-    if ( d->pagebuf )
-	DISPOSE( d->pagebuf );
+  if ( d->pagebuf )
+    DISPOSE( d->pagebuf );
 
-    DISPOSE( d );
-    --num_descriptors;
-    return;
+  DISPOSE( d );
+  --num_descriptors;
 }
 
 void close_socket( DESCRIPTOR_DATA *dclose, bool force )

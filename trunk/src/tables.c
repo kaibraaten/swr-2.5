@@ -1130,7 +1130,8 @@ SKILLTYPE *fread_skill( FILE *fp )
     SKILLTYPE *skill;
 
     CREATE( skill, SKILLTYPE, 1 );
-    
+    skill->affects = NULL;
+
     for ( ; ; )
     {
 	word   = feof( fp ) ? "End" : fread_word( fp );
