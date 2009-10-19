@@ -679,7 +679,6 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
       for ( rnum = COLONY_ROOM_FIRST ; rnum <= COLONY_ROOM_LAST ; rnum ++ )
 	{
 	  location = make_room( ++top_r_vnum );
-	  planet->size++;
 	  
 	  if ( !location )
 	    {
@@ -687,6 +686,7 @@ void do_makeplanet( CHAR_DATA *ch, char *argument )
 	      return;
 	    }
 
+	  planet->size++;
 	  location->area = pArea;
 	  STRFREE( location->description );
 	  STRFREE( location->name );
