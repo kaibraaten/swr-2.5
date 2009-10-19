@@ -1138,7 +1138,7 @@ void load_rooms( AREA_DATA *tarea, FILE *fp )
 	      oldroom = TRUE;
 	    }
 	}
-	else
+      else
 	{
 	  oldroom = FALSE;
 	  CREATE( pRoomIndex, ROOM_INDEX_DATA, 1 );
@@ -1152,58 +1152,63 @@ void load_rooms( AREA_DATA *tarea, FILE *fp )
 	  pRoomIndex->prev_in_ship      = NULL;
 	}
 
-	fBootDb = tmpBootDb;
-	pRoomIndex->area		= tarea;
-	pRoomIndex->vnum		= vnum;
-	pRoomIndex->first_extradesc	= NULL;
-	pRoomIndex->last_extradesc	= NULL;
+      fBootDb = tmpBootDb;
+      pRoomIndex->area		= tarea;
+      pRoomIndex->vnum		= vnum;
+      pRoomIndex->first_extradesc	= NULL;
+      pRoomIndex->last_extradesc	= NULL;
 
-	pRoomIndex->name		= fread_string( fp );
-	pRoomIndex->description		= fread_string( fp );
+      pRoomIndex->name		= fread_string( fp );
+      pRoomIndex->description		= fread_string( fp );
 
-	/* Area number			  fread_number( fp ); */
-	ln = fread_line( fp );
-	x1=x2=x3=x4=x5=x6=0;
-	sscanf( ln, "%d %d %d %d %d %d",
+      /* Area number			  fread_number( fp ); */
+      ln = fread_line( fp );
+      x1=x2=x3=x4=x5=x6=0;
+      sscanf( ln, "%d %d %d %d %d %d",
 	      &x1, &x2, &x3, &x4, &x5, &x6 );
 
-	pRoomIndex->room_flags		= x2;
-	pRoomIndex->sector_type		= x3;
-	pRoomIndex->tele_delay		= x4;
-	pRoomIndex->tele_vnum		= x5;
-	pRoomIndex->tunnel		= x6;
+      pRoomIndex->room_flags		= x2;
+      pRoomIndex->sector_type		= x3;
+      pRoomIndex->tele_delay		= x4;
+      pRoomIndex->tele_vnum		= x5;
+      pRoomIndex->tunnel		= x6;
 
-	if (pRoomIndex->sector_type < 0 || pRoomIndex->sector_type == SECT_MAX)
+      if (pRoomIndex->sector_type < 0 || pRoomIndex->sector_type == SECT_MAX)
 	{
 	  bug( "Fread_rooms: vnum %d has bad sector_type %d.", vnum ,
-	      pRoomIndex->sector_type);
+	       pRoomIndex->sector_type);
 	  pRoomIndex->sector_type = 1;
 	}
-	pRoomIndex->light		= 0;
-	pRoomIndex->first_exit		= NULL;
-	pRoomIndex->last_exit		= NULL;
 
-	for ( ; ; )
+      pRoomIndex->light		= 0;
+      pRoomIndex->first_exit		= NULL;
+      pRoomIndex->last_exit		= NULL;
+
+      for ( ; ; )
 	{
-	    letter = fread_letter( fp );
+	  letter = fread_letter( fp );
 
-	    if ( letter == 'S' )
-		break;
+	  if ( letter == 'S' )
+	    break;
 
-	    if ( letter == 'D' )
+	  if ( letter == 'D' )
 	    {
-		EXIT_DATA *pexit;
-		int locks;
+	      EXIT_DATA *pexit = NULL;
+	      int locks = 0;
 
-		door = fread_number( fp );
-		if ( door < 0 || door > 10 )
+	      door = fread_number( fp );
+
+	      if ( door < 0 || door > 10 )
 		{
-		    bug( "Fread_rooms: vnum %d has bad door number %d.", vnum,
-		        door );
-		    if ( fBootDb )
+		  bug( "Fread_rooms: vnum %d has bad door number %d.", vnum,
+		       door );
+
+		  if ( fBootDb )
+		    {
 		      exit( 1 );
+		    }
 		}
-		else
+	      else
 		{
 		  pexit = make_exit( pRoomIndex, NULL, door );
 		  pexit->description	= fread_string( fp );
@@ -1212,7 +1217,7 @@ void load_rooms( AREA_DATA *tarea, FILE *fp )
 		  ln = fread_line( fp );
 		  x1=x2=x3=x4=0;
 		  sscanf( ln, "%d %d %d %d",
-		      &x1, &x2, &x3, &x4 );
+			  &x1, &x2, &x3, &x4 );
 
 		  locks			= x1;
 		  pexit->key		= x2;
@@ -1221,40 +1226,39 @@ void load_rooms( AREA_DATA *tarea, FILE *fp )
 		  pexit->distance	= x4;
 
 		  switch ( locks )
-		  {
+		    {
 		    case 1:  pexit->exit_info = EX_ISDOOR;                break;
 		    case 2:  pexit->exit_info = EX_ISDOOR | EX_PICKPROOF; break;
 		    default: pexit->exit_info = locks;
-		  }
+		    }
 		}
 	    }
-	    else if ( letter == 'E' )
+	  else if ( letter == 'E' )
 	    {
-		EXTRA_DESCR_DATA *ed;
+	      EXTRA_DESCR_DATA *ed = NULL;
 
-		CREATE( ed, EXTRA_DESCR_DATA, 1 );
-		ed->keyword		= fread_string( fp );
-		ed->description		= fread_string( fp );
-		LINK( ed, pRoomIndex->first_extradesc, pRoomIndex->last_extradesc,
-			  next, prev );
-		top_ed++;
+	      CREATE( ed, EXTRA_DESCR_DATA, 1 );
+	      ed->keyword		= fread_string( fp );
+	      ed->description		= fread_string( fp );
+	      LINK( ed, pRoomIndex->first_extradesc, pRoomIndex->last_extradesc,
+		    next, prev );
+	      top_ed++;
 	    }
-	    else if ( letter == '>' )
+	  else if ( letter == '>' )
 	    {
 	      ungetc( letter, fp );
 	      rprog_read_programs( fp, pRoomIndex );
             }
-	    else
+	  else
 	    {
-		bug( "Load_rooms: vnum %d has flag '%c' not 'DES'.", vnum,
-		    letter );
-		shutdown_mud( "Room flag not DES" );
-		exit( 1 );
+	      bug( "Load_rooms: vnum %d has flag '%c' not 'DES'.", vnum,
+		   letter );
+	      shutdown_mud( "Room flag not DES" );
+	      exit( 1 );
 	    }
-
 	}
 
-	if ( !oldroom )
+      if ( !oldroom )
 	{
 	  iHash			 = vnum % MAX_KEY_HASH;
 	  pRoomIndex->next	 = room_index_hash[iHash];
@@ -1262,13 +1266,11 @@ void load_rooms( AREA_DATA *tarea, FILE *fp )
 	  top_room++;
 	}
 	
-	if ( vnum > top_r_vnum )
-	    top_r_vnum = vnum;
+      if ( vnum > top_r_vnum )
+	top_r_vnum = vnum;
 	
-	LINK ( pRoomIndex , tarea->first_room , tarea->last_room, next_in_area , prev_in_area );
+      LINK ( pRoomIndex , tarea->first_room , tarea->last_room, next_in_area , prev_in_area );
     }
-
-    return;
 }
 
 

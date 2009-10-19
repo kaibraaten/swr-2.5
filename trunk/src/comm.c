@@ -630,7 +630,7 @@ void new_descriptor( SOCKET new_desc )
     char buf[MAX_STRING_LENGTH];
     DESCRIPTOR_DATA *dnew = NULL;
     struct hostent  *from = NULL;
-    const char *hostname = NULL;
+    //const char *hostname = NULL;
     struct sockaddr_in sock;
     SOCKET desc = 0;
     socklen_t size = 0;
@@ -695,7 +695,7 @@ void new_descriptor( SOCKET new_desc )
 
     from = gethostbyaddr( (char *) &sock.sin_addr,
 	  	sizeof(sock.sin_addr), AF_INET );
-    hostname = STRALLOC( (char *)( from ? from->h_name : "") );
+    //hostname = STRALLOC( (char *)( from ? from->h_name : "") );
 	
 
     if ( !sysdata.NO_NAME_RESOLVING )

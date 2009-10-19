@@ -146,33 +146,36 @@ void fread_planet( PLANET_DATA *planet, FILE *fp )
 	case 'A':
 	  if ( !str_cmp( word, "Area" ) )
 	    {
-	      char aName[MAX_STRING_LENGTH];
-	      AREA_DATA *pArea;
-                	        
-	      sprintf (aName, "%s", fread_string(fp));
+	      char *aName = fread_string(fp);
+	      AREA_DATA *pArea = NULL;
+
 	      for( pArea = first_area ; pArea ; pArea = pArea->next )
-		if (pArea->filename && !str_cmp(pArea->filename , aName ) )
-	          {
-		    ROOM_INDEX_DATA *room;
-	             
-		    pArea->planet = planet; 
-		    planet->area = pArea;
-		    for( room = pArea->first_room ; room ; room = room->next_in_area )
-		      {  	       
-			planet->size++;
-			if ( room->sector_type <= SECT_CITY )
-			  planet->citysize++;    
-			else if ( room->sector_type == SECT_FARMLAND )
-			  planet->farmland++;    
-			else if ( room->sector_type != SECT_DUNNO )
-			  planet->wilderness++;
-                             
-			if ( IS_SET( room->room_flags , ROOM_CONTROL ))
-			  planet->controls++;    
-			if ( IS_SET( room->room_flags , ROOM_BARRACKS ))
-			  planet->barracks++;    
-		      } 	       
-	          }      
+		{
+		  if (pArea->filename && !str_cmp(pArea->filename , aName ) )
+		    {
+		      ROOM_INDEX_DATA *room;
+	            
+		      pArea->planet = planet; 
+		      planet->area = pArea;
+		      for( room = pArea->first_room ; room ; room = room->next_in_area )
+			{  	       
+			  planet->size++;
+			  if ( room->sector_type <= SECT_CITY )
+			    planet->citysize++;    
+			  else if ( room->sector_type == SECT_FARMLAND )
+			    planet->farmland++;    
+			  else if ( room->sector_type != SECT_DUNNO )
+			    planet->wilderness++;
+			
+			  if ( IS_SET( room->room_flags , ROOM_CONTROL ))
+			    planet->controls++;    
+			  if ( IS_SET( room->room_flags , ROOM_BARRACKS ))
+			    planet->barracks++;    
+			} 	       
+		    }      
+		}
+
+	      STRFREE( aName );
 	      fMatch = TRUE;
 	    }
 	  break;
@@ -210,7 +213,10 @@ void fread_planet( PLANET_DATA *planet, FILE *fp )
 	  KEY( "Sector",	planet->sector,		fread_number( fp ) );
 	  if ( !str_cmp( word, "Starsystem" ) )
 	    {
-	      planet->starsystem = starsystem_from_name ( fread_string(fp) );
+	      char *systemname = fread_string(fp);
+	      planet->starsystem = starsystem_from_name (systemname);
+	      STRFREE(systemname);
+
 	      if (planet->starsystem)
                 {
 		  SPACE_DATA *starsystem = planet->starsystem;
