@@ -383,7 +383,7 @@ void fread_ship_prototype( SHIP_PROTOTYPE *prototype, FILE *fp )
 
 SHIP_PROTOTYPE *ship_prototype_create( void )
 {
-  SHIP_PROTOTYPE *ship = 0;
+  SHIP_PROTOTYPE *ship = NULL;
   CREATE( ship, SHIP_PROTOTYPE, 1 );
   ship->next         = NULL;
   ship->prev         = NULL;
@@ -901,6 +901,9 @@ static void create_default_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
   ship->viewscreen = room[0];
   ship->entrance = room[0];
   ship->engine = room[0];
+
+  LINK( room[0], ship->first_room, ship->last_room,
+	next_in_ship, prev_in_ship );
 }
 
 static void create_fighter1_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
@@ -911,6 +914,8 @@ static void create_fighter1_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
   room[0]->tunnel = 1;
   ship->entrance = room[0];
   ship->engine = room[0];
+  LINK( room[0], ship->first_room, ship->last_room,
+        next_in_ship, prev_in_ship );
 }
 
 static void create_fighter2_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
@@ -921,38 +926,56 @@ static void create_fighter2_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
   room[0]->tunnel = 2;
   ship->entrance = room[0];
   ship->engine = room[0];
+  LINK( room[0], ship->first_room, ship->last_room,
+        next_in_ship, prev_in_ship );
 }
 
 static void create_shuttle1_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
 {
+  size_t n = 0;
   bridge_rooms( room[1] , room[0] , DIR_NORTH );
   make_cockpit( room[0] , ship );
   ship->entrance = room[0];
   ship->engine = room[0];
+
+  for( n = 0; n <= 1; ++n )
+    LINK( room[0], ship->first_room, ship->last_room,
+	  next_in_ship, prev_in_ship );
 }
 
 static void create_shuttle2_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
 {
+  size_t n = 0;
   bridge_rooms( room[1] , room[0] , DIR_NORTH );
   bridge_rooms( room[1] , room[2] , DIR_SOUTH );
   make_cockpit( room[0], ship);
   make_turret( room[2], ship );
   ship->entrance = room[0];
   ship->engine = room[0];
+
+  for( n = 0; n <= 2; ++n )
+    LINK( room[0], ship->first_room, ship->last_room,
+          next_in_ship, prev_in_ship );
 }
 
 static void create_transport1_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
 {
+  size_t n = 0;
   bridge_rooms( room[1] , room[0] , DIR_NORTH );
   bridge_rooms( room[1] , room[2] , DIR_SOUTH );
   bridge_rooms( room[1] , room[3] , DIR_WEST );
   make_cockpit( room[0], ship );
   make_engine( room[2], ship );
   make_entrance( room[1], ship );
+
+  for( n = 0; n <= 3; ++n )
+    LINK( room[0], ship->first_room, ship->last_room,
+          next_in_ship, prev_in_ship );
 }
 
 static void create_transport2_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
 {
+  size_t n = 0;
   bridge_rooms( room[1] , room[0] , DIR_NORTH );
   bridge_rooms( room[1] , room[2] , DIR_SOUTH );
   bridge_rooms( room[1] , room[3] , DIR_WEST );
@@ -961,10 +984,15 @@ static void create_transport2_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
   make_engine( room[2], ship );
   make_entrance( room[1], ship );
   make_turret( room[4], ship );
+
+  for( n = 0; n <= 4; ++n )
+    LINK( room[0], ship->first_room, ship->last_room,
+          next_in_ship, prev_in_ship );
 }
 
 static void create_corvette_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
 {
+  size_t n = 0;
   make_pilot( room[0], ship );
   make_bridge( room[1], ship );
   make_copilot( room[2], ship );
@@ -980,10 +1008,15 @@ static void create_corvette_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
   bridge_rooms( room[4] , room[6] , DIR_WEST );
   bridge_rooms( room[4] , room[7] , DIR_EAST );
   post_ship_guard( room[1] );
+
+  for( n = 0; n <= 7; ++n )
+    LINK( room[0], ship->first_room, ship->last_room,
+          next_in_ship, prev_in_ship );
 }
 
 static void create_frigate_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
 {
+  size_t n = 0;
   make_pilot( room[0], ship );
   make_bridge( room[1], ship );
   make_copilot( room[2], ship );
@@ -1002,10 +1035,15 @@ static void create_frigate_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
   bridge_rooms( room[4] , room[7] , DIR_SOUTH );
   bridge_rooms( room[7] , room[9] , DIR_SOUTH );
   post_ship_guard( room[1] );
+
+  for( n = 0; n <= 9; ++n )
+    LINK( room[0], ship->first_room, ship->last_room,
+	  next_in_ship, prev_in_ship );
 }
 
 static void create_destroyer_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
 {
+  size_t n = 0;
   make_pilot( room[0], ship );
   make_bridge( room[1], ship );
   make_copilot( room[2], ship );
@@ -1028,10 +1066,15 @@ static void create_destroyer_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
   bridge_rooms( room[7] , room[10] , DIR_DOWN );
   bridge_rooms( room[7] , room[11] , DIR_UP );
   post_ship_guard( room[1] );
+
+  for( n = 0; n <= 11; ++n )
+    LINK( room[0], ship->first_room, ship->last_room,
+          next_in_ship, prev_in_ship );
 }
 
 static void create_cruiser_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
 {
+  size_t n = 0;
   make_pilot( room[0], ship );
   make_bridge( room[1], ship );
   make_copilot( room[2], ship );
@@ -1061,10 +1104,15 @@ static void create_cruiser_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
   bridge_rooms( room[6] , room[11] , DIR_NORTHWEST );
   post_ship_guard( room[1] );
   post_ship_guard( room[1] );
+
+  for( n = 0; n <= 14; ++n )
+    LINK( room[0], ship->first_room, ship->last_room,
+          next_in_ship, prev_in_ship );
 }
 
 static void create_battleship_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
 {
+  size_t n = 0;
   make_pilot( room[0], ship );
   make_bridge( room[1], ship );
   make_copilot( room[2], ship );
@@ -1100,10 +1148,15 @@ static void create_battleship_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
   bridge_elevator( room[14] , room[16] , DIR_SOUTH , "Hangers" );
   post_ship_guard( room[1] );
   post_ship_guard( room[1] );
+
+  for( n = 0; n <= 17; ++n )
+    LINK( room[0], ship->first_room, ship->last_room,
+          next_in_ship, prev_in_ship );
 }
 
 static void create_flagship_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
 {
+  size_t n = 0;
   make_pilot( room[0], ship );
   make_bridge( room[1], ship );
   make_copilot( room[2], ship );
@@ -1144,6 +1197,10 @@ static void create_flagship_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] )
   bridge_rooms( room[12] , room[21] , DIR_SOUTH );
   post_ship_guard( room[1] );
   post_ship_guard( room[1] );
+
+  for( n = 0; n <= 23; ++n )
+    LINK( room[0], ship->first_room, ship->last_room,
+          next_in_ship, prev_in_ship );
 }
 
 void create_ship_rooms( SHIP_DATA *ship )

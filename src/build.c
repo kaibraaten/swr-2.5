@@ -4200,10 +4200,9 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
 
 void free_area( AREA_DATA *are )
 {
-    DISPOSE( are->name );
-    DISPOSE( are->filename );
-    DISPOSE( are );
-    are = NULL;
+  DISPOSE( are->name );
+  DISPOSE( are->filename );
+  DISPOSE( are );
 }
 
 void do_aassign( CHAR_DATA *ch, char *argument )
@@ -4288,10 +4287,7 @@ bool DelRExtra( ROOM_INDEX_DATA *room, char *keywords )
     if ( !rmed )
       return FALSE;
     UNLINK( rmed, room->first_extradesc, room->last_extradesc, next, prev );
-    STRFREE( rmed->keyword );
-    STRFREE( rmed->description );
-    DISPOSE( rmed );
-    top_ed--;
+    free_extra_descr( rmed );
     return TRUE;
 }
 
@@ -4327,10 +4323,7 @@ bool DelOExtra( OBJ_DATA *obj, char *keywords )
     if ( !rmed )
       return FALSE;
     UNLINK( rmed, obj->first_extradesc, obj->last_extradesc, next, prev );
-    STRFREE( rmed->keyword );
-    STRFREE( rmed->description );
-    DISPOSE( rmed );
-    top_ed--;
+    free_extra_descr( rmed );
     return TRUE;
 }
 

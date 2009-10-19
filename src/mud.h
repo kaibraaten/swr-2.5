@@ -690,7 +690,6 @@ struct	clan_data
     int         spacecraft;
     int		vehicles;
     int		salary;
-    char      * tmpstr;
 };
 
 struct ship_prototype_data
@@ -3560,6 +3559,7 @@ void	act		args( ( short AType, const char *format, CHAR_DATA *ch,
 void	reset_all	args( ( ) );
 
 /* db.c */
+void free_extra_descr( EXTRA_DESCR_DATA *ed );
 void free_shop( SHOP_DATA* );
 void free_help( HELP_DATA* );
 void free_ban( BAN_DATA* );
