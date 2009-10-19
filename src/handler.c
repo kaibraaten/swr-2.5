@@ -2307,29 +2307,35 @@ void extract_room( ROOM_INDEX_DATA *room )
  */
 void clean_room( ROOM_INDEX_DATA *room )
 {
-   EXTRA_DESCR_DATA	*ed, *ed_next;
-   EXIT_DATA		*pexit, *pexit_next;
+  EXTRA_DESCR_DATA	*ed, *ed_next;
+  EXIT_DATA		*pexit, *pexit_next;
 
-   STRFREE( room->description );
-   STRFREE( room->name );
-   for ( ed = room->first_extradesc; ed; ed = ed_next )
-   {
-	ed_next = ed->next;
-	STRFREE( ed->description );
-	STRFREE( ed->keyword );
-	DISPOSE( ed );
-	top_ed--;
+  STRFREE( room->description );
+  STRFREE( room->name );
+  room->description = NULL;
+  room->name = NULL;
+
+  for ( ed = room->first_extradesc; ed; ed = ed_next )
+    {
+      ed_next = ed->next;
+      STRFREE( ed->description );
+      STRFREE( ed->keyword );
+      DISPOSE( ed );
+      top_ed--;
+    }
+
+  room->first_extradesc	= NULL;
+  room->last_extradesc		= NULL;
+
+  for ( pexit = room->first_exit; pexit; pexit = pexit_next )
+    {
+      pexit_next = pexit->next;
+      STRFREE( pexit->keyword );
+      STRFREE( pexit->description );
+      DISPOSE( pexit );
+      top_exit--;
    }
-   room->first_extradesc	= NULL;
-   room->last_extradesc		= NULL;
-   for ( pexit = room->first_exit; pexit; pexit = pexit_next )
-   {
-	pexit_next = pexit->next;
-	STRFREE( pexit->keyword );
-	STRFREE( pexit->description );
-	DISPOSE( pexit );
-	top_exit--;
-   }
+
    room->first_exit = NULL;
    room->last_exit = NULL;
    room->room_flags = 0;
