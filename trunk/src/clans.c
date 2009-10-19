@@ -150,8 +150,6 @@ void fread_clan( CLAN_DATA *clan, FILE *fp )
 		  clan->atwar		= STRALLOC( "" );
 		if (!clan->description)
 		  clan->description 	= STRALLOC( "" );
-		if (!clan->tmpstr)
-		  clan->tmpstr		= STRALLOC( "" );
 		return;
 	    }
 	    break;
@@ -687,7 +685,6 @@ void do_makeclan( CHAR_DATA *ch, char *argument )
     clan->description	= STRALLOC( "" );
     clan->leaders	= STRALLOC( "" );
     clan->atwar		= STRALLOC( "" );
-    clan->tmpstr	= STRALLOC( "" );
     clan->funds         = 0;
     clan->salary        = 0;
     clan->members       = 0;

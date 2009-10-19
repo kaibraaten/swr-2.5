@@ -4561,7 +4561,7 @@ static void free_all_descriptors( void )
   for ( d = first_descriptor; d; d = d_next )
     {
       d_next = d->next;
-      close_socket( d, FALSE );
+      close_socket( d, TRUE );
     }
 }
 
@@ -4593,6 +4593,23 @@ void free_repair( REPAIR_DATA *repair )
 void free_shop( SHOP_DATA *shop )
 {
   DISPOSE( shop );
+}
+
+static void free_shop_list( void )
+{
+  while( first_shop )
+    {
+      SHOP_DATA *shop = first_shop;
+      UNLINK( shop, first_shop, last_shop, next, prev );
+      free_shop( shop );
+    }
+
+  while( first_repair )
+    {
+      REPAIR_DATA *repair = first_repair;
+      UNLINK( repair, first_repair, last_repair, next, prev );
+      free_repair( repair );
+    }
 }
 
 void free_space_data( SPACE_DATA *starsystem )
@@ -4775,6 +4792,289 @@ static void free_skill_list( void )
     }
 }
 
+void free_extra_descr( EXTRA_DESCR_DATA *ed )
+{
+  STRFREE( ed->keyword );
+  STRFREE( ed->description );
+  DISPOSE( ed );
+  top_ed--;
+}
+
+void free_room( ROOM_INDEX_DATA *room )
+{
+  MPROG_ACT_LIST *mpact = NULL;
+  EXTRA_DESCR_DATA *ed = NULL;
+  EXTRA_DESCR_DATA *ed_next = NULL;
+  MPROG_DATA *mprog = NULL;
+
+  STRFREE( room->name );
+  STRFREE( room->description );
+
+  for( ed = room->first_extradesc; ed; ed = ed_next )
+    {
+      ed_next = ed->next;
+      UNLINK( ed, room->first_extradesc, room->last_extradesc, next, prev );
+      free_extra_descr( ed );
+    }
+
+  while( room->first_exit )
+    {
+      extract_exit( room, room->first_exit );
+    }
+  
+  while( ( mpact = room->mpact ) )
+    {
+      room->mpact = mpact->next;
+      DISPOSE( mpact->buf );
+      DISPOSE( mpact );
+    }
+
+  while( ( mprog = room->mudprogs ) )
+    {
+      room->mudprogs = mprog->next;
+      STRFREE( mprog->arglist );
+      STRFREE( mprog->comlist );
+      DISPOSE( mprog );
+    }
+
+  DISPOSE( room );
+}
+
+void free_turret( TURRET_DATA *turret )
+{
+  /*
+  if( turret->room )
+    {
+      free_room( turret->room );
+    }
+  */
+  DISPOSE( turret );
+}
+
+void free_hangar( HANGER_DATA *hangar )
+{
+  /*
+  if( hangar->room )
+    {
+      free_room( hangar->room );
+    }
+  */
+  DISPOSE( hangar );
+}
+
+void free_ship( SHIP_DATA *ship )
+{
+  TURRET_DATA *turret = NULL;
+  TURRET_DATA *turret_next = NULL;
+  HANGER_DATA *hangar = NULL;
+  HANGER_DATA *hangar_next = NULL;
+  ROOM_INDEX_DATA *room = NULL;
+  ROOM_INDEX_DATA *room_next = NULL;
+  size_t n = 0;
+
+  for( turret = ship->first_turret; turret; turret = turret_next )
+    {
+      turret_next = turret->next;
+      UNLINK( turret, ship->first_turret, ship->last_turret, next, prev );
+      free_turret( turret );
+    }
+
+  for( hangar = ship->first_hanger; hangar; hangar = hangar_next )
+    {
+      hangar_next = hangar->next;
+      UNLINK( hangar, ship->first_hanger, ship->last_hanger, next, prev );
+      free_hangar( hangar );
+    }
+
+  if( ship->filename )
+    DISPOSE( ship->filename );
+
+  if( ship->name )
+    STRFREE( ship->name );
+
+  if( ship->home )
+    STRFREE( ship->home );
+
+  for( n = 0; n < MAX_SHIP_ROOMS; ++n )
+    {
+      if( ship->description[n] )
+	STRFREE( ship->description[n] );
+    }
+
+  if( ship->pilot )
+    STRFREE( ship->pilot );
+
+  if( ship->copilot )
+    STRFREE( ship->copilot );
+
+  if( ship->dest )
+    STRFREE( ship->dest );
+
+  if( ship->owner )
+    STRFREE( ship->owner );
+
+  for( room = ship->first_room; room; room = room_next )
+    {
+      room_next = room->next;
+      UNLINK( room, ship->first_room, ship->last_room,
+	      next_in_ship, prev_in_ship );
+      free_room( room );
+    }
+
+  DISPOSE( ship );
+}
+
+static void free_ship_list( void )
+{
+  SHIP_DATA *ship = NULL;
+  SHIP_DATA *ship_next = NULL;
+
+  for( ship = first_ship; ship; ship = ship_next )
+    {
+      ship_next = ship->next;
+      UNLINK( ship, first_ship, last_ship, next, prev );
+      free_ship( ship );
+    }
+}
+
+void free_ship_prototype( SHIP_PROTOTYPE *proto )
+{
+  if( proto->filename )
+    DISPOSE( proto->filename );
+
+  if( proto->name )
+    STRFREE( proto->name );;
+
+  if( proto->description )
+    STRFREE( proto->description );
+
+  DISPOSE( proto );
+}
+
+static void free_ship_prototype_list( void )
+{
+  SHIP_PROTOTYPE *proto = NULL;
+  SHIP_PROTOTYPE *proto_next = NULL;
+
+  for( proto = first_ship_prototype; proto; proto = proto_next )
+    {
+      proto_next = proto->next;
+      UNLINK( proto, first_ship_prototype, last_ship_prototype, next, prev );
+      free_ship_prototype( proto );
+    }
+}
+
+void free_clan( CLAN_DATA *clan )
+{
+  if( clan->filename )
+    DISPOSE( clan->filename );
+
+  if( clan->name )
+    STRFREE( clan->name );
+
+  if( clan->description )
+    STRFREE( clan->description );
+
+  if( clan->leaders )
+    STRFREE( clan->leaders );
+
+  if( clan->atwar )
+    STRFREE( clan->atwar );
+
+  DISPOSE( clan );
+}
+
+static void free_clan_list( void )
+{
+  CLAN_DATA *clan = NULL;
+  CLAN_DATA *clan_next = NULL;
+
+  for( clan = first_clan; clan; clan = clan_next )
+    {
+      clan_next = clan->next;
+      UNLINK( clan, first_clan, last_clan, next, prev );
+      free_clan( clan );
+    }
+}
+
+void free_guard( GUARD_DATA *guard )
+{
+  DISPOSE( guard );
+}
+
+void free_planet( PLANET_DATA *planet )
+{
+  GUARD_DATA *guard = NULL;
+  GUARD_DATA *g_next = NULL;
+
+  for( guard = planet->first_guard; guard; guard = g_next )
+    {
+      g_next = guard->next;
+      UNLINK( guard , guard->planet->first_guard,
+	      guard->planet->last_guard, next_on_planet,
+	      prev_on_planet );
+      UNLINK( guard , first_guard, last_guard, next, prev );
+      free_guard( guard );
+    }
+
+  if( planet->name )
+    STRFREE( planet->name );
+
+  if( planet->filename )
+    DISPOSE( planet->filename );
+
+  DISPOSE( planet );
+}
+
+static void free_planet_list( void )
+{
+  PLANET_DATA *planet = NULL;
+  PLANET_DATA *p_next = NULL;
+
+  for( planet = first_planet; planet; planet = p_next )
+    {
+      p_next = planet->next;
+      UNLINK( planet, first_planet, last_planet, next, prev );
+      free_planet( planet );
+    }
+}
+
+static void free_character_list( void )
+{
+  CHAR_DATA *ch = NULL;
+  CHAR_DATA *ch_next = NULL;
+
+  for( ch = first_char; ch; ch = ch_next )
+    {
+      ch_next = ch->next;
+      UNLINK( ch, first_char, last_char, next, prev );
+      free_char( ch );
+    }
+}
+
+void dispose_area( AREA_DATA *area )
+{
+  while( area->first_room )
+    {
+      ROOM_INDEX_DATA *room = area->first_room;
+      UNLINK( room, area->first_room, area->last_room,
+	      next_in_area, prev_in_area );
+      free_room( room );
+    }
+
+  free_area( area );
+}
+
+static void free_area_list( void )
+{
+  while( first_area )
+    {
+      AREA_DATA *area = first_area;
+      UNLINK( area, first_area, last_area, next, prev );
+      dispose_area( area );
+    }
+}
+
 void free_memory( void )
 {
   free_ban_list();
@@ -4783,7 +5083,17 @@ void free_memory( void )
   free_command_list();
   free_social_list();
   free_skill_list();
-  free_sysdata();
-
+  free_ship_list();
+  free_ship_prototype_list();
+  free_clan_list();
+  free_planet_list();
   free_all_descriptors();
+  free_character_list();
+  free_area_list();
+  free_shop_list();
+
+  if( auction )
+    DISPOSE( auction );
+
+  free_sysdata();
 }

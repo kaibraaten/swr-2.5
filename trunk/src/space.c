@@ -1835,10 +1835,9 @@ bool load_ship_file( const char *shipfile )
   char filename[256];
   SHIP_DATA *ship = ship_create();
   FILE *fp;
-  bool found;
+  bool found = FALSE;
   CLAN_DATA *clan;
         
-  found = FALSE;
   sprintf( filename, "%s%s", SHIP_DIR, shipfile );
 
   if ( ( fp = fopen( filename, "r" ) ) != NULL )
