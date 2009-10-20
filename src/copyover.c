@@ -61,7 +61,7 @@ extern SOCKET control;		/* Controlling descriptor	*/
 void do_copyover (CHAR_DATA *ch, char * argument)
 {
   DESCRIPTOR_DATA *d, *d_next;
-  char buf [100], buf2;
+  char buf [100];
   FILE *fp = fopen (COPYOVER_FILE, "w");
 
 #ifdef AMIGA
@@ -123,7 +123,7 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 
   if( error_code == -1 )
     {
-      bug( "Copyover failure, executable not be run." );
+      bug( "Copyover failure, executable could not be run." );
       fprintf( stderr, "Failed to run %s\n", EXE_FILE );
       ch_printf( ch, "Copyover FAILED!\r\n" );
     }
@@ -139,7 +139,7 @@ void do_copyover (CHAR_DATA *ch, char * argument)
   sprintf (buf, "%d", port);
   sprintf (buf2, "%d", control);
 
-  execl (EXE_FILE, "swreality", buf, "copyover", buf2, (char*) NULL );
+  execl (EXE_FILE, "swr", buf, "copyover", buf2, (char*) NULL );
 
   /* Failed - sucessful exec will not return */
 
