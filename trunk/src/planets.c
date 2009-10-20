@@ -196,8 +196,10 @@ void fread_planet( PLANET_DATA *planet, FILE *fp )
 	case 'G':
 	  if ( !str_cmp( word, "GovernedBy" ) )
 	    {
-	      planet->governed_by = get_clan ( fread_string(fp) );
+	      char *clan_name = fread_string(fp);
+	      planet->governed_by = get_clan ( clan_name );
 	      fMatch = TRUE;
+	      STRFREE( clan_name );
 	    }
 	  break;
 	
