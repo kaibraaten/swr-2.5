@@ -9,8 +9,8 @@
 
 #define MAX_NEST	100
 
-CLAN_DATA * first_clan;
-CLAN_DATA * last_clan;
+CLAN_DATA * first_clan = NULL;
+CLAN_DATA * last_clan = NULL;
 
 /* local routines */
 void	fread_clan	args( ( CLAN_DATA *clan, FILE *fp ) );

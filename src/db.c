@@ -4,9 +4,9 @@
 #include <stdarg.h>
 #include <string.h>
 #include <unistd.h>
+#include "mud.h"
 #include <sys/stat.h>
 #include <dirent.h>
-#include "mud.h"
 
 extern	int	_filbuf		args( (FILE *) );
 

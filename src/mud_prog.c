@@ -33,7 +33,7 @@ int mprog_do_command( char *cmnd, CHAR_DATA *mob, CHAR_DATA *actor,
 /*
  *  Mudprogram additions
  */
-CHAR_DATA *supermob;
+CHAR_DATA *supermob = NULL;
 struct act_prog_data *room_act_list;
 struct act_prog_data *obj_act_list;
 struct act_prog_data *mob_act_list;

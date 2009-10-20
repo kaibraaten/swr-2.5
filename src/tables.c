@@ -4,7 +4,7 @@
 #include "mud.h"
 
 /* global variables */
-int top_sn;
+int top_sn = 0;
 
 SKILLTYPE *		skill_table	[MAX_SKILL];
 

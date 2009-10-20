@@ -10,8 +10,8 @@
 #define VOTE_OPEN 1
 #define VOTE_CLOSED 2
 
-BOARD_DATA *		first_board;
-BOARD_DATA *		last_board;
+BOARD_DATA *		first_board = NULL;
+BOARD_DATA *		last_board = NULL;
 
 bool	is_note_to	args( ( CHAR_DATA *ch, NOTE_DATA *pnote ) );
 void	note_attach	args( ( CHAR_DATA *ch ) );

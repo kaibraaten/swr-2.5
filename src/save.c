@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include "mud.h"
 #include <sys/stat.h>
 #include <sys/dir.h>
-#include "mud.h"
 
 /*
  * Increment with every major format change.
@@ -19,7 +19,7 @@
 OBJ_DATA *save_equipment[MAX_WEAR][8];
 CHAR_DATA *quitting_char, *loading_char, *saving_char;
 
-int file_ver;
+int file_ver = 0;
 extern FILE *fpArea;
 extern char strArea[MAX_INPUT_LENGTH];
 
