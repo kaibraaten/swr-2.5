@@ -4576,8 +4576,12 @@ static void free_all_descriptors( void )
 
 void free_help( HELP_DATA *help )
 {
-  STRFREE( help->text );
-  STRFREE( help->keyword );
+  if( help->text )
+    STRFREE( help->text );
+
+  if( help->keyword )
+    STRFREE( help->keyword );
+
   DISPOSE( help );
 }
 

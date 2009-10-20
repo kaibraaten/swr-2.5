@@ -60,12 +60,15 @@ extern SOCKET control;		/* Controlling descriptor	*/
 
 void do_copyover (CHAR_DATA *ch, char * argument)
 {
-#ifdef AMIGA
-  ch_printf( ch, "Not implemented on this platform.\r\n" );
-#else
   DESCRIPTOR_DATA *d, *d_next;
-  char buf [100], buf2[100];
+  char buf [100], buf2;
   FILE *fp = fopen (COPYOVER_FILE, "w");
+
+#ifdef AMIGA
+  long error_code = 0;
+#else
+  char buf2[100];
+#endif
 
   if (!fp)
     {
@@ -91,7 +94,19 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 	}
       else
 	{
-	  fprintf (fp, "%d %s %s\n", d->descriptor, och->name, d->host);
+#ifdef AMIGA
+	  SOCKET cur_desc = ReleaseCopyOfSocket( d->descriptor, UNIQUE_ID );
+
+	  if( cur_desc == SOCKET_ERROR )
+	    {
+	      fprintf( stderr, "ReleaseCopyOfSocket() failed.\n" );
+	      exit( 1 );
+	    }
+#else
+	  SOCKET cur_desc = d->descriptor;
+#endif
+
+	  fprintf (fp, "%d %s %s\n", cur_desc, och->name, d->host);
 	  save_char_obj (och);
 	  write_to_descriptor (d->descriptor, buf, 0);
 	}
@@ -100,7 +115,26 @@ void do_copyover (CHAR_DATA *ch, char * argument)
   fprintf (fp, "-1\n");
   fclose (fp);
 
+#ifdef AMIGA
+  sprintf( buf, "run %s %d copyover %d",
+	   EXE_FILE, port, control );
+
+  error_code = System( buf, TAG_DONE );
+
+  if( error_code == -1 )
+    {
+      bug( "Copyover failure, executable not be run." );
+      fprintf( stderr, "Failed to run %s\n", EXE_FILE );
+      ch_printf( ch, "Copyover FAILED!\r\n" );
+    }
+  else
+    {
+      exit( 0 );
+    }
+
+#else
   /* exec - descriptors are inherited */
+
 
   sprintf (buf, "%d", port);
   sprintf (buf2, "%d", control);
@@ -144,6 +178,16 @@ void copyover_recover( void )
       if (desc == -1)
 	break;
 
+#ifdef AMIGA
+      desc = ObtainSocket( desc, PF_INET, SOCK_STREAM, IPPROTO_TCP );
+
+      if( desc == INVALID_SOCKET )
+	{
+	  bug( "ObtainSocket returned error." );
+	  continue;
+	}
+#endif
+
       /* Write something, and check if it goes error-free */
       if (!write_to_descriptor (desc, "\r\nThe surge of Light passes leaving you unscathed and your world reshaped anew\r\n", 0))
 	{
@@ -170,7 +214,7 @@ void copyover_recover( void )
 	}
       else /* ok! */
 	{
-          write_to_descriptor (desc, "\r\nWarmboot recovery complete.\r\n",0);
+          write_to_descriptor (desc, "\r\nCopyover recovery complete.\r\n",0);
 
 	  /* Just In Case,  Someone said this isn't necassary, but _why_
 	     do we want to dump someone in limbo? */
