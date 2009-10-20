@@ -12,11 +12,11 @@ void write_area_list();
 void write_starsystem_list();
 extern const   char *  sector_name     [SECT_MAX];
 
-PLANET_DATA * first_planet;
-PLANET_DATA * last_planet;
+PLANET_DATA * first_planet = NULL;
+PLANET_DATA * last_planet = NULL;
 
-GUARD_DATA * first_guard;
-GUARD_DATA * last_guard;
+GUARD_DATA * first_guard = NULL;
+GUARD_DATA * last_guard = NULL;
 
 /* local routines */
 void	fread_planet	args( ( PLANET_DATA *planet, FILE *fp ) );

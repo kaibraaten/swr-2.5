@@ -32,10 +32,10 @@ void	subtract_times	args( ( struct timeval *etime,
  * Global Variables
  */
 
-CHAR_DATA *	gch_prev;
-OBJ_DATA *	gobj_prev;
+CHAR_DATA *	gch_prev = NULL;
+OBJ_DATA *	gobj_prev = NULL;
 
-CHAR_DATA *	timechar;
+CHAR_DATA *	timechar = NULL;
 
 const char * corpse_descs[] =
    { 

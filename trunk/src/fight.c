@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include "mud.h"
 #include <sys/stat.h>
 #include <sys/dir.h>
-#include "mud.h"
 
 extern char		lastplayercmd[MAX_INPUT_LENGTH];
 extern CHAR_DATA *	gch_prev;

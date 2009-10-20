@@ -6,8 +6,8 @@
 #include <string.h>
 #include "mud.h"
 
-VOTE_DATA * first_poll;
-VOTE_DATA * last_poll;
+VOTE_DATA * first_poll = NULL;
+VOTE_DATA * last_poll = NULL;
 
 /* local routines */
 void	fread_poll	args( ( VOTE_DATA *poll, FILE *fp ) );

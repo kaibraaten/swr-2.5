@@ -14,15 +14,15 @@ extern int		cur_qchars;
 extern CHAR_DATA *	gch_prev;
 extern OBJ_DATA  *	gobj_prev;
 
-CHAR_DATA	*cur_char;
-ROOM_INDEX_DATA	*cur_room;
-bool		 cur_char_died;
-ch_ret		 global_retcode;
+CHAR_DATA	*cur_char = NULL;
+ROOM_INDEX_DATA	*cur_room = NULL;
+bool		 cur_char_died = FALSE;
+ch_ret		 global_retcode = rNONE;
 
-int		 cur_obj;
-int		 cur_obj_serial;
-bool		 cur_obj_extracted;
-obj_ret		 global_objcode;
+int		 cur_obj = 0;
+int		 cur_obj_serial = 0;
+bool		 cur_obj_extracted = FALSE;
+obj_ret		 global_objcode = rNONE;
 
 bool is_wizvis( const CHAR_DATA *ch , const CHAR_DATA *victim );
 
