@@ -104,7 +104,7 @@ void interpret( CHAR_DATA *ch, char *argument )
 	/*
 	 * Strip leading spaces.
 	 */
-	while ( isspace(*argument) )
+	while ( isspace((int) *argument) )
 	    argument++;
 	if ( argument[0] == '\0' )
 	    return;
@@ -128,12 +128,12 @@ void interpret( CHAR_DATA *ch, char *argument )
 	 *   also no spaces needed after punctuation.
 	 */
 	strcpy( logline, argument );
-	if ( !isalpha(argument[0]) && !isdigit(argument[0]) )
+	if ( !isalpha((int) argument[0]) && !isdigit((int) argument[0]) )
 	{
 	    command[0] = argument[0];
 	    command[1] = '\0';
 	    argument++;
-	    while ( isspace(*argument) )
+	    while ( isspace((int) *argument) )
 		argument++;
 	}
 	else
@@ -459,7 +459,7 @@ bool is_number( const char *arg )
 
     for ( ; *arg != '\0'; arg++ )
     {
-	if ( !isdigit(*arg) )
+      if ( !isdigit((int) *arg) )
 	    return FALSE;
     }
 
@@ -505,7 +505,7 @@ char *one_argument( char *argument, char *arg_first )
   char cEnd = ' ';
   short count = 0;
 
-  while ( isspace(*argument) )
+  while ( isspace((int) *argument) )
     argument++;
 
   if ( *argument == '\'' || *argument == '"' )
@@ -526,7 +526,7 @@ char *one_argument( char *argument, char *arg_first )
 
   *arg_first = '\0';
 
-  while ( isspace(*argument) )
+  while ( isspace((int) *argument) )
     argument++;
 
   return argument;
@@ -541,7 +541,7 @@ char *one_argument2( char *argument, char *arg_first )
   char cEnd = ' ';
   short count = 0;
 
-  while ( isspace(*argument) )
+  while ( isspace((int) *argument) )
     argument++;
 
   if ( *argument == '\'' || *argument == '"' )
@@ -562,7 +562,7 @@ char *one_argument2( char *argument, char *arg_first )
 
   *arg_first = '\0';
 
-  while ( isspace(*argument) )
+  while ( isspace((int) *argument) )
     argument++;
 
   return argument;

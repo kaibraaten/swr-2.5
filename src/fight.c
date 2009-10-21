@@ -5,7 +5,7 @@
 #include <unistd.h>
 #include "mud.h"
 #include <sys/stat.h>
-#include <sys/dir.h>
+/*#include <sys/dir.h>*/
 
 extern char		lastplayercmd[MAX_INPUT_LENGTH];
 extern CHAR_DATA *	gch_prev;
@@ -1957,16 +1957,16 @@ else
 	    save_equipment[x][y] = NULL;
   }
   
-  sprintf( buf, "%s%c/%s", PLAYER_DIR, tolower(arg[0]),
+  sprintf( buf, "%s%c/%s", PLAYER_DIR, tolower((int)arg[0]),
           capitalize( arg ) );
-  sprintf( buf2, "%s%c/%s", BACKUP_DIR, tolower(arg[0]),
+  sprintf( buf2, "%s%c/%s", BACKUP_DIR, tolower((int)arg[0]),
           capitalize( arg ) );
   
   rename( buf, buf2 );
   
-  sprintf( buf, "%s%c/%s.clone", PLAYER_DIR, tolower(arg[0]),
+  sprintf( buf, "%s%c/%s.clone", PLAYER_DIR, tolower((int)arg[0]),
           capitalize( arg ) );
-  sprintf( buf2, "%s%c/%s", PLAYER_DIR, tolower(arg[0]),
+  sprintf( buf2, "%s%c/%s", PLAYER_DIR, tolower((int)arg[0]),
           capitalize( arg ) );
 
   rename( buf, buf2 );

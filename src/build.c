@@ -1389,7 +1389,7 @@ void do_mset( CHAR_DATA *ch, char *argument )
 	    return;
 	}
 
-	if( !arg3 || arg3[0] == '\0' )
+	if( arg3[0] == '\0' )
 	  {
 	    /*
 	     * Crash bug fix, oops guess I should have caught this one :)

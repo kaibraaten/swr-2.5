@@ -229,33 +229,32 @@ int wherehome( const CHAR_DATA *ch)
 
 char *grab_word( char *argument, char *arg_first )
 {
-    char cEnd;
-    short count;
+  char cEnd =  ' ';
+  short count = 0;
 
-    count = 0;
+  while ( isspace((int)*argument) )
+    argument++;
 
-    while ( isspace(*argument) )
-	argument++;
+  if ( *argument == '\'' || *argument == '"' )
+    cEnd = *argument++;
 
-    cEnd = ' ';
-    if ( *argument == '\'' || *argument == '"' )
-	cEnd = *argument++;
-
-    while ( *argument != '\0' || ++count >= 255 )
+  while ( *argument != '\0' || ++count >= 255 )
     {
-	if ( *argument == cEnd )
+      if ( *argument == cEnd )
 	{
-	    argument++;
-	    break;
+	  argument++;
+	  break;
 	}
-	*arg_first++ = *argument++;
+
+      *arg_first++ = *argument++;
     }
-    *arg_first = '\0';
 
-    while ( isspace(*argument) )
-	argument++;
+  *arg_first = '\0';
 
-    return argument;
+  while ( isspace((int)*argument) )
+    argument++;
+
+  return argument;
 }
 
 char *wordwrap( char *txt, short wrap )

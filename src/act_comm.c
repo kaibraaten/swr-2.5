@@ -222,7 +222,7 @@ const char *drunk_speech( const char *argument, CHAR_DATA *ch )
 
   while ( *arg != '\0' )
     {
-      if ( toupper(*arg) == 'S' )
+      if ( toupper((int)*arg) == 'S' )
 	{
 	  if ( number_percent() < ( drunk * 2 ) ) /* add 'h' after an 's' */
 	    {
@@ -234,7 +234,7 @@ const char *drunk_speech( const char *argument, CHAR_DATA *ch )
 	      *txt++ = *arg;
 	    }
 	}
-      else if ( toupper(*arg) == 'X' )
+      else if ( toupper((int)*arg) == 'X' )
 	{
 	  if ( number_percent() < ( drunk * 2 / 2 ) )
 	    {
@@ -269,10 +269,10 @@ const char *drunk_speech( const char *argument, CHAR_DATA *ch )
     {
       if ( number_percent() < ( 2 * drunk / 2.5 ) )
 	{
-	  if ( isupper(*txt) )
-	    *txt1 = (char) tolower( *txt );
-	  else if ( islower(*txt) )
-	    *txt1 = (char) toupper( *txt );
+	  if ( isupper((int)*txt) )
+	    *txt1 = (char) tolower( (int)*txt );
+	  else if ( islower((int)*txt) )
+	    *txt1 = (char) toupper( (int)*txt );
 	  else
 	    *txt1 = *txt;
 	}
@@ -1040,7 +1040,7 @@ void do_emote( CHAR_DATA *ch, char *argument )
 
   strcpy( buf, argument );
 
-  if ( isalpha(plast[-1]) )
+  if ( isalpha((int)plast[-1]) )
     strcat( buf, "." );
 
   MOBtrigger = FALSE;

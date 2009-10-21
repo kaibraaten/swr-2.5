@@ -15,20 +15,33 @@ ch_ret	spell_affectchar args( ( int sn, int level, CHAR_DATA *ch, void *vo ) );
 /*
  * Is immune to a damage type
  */
-bool is_immune( CHAR_DATA *ch, short damtype )
+bool is_immune( CHAR_DATA *ch, int damtype )
 {
   switch( damtype )
     {
-    case SD_FIRE:           return( IS_SET( ch->immune, RIS_FIRE ) );
-    case SD_COLD:           return( IS_SET( ch->immune, RIS_COLD ) );
-    case SD_ELECTRICITY:    return( IS_SET( ch->immune, RIS_ELECTRICITY ) );
-    case SD_ENERGY:         return( IS_SET( ch->immune, RIS_ENERGY ) );
-    case SD_ACID:           return( IS_SET( ch->immune, RIS_ACID ) );
-    case SD_POISON:         return( IS_SET( ch->immune, RIS_POISON ) );
-    case SD_DRAIN:          return( IS_SET( ch->immune, RIS_DRAIN ) );
+    case SD_FIRE:
+      return IS_SET( ch->immune, RIS_FIRE ) ? TRUE : FALSE;
+
+    case SD_COLD:
+      return IS_SET( ch->immune, RIS_COLD ) ? TRUE : FALSE;
+
+    case SD_ELECTRICITY:
+      return IS_SET( ch->immune, RIS_ELECTRICITY ) ? TRUE : FALSE;
+
+    case SD_ENERGY:
+      return IS_SET( ch->immune, RIS_ENERGY ) ? TRUE : FALSE;
+
+    case SD_ACID:
+      return IS_SET( ch->immune, RIS_ACID ) ? TRUE : FALSE;
+
+    case SD_POISON:
+      return IS_SET( ch->immune, RIS_POISON ) ? TRUE : FALSE;
+
+    case SD_DRAIN:
+      return IS_SET( ch->immune, RIS_DRAIN ) ? TRUE : FALSE;
     }
 
-    return FALSE;
+  return FALSE;
 }
 
 /*
@@ -418,7 +431,7 @@ int ris_save( CHAR_DATA *ch, int chance, int ris )
 int rd_parse(const CHAR_DATA *ch, int level, char *exp)
 {
   int x = 0, lop = 0, gop = 0, eop = 0;
-  char operation;
+  char operation = 0;
   char *sexp[2];
   int total = 0, len = 0;
 
@@ -435,7 +448,7 @@ int rd_parse(const CHAR_DATA *ch, int level, char *exp)
 
   /* check if the expresion is just a number */
   len = strlen(exp);
-  if ( len == 1 && isalpha(exp[0]) )
+  if ( len == 1 && isalpha((int) exp[0]) )
     switch(exp[0]) {
 	case 'L': case 'l':	return level;
 	case 'H': case 'h':	return ch->hit;
@@ -452,7 +465,7 @@ int rd_parse(const CHAR_DATA *ch, int level, char *exp)
     }
 
   for (x = 0; x < len; ++x)
-    if (!isdigit(exp[x]) && !isspace(exp[x]))
+    if (!isdigit((int) exp[x]) && !isspace((int) exp[x]))
       break;
 
   if (x == len)

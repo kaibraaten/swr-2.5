@@ -982,7 +982,7 @@ void read_from_buffer( DESCRIPTOR_DATA *d )
 
       if ( d->inbuf[i] == '\b' && k > 0 )
 	--k;
-      else if( isprint( d->inbuf[i] ) )
+      else if( isprint( (int) d->inbuf[i] ) )
 	d->incomm[k++] = d->inbuf[i];
     }
 
@@ -1286,7 +1286,7 @@ bool check_parse_name( const char *name )
 	fIll = TRUE;
 	for ( pc = name; *pc != '\0'; pc++ )
 	{
-	    if ( !isalpha(*pc) )
+	  if ( !isalpha((int)*pc) )
 		return FALSE;
 	    if ( LOWER(*pc) != 'i' && LOWER(*pc) != 'l' )
 		fIll = FALSE;
@@ -2184,10 +2184,10 @@ int make_color_sequence(const char *col, char *buf, DESCRIPTOR_DATA *d)
 
 void set_pager_input( DESCRIPTOR_DATA *d, char *argument )
 {
-  while ( isspace(*argument) )
+  while ( isspace((int)*argument) )
     argument++;
+
   d->pagecmd = *argument;
-  return;
 }
 
 bool pager_output( DESCRIPTOR_DATA *d )
@@ -2200,68 +2200,84 @@ bool pager_output( DESCRIPTOR_DATA *d )
 
   if ( !d || !d->pagepoint || d->pagecmd == -1 )
     return TRUE;
+
   ch = d->original ? d->original : d->character;
   pclines = UMAX(ch->pcdata->pagerlen, 5) - 1;
+
   switch(LOWER(d->pagecmd))
-  {
-  default:
-    lines = 0;
-    break;
-  case 'b':
-    lines = -1-(pclines*2);
-    break;
-  case 'r':
-    lines = -1-pclines;
-    break;
-  case 'q':
-    d->pagetop = 0;
-    d->pagepoint = NULL;
-    flush_buffer(d, TRUE);
-    DISPOSE(d->pagebuf);
-    d->pagesize = MAX_STRING_LENGTH;
-    return TRUE;
-  }
+    {
+    default:
+      lines = 0;
+      break;
+
+    case 'b':
+      lines = -1-(pclines*2);
+      break;
+
+    case 'r':
+      lines = -1-pclines;
+      break;
+
+    case 'q':
+      d->pagetop = 0;
+      d->pagepoint = NULL;
+      flush_buffer(d, TRUE);
+      DISPOSE(d->pagebuf);
+      d->pagesize = MAX_STRING_LENGTH;
+      return TRUE;
+    }
+
   while ( lines < 0 && d->pagepoint >= d->pagebuf )
     if ( *(--d->pagepoint) == '\n' )
       ++lines;
+
   if ( *d->pagepoint == '\n' && *(++d->pagepoint) == '\r' )
-      ++d->pagepoint;
+    ++d->pagepoint;
+
   if ( d->pagepoint < d->pagebuf )
     d->pagepoint = d->pagebuf;
+
   for ( lines = 0, last = d->pagepoint; lines < pclines; ++last )
     if ( !*last )
       break;
     else if ( *last == '\n' )
       ++lines;
+
   if ( *last == '\r' )
     ++last;
+
   if ( last != d->pagepoint )
-  {
-    if ( !write_to_descriptor(d->descriptor, d->pagepoint,
-          (last-d->pagepoint)) )
-      return FALSE;
-    d->pagepoint = last;
-  }
-  while ( isspace(*last) )
+    {
+      if ( !write_to_descriptor(d->descriptor, d->pagepoint,
+				(last-d->pagepoint)) )
+	return FALSE;
+      d->pagepoint = last;
+    }
+
+  while ( isspace((int) *last) )
     ++last;
+
   if ( !*last )
-  {
-    d->pagetop = 0;
-    d->pagepoint = NULL;
-    flush_buffer(d, TRUE);
-    DISPOSE(d->pagebuf);
-    d->pagesize = MAX_STRING_LENGTH;
-    return TRUE;
-  }
+    {
+      d->pagetop = 0;
+      d->pagepoint = NULL;
+      flush_buffer(d, TRUE);
+      DISPOSE(d->pagebuf);
+      d->pagesize = MAX_STRING_LENGTH;
+      return TRUE;
+    }
+
   d->pagecmd = -1;
+
   if ( IS_SET( ch->act, PLR_ANSI ) )
-      if ( write_to_descriptor(d->descriptor, "\033[1;36m", 7) == FALSE )
-	return FALSE;
-  if ( (ret=write_to_descriptor(d->descriptor,
-	"(C)ontinue, (R)efresh, (B)ack, (Q)uit: [C] ", 0)) == FALSE )
-	return FALSE;
+    if ( write_to_descriptor(d->descriptor, "\033[1;36m", 7) == FALSE )
+      return FALSE;
+
+  if ( (ret=write_to_descriptor(d->descriptor, "(C)ontinue, (R)efresh, (B)ack, (Q)uit: [C] ", 0)) == FALSE )
+    return FALSE;
+
   if ( IS_SET( ch->act, PLR_ANSI ) )
-  {
+    {
       char buf[32];
 
       if ( d->pagecolor == 7 )
@@ -2270,7 +2286,8 @@ bool pager_output( DESCRIPTOR_DATA *d )
 	sprintf(buf, "\033[0;%d;%s%dm", (d->pagecolor & 8) == 8,
 		(d->pagecolor > 15 ? "5;" : ""), (d->pagecolor & 7)+30);
       ret = write_to_descriptor( d->descriptor, buf, 0 );
-  }
+    }
+
   return ret;
 }
 

@@ -698,7 +698,7 @@ void set_title( CHAR_DATA *ch, const char *title )
       return;
     }
 
-  if ( isalpha(title[0]) || isdigit(title[0]) )
+  if ( isalpha((int) title[0]) || isdigit((int) title[0]) )
     {
       buf[0] = ' ';
       strcpy( buf+1, title );

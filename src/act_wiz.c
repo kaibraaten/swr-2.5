@@ -3045,7 +3045,7 @@ void do_loadup( CHAR_DATA *ch, char *argument )
 
     name[0] = UPPER(name[0]);
 
-    sprintf( fname, "%s%c/%s", PLAYER_DIR, tolower(name[0]),
+    sprintf( fname, "%s%c/%s", PLAYER_DIR, tolower((int)name[0]),
 			capitalize( name ) );
     if ( stat( fname, &fst ) != -1 )
     {
@@ -3518,9 +3518,9 @@ void do_destroy( CHAR_DATA *ch, char *argument )
 	    save_equipment[x][y] = NULL;
   }
   
-  sprintf( buf, "%s%c/%s", PLAYER_DIR, tolower(arg[0]),
+  sprintf( buf, "%s%c/%s", PLAYER_DIR, tolower((int)arg[0]),
           capitalize( arg ) );
-  sprintf( buf2, "%s%c/%s", BACKUP_DIR, tolower(arg[0]),
+  sprintf( buf2, "%s%c/%s", BACKUP_DIR, tolower((int)arg[0]),
           capitalize( arg ) );
   if ( !rename( buf, buf2 ) )
   {

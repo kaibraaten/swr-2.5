@@ -48,7 +48,7 @@ void mail_count( CHAR_DATA *ch );
  */
 void nanny( DESCRIPTOR_DATA *d, char *argument )
 {
-  while ( isspace(*argument) )
+  while ( isspace((int) *argument) )
     argument++;
 
   switch ( d->connected )
@@ -779,7 +779,7 @@ static void nanny_done_motd( DESCRIPTOR_DATA *d, char *argument )
       ROOM_INDEX_DATA *storeroom = ch->plr_home;
 
       room_extract_contents( storeroom );
-      sprintf( filename, "%s%c/%s.home", PLAYER_DIR, tolower(ch->name[0]),
+      sprintf( filename, "%s%c/%s.home", PLAYER_DIR, tolower((int)ch->name[0]),
 	       capitalize( ch->name ) );
       if ( ( fph = fopen( filename, "r" ) ) != NULL )
 	{
