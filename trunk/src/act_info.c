@@ -1784,7 +1784,7 @@ HELP_DATA *get_help( CHAR_DATA *ch, char *argument )
     if ( argument[0] == '\0' )
       argument = const_char_to_nonconst( "summary" );
 
-    if ( isdigit(argument[0]) )
+    if ( isdigit((int) argument[0]) )
     {
 	lev = number_argument( argument, argnew );
 	argument = argnew;
@@ -1855,35 +1855,38 @@ void do_help( CHAR_DATA *ch, char *argument )
  */
 void do_hedit( CHAR_DATA *ch, char *argument )
 {
-    HELP_DATA *pHelp;
+  HELP_DATA *pHelp = NULL;
 
-    if ( !ch->desc )
+  if ( !ch->desc )
     {
-	send_to_char( "You have no descriptor.\r\n", ch );
-	return;
+      send_to_char( "You have no descriptor.\r\n", ch );
+      return;
     }
 
-    switch( ch->substate )
+  switch( ch->substate )
     {
-	default:
-	  break;
-	case SUB_HELP_EDIT:
-	  if ( (pHelp = (HELP_DATA*) ch->dest_buf) == NULL )
-	  {
-		bug( "hedit: sub_help_edit: NULL ch->dest_buf", 0 );
-		stop_editing( ch );
-		return;
-	  }
-	  STRFREE( pHelp->text );
-	  pHelp->text = copy_buffer( ch );
+    default:
+      break;
+
+    case SUB_HELP_EDIT:
+      if ( (pHelp = (HELP_DATA*) ch->dest_buf) == NULL )
+	{
+	  bug( "hedit: sub_help_edit: NULL ch->dest_buf", 0 );
 	  stop_editing( ch );
 	  return;
+	}
+
+      STRFREE( pHelp->text );
+      pHelp->text = copy_buffer( ch );
+      stop_editing( ch );
+      return;
     }
-    if ( (pHelp = get_help( ch, argument )) == NULL )	/* new help */
+
+  if ( (pHelp = get_help( ch, argument )) == NULL )	/* new help */
     {
-      HELP_DATA *tHelp;
+      HELP_DATA *tHelp = NULL;
       char argnew[MAX_INPUT_LENGTH];
-      int lev;
+      int lev = 0;
       bool new_help = TRUE;
 
       for( tHelp = first_help; tHelp; tHelp = tHelp->next )
@@ -1893,15 +1896,17 @@ void do_hedit( CHAR_DATA *ch, char *argument )
             new_help = FALSE;
             break;
 	  }
+
       if( new_help )
 	{
-	  if( isdigit( argument[0] ) )
+	  if( isdigit( (int) argument[0] ) )
 	    {
 	      lev = number_argument( argument, argnew );
 	      argument = argnew;
 	    }
 	  else
             lev = get_trust( ch );
+
 	  CREATE( pHelp, HELP_DATA, 1 );
 	  pHelp->keyword = STRALLOC( strupper( argument ) );
 	  pHelp->text = STRALLOC( "" );
@@ -1910,9 +1915,9 @@ void do_hedit( CHAR_DATA *ch, char *argument )
 	}
     }
 
-    ch->substate = SUB_HELP_EDIT;
-    ch->dest_buf = pHelp;
-    start_editing( ch, pHelp->text );
+  ch->substate = SUB_HELP_EDIT;
+  ch->dest_buf = pHelp;
+  start_editing( ch, pHelp->text );
 }
 
 /*
@@ -2718,7 +2723,7 @@ void do_password( CHAR_DATA *ch, char *argument )
      * So we just steal all its code.  Bleagh.
      */
     pArg = arg1;
-    while ( isspace(*argument) )
+    while ( isspace((int)*argument) )
 	argument++;
 
     cEnd = ' ';
@@ -2737,7 +2742,7 @@ void do_password( CHAR_DATA *ch, char *argument )
     *pArg = '\0';
 
     pArg = arg2;
-    while ( isspace(*argument) )
+    while ( isspace((int)*argument) )
 	argument++;
 
     cEnd = ' ';

@@ -289,7 +289,7 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA *mob, CHAR_DATA *actor,
   else
   {
     pchck = opr;
-    while ( *point != ' ' && !isalnum(*point) )
+    while ( *point != ' ' && !isalnum((int)*point) )
       if ( *point == '\0' )
       {
         progbug( "Ifcheck operator without value", mob );

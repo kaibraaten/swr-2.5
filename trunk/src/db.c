@@ -2139,7 +2139,7 @@ char fread_letter( FILE *fp )
 
       c = getc( fp );
     }
-  while ( isspace(c) );
+  while ( isspace((int) c) );
 
   return c;
 }
@@ -2168,7 +2168,7 @@ float fread_float( FILE *fp )
 	 }
        c = getc( fp );
      }
-   while( isspace( c ) );
+   while( isspace( (int) c ) );
 
    number = 0;
 
@@ -2183,7 +2183,7 @@ float fread_float( FILE *fp )
        c = getc( fp );
      }
 
-   if( !isdigit( c ) )
+   if( !isdigit( (int) c ) )
      {
        bug( "%s: bad format. (%c)", __FUNCTION__, c );
        if( fBootDb )
@@ -2193,7 +2193,7 @@ float fread_float( FILE *fp )
 
    while( 1 )
      {
-       if( c == '.' || isdigit( c ) )
+       if( c == '.' || isdigit( (int) c ) )
 	 {
 	   if( c == '.' )
 	     {
@@ -2253,7 +2253,7 @@ int fread_number( FILE *fp )
         }
 	c = getc( fp );
     }
-    while ( isspace(c) );
+    while ( isspace( (int) c ) );
 
     number = 0;
 
@@ -2268,7 +2268,7 @@ int fread_number( FILE *fp )
 	c = getc( fp );
     }
 
-    if ( !isdigit(c) )
+    if ( !isdigit((int) c) )
     {
 	bug( "Fread_number: bad format. (%c)", c );
 	if ( fBootDb )
@@ -2276,7 +2276,7 @@ int fread_number( FILE *fp )
 	return 0;
     }
 
-    while ( isdigit(c) )
+    while ( isdigit( (int) c ) )
     {
         if ( feof(fp) )
         {
@@ -2348,7 +2348,7 @@ char *fread_string( FILE *fp )
 	}
 	c = getc( fp );
     }
-    while ( isspace(c) );
+    while ( isspace((int)c) );
 
     if ( ( *plast++ = c ) == '~' )
 	return STRALLOC( "" );
@@ -2419,7 +2419,7 @@ char *fread_string_nohash( FILE *fp )
 	}
 	c = getc( fp );
     }
-    while ( isspace(c) );
+    while ( isspace((int)c) );
 
     if ( ( *plast++ = c ) == '~' )
 	return str_dup( "" );
@@ -2523,7 +2523,7 @@ char *fread_line( FILE *fp )
 	}
 	c = getc( fp );
     }
-    while ( isspace(c) );
+    while ( isspace((int)c) );
 
     ungetc( c, fp );
     do
@@ -2580,7 +2580,7 @@ char *fread_word( FILE *fp )
 	}
 	cEnd = getc( fp );
     }
-    while ( isspace( cEnd ) );
+    while ( isspace( (int) cEnd ) );
 
     if ( cEnd == '\'' || cEnd == '"' )
     {
@@ -2604,7 +2604,7 @@ char *fread_word( FILE *fp )
 	    return word;
 	}
 	*pword = getc( fp );
-	if ( cEnd == ' ' ? isspace(*pword) : *pword == cEnd )
+	if ( cEnd == ' ' ? isspace((int) *pword) : *pword == cEnd )
 	{
 	    if ( cEnd == ' ' )
 		ungetc( *pword, fp );
@@ -2984,9 +2984,9 @@ char *capitalize( const char *str )
 	    {
 	      state = Color;
 	    }
-	  else if( isalpha(c) )
+	  else if( isalpha( (int) c ) )
 	    {
-	      c = bFirst ? toupper(c) : tolower(c);
+	      c = bFirst ? toupper( (int) c )  : tolower( (int) c );
 	      bFirst = FALSE;
 	    }
 	}
@@ -3039,7 +3039,7 @@ bool isavowel( char letter )
 {
     char c;
 
-    c = tolower( letter );
+    c = tolower( (int)letter );
     if ( c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' )
       return TRUE;
     else
@@ -3060,7 +3060,7 @@ const char *aoran( const char *str )
     }
 
     if ( isavowel(str[0])
-    || ( strlen(str) > 1 && tolower(str[0]) == 'y' && !isavowel(str[1])) )
+	 || ( strlen(str) > 1 && tolower((int)str[0]) == 'y' && !isavowel(str[1])) )
       strcpy( temp, "an " );
     else
       strcpy( temp, "a " );

@@ -5,7 +5,10 @@
 #include <unistd.h>
 #include "mud.h"
 #include <sys/stat.h>
+/*
 #include <sys/dir.h>
+*/
+#include <dirent.h>
 
 /*
  * Increment with every major format change.
@@ -43,7 +46,7 @@ void save_home( const CHAR_DATA *ch )
       char filename[256];
       OBJ_DATA *contents;
 
-      sprintf( filename, "%s%c/%s.home", PLAYER_DIR, tolower(ch->name[0]),
+      sprintf( filename, "%s%c/%s.home", PLAYER_DIR, tolower((int)ch->name[0]),
 	       capitalize( ch->name ) );
 
       if ( ( fp = fopen( filename, "w" ) ) == NULL )
@@ -69,7 +72,7 @@ void load_home( CHAR_DATA *ch )
   ROOM_INDEX_DATA *storeroom = ch->plr_home;
 
   sprintf( filename, "%s%c/%s.home", PLAYER_DIR,
-	   tolower( ch->name[0] ), capitalize( ch->name ) );
+	   tolower( (int) ch->name[0] ), capitalize( ch->name ) );
 
   if( ( fph = fopen( filename, "r" ) ) )
     {
@@ -219,7 +222,7 @@ void save_char_obj( CHAR_DATA *ch )
     de_equip_char( ch );
 
     ch->save_time = current_time;
-    sprintf( strsave, "%s%c/%s", PLAYER_DIR, tolower(ch->name[0]),
+    sprintf( strsave, "%s%c/%s", PLAYER_DIR, tolower((int) ch->name[0]),
 				 capitalize( ch->name ) );
 
     /*
@@ -227,7 +230,7 @@ void save_char_obj( CHAR_DATA *ch )
      */
     if ( IS_SET( sysdata.save_flags, SV_BACKUP ) )
     {
-	sprintf( strback, "%s%c/%s", BACKUP_DIR, tolower(ch->name[0]),
+      sprintf( strback, "%s%c/%s", BACKUP_DIR, tolower((int) ch->name[0]),
 				 capitalize( ch->name ) );
 	rename( strsave, strback );
     }
@@ -275,7 +278,7 @@ void save_clone( CHAR_DATA *ch )
     de_equip_char( ch );
 
     ch->save_time = current_time;
-    sprintf( strsave, "%s%c/%s.clone", PLAYER_DIR, tolower(ch->name[0]),
+    sprintf( strsave, "%s%c/%s.clone", PLAYER_DIR, tolower((int) ch->name[0]),
 				 capitalize( ch->name ) );
 
     /*
@@ -283,7 +286,7 @@ void save_clone( CHAR_DATA *ch )
      */
     if ( IS_SET( sysdata.save_flags, SV_BACKUP ) )
     {
-	sprintf( strback, "%s%c/%s", BACKUP_DIR, tolower(ch->name[0]),
+      sprintf( strback, "%s%c/%s", BACKUP_DIR, tolower((int) ch->name[0]),
 				 capitalize( ch->name ) );
 	rename( strsave, strback );
     }
@@ -754,7 +757,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, const char *name, bool preload )
     ch->was_sentinel                    = NULL;
     ch->plr_home                        = NULL;
     found = FALSE;
-    sprintf( strsave, "%s%c/%s", PLAYER_DIR, tolower(name[0]),
+    sprintf( strsave, "%s%c/%s", PLAYER_DIR, tolower((int) name[0]),
 			capitalize( name ) );
 
 #ifndef AMIGA
@@ -762,7 +765,7 @@ bool load_char_obj( DESCRIPTOR_DATA *d, const char *name, bool preload )
     {
       if ( fst.st_size == 0 )
       {
-	sprintf( strsave, "%s%c/%s", BACKUP_DIR, tolower(name[0]),
+	sprintf( strsave, "%s%c/%s", BACKUP_DIR, tolower((int) name[0]),
 			capitalize( name ) );
 	send_to_char( "Restoring your backup player file...", ch );
       }
@@ -1403,8 +1406,8 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
 	    if ( !str_cmp( word, "Title" ) )
 	    {
 		ch->pcdata->title = fread_string( fp );
-		if ( isalpha(ch->pcdata->title[0])
-		||   isdigit(ch->pcdata->title[0]) )
+		if ( isalpha((int) ch->pcdata->title[0])
+		     ||   isdigit((int) ch->pcdata->title[0]) )
 		{
 		    sprintf( buf, " %s", ch->pcdata->title );
 		    if ( ch->pcdata->title )
@@ -1804,7 +1807,7 @@ void do_last( CHAR_DATA *ch, char *argument )
 	return;
     }
     strcpy( name, capitalize(arg) );
-    sprintf( buf, "%s%c/%s", PLAYER_DIR, tolower(arg[0]), name );
+    sprintf( buf, "%s%c/%s", PLAYER_DIR, tolower((int) arg[0]), name );
     if ( stat( buf, &fst ) != -1 )
       sprintf( buf, "%s was last on: %s\r\n", name, ctime( &fst.st_mtime ) );
     else
@@ -1864,7 +1867,7 @@ void write_corpses( CHAR_DATA *ch, char *name )
 void load_corpses( void )
 {
   DIR *dp;
-  struct direct *de;
+  struct dirent *de;
   extern int falling;
   
   if ( !(dp = opendir(CORPSE_DIR)) )

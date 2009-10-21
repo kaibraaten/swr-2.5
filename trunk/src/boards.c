@@ -786,7 +786,7 @@ void do_note( CHAR_DATA *ch, char *arg_passed, bool IS_MAIL )
 
         arg_passed[0] = UPPER(arg_passed[0]);
 
-        sprintf( fname, "%s%c/%s", PLAYER_DIR, tolower(arg_passed[0]),
+        sprintf( fname, "%s%c/%s", PLAYER_DIR, tolower((int)arg_passed[0]),
                  capitalize( arg_passed ) );
  
 	if ( !IS_MAIL || stat( fname, &fst ) != -1 || !str_cmp(arg_passed, "all") )
@@ -1073,7 +1073,9 @@ BOARD_DATA *read_board( char *boardfile, FILE *fp )
 		return NULL;
 	    }
 	}
-	while ( isspace(letter) );
+	while ( isspace((int)letter) )
+	  ;
+
 	ungetc( letter, fp );
 
 	CREATE( board, BOARD_DATA, 1 );
@@ -1165,7 +1167,9 @@ NOTE_DATA *read_note( char *notefile, FILE *fp )
 		return NULL;
 	    }
 	}
-	while ( isspace(letter) );
+	while ( isspace((int)letter) )
+	  ;
+
 	ungetc( letter, fp );
 
 	CREATE( pnote, NOTE_DATA, 1 );

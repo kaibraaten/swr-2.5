@@ -1126,7 +1126,7 @@ void do_appoint ( CHAR_DATA *ch , char *argument )
     
     name[0] = UPPER(name[0]);
 
-    sprintf( fname, "%s%c/%s", PLAYER_DIR, tolower(name[0]),
+    sprintf( fname, "%s%c/%s", PLAYER_DIR, tolower((int)name[0]),
 			capitalize( name ) );
     
     if ( stat( fname, &fst ) == -1 )
