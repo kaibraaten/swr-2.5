@@ -975,7 +975,8 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
 	if( aff->location == APPLY_WEAPONSPELL && IS_VALID_SN( aff->modifier ) && skill_table[aff->modifier]->spell_fun )
 	  retcode = ( *skill_table[aff->modifier]->spell_fun ) ( aff->modifier, 100, ch, victim );
 
-      if( retcode == rSPELL_FAILED ) retcode = rNONE; // Luc, 6/11/2007
+      if( retcode == rSPELL_FAILED )
+	retcode = rNONE;
 
       if( retcode != rNONE || char_died( ch ) || char_died( victim ) )
 	return retcode;
@@ -983,7 +984,8 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
 	if( aff->location == APPLY_WEAPONSPELL && IS_VALID_SN( aff->modifier ) && skill_table[aff->modifier]->spell_fun )
 	  retcode = ( *skill_table[aff->modifier]->spell_fun ) ( aff->modifier, 100, ch, victim );
 
-      if( retcode == rSPELL_FAILED ) retcode = rNONE; // Luc, 6/11/2007
+      if( retcode == rSPELL_FAILED )
+	retcode = rNONE;
 
       if( retcode != rNONE || char_died( ch ) || char_died( victim ) )
 	return retcode;

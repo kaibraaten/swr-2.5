@@ -1985,7 +1985,6 @@ struct	obj_index_data
     char *		description;
     char *		action_desc;
     long		vnum;
-  //short              level;
     short		item_type;
     int			extra_flags;
     int			magic_flags; /*Need more bitvectors for spells - Scryn*/
@@ -2032,7 +2031,6 @@ struct	obj_data
     short		wear_loc;
     short		weight;
     int			cost;
-  //short		level;
     short		timer;
     int			value	[6];
     short		count;		/* support for object grouping */
@@ -3265,63 +3263,18 @@ DECLARE_SPELL_FUN(	spell_sleep		);
 DECLARE_SPELL_FUN(	spell_smaug		);
 
 /*
- * OS-dependent declarations.
- * These are all very standard library functions,
- *   but some systems have incomplete or non-ansi header files.
- */
-#ifndef __cplusplus
-#if	defined(_AIX)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(apollo)
-int	atoi		args( ( const char *string ) );
-void *	calloc		args( ( unsigned nelem, size_t size ) );
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(hpux)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(interactive)
-#endif
-
-#if	defined(linux)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(MIPS_OS)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(NeXT)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(sequent)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(sun)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-#if	defined(ultrix)
-char *	crypt		args( ( const char *key, const char *salt ) );
-#endif
-
-/*
  * The crypt(3) function is not available on some operating systems.
  * In particular, the U.S. Government prohibits its export from the
  *   United States to foreign countries.
  * Turn on NOCRYPT to keep passwords in plain text.
  */
-#if	defined(NOCRYPT)
+#if defined(NOCRYPT)
 #define crypt(s1, s2)	(s1)
+#else
+char *crypt( const char *key, const char *salt );
 #endif
 
-#endif /* __cplusplus */
+/*#endif*/ /* __cplusplus */
 
 /*
  * Data files used by the server.

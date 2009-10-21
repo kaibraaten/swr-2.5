@@ -4865,7 +4865,6 @@ void free_ship( SHIP_DATA *ship )
 {
   size_t n = 0;
 
-  //for( turret = ship->first_turret; turret; turret = turret_next )
   while( ship->first_turret )
     {
       TURRET_DATA *turret = ship->first_turret;

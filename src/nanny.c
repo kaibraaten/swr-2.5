@@ -6,7 +6,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <arpa/telnet.h> // Telnet opt codes
+#include <arpa/telnet.h> /* Telnet opt codes */
 #include <unistd.h>
 #include "mud.h"
 
@@ -31,7 +31,6 @@ static  OBJ_DATA *      rgObjNest       [MAX_NEST];
 extern bool wizlock;
 const   char    echo_off_str    [] = { IAC, WILL, TELOPT_ECHO, '\0' };
 const   char    echo_on_str     [] = { IAC, WONT, TELOPT_ECHO, '\0' };
-//const   char    go_ahead_str    [] = { IAC, GA, '\0' };
 
 /*
  * External functions.

@@ -8,21 +8,14 @@
 /*
  * Externals
  */
-
 void subtract_times( struct timeval *etime, struct timeval *stime );
-
-
-
 bool	check_social	args( ( CHAR_DATA *ch, const char *command,
 			    char *argument ) );
-
 
 /*
  * Log-all switch.
  */
 bool				fLogAll		= FALSE;
-
-
 CMDTYPE	   *command_hash[126];	/* hash table for cmd_table */
 SOCIALTYPE *social_index[27];   /* hash table for socials   */
 
@@ -668,24 +661,27 @@ void send_timer(struct timerset *vtime, const CHAR_DATA *ch)
 void update_userec(struct timeval *time_used, struct timerset *userec)
 {
   userec->num_uses++;
+
   if ( !timerisset(&userec->min_time)
-  ||    timercmp(time_used, &userec->min_time, <) )
-  {
-    userec->min_time.tv_sec  = time_used->tv_sec;
-    userec->min_time.tv_usec = time_used->tv_usec;
-  }
+       || timercmp(time_used, &userec->min_time, <) )
+    {
+      userec->min_time.tv_sec  = time_used->tv_sec;
+      userec->min_time.tv_usec = time_used->tv_usec;
+    }
+
   if ( !timerisset(&userec->max_time)
-  ||    timercmp(time_used, &userec->max_time, >) )
-  {
-    userec->max_time.tv_sec  = time_used->tv_sec;
-    userec->max_time.tv_usec = time_used->tv_usec;
-  }
+       || timercmp(time_used, &userec->max_time, >) )
+    {
+      userec->max_time.tv_sec  = time_used->tv_sec;
+      userec->max_time.tv_usec = time_used->tv_usec;
+    }
+
   userec->total_time.tv_sec  += time_used->tv_sec;
   userec->total_time.tv_usec += time_used->tv_usec;
+
   while ( userec->total_time.tv_usec >= 1000000 )
-  {
-    userec->total_time.tv_sec++;
-    userec->total_time.tv_usec -= 1000000;
-  }
-  return;
+    {
+      userec->total_time.tv_sec++;
+      userec->total_time.tv_usec -= 1000000;
+    }
 }

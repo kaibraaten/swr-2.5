@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include "mud.h"
 
+#define MAX_BUF_LINES 48
+
 extern int	top_affect;
 extern int	top_ed;
 extern bool	fBootDb;
@@ -3843,7 +3845,7 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
     EDITOR_DATA *edit;
     char cmd[MAX_INPUT_LENGTH];
     char buf[MAX_INPUT_LENGTH+1];
-    short x, line, max_buf_lines;
+    short x, line;
     bool save;
 
     if ( (d = ch->desc) == NULL )
@@ -3877,10 +3879,6 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
    
    edit = ch->editor;
    save = FALSE;
-   max_buf_lines = 24;
-
-   if ( ch->substate == SUB_MPROG_EDIT || ch->substate == SUB_HELP_EDIT )
-     max_buf_lines = 48;
 
    if ( argument[0] == '/' || argument[0] == '\\' )
    {
@@ -3960,7 +3958,7 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
         
         if ( !str_cmp( cmd+1, "f" ) )
 	{
-	    char   temp_buf[MAX_STRING_LENGTH+max_buf_lines];
+	    char   temp_buf[MAX_STRING_LENGTH + MAX_BUF_LINES];
 	    int    x, ep, old_p, end_mark; 
 	    int    p = 0;
 	    
@@ -4012,7 +4010,7 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
 	
 	if ( !str_cmp( cmd+1, "i" ) )
 	{
-	    if ( edit->numlines >= max_buf_lines )
+	    if ( edit->numlines >= MAX_BUF_LINES )
 		send_to_char( "Buffer is full.\r\n> ", ch );
 	    else
 	    {
@@ -4177,9 +4175,9 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
             
             if ( edit->on_line > edit->numlines )
 	       edit->numlines++;
-	    if ( edit->numlines > max_buf_lines )
+	    if ( edit->numlines > MAX_BUF_LINES )
 	    {
-	        edit->numlines = max_buf_lines;
+	        edit->numlines = MAX_BUF_LINES;
 	        send_to_char( "Buffer full.\r\n", ch );
 	        save = TRUE;
 	        break;
@@ -4466,7 +4464,7 @@ void fold_area( const AREA_DATA *tarea, const char *filename, bool install )
 		      fprintf( fpout, "> %s %s~\n", mprog_type_to_name( mprog->type ), mprog->arglist );
 		      count++;
 		    }
-		  // Don't let it save progs which came from files. That would be silly.
+		  /* Don't let it save progs which came from files. That would be silly.*/
 		  else if( mprog->comlist && mprog->comlist[0] != '\0' && !mprog->fileprog )
 		    {
 		      fprintf( fpout, "> %s %s~\n%s~\n", mprog_type_to_name( mprog->type ),
@@ -5905,7 +5903,7 @@ void save_mobs()
 			fprintf( fpout, "> %s %s~\n", mprog_type_to_name( mprog->type ), mprog->arglist );
 			count++;
 		      }
-		    // Don't let it save progs which came from files. That would be silly.
+		    /* Don't let it save progs which came from files. That would be silly.*/
 		    else if( mprog->comlist && mprog->comlist[0] != '\0' && !mprog->fileprog )
 		      {
 			fprintf( fpout, "> %s %s~\n%s~\n", mprog_type_to_name( mprog->type ),
@@ -6097,7 +6095,7 @@ void save_objects()
 			fprintf( fpout, "> %s %s~\n", mprog_type_to_name( mprog->type ), mprog->arglist );
 			count++;
 		      }
-		    // Don't let it save progs which came from files. That would be silly.
+		    /* Don't let it save progs which came from files. That would be silly.*/
 		    else if( mprog->comlist && mprog->comlist[0] != '\0' && !mprog->fileprog )
 		      {
 			fprintf( fpout, "> %s %s~\n%s~\n", mprog_type_to_name( mprog->type ),

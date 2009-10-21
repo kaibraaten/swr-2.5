@@ -3160,7 +3160,6 @@ void room_extract_contents( ROOM_INDEX_DATA *room )
   for( robj = room->first_content; robj; robj = obj_next )
     {
       obj_next = robj->next_content;
-      //separate_obj( robj );
       extract_obj( robj );
     }
 }

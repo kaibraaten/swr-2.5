@@ -102,7 +102,6 @@ void make_corpse( const CHAR_DATA *ch )
       if ( ch->gold > 0 )
 	{
 	  obj_to_obj( create_money( ch->gold ), corpse );
-	  //ch->gold = 0;
 	}
 
       /* Cannot use these!  They are used.
@@ -124,7 +123,6 @@ void make_corpse( const CHAR_DATA *ch )
       if ( ch->gold > 0 )
 	{
 	  obj_to_obj( create_money( ch->gold ), corpse );
-	  //ch->gold = 0;
 	}
     }
 
