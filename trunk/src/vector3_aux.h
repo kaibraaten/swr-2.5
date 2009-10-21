@@ -91,4 +91,4 @@ double missile_distance_to_ship( const MISSILE_DATA * const m,
 				 const SHIP_DATA * const s );
 void vector_randomize( Vector3 * const vec, int from, int to );
 
-#endif // include guard
+#endif /* include guard */

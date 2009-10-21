@@ -68,7 +68,7 @@ void move_missiles( void )
       if ( target && target->starsystem
            && target->starsystem == missile->starsystem )
         {
-          missile_set_course_to_ship( missile, target ); // home in
+          missile_set_course_to_ship( missile, target ); /* home in */
           missile_move( missile );
 
           if( missile_distance_to_ship( missile, target ) <= 20 )
@@ -570,7 +570,7 @@ static void ship_respawn_mob_ship( SHIP_DATA *ship )
   if( ( ship->ship_class == SPACE_STATION
 	|| ship->type == MOB_SHIP ) && ship->home )
     {
-      // 4% chance of respawning mob ship or space station.
+      /* 4% chance of respawning mob ship or space station.*/
       if ( number_range(1, 25) == 25 )
 	{
 	  ship_to_starsystem(ship, starsystem_from_name(ship->home) );
@@ -780,7 +780,7 @@ static void ship_handle_autoflying( SHIP_DATA *ship )
 	    {
 	      ship_handle_autoflying_has_target( ship );
 	    }
-	  else // if( ship->target )
+	  else /* if( ship->target ) */
 	    {
 	      CLAN_DATA * clan = NULL;
 	      CLAN_DATA * shipclan = NULL;
@@ -794,9 +794,9 @@ static void ship_handle_autoflying( SHIP_DATA *ship )
 	      if( shipclan )
 		{
 		  ship_handle_autoflying_clanship( ship, shipclan );
-		} // if shipclan
+		} /* if shipclan */
 	    }
-	} // if( ship->starsystem )
+	} /* if( ship->starsystem ) */
       else
 	{
 	  ship_respawn_mob_ship( ship );

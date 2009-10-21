@@ -43,5 +43,5 @@ static const int SOCKET_ERROR = -1;
 typedef int SOCKET;
 typedef char sockbuf_t;
 
-#endif // include guard
+#endif /* include guard */
 
