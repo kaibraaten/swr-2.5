@@ -3,11 +3,11 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include "mud.h"
 #ifndef WIN32
 #include <unistd.h>
 #include <dirent.h>
 #endif
-#include "mud.h"
 #include <sys/stat.h>
 
 #ifndef WIN32
