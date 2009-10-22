@@ -3263,22 +3263,6 @@ DECLARE_SPELL_FUN(	spell_sleep		);
 DECLARE_SPELL_FUN(	spell_smaug		);
 
 /*
- * The crypt(3) function is not available on some operating systems.
- * In particular, the U.S. Government prohibits its export from the
- *   United States to foreign countries.
- * Turn on NOCRYPT to keep passwords in plain text.
- */
-#if defined(NOCRYPT)
-#define crypt(s1, s2)	(s1)
-#else
-#ifndef AMIGA
-char *crypt( const char *key, const char *salt );
-#endif
-#endif
-
-/*#endif*/ /* __cplusplus */
-
-/*
  * Data files used by the server.
  *
  * AREA_LIST contains a list of areas to boot.
