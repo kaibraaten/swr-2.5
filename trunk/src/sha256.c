@@ -29,11 +29,13 @@
 #if !defined(WIN32)
 #include <sys/param.h>
 #include <sys/cdefs.h>
- #if defined(__FreeBSD__)
-  #include <sys/endian.h>
- #else
-  #include <endian.h>
- #endif
+#if defined(__FreeBSD__)
+#include <sys/endian.h>
+#elif defined(AMIGA)
+#include <machine/endian.h>
+#else
+#include <endian.h>
+#endif
 #endif
 #include "sha256.h"
 

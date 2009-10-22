@@ -2,14 +2,13 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#include "mud.h"
 #ifdef WIN32
-/*#include <sys/dir.h>*/
 #include <io.h>
 #else
 #include <unistd.h>
 #include <dirent.h>
 #endif
-#include "mud.h"
 #include <sys/stat.h>
 
 /*
