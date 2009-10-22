@@ -29,7 +29,6 @@ static void nanny_read_imotd( DESCRIPTOR_DATA *d, char *argument );
 static void nanny_read_nmotd( DESCRIPTOR_DATA *d, char *argument );
 static void nanny_done_motd( DESCRIPTOR_DATA *d, char *argument );
 
-#define MAX_NEST        100
 static  OBJ_DATA *      rgObjNest       [MAX_NEST];
 extern bool wizlock;
 #ifndef WIN32

@@ -8,11 +8,10 @@
 /*
  * Local functions.
  */
-void	get_obj		args( ( CHAR_DATA *ch, OBJ_DATA *obj,
-			    OBJ_DATA *container ) );
-bool	remove_obj	args( ( CHAR_DATA *ch, int iWear, bool fReplace ) );
-void	wear_obj	args( ( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace, short wear_bit ) );
-bool    job_trigger     args( ( CHAR_DATA *victim, CHAR_DATA *ch, OBJ_DATA *obj ) );                              
+void get_obj( CHAR_DATA *ch, OBJ_DATA *obj, OBJ_DATA *container );
+bool remove_obj( CHAR_DATA *ch, int iWear, bool fReplace );
+void wear_obj( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace, short wear_bit );
+bool job_trigger( CHAR_DATA *victim, CHAR_DATA *ch, OBJ_DATA *obj );
 void wear_obj_dispatch_fun( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace,
                             int wear_loc );
 void write_corpses( CHAR_DATA *ch, char *name );
