@@ -57,6 +57,6 @@ struct timezone
   int  tz_dsttime;     /* type of dst correction */
 };
 
-int gettimeofday( timeval*, timezone* );
+int gettimeofday( struct timeval*, struct timezone* );
 
 #endif //include guards

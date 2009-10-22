@@ -26,10 +26,9 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <sys/cdefs.h>
-#include <sys/param.h>
 #if !defined(WIN32)
- #include <sys/cdefs.h>
+#include <sys/param.h>
+#include <sys/cdefs.h>
  #if defined(__FreeBSD__)
   #include <sys/endian.h>
  #else

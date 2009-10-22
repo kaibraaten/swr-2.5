@@ -3,10 +3,12 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#ifndef WIN32
 #include <unistd.h>
+#include <dirent.h>
+#endif
 #include "mud.h"
 #include <sys/stat.h>
-#include <dirent.h>
 
 extern	int	_filbuf		args( (FILE *) );
 
