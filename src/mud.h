@@ -1915,8 +1915,8 @@ struct	pc_data
     int                 flags;		/* Whether the player is deadly and whatever else we add.      */
     int			pkills;		/* Number of pkills on behalf of clan */
     int			pdeaths;	/* Number of times pkilled (legally)  */
-    long int            outcast_time;	/* The time at which the char was outcast */
-    long int            restore_time;	/* The last time the char did a restore all */
+    time_t            outcast_time;	/* The time at which the char was outcast */
+    time_t            restore_time;	/* The last time the char did a restore all */
     short		wizinvis;	/* wizinvis level */
     short		min_snoop;	/* minimum snoop level */
     short		condition	[MAX_CONDS];

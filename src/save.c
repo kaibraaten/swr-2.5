@@ -40,6 +40,8 @@ void	fwrite_char	args( ( const CHAR_DATA *ch, FILE *fp ) );
 void	fread_char	args( ( CHAR_DATA *ch, FILE *fp, bool preload) );
 void	write_corpses	args( ( CHAR_DATA *ch, char *name ) );
 
+extern int falling;
+
 void save_home( const CHAR_DATA *ch )
 {
   if ( ch->plr_home )
@@ -1868,6 +1870,7 @@ void write_corpses( CHAR_DATA *ch, char *name )
 
 void load_corpses( void )
 {
+#ifndef WIN32
 #ifdef WIN32
 	struct _finddata_t c_file;
 	long hFile = 0;
@@ -1951,6 +1954,7 @@ void load_corpses( void )
 	_findclose( hFile );
 #else
   closedir(dp);
+#endif
 #endif
   falling = 0;
 }

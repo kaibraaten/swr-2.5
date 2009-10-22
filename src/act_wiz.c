@@ -2234,7 +2234,7 @@ void do_restore( CHAR_DATA *ch, char *argument )
 
 void do_restoretime( CHAR_DATA *ch, char *argument )
 {
-  long int time_passed;
+  time_t time_passed;
   int hour, minute;
 
   if ( !last_restore_all_time )

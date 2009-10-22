@@ -2145,7 +2145,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
 	  tmpobj = (OBJ_DATA*) ch->spare_ptr;
 	  stop_editing( ch );
 	  ch->dest_buf = tmpobj;
-	  ch->substate = ch->tempnum;
+	  ch->substate = (short) ch->tempnum;
 	  return;
 	
 	case SUB_OBJ_LONG:
@@ -2172,7 +2172,7 @@ void do_oset( CHAR_DATA *ch, char *argument )
 	  }
 	  tmpobj = (OBJ_DATA*) ch->spare_ptr;
 	  stop_editing( ch );
-	  ch->substate = ch->tempnum;
+	  ch->substate = (short) ch->tempnum;
 	  ch->dest_buf = tmpobj;
 	  return;
     }
@@ -2967,7 +2967,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
 	  STRFREE( location->description );
 	  location->description = copy_buffer( ch );
 	  stop_editing( ch );
-	  ch->substate = ch->tempnum;
+	  ch->substate = (short) ch->tempnum;
 	  return;
 	case SUB_ROOM_EXTRA:
 	  ed = (EXTRA_DESCR_DATA*) ch->dest_buf;
@@ -2980,7 +2980,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
 	  STRFREE( ed->description );
 	  ed->description = copy_buffer( ch );
 	  stop_editing( ch );
-	  ch->substate = ch->tempnum;
+	  ch->substate = (short) ch->tempnum;
 	  return;
     }
 

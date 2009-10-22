@@ -493,13 +493,13 @@ void do_showplanet( CHAR_DATA *ch, char *argument )
 
     if ( planet->size > 0 )
     {
-       float tempf = planet->citysize;
+       float tempf = (float) planet->citysize;
        pc = (int)(tempf / planet->size *  100);
 
-       tempf = planet->wilderness;
+       tempf = (float) planet->wilderness;
        pw = (int)(tempf / planet->size *  100);
 
-       tempf = planet->farmland;
+       tempf = (float) planet->farmland;
        pf = (int)(tempf / planet->size *  100);
     }
     
