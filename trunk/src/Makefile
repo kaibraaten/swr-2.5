@@ -1,4 +1,4 @@
-CC = g++
+CC = gcc
 BINARY = swr
 WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wredundant-decls -Wwrite-strings
 
