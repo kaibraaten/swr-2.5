@@ -3271,7 +3271,9 @@ DECLARE_SPELL_FUN(	spell_smaug		);
 #if defined(NOCRYPT)
 #define crypt(s1, s2)	(s1)
 #else
+#ifndef AMIGA
 char *crypt( const char *key, const char *salt );
+#endif
 #endif
 
 /*#endif*/ /* __cplusplus */
