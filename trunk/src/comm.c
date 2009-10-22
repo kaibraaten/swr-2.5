@@ -206,7 +206,11 @@ int main( int argc, char **argv )
 SOCKET init_socket( int port )
 {
   struct sockaddr_in	 sa;
+#ifdef WIN32
+	const char optval = 1;
+#else
   int optval = 1;
+#endif
   socklen_t optlen = sizeof( optval );
   SOCKET fd = 0;
 
@@ -638,8 +642,10 @@ void new_descriptor( SOCKET new_desc )
     struct sockaddr_in sock;
     SOCKET desc = 0;
     socklen_t size = 0;
-#if defined(AMIGA) || defined(WIN32)
+#if defined(AMIGA)
     char optval = 1;
+#elif defined(WIN32)
+	unsigned long optval = 1;
 #endif
 
     set_alarm( 20 );

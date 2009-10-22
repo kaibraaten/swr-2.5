@@ -2597,7 +2597,7 @@ void do_propeganda ( CHAR_DATA *ch , char *argument )
     }     
   else
     {
-      planet->pop_support -= .1;
+      planet->pop_support -= (float) .1;
       send_to_char( "Popular support for the current government decreases.\r\n", ch );
     }
     

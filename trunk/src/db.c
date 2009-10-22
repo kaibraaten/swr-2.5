@@ -10,7 +10,9 @@
 #include "mud.h"
 #include <sys/stat.h>
 
+#ifndef WIN32
 extern	int	_filbuf		args( (FILE *) );
+#endif
 
 void init_supermob();
 
