@@ -11,7 +11,7 @@
 #include <sys/stat.h>
 
 #ifndef WIN32
-extern	int	_filbuf		args( (FILE *) );
+extern	int _filbuf( FILE* );
 #endif
 
 void init_supermob();
@@ -20,188 +20,183 @@ void init_supermob();
  * Globals.
  */
 
-WIZENT *	first_wiz = NULL;
-WIZENT *	last_wiz = NULL;
+WIZENT *first_wiz = NULL;
+WIZENT *last_wiz = NULL;
 
-time_t                  last_restore_all_time = 0;
+time_t last_restore_all_time = 0;
 
-HELP_DATA *		first_help = NULL;
-HELP_DATA *		last_help = NULL;
+HELP_DATA *first_help = NULL;
+HELP_DATA *last_help = NULL;
 
-SHOP_DATA *		first_shop = NULL;
-SHOP_DATA *		last_shop = NULL;
+SHOP_DATA *first_shop = NULL;
+SHOP_DATA *last_shop = NULL;
 
-REPAIR_DATA *		first_repair = NULL;
-REPAIR_DATA *		last_repair = NULL;
+REPAIR_DATA *first_repair = NULL;
+REPAIR_DATA *last_repair = NULL;
 
-TELEPORT_DATA *		first_teleport = NULL;
-TELEPORT_DATA *		last_teleport = NULL;
+TELEPORT_DATA *first_teleport = NULL;
+TELEPORT_DATA *last_teleport = NULL;
 
-OBJ_DATA *		extracted_obj_queue = NULL;
-EXTRACT_CHAR_DATA *	extracted_char_queue = NULL;
+OBJ_DATA *extracted_obj_queue = NULL;
+EXTRACT_CHAR_DATA *extracted_char_queue = NULL;
 
-char			bug_buf		[2*MAX_INPUT_LENGTH];
-CHAR_DATA *		first_char = NULL;
-CHAR_DATA *		last_char = NULL;
-char *			help_greeting = NULL;
-char			log_buf		[2*MAX_INPUT_LENGTH];
+char bug_buf[2*MAX_INPUT_LENGTH];
+CHAR_DATA *first_char = NULL;
+CHAR_DATA *last_char = NULL;
+char *help_greeting = NULL;
+char log_buf[2*MAX_INPUT_LENGTH];
 
-OBJ_DATA *		first_object = NULL;
-OBJ_DATA *		last_object = NULL;
-TIME_INFO_DATA		time_info;
-WEATHER_DATA		weather_info;
+OBJ_DATA *first_object = NULL;
+OBJ_DATA *last_object = NULL;
+TIME_INFO_DATA time_info;
+WEATHER_DATA weather_info;
 
-int			cur_qobjs = 0;
-int			cur_qchars = 0;
-int			nummobsloaded = 0;
-int			numobjsloaded = 0;
-int			physicalobjects = 0;
+int cur_qobjs = 0;
+int cur_qchars = 0;
+int nummobsloaded = 0;
+int numobjsloaded = 0;
+int physicalobjects = 0;
 
-MAP_INDEX_DATA  *       first_map = NULL;	/* maps */
+MAP_INDEX_DATA *first_map = NULL;	/* maps */
 
-AUCTION_DATA    * 	auction = NULL;	/* auctions */
+AUCTION_DATA *auction = NULL;	/* auctions */
 OBJ_DATA *supermob_obj = NULL;
 
 /* criminals */
 short   gsn_torture;
-short   gsn_disguise;
-short   gsn_pickshiplock;
-short   gsn_hijack;
+short gsn_disguise;
+short gsn_pickshiplock;
+short gsn_hijack;
 
 /* soldiers and officers */
-short   gsn_reinforcements;
-short   gsn_postguard;
-short   gsn_first_aid;
-short   gsn_throw;
+short gsn_reinforcements;
+short gsn_postguard;
+short gsn_first_aid;
+short gsn_throw;
 
-short   gsn_quicktalk;
-short   gsn_propeganda;
+short gsn_quicktalk;
+short gsn_propeganda;
 
 /* pilots and smugglers */
-short   gsn_spacecraft;
-short   gsn_weaponsystems;
-short   gsn_shipmaintenance; 
-short   gsn_shipdesign; 
-short   gsn_spacecombat;
+short gsn_spacecraft;
+short gsn_weaponsystems;
+short gsn_shipmaintenance; 
+short gsn_shipdesign; 
+short gsn_spacecombat;
 
 /* player building skills */
-short   gsn_lightsaber_crafting;
-short   gsn_spice_refining;
-short   gsn_makeblade;
-short   gsn_makeblaster;
-short   gsn_makelight;
-short   gsn_makecomlink;
-short   gsn_makearmor;
-short   gsn_makeshield;
-short   gsn_makecontainer;
-short   gsn_makejewelry;
+short gsn_lightsaber_crafting;
+short gsn_spice_refining;
+short gsn_makeblade;
+short gsn_makeblaster;
+short gsn_makelight;
+short gsn_makecomlink;
+short gsn_makearmor;
+short gsn_makeshield;
+short gsn_makecontainer;
+short gsn_makejewelry;
 
-short   gsn_bridge;
-short   gsn_survey;
-short   gsn_landscape;
-short   gsn_construction;
+short gsn_bridge;
+short gsn_survey;
+short gsn_landscape;
+short gsn_construction;
  
 /* weaponry */
-short			gsn_blasters;
-short                  gsn_bowcasters;
-short                  gsn_force_pikes;
-short			gsn_lightsabers;
-short			gsn_vibro_blades;
-short			gsn_flexible_arms;
-short			gsn_talonous_arms;
-short			gsn_bludgeons;
+short gsn_blasters;
+short gsn_bowcasters;
+short gsn_force_pikes;
+short gsn_lightsabers;
+short gsn_vibro_blades;
+short gsn_flexible_arms;
+short gsn_talonous_arms;
+short gsn_bludgeons;
 
 /* thief */
-short          	gsn_backstab;
-short			gsn_circle;
-short			gsn_dodge;
-short			gsn_hide;
-short			gsn_peek;
-short			gsn_pick_lock;
-short			gsn_sneak;
-short			gsn_steal;
-short			gsn_gouge;
-short			gsn_poison_weapon;
+short gsn_backstab;
+short gsn_circle;
+short gsn_dodge;
+short gsn_hide;
+short gsn_peek;
+short gsn_pick_lock;
+short gsn_sneak;
+short gsn_steal;
+short gsn_gouge;
+short gsn_poison_weapon;
 
 /* thief & warrior */
-short			gsn_enhanced_damage;
-short			gsn_kick;
-short			gsn_parry;
-short			gsn_rescue;
-short			gsn_second_attack;
-short			gsn_third_attack;
-short			gsn_dual_wield;
-short                  gsn_bashdoor;
-short			gsn_grip; 
-short			gsn_berserk;
-short			gsn_hitall;
-short			gsn_disarm;
+short gsn_enhanced_damage;
+short gsn_kick;
+short gsn_parry;
+short gsn_rescue;
+short gsn_second_attack;
+short gsn_third_attack;
+short gsn_dual_wield;
+short gsn_bashdoor;
+short gsn_grip; 
+short gsn_berserk;
+short gsn_hitall;
+short gsn_disarm;
 
 
 /* other   */
-short			gsn_aid;
-short			gsn_track;
-short			gsn_mount;
-short			gsn_climb;
-short			gsn_slice;
+short gsn_aid;
+short gsn_track;
+short gsn_mount;
+short gsn_climb;
+short gsn_slice;
 
 /* spells */
-short			gsn_aqua_breath;
-short          	gsn_blindness;
-short			gsn_charm_person;
-short			gsn_invis;
-short			gsn_mass_invis;
-short			gsn_poison;
-short			gsn_sleep;
-short			gsn_stun;
-short			gsn_possess;
-short			gsn_fireball;
-short			gsn_lightning_bolt;
+short gsn_aqua_breath;
+short gsn_blindness;
+short gsn_charm_person;
+short gsn_invis;
+short gsn_mass_invis;
+short gsn_poison;
+short gsn_sleep;
+short gsn_stun;
+short gsn_possess;
+short gsn_fireball;
+short gsn_lightning_bolt;
 
 /* for searching */
-short			gsn_first_spell;
-short			gsn_first_skill;
-short			gsn_first_weapon;
-short			gsn_top_sn;
-
+short gsn_first_spell;
+short gsn_first_skill;
+short gsn_first_weapon;
+short gsn_top_sn;
 
 /*
  * Locals.
  */
-MOB_INDEX_DATA *	mob_index_hash		[MAX_KEY_HASH];
-OBJ_INDEX_DATA *	obj_index_hash		[MAX_KEY_HASH];
-ROOM_INDEX_DATA *	room_index_hash		[MAX_KEY_HASH];
+MOB_INDEX_DATA *mob_index_hash[MAX_KEY_HASH];
+OBJ_INDEX_DATA *obj_index_hash[MAX_KEY_HASH];
+ROOM_INDEX_DATA *room_index_hash[MAX_KEY_HASH];
 
-AREA_DATA *		first_area;
-AREA_DATA *		last_area;
-AREA_DATA *		first_build;
-AREA_DATA *		last_build;
-AREA_DATA *		first_asort;
-AREA_DATA *		last_asort;
-AREA_DATA *		first_bsort;
-AREA_DATA *		last_bsort;
+AREA_DATA *first_area = NULL;
+AREA_DATA *last_area = NULL;
+AREA_DATA *first_build = NULL;
+AREA_DATA *last_build = NULL;
 
-SYSTEM_DATA		sysdata;
+SYSTEM_DATA sysdata;
 
-int			top_affect;
-int			top_area;
-int			top_ed;
-int			top_exit;
-int			top_help;
-int			top_mob_index;
-int			top_obj_index;
-int			top_room;
-int 			top_r_vnum;
-int			top_shop;
-int			top_repair;
-int			top_vroom;
+int top_affect = 0;
+int top_area = 0;
+int top_ed = 0;
+int top_exit = 0;
+int top_help = 0;
+int top_mob_index = 0;
+int top_obj_index = 0;
+int top_room = 0;
+int top_r_vnum = 0;
+int top_shop = 0;
+int top_repair = 0;
+int top_vroom = 0;
 
 /*
  * Semi-locals.
  */
-bool			fBootDb = FALSE;
-FILE *			fpArea = NULL;
-char			strArea[MAX_INPUT_LENGTH];
+bool fBootDb = FALSE;
+FILE *fpArea = NULL;
+char strArea[MAX_INPUT_LENGTH];
 
 bool MOBtrigger = TRUE;
 
@@ -285,8 +280,6 @@ static void boot_init_globals( void )
   last_repair         = NULL;
   first_teleport      = NULL;
   last_teleport       = NULL;
-  first_asort         = NULL;
-  last_asort          = NULL;
   extracted_obj_queue = NULL;
   extracted_char_queue= NULL;
   cur_qobjs           = 0;
@@ -4196,74 +4189,11 @@ void load_area_file( AREA_DATA *tarea, const char *filename )
 
   if ( tarea )
     {
-      if ( fBootDb )
-	sort_area( tarea, FALSE );
-
       fprintf( stderr, "%s\n",
 	       filename);
     }
   else
     fprintf( stderr, "(%s)\n", filename );
-}
-
-
-
-/*
- * Sort by room vnums					-Altrag & Thoric
- */
-void sort_area( AREA_DATA *pArea, bool proto )
-{
-    AREA_DATA *first_sort, *last_sort;
-    bool found;
-
-    if ( !pArea )
-    {
-	bug( "Sort_area: NULL pArea" );
-	return;
-    }
-
-    if ( proto )
-    {
-	first_sort = first_bsort;
-	last_sort  = last_bsort;
-    }
-    else
-    {
-	first_sort = first_asort;
-	last_sort  = last_asort;
-    }
-	
-    found = FALSE;
-    pArea->next_sort = NULL;
-    pArea->prev_sort = NULL;
-
-    if ( !first_sort )
-    {
-	pArea->prev_sort = NULL;
-	pArea->next_sort = NULL;
-	first_sort	 = pArea;
-	last_sort	 = pArea;
-	found = TRUE;
-    }
-
-    if ( !found )
-    {
-	pArea->prev_sort     = last_sort;
-	pArea->next_sort     = NULL;
-	last_sort->next_sort = pArea;
-	last_sort	     = pArea;
-    }
-
-    if ( proto )
-    {
-	first_bsort = first_sort;
-	last_bsort  = last_sort;
-    }
-    else
-    {
-	first_asort = first_sort;
-	last_asort  = last_sort;
-    }
 }
 
 /*
