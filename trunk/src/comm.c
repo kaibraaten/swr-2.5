@@ -575,13 +575,19 @@ void game_loop( )
 
 	if ( secDelta > 0 || ( secDelta == 0 && usecDelta > 0 ) )
 	  {
-	    struct timeval stall_time;
-
-	    stall_time.tv_usec = usecDelta;
+		struct timeval stall_time;
+#ifdef WIN32
+    fd_set dummy_set;
+    FD_ZERO (&dummy_set);
+    FD_SET (control, &dummy_set);
+#endif
+		stall_time.tv_usec = usecDelta;
 	    stall_time.tv_sec  = secDelta;
 
 #ifdef AMIGA
 	    if( WaitSelect( 0, 0, 0, 0, &stall_time, 0 ) == SOCKET_ERROR )
+#elif defined(WIN32)
+		if (select (0, NULL, NULL, &dummy_set, &stall_time) == SOCKET_ERROR)
 #else
 	    if ( select( 0, NULL, NULL, NULL, &stall_time ) == SOCKET_ERROR )
 #endif
