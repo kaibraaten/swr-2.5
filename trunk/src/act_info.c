@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "mud.h"
+#include "sha256.h"
 
 const char *	const	where_name	[] =
   {
@@ -2766,10 +2767,10 @@ void do_password( CHAR_DATA *ch, char *argument )
 	return;
     }
 
-    if ( strcmp( crypt( arg1, ch->pcdata->pwd ), ch->pcdata->pwd ) )
+    if ( strcmp( sha256_crypt( arg1 ), ch->pcdata->pwd ) )
     {
 	WAIT_STATE( ch, 40 );
-	send_to_char( "Wrong password.  Wait 10 seconds.\r\n", ch );
+	send_to_char( "Wrong password. Wait 10 seconds.\r\n", ch );
 	return;
     }
 
@@ -2783,7 +2784,8 @@ void do_password( CHAR_DATA *ch, char *argument )
     /*
      * No tilde allowed because of player file format.
      */
-    pwdnew = crypt( arg2, ch->name );
+    pwdnew = sha256_crypt( arg2 );
+
     for ( p = pwdnew; *p != '\0'; p++ )
     {
 	if ( *p == '~' )

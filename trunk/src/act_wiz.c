@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include "mud.h"
+#include "sha256.h"
 
 #define RESTORE_INTERVAL 21600
 
@@ -3450,13 +3451,14 @@ void do_set_boot_time( CHAR_DATA *ch, char *argument)
  */ 
 void do_form_password( CHAR_DATA *ch, char *argument) 
 {
-   char arg[MAX_STRING_LENGTH];
-  
-   argument = one_argument(argument, arg);
+  if( !argument || strlen( argument ) == 0 )
+    {
+      ch_printf( ch, "Please provide an argument.\r\n" );
+      return;
+    }
    
-   ch_printf(ch, "Those two arguments encrypted would result in: %s", 
-   crypt(arg, argument)); 
-   return;
+  ch_printf(ch, "That would result in the following password: %s",
+	    sha256_crypt(argument)); 
 }
 
 /*
