@@ -12,7 +12,6 @@ extern int	top_exit;
 void do_buyhome( CHAR_DATA *ch, char *argument )
 {
      ROOM_INDEX_DATA *room;
-     AREA_DATA *pArea;
      char filename[256];
 
      if ( !ch->in_room )
@@ -35,15 +34,6 @@ void do_buyhome( CHAR_DATA *ch, char *argument )
      }
      
      room = ch->in_room;
-     
-     for ( pArea = first_bsort; pArea; pArea = pArea->next_sort )
-     {
-         if ( room->area == pArea )
-         {
-             send_to_char( "&RThis area isn't installed yet!\r\n&w", ch);
-             return;
-         }
-     }
      
      if ( !IS_SET( room->room_flags , ROOM_EMPTY_HOME ) )
      {

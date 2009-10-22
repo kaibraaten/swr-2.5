@@ -1667,7 +1667,6 @@ struct timer_data
 struct	mob_index_data
 {
     MOB_INDEX_DATA *	next;
-    MOB_INDEX_DATA *	next_sort;
     SPEC_FUN *		spec_fun;
     SPEC_FUN *          spec_2;
     SHOP_DATA *		pShop;
@@ -1975,7 +1974,6 @@ struct	extra_descr_data
 struct	obj_index_data
 {
     OBJ_INDEX_DATA *	next;
-    OBJ_INDEX_DATA *	next_sort;
     EXTRA_DESCR_DATA *	first_extradesc;
     EXTRA_DESCR_DATA *	last_extradesc;
     AFFECT_DATA *	first_affect;
@@ -2068,8 +2066,6 @@ struct	area_data
 {
     AREA_DATA *		next;
     AREA_DATA *		prev;
-    AREA_DATA *		next_sort;
-    AREA_DATA *		prev_sort;
     PLANET_DATA *       planet;
     ROOM_INDEX_DATA *   first_room;
     ROOM_INDEX_DATA *   last_room;
@@ -2117,7 +2113,6 @@ struct	vote_data
 struct	room_index_data
 {
     ROOM_INDEX_DATA *	next;
-    ROOM_INDEX_DATA *	next_sort;
     ROOM_INDEX_DATA *	next_in_area;
     ROOM_INDEX_DATA *	prev_in_area;
     ROOM_INDEX_DATA *	next_in_ship;
@@ -2811,10 +2806,6 @@ extern		AREA_DATA	  *	first_area;
 extern		AREA_DATA	  *	last_area;
 extern		AREA_DATA	  *	first_build;
 extern		AREA_DATA	  *	last_build;
-extern		AREA_DATA	  *	first_asort;
-extern		AREA_DATA	  *	last_asort;
-extern		AREA_DATA	  *	first_bsort;
-extern		AREA_DATA	  *	last_bsort;
 extern		TELEPORT_DATA	  *	first_teleport;
 extern		TELEPORT_DATA	  *	last_teleport;
 extern		OBJ_DATA	  *	extracted_obj_queue;
@@ -3565,7 +3556,6 @@ void	make_wizlist	args( ( void ) );
 bool    delete_room     args( ( ROOM_INDEX_DATA *room ) );
 bool    delete_obj      args( ( OBJ_INDEX_DATA *obj ) );
 bool    delete_mob      args( ( MOB_INDEX_DATA *mob ) );
-void	sort_area	args( ( AREA_DATA *pArea, bool proto ) );
 void   load_votes   	args( ( void ) );
 void   save_votes   	args( ( void ) );
 
