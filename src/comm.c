@@ -11,6 +11,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <arpa/telnet.h>
 #include "mud.h"
 #include "os.h"
 
