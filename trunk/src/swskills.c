@@ -1706,9 +1706,9 @@ void add_reinforcements( CHAR_DATA *ch )
 void do_torture( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
-    int chance, dam;
-    bool fail;
+    CHAR_DATA *victim = NULL;
+    int chance = 0, dam = 0;
+    bool fail = FALSE;
     
     if ( !IS_NPC(ch)
 	 &&  character_skill_level( ch, gsn_torture ) <= 0  )
@@ -1765,7 +1765,7 @@ void do_torture( CHAR_DATA *ch, char *argument )
 	return;
     }
     
-    ch->alignment = ch->alignment -= 100;
+    ch->alignment -= 100;
     ch->alignment = URANGE( -1000, ch->alignment, 1000 );
     
     WAIT_STATE( ch, skill_table[gsn_torture]->beats );
