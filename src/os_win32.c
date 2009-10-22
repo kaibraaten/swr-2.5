@@ -27,7 +27,7 @@
 #include <time.h>
 #include "os.h"
 
-void network_setup( void )
+void network_startup( void )
 {
   WSADATA wsaData;
 

@@ -6,8 +6,10 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#ifndef WIN32
 #include <arpa/telnet.h> /* Telnet opt codes */
 #include <unistd.h>
+#endif
 #include "mud.h"
 #include "sha256.h"
 
@@ -30,9 +32,10 @@ static void nanny_done_motd( DESCRIPTOR_DATA *d, char *argument );
 #define MAX_NEST        100
 static  OBJ_DATA *      rgObjNest       [MAX_NEST];
 extern bool wizlock;
+#ifndef WIN32
 const   char    echo_off_str    [] = { IAC, WILL, TELOPT_ECHO, '\0' };
 const   char    echo_on_str     [] = { IAC, WONT, TELOPT_ECHO, '\0' };
-
+#endif
 /*
  * External functions.
  */
@@ -286,8 +289,10 @@ arts of this game...\r\n"
 
       /* Old player */
       write_to_buffer( d, "Password: ", 0 );
-      write_to_buffer( d, echo_off_str, 0 );
-      d->connected = CON_GET_OLD_PASSWORD;
+#ifndef WIN32
+	  write_to_buffer( d, echo_off_str, 0 );
+#endif
+	  d->connected = CON_GET_OLD_PASSWORD;
       return;
     }
   else
@@ -316,7 +321,9 @@ static void nanny_get_old_password( DESCRIPTOR_DATA *d, char *argument )
       return;
     }
 
+#ifndef WIN32
   write_to_buffer( d, echo_on_str, 0 );
+#endif
 
   if ( check_playing( d, ch->name, TRUE ) )
     return;
@@ -364,8 +371,13 @@ static void nanny_confirm_new_name( DESCRIPTOR_DATA *d, char *argument )
     case 'y': case 'Y':
       sprintf( buf, "\r\nMake sure to use a password that won't be easily guessed by someone else."
 	       "\r\nPick a good password for %s: %s",
-	       ch->name, echo_off_str );
-      write_to_buffer( d, buf, 0 );
+	       ch->name,
+#ifdef WIN32
+			"" );
+#else
+		   echo_off_str );
+#endif
+	  write_to_buffer( d, buf, 0 );
       d->connected = CON_GET_NEW_PASSWORD;
       break;
 
@@ -427,7 +439,9 @@ static void nanny_confirm_new_password( DESCRIPTOR_DATA *d, char *argument )
       return;
     }
 
+#ifndef WIN32
   write_to_buffer( d, echo_on_str, 0 );
+#endif
   write_to_buffer( d, "\r\nWhat is your sex (M/F/N)? ", 0 );
   d->connected = CON_GET_NEW_SEX;
 }

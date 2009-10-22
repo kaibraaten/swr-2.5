@@ -1,5 +1,8 @@
 #include <sys/types.h>
+#ifndef WIN32
 #include <sys/time.h>
+#include <unistd.h>
+#endif
 #include <sys/stat.h>
 #include <ctype.h>
 #include <errno.h>
@@ -9,11 +12,12 @@
 #include <signal.h>
 #include <stdarg.h>
 #include "mud.h"
+#include "os.h"
 
 /*
  * Socket and TCP/IP stuff.
  */
-#include <unistd.h>
+/*
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
@@ -21,9 +25,10 @@
 #include <arpa/inet.h>
 #include <arpa/telnet.h>
 #include <netdb.h>
-
+*/
+#ifndef WIN32
 const   char    go_ahead_str    [] = { IAC, GA, '\0' };
-
+#endif
 /*  from act_info?  */
 void    show_condition( CHAR_DATA *ch, CHAR_DATA *victim );
 void        write_ship_list args( ( void ) );
@@ -368,7 +373,7 @@ void game_loop( )
   char cmdline[MAX_INPUT_LENGTH];
   DESCRIPTOR_DATA *d = NULL;
 
-#ifndef AMIGA
+#if !defined(AMIGA) && !defined(WIN32)
   signal( SIGPIPE, SIG_IGN );
   signal( SIGALRM, caught_alarm );
   /* signal( SIGSEGV, SegVio ); */
@@ -627,7 +632,7 @@ void new_descriptor( SOCKET new_desc )
     struct sockaddr_in sock;
     SOCKET desc = 0;
     socklen_t size = 0;
-#ifdef AMIGA
+#if defined(AMIGA) || defined(WIN32)
     char optval = 1;
 #endif
 
@@ -657,9 +662,11 @@ void new_descriptor( SOCKET new_desc )
     set_alarm( 20 );
 
 #ifdef AMIGA
-    if( IoctlSocket( desc, FIONBIO, &optval ) == -1 )
+    if( IoctlSocket( desc, FIONBIO, &optval ) == SOCKET_ERROR )
+#elif defined(WIN32)
+	if( ioctlsocket( desc, FIONBIO, &optval ) == SOCKET_ERROR )
 #else
-    if ( fcntl( desc, F_SETFL, FNDELAY ) == -1 )
+    if ( fcntl( desc, F_SETFL, FNDELAY ) == SOCKET_ERROR )
 #endif
     {
 	perror( "New_descriptor: fcntl: FNDELAY" );
@@ -1092,9 +1099,11 @@ bool flush_buffer( DESCRIPTOR_DATA *d, bool fPrompt )
 
 	if ( IS_SET(ch->act, PLR_PROMPT) )
 	    display_prompt(d);
+#ifndef WIN32
 	if ( IS_SET(ch->act, PLR_TELNET_GA) )
 	    write_to_buffer( d, go_ahead_str, 0 );
-    }
+#endif
+	}
 
     /*
      * Short-circuit if nothing to write.

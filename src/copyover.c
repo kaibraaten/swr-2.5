@@ -23,7 +23,10 @@
 /* Origional Copyover Code by Erwin S. Andreasen http://www.andreasen.org/ */
 
 #include <sys/types.h>
+#ifndef WIN32
 #include <sys/time.h>
+#include <unistd.h>
+#endif
 #include <sys/stat.h>
 #include <ctype.h>
 #include <errno.h>
@@ -33,11 +36,12 @@
 #include <signal.h>
 #include <stdarg.h>
 #include "mud.h"
+#include "os.h"
 
 /*
  * Socket and TCP/IP stuff.
  */
-#include <unistd.h>
+/*
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
@@ -45,6 +49,7 @@
 #include <arpa/inet.h>
 #include <arpa/telnet.h>
 #include <netdb.h>
+*/
 /*
  * OS-dependent local functions.
  */

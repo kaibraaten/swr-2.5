@@ -2,13 +2,15 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#ifdef WIN32
+/*#include <sys/dir.h>*/
+#include <io.h>
+#else
 #include <unistd.h>
+#include <dirent.h>
+#endif
 #include "mud.h"
 #include <sys/stat.h>
-/*
-#include <sys/dir.h>
-*/
-#include <dirent.h>
 
 /*
  * Increment with every major format change.
@@ -1785,7 +1787,7 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 
 void set_alarm( long seconds )
 {
-#ifndef AMIGA
+#if !defined( AMIGA ) && !defined( WIN32 )
     alarm( seconds );
 #endif
 }
@@ -1866,11 +1868,20 @@ void write_corpses( CHAR_DATA *ch, char *name )
 
 void load_corpses( void )
 {
-  DIR *dp;
+#ifdef WIN32
+	struct _finddata_t c_file;
+	long hFile = 0;
+#else
+	DIR *dp;
   struct dirent *de;
+#endif
   extern int falling;
   
+#ifdef WIN32
+  if( ( hFile = _findfirst( "corpses\*", &c_file ) ) )
+#else
   if ( !(dp = opendir(CORPSE_DIR)) )
+#endif
   {
     bug( "Load_corpses: can't open CORPSE_DIR", 0);
     perror(CORPSE_DIR);
@@ -1878,12 +1889,25 @@ void load_corpses( void )
   }
 
   falling = 1; /* Arbitrary, must be >0 though. */
+#ifdef WIN32
+	while( _findnext( hFile, &c_file ) )
+#else
   while ( (de = readdir(dp)) != NULL )
+#endif
   {
-    if ( de->d_name[0] != '.' )
-    {
-      sprintf(strArea, "%s%s", CORPSE_DIR, de->d_name );
-      fprintf(stderr, "Corpse -> %s\n", strArea);
+#ifdef WIN32
+	if( c_file.name[0] != '.' )
+#else
+	if ( de->d_name[0] != '.' )
+#endif
+	  {
+      sprintf(strArea, "%s%s", CORPSE_DIR,
+#ifdef WIN32
+			c_file.name );
+#else
+		  de->d_name );
+#endif
+	  fprintf(stderr, "Corpse -> %s\n", strArea);
       if ( !(fpArea = fopen(strArea, "r")) )
       {
         perror(strArea);
@@ -1923,7 +1947,10 @@ void load_corpses( void )
   }
   fpArea = NULL;
   strcpy(strArea, "$");
+#ifdef WIN32
+	_findclose( hFile );
+#else
   closedir(dp);
+#endif
   falling = 0;
-  return;
 }

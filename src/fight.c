@@ -2,7 +2,9 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+#ifndef WIN32
 #include <unistd.h>
+#endif
 #include "mud.h"
 #include <sys/stat.h>
 /*#include <sys/dir.h>*/

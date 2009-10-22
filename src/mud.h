@@ -3,8 +3,10 @@
 
 #include <stdlib.h>
 #include <limits.h>
+#ifndef WIN32
 #include <sys/cdefs.h>
 #include <sys/time.h>
+#endif
 #include <math.h>
 
 #ifdef __STORMGCC__
