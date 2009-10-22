@@ -7,15 +7,13 @@
 #include "mud.h"
 
 
-#define MAX_NEST	100
-
 CLAN_DATA * first_clan = NULL;
 CLAN_DATA * last_clan = NULL;
 
 /* local routines */
-void	fread_clan	args( ( CLAN_DATA *clan, FILE *fp ) );
-bool	load_clan_file	args( ( const char *clanfile ) );
-void	write_clan_list	args( ( void ) );
+void fread_clan( CLAN_DATA *clan, FILE *fp );
+bool load_clan_file( const char *clanfile );
+void write_clan_list( void );
 
 
 /*
