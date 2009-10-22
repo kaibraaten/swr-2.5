@@ -322,18 +322,19 @@ void SHA256_Final(unsigned char digest[32], SHA256_CTX * ctx)
 
 char *sha256_crypt( const char *pwd )
 {
-   SHA256_CTX context;
-   static char output[65];
-   unsigned char sha256sum[32];
-   unsigned int j;
+  SHA256_CTX context;
+  static char output[65];
+  unsigned char sha256sum[32];
+  unsigned int j;
 
-   SHA256_Init( &context );
-   SHA256_Update( &context, (const unsigned char *) pwd, strlen(pwd) );
-   SHA256_Final( sha256sum, &context );
+  SHA256_Init( &context );
+  SHA256_Update( &context, (const unsigned char *) pwd, strlen(pwd) );
+  SHA256_Final( sha256sum, &context );
 
-   for( j = 0; j < 32; ++j )
-   {
-      snprintf( output + j * 2, 65, "%02x", sha256sum[j] );
-   }
-   return output;
+  for( j = 0; j < 32; ++j )
+    {
+      sprintf( output + j * 2, "%02x", sha256sum[j] );
+    }
+
+  return output;
 }
