@@ -989,8 +989,8 @@ void do_resign( CHAR_DATA *ch, char *argument )
 
 void do_clan_withdraw( CHAR_DATA *ch, char *argument )
 {
-    CLAN_DATA *clan;
-    long       amount;
+    CLAN_DATA *clan = NULL;
+    long       amount = 0;
     
     if ( IS_NPC( ch ) || !ch->pcdata->clan )
     {
