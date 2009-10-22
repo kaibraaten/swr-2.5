@@ -1878,7 +1878,6 @@ void load_corpses( void )
 	DIR *dp;
   struct dirent *de;
 #endif
-  extern int falling;
   
 #ifdef WIN32
   if( ( hFile = _findfirst( "corpses\*", &c_file ) ) )
