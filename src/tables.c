@@ -889,22 +889,23 @@ const char *skill_name( DO_FUN *skill )
 /*
  * Function used by qsort to sort skills
  */
-int skill_comp( SKILLTYPE **sk1, SKILLTYPE **sk2 )
+int skill_comp( const SKILLTYPE **sk1, const SKILLTYPE **sk2 )
 {
-    SKILLTYPE *skill1 = (*sk1);
-    SKILLTYPE *skill2 = (*sk2);
+  const SKILLTYPE *skill1 = (*sk1);
+  const SKILLTYPE *skill2 = (*sk2);
 
-    if ( !skill1 && skill2 )
-	return 1;
-    if ( skill1 && !skill2 )
-	return -1;
-    if ( !skill1 && !skill2 )
-	return 0;
-    if ( skill1->type < skill2->type )
-	return -1;
-    if ( skill1->type > skill2->type )
-	return 1;
-    return strcmp( skill1->name, skill2->name );
+  if ( !skill1 && skill2 )
+    return 1;
+  if ( skill1 && !skill2 )
+    return -1;
+  if ( !skill1 && !skill2 )
+    return 0;
+  if ( skill1->type < skill2->type )
+    return -1;
+  if ( skill1->type > skill2->type )
+    return 1;
+
+  return strcmp( skill1->name, skill2->name );
 }
 
 /*
@@ -912,9 +913,9 @@ int skill_comp( SKILLTYPE **sk1, SKILLTYPE **sk2 )
  */
 void sort_skill_table()
 {
-    log_string( "Sorting skill table..." );
-    qsort( &skill_table[1], top_sn-1, sizeof( SKILLTYPE * ),
-		(int(*)(const void *, const void *)) skill_comp );
+  log_string( "Sorting skill table..." );
+  qsort( &skill_table[1], top_sn-1, sizeof( SKILLTYPE * ),
+	 (int(*)(const void *, const void *)) skill_comp );
 }
 
 
