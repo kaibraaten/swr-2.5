@@ -222,4 +222,15 @@ char *check_hash( char *str );
 void hash_dump( int hash );
 void show_high_hash( int top );
 
+char *scramble( const char *argument, int modifier );
+
+/* Random number stuff */
+int number_fuzzy( int number );
+int number_range( int from, int to );
+int number_percent( void );
+int number_door( void );
+int number_bits( int width );
+int dice( int number, int size );
+int interpolate( int level, int value_00, int value_32 );
+
 #endif /* include guard */

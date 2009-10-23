@@ -17,7 +17,6 @@ void send_control_page_to_char(CHAR_DATA * ch, char page);
  */
 void talk_channel( CHAR_DATA *ch, const char *argument,
 		   int channel, const char *verb );
-char *scramble( const char *argument, int modifier );
 const char *drunk_speech( const char *argument, CHAR_DATA *ch );
 
 #define	MAX_NOISE	1
@@ -130,60 +129,6 @@ void do_beep( CHAR_DATA *ch, char *argument )
   sprintf( buf , "%s beeps: '$t'" , ch->name );   
 
   act( AT_WHITE, buf, ch, argument, victim, TO_VICT );
-}
-
-/* Text scrambler -- Altrag */
-char *scramble( const char *argument, int modifier )
-{
-  static char arg[MAX_INPUT_LENGTH];
-  int position = 0;
-  int conversion = 0;
-    
-  modifier %= number_range( 80, 300 ); /* Bitvectors get way too large #s */
-
-  for ( position = 0; position < MAX_INPUT_LENGTH; position++ )
-    {
-      if ( argument[position] == '\0' )
-    	{
-	  arg[position] = '\0';
-	  return arg;
-    	}
-      else if ( argument[position] >= 'A' && argument[position] <= 'Z' )
-	{
-	  conversion = -conversion + position - modifier + argument[position] - 'A';
-	  conversion = number_range( conversion - 5, conversion + 5 );
-	  while ( conversion > 25 )
-	    conversion -= 26;
-	  while ( conversion < 0 )
-	    conversion += 26;
-	  arg[position] = (char)(conversion + 'A');
-	}
-      else if ( argument[position] >= 'a' && argument[position] <= 'z' )
-	{
-	  conversion = -conversion + position - modifier + argument[position] - 'a';
-	  conversion = number_range( conversion - 5, conversion + 5 );
-	  while ( conversion > 25 )
-	    conversion -= 26;
-	  while ( conversion < 0 )
-	    conversion += 26;
-	  arg[position] = (char)(conversion + 'a');
-	}
-      else if ( argument[position] >= '0' && argument[position] <= '9' )
-	{
-	  conversion = -conversion + position - modifier + argument[position] - '0';
-	  conversion = number_range( conversion - 2, conversion + 2 );
-	  while ( conversion > 9 )
-	    conversion -= 10;
-	  while ( conversion < 0 )
-	    conversion += 10;
-	  arg[position] = (char)(conversion + '0');
-	}
-      else
-	arg[position] = argument[position];
-    }
-
-  arg[position-1] = '\0';
-  return arg;	     
 }
 
 const char *drunk_speech( const char *argument, CHAR_DATA *ch )
