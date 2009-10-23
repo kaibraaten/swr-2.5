@@ -785,20 +785,32 @@ bool check_blind( CHAR_DATA *ch )
  */
 int get_door( const char *arg )
 {
-    int door;
+  int door = DIR_SOMEWHERE;
 
-	 if ( !str_cmp( arg, "n"  ) || !str_cmp( arg, "north"	  ) ) door = 0;
-    else if ( !str_cmp( arg, "e"  ) || !str_cmp( arg, "east"	  ) ) door = 1;
-    else if ( !str_cmp( arg, "s"  ) || !str_cmp( arg, "south"	  ) ) door = 2;
-    else if ( !str_cmp( arg, "w"  ) || !str_cmp( arg, "west"	  ) ) door = 3;
-    else if ( !str_cmp( arg, "u"  ) || !str_cmp( arg, "up"	  ) ) door = 4;
-    else if ( !str_cmp( arg, "d"  ) || !str_cmp( arg, "down"	  ) ) door = 5;
-    else if ( !str_cmp( arg, "ne" ) || !str_cmp( arg, "northeast" ) ) door = 6;
-    else if ( !str_cmp( arg, "nw" ) || !str_cmp( arg, "northwest" ) ) door = 7;
-    else if ( !str_cmp( arg, "se" ) || !str_cmp( arg, "southeast" ) ) door = 8;
-    else if ( !str_cmp( arg, "sw" ) || !str_cmp( arg, "southwest" ) ) door = 9;
-    else door = -1;
-    return door;
+  if ( !str_cmp( arg, "n"  ) || !str_cmp( arg, "north" ) )
+    door = DIR_NORTH;
+  else if ( !str_cmp( arg, "e"  ) || !str_cmp( arg, "east" ) )
+    door = DIR_EAST;
+  else if ( !str_cmp( arg, "s"  ) || !str_cmp( arg, "south" ) )
+    door = DIR_SOUTH;
+  else if ( !str_cmp( arg, "w"  ) || !str_cmp( arg, "west" ) )
+    door = DIR_WEST;
+  else if ( !str_cmp( arg, "u"  ) || !str_cmp( arg, "up" ) )
+    door = DIR_UP;
+  else if ( !str_cmp( arg, "d"  ) || !str_cmp( arg, "down" ) )
+    door = DIR_DOWN;
+  else if ( !str_cmp( arg, "ne" ) || !str_cmp( arg, "northeast" ) )
+    door = DIR_NORTHEAST;
+  else if ( !str_cmp( arg, "nw" ) || !str_cmp( arg, "northwest" ) )
+    door = DIR_NORTHWEST;
+  else if ( !str_cmp( arg, "se" ) || !str_cmp( arg, "southeast" ) )
+    door = DIR_SOUTHEAST;
+  else if ( !str_cmp( arg, "sw" ) || !str_cmp( arg, "southwest" ) )
+    door = DIR_SOUTHWEST;
+  else
+    door = -1;
+
+  return door;
 }
 
 void do_look
