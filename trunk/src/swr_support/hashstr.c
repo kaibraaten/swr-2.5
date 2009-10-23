@@ -28,11 +28,14 @@ struct hashstr_data
     unsigned short int	 length;	/* length of string */
 };
 
-char *		str_alloc( const char *str );
-char *		quick_link( const char *str );
-int		str_free( char *str );
-void		show_hash( int count );
-char *		hash_stats( void );
+char *str_alloc( const char *str );
+char *quick_link( const char *str );
+int str_free( char *str );
+void show_hash( int count );
+char *hash_stats( void );
+void hash_dump( int );
+char *check_hash( char* );
+void show_high_hash( int );
 
 struct hashstr_data *string_hash[STR_HASH_SIZE];
 
@@ -43,30 +46,36 @@ struct hashstr_data *string_hash[STR_HASH_SIZE];
  */
 char *str_alloc( const char *str )
 {
-   register int len = 0, hash = 0, psize = 0;
-   register struct hashstr_data *ptr = NULL;
+  register int hash = 0;
+  register size_t len = 0, psize = 0;
+  register struct hashstr_data *ptr = NULL;
 
-   len = strlen(str);
-   psize = sizeof(struct hashstr_data);
-   hash = len % STR_HASH_SIZE;
-   for (ptr = string_hash[hash]; ptr; ptr = ptr->next )
-     if ( len == ptr->length && !strcmp(str,(char *)ptr+psize) )
-     {
+  len = strlen(str);
+  psize = sizeof(struct hashstr_data);
+  hash = len % STR_HASH_SIZE;
+
+  for (ptr = string_hash[hash]; ptr; ptr = ptr->next )
+    if ( len == ptr->length && !strcmp(str,(char *)ptr+psize) )
+      {
 	if ( ptr->links < 65535 )
 	  ++ptr->links;
+
 	return (char *) ptr+psize;
-     }
-   ptr = (struct hashstr_data *) malloc(len+psize+1);
-   ptr->links		= 1;
-   ptr->length		= len;
-   if (len)
-     strcpy( (char *) ptr+psize, str );
+      }
+
+  ptr = (struct hashstr_data *) malloc(len+psize+1);
+  ptr->links		= 1;
+  ptr->length		= len;
+
+  if (len)
+    strcpy( (char *) ptr+psize, str );
 /*     memcpy( (char *) ptr+psize, str, len+1 ); */
-   else
-     strcpy( (char *) ptr+psize, "" );
-   ptr->next		= string_hash[hash];
-   string_hash[hash]	= ptr;
-   return (char *) ptr+psize;
+  else
+    strcpy( (char *) ptr+psize, "" );
+
+  ptr->next		= string_hash[hash];
+  string_hash[hash]	= ptr;
+  return (char *) ptr+psize;
 }
 
 /*
@@ -76,9 +85,7 @@ char *str_alloc( const char *str )
  */
 char *quick_link( const char *str )
 {
-  register struct hashstr_data *ptr = NULL;
-
-  ptr = (struct hashstr_data *) (str - sizeof(struct hashstr_data));
+  register struct hashstr_data *ptr = (struct hashstr_data *) (str - sizeof(struct hashstr_data));
 
   if ( ptr->links == 0 )
     {

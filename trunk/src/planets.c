@@ -8,8 +8,8 @@ void vector_randomize( Vector3 * const vec, int from, int to );
 
 extern int top_area;
 extern int top_r_vnum;
-void write_area_list();
-void write_starsystem_list();
+void write_area_list( void );
+void write_starsystem_list( void );
 extern const   char *  sector_name     [SECT_MAX];
 
 PLANET_DATA * first_planet = NULL;

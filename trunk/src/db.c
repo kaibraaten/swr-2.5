@@ -14,7 +14,7 @@
 extern	int _filbuf( FILE* );
 #endif
 
-void init_supermob();
+void init_supermob( void );
 
 /*
  * Globals.
@@ -136,7 +136,6 @@ short gsn_grip;
 short gsn_berserk;
 short gsn_hitall;
 short gsn_disarm;
-
 
 /* other   */
 short gsn_aid;

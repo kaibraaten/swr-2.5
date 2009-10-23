@@ -1,6 +1,8 @@
 #ifndef _MUD_H_
 #define _MUD_H_
 
+#include <swr_support.h>
+
 #include <stdlib.h>
 #include <limits.h>
 #ifndef WIN32
@@ -8,14 +10,7 @@
 #include <sys/time.h>
 #endif
 #include <math.h>
-
-#ifdef __STORMGCC__
-typedef long clock_t;
-#endif
-
 #include <time.h>
-
-#include <swr_support.h>
 
 typedef	int				ch_ret;
 typedef	int				obj_ret;
@@ -3162,7 +3157,7 @@ int	get_mpflag	args( ( const char *flag ) );
 int	get_dir		args( ( const char *txt  ) );
 int     get_vip_flag    args( ( const char *flag ) );
 int     get_wanted_flag args( ( const char *flag ) );
-void    save_some_areas args( ( ) );
+void    save_some_areas args( ( void ) );
 
 /* clans.c */
 void clan_add_leader( CLAN_DATA *clan, const char *name );
@@ -3248,7 +3243,7 @@ void	act		args( ( short AType, const char *format, CHAR_DATA *ch,
 			    const void *arg1, const void *arg2, int type ) );
 
 /* reset.c */
-void	reset_all	args( ( ) );
+void	reset_all	args( ( void ) );
 
 /* db.c */
 void free_extra_descr( EXTRA_DESCR_DATA *ed );
@@ -3380,7 +3375,7 @@ void    mprog_hour_trigger      args ( ( CHAR_DATA *mob ) );
 void    mprog_time_trigger      args ( ( CHAR_DATA *mob ) );
 void    progbug                 args( ( const char *str, CHAR_DATA *mob ) );
 void	rset_supermob		args( ( ROOM_INDEX_DATA *room) );
-void	release_supermob	args( ( ) );
+void	release_supermob	args( ( void ) );
 
 /* player.c */
 void set_title( CHAR_DATA *ch, const char *title );
@@ -3504,7 +3499,7 @@ bool	check_pos	args( ( const CHAR_DATA *ch, short position ) );
 void	interpret	args( ( CHAR_DATA *ch, char *argument ) );
 ST *	find_social	args( ( const char *command ) );
 CMDTYPE *find_command	args( ( const char *command ) );
-void	hash_commands	args( ( ) );
+void	hash_commands	args( ( void ) );
 void send_timer( struct timerset *vtime, const CHAR_DATA *ch );
 
 /* magic.c */
@@ -3670,14 +3665,6 @@ extern	const   char *  ris_strings[];
 extern	const   char    control_page_a[];
 extern	const   char    control_help_page[];
 
-				/*
-#define SHORT 1
-#define INT 2
-#define CHAR 3
-#define STRING 4
-#define SPECIAL 5
-				*/
-
 #define NO_PAGE    0
 #define MOB_PAGE_A 1
 #define MOB_PAGE_B 2
@@ -3762,7 +3749,7 @@ struct  map_index_data
 
 
 MAP_INDEX_DATA *get_map_index(long vnum);
-void            init_maps();
+void            init_maps( void );
 
 
 /*

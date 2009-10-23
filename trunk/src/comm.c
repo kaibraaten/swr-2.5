@@ -288,6 +288,7 @@ static void SegVio()
 /*
  * LAG alarm!							-Thoric
  */
+#if !defined(AMIGA) && !defined(WIN32)
 static void caught_alarm( int foo )
 {
     char buf[MAX_STRING_LENGTH];
@@ -306,6 +307,7 @@ static void caught_alarm( int foo )
     log_string( "Normal termination of game." );
     exit( 0 );
 }
+#endif
 
 bool check_bad_desc( SOCKET desc )
 {
