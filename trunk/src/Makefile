@@ -1,6 +1,6 @@
 CC = gcc
 BINARY = swr
-WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wredundant-decls -Wwrite-strings
+WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wredundant-decls -Wwrite-strings -Wshadow
 
 CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support
 LFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support

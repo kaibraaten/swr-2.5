@@ -71,26 +71,29 @@ const	struct	model_type	model	[MAX_SHIP_MODEL+1] =
 };
 
 /* local routines */
-void	fread_ship_prototype	args( ( SHIP_PROTOTYPE *ship, FILE *fp ) );
-bool	load_ship_prototype	args( ( const char *shipfile ) );
-void	write_prototype_list	args( ( void ) );
-void	write_ship_list	args( ( void ) );
-void    bridge_rooms( ROOM_INDEX_DATA *rfrom , ROOM_INDEX_DATA *rto , int edir );
-void    bridge_elevator( ROOM_INDEX_DATA *rfrom , ROOM_INDEX_DATA *rto , int edir , const char * exname );
-void 	post_ship_guard( ROOM_INDEX_DATA * pRoomIndex );
-void    make_cockpit( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-void    make_turret( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-void    make_bridge( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-void    make_pilot( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-void    make_copilot( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-void    make_engine( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-void    make_medical( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-void    make_lounge( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-void    make_entrance( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-void    make_hanger( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-void    make_garage( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-void    make_elevator( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
-long    get_design_value( int hull, int energy, int shield, int speed, int manuever, int lasers, int missiles, int chaff, int smodel );
+void fread_ship_prototype( SHIP_PROTOTYPE *ship, FILE *fp );
+bool load_ship_prototype( const char *shipfile );
+void write_prototype_list( void );
+void write_ship_list( void );
+void bridge_rooms( ROOM_INDEX_DATA *rfrom , ROOM_INDEX_DATA *rto , int edir );
+void bridge_elevator( ROOM_INDEX_DATA *rfrom, ROOM_INDEX_DATA *rto,
+		      int edir , const char * exname );
+void post_ship_guard( ROOM_INDEX_DATA * pRoomIndex );
+void make_cockpit( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+void make_turret( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+void make_bridge( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+void make_pilot( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+void make_copilot( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+void make_engine( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+void make_medical( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+void make_lounge( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+void make_entrance( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+void make_hanger( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+void make_garage( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+void make_elevator( ROOM_INDEX_DATA *room , SHIP_DATA *ship );
+long get_design_value( int hull, int energy, int shield, int speed,
+		       int manuever, int lasers, int missiles,
+		       int chaff, int smodel );
 
 long int get_prototype_value( const SHIP_PROTOTYPE *prototype )
 {
@@ -1555,7 +1558,7 @@ void do_designship( CHAR_DATA * ch , char * argument )
 	  send_to_char( "n, e, w, s, u, d - move robot that direction and create a new room if needed\r\n" , ch);
 	  send_to_char( "c - make current room cockpit,          b - make current room bridge\r\n" , ch);
 	  send_to_char( "p - make current room pilot chair,      2 - make current room copilot chair\r\n" , ch);
-	  send_to_char( "m - make current room engin room,       + - make current room medical bay\r\n" , ch);
+	  send_to_char( "m - make current room engine room,      + - make current room medical bay\r\n" , ch);
 	  send_to_char( "l - make current room crew lounge,      t - make current room turret\r\n" , ch);
 	  send_to_char( "h - make current room hanger,           v - make current room vehicle garage\r\n" , ch);
 	  send_to_char( "\r\n" , ch);

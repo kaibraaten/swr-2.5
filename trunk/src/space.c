@@ -19,7 +19,6 @@ MISSILE_DATA * last_missile = NULL;
 SPACE_DATA * first_starsystem = NULL;
 SPACE_DATA * last_starsystem = NULL;
 
-
 /* local routines */
 static void handle_ship_collision( void );
 static void fread_ship( SHIP_DATA *ship, FILE *fp );
@@ -31,17 +30,16 @@ void write_starsystem_list( void );
 static void resetship( SHIP_DATA *ship );
 static void landship( SHIP_DATA *ship, char *arg );
 static void launchship( SHIP_DATA *ship );
-static void echo_to_room_dnr( int ecolor, ROOM_INDEX_DATA *room, const char *argument );
-static ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship, EXIT_DATA  *exit , int fall );
+static void echo_to_room_dnr( int ecolor, ROOM_INDEX_DATA *room,
+			      const char *argument );
+static ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship,
+			  EXIT_DATA *exit, int fall );
 static bool autofly(SHIP_DATA *ship);
 
-/* from comm.c */
-bool write_to_descriptor( int desc, char *txt, int length );
-
 /* from act_info.c */
-bool is_online( const char * argument );
+bool is_online( const char *argument );
 
-void echo_to_room_dnr ( int ecolor , ROOM_INDEX_DATA *room , const char *argument ) 
+void echo_to_room_dnr(int ecolor, ROOM_INDEX_DATA *room, const char *argument) 
 {
   CHAR_DATA *vic = NULL;
     
@@ -472,8 +470,7 @@ static void ship_echo_proximity_alert( const SHIP_DATA *ship,
 				       const Vector3 *target_position )
 {
   char buf[MAX_STRING_LENGTH];
-  sprintf( buf, "Proximity alert: %s  %.0f %.0f %.0f",
-	   target_name,
+  sprintf( buf, "Proximity alert: %s  %.0f %.0f %.0f", target_name,
 	   target_position->x, target_position->y, target_position->z);
   echo_to_room( AT_RED , ship->pilotseat,  buf );
 }
@@ -654,7 +651,6 @@ static void ship_handle_autoflying_clanship( SHIP_DATA *ship, CLAN_DATA *clan )
 
       if ( targetok == 1 && target->target )
 	{
-	  char buf[MAX_STRING_LENGTH];
 	  ship->target = target->target;
 	  sprintf( buf , "You are being targetted by %s.",
 		   ship->name);
@@ -862,8 +858,8 @@ void update_space()
 
 void write_starsystem_list( )
 {
-  SPACE_DATA *tstarsystem;
-  FILE *fpout;
+  SPACE_DATA *tstarsystem = NULL;
+  FILE *fpout = NULL;
   char filename[256];
 
   sprintf( filename, "%s%s", SPACE_DIR, SPACE_LIST );
@@ -890,11 +886,13 @@ SPACE_DATA *starsystem_from_name( const char *name )
 {
   SPACE_DATA *starsystem = NULL;
     
-  for ( starsystem = first_starsystem; starsystem; starsystem = starsystem->next )
+  for( starsystem = first_starsystem; starsystem;
+       starsystem = starsystem->next )
     if ( !str_cmp( name, starsystem->name ) )
       return starsystem;
     
-  for ( starsystem = first_starsystem; starsystem; starsystem = starsystem->next )
+  for( starsystem = first_starsystem; starsystem;
+       starsystem = starsystem->next )
     if ( !str_prefix( name, starsystem->name ) )
       return starsystem;
     
@@ -1129,7 +1127,7 @@ bool load_starsystem( const char *starsystemfile )
 /*
  * Load in all the starsystem files.
  */
-void load_space( )
+void load_space()
 {
   FILE *fpList = NULL;
   char starsystemlist[256];
@@ -1281,7 +1279,7 @@ void do_setstarsystem( CHAR_DATA *ch, char *argument )
     return;
 }
 
-void showstarsystem( CHAR_DATA *ch , const SPACE_DATA *starsystem )
+static void showstarsystem( const CHAR_DATA *ch, const SPACE_DATA *starsystem )
 {   
   PLANET_DATA * planet;
     
@@ -1597,6 +1595,7 @@ SHIP_DATA *ship_from_entrance( const ROOM_INDEX_DATA * room )
 
     return NULL;
 }
+
 SHIP_DATA *ship_from_engine( const ROOM_INDEX_DATA * room )
 {
    SHIP_DATA *ship;
@@ -1630,8 +1629,6 @@ SHIP_DATA *ship_from_turret( const ROOM_INDEX_DATA * room )
    
     return NULL;
 }
-
-
 
 void save_ship( const SHIP_DATA *ship )
 {
@@ -2429,66 +2426,60 @@ void do_speeders( CHAR_DATA *ch, char *argument )
 
 void do_allspeeders( CHAR_DATA *ch, char *argument )
 {
-    SHIP_DATA *ship;
-    int count = 0;
+  SHIP_DATA *ship = NULL;
+  int count = 0;
 
-      count = 0;
-      send_to_char( "&Y\r\nThe following sea/land/air vehicles are currently formed:\r\n", ch );
-    
-      send_to_char( "\r\n&WVehicle                            Owner\r\n", ch );
-      for ( ship = first_ship; ship; ship = ship->next )
-      {   
-        if ( ship->ship_class <= SPACE_STATION ) 
-           continue; 
-      
-        if (ship->type == MOB_SHIP)
-           continue;
-        set_char_color( AT_BLUE, ch );
-        
-        
-        ch_printf( ch, "%-35s %-15s\r\n", ship->name, ship->owner );
+  send_to_char( "&Y\r\nThe following sea/land/air vehicles are currently formed:\r\n", ch );
+  send_to_char( "\r\n&WVehicle                            Owner\r\n", ch );
 
-        count++;
-      }
-    
-      if ( !count )
-      {
-        send_to_char( "There are none currently formed.\r\n", ch );
-	return;
-      }
-    
+  for ( ship = first_ship; ship; ship = ship->next )
+    {   
+      if ( ship->ship_class <= SPACE_STATION ) 
+	continue; 
+
+      if (ship->type == MOB_SHIP)
+	continue;
+
+      set_char_color( AT_BLUE, ch );
+      ch_printf( ch, "%-35s %-15s\r\n", ship->name, ship->owner );
+
+      count++;
+    }
+
+  if ( !count )
+    {
+      send_to_char( "There are none currently formed.\r\n", ch );
+      return;
+    }
 }
 
 void do_allships( CHAR_DATA *ch, char *argument )
 {
-    SHIP_DATA *ship;
-    int count = 0;
-
-      count = 0;
-      send_to_char( "&Y\r\nThe following ships are currently formed:\r\n", ch );
+  SHIP_DATA *ship;
+  int count = 0;
+  send_to_char( "&Y\r\nThe following ships are currently formed:\r\n", ch );
     
-      send_to_char( "\r\n&WShip                               Owner\r\n", ch );
+  send_to_char( "\r\n&WShip                               Owner\r\n", ch );
       
-      for ( ship = first_ship; ship; ship = ship->next )
-      {   
-        if ( ship->ship_class > SPACE_STATION ) 
-           continue; 
+  for ( ship = first_ship; ship; ship = ship->next )
+    {   
+      if ( ship->ship_class > SPACE_STATION ) 
+	continue; 
       
-        if (ship->type == MOB_SHIP)
-           continue;
-        set_char_color( AT_BLUE, ch );
+      if (ship->type == MOB_SHIP)
+	continue;
+      set_char_color( AT_BLUE, ch );
         
-        ch_printf( ch, "%-35s %-15s\r\n", ship->name, ship->owner );
+      ch_printf( ch, "%-35s %-15s\r\n", ship->name, ship->owner );
         
-        count++;
-      }
+      count++;
+    }
     
-      if ( !count )
-      {
-        send_to_char( "There are no ships currently formed.\r\n", ch );
-	return;
-      }
-    
+  if ( !count )
+    {
+      send_to_char( "There are no ships currently formed.\r\n", ch );
+      return;
+    }
 }
 
 void ship_to_starsystem( SHIP_DATA *ship , SPACE_DATA *starsystem )
@@ -2631,18 +2622,18 @@ bool extract_ship( SHIP_DATA *ship )
 void damage_ship_ch( SHIP_DATA *ship , int min , int max , CHAR_DATA *ch )
 {   
   int shield_dmg = 0;
-  int damage = number_range( min , max );
+  int damg = number_range( min , max );
 
   if ( ship->shield > 0 )
     {   
-      shield_dmg = UMIN( ship->shield , damage );
-      damage -= shield_dmg;
+      shield_dmg = UMIN( ship->shield , damg );
+      damg -= shield_dmg;
       ship->shield -= shield_dmg;
       if ( ship->shield == 0 )
 	echo_to_cockpit( AT_BLOOD , ship , "Shields down..." );    	  
     }
 
-  if ( damage > 0 )
+  if ( damg > 0 )
     {
       if ( number_range(1, 100) <= 5 && ship->shipstate != SHIP_DISABLED )
         {
@@ -2664,7 +2655,7 @@ void damage_ship_ch( SHIP_DATA *ship , int min , int max , CHAR_DATA *ch )
     
     }
     
-  ship->hull -= damage*5;
+  ship->hull -= damg*5;
 
   if ( ship->hull <= 0 )
     {
@@ -2680,18 +2671,18 @@ void damage_ship_ch( SHIP_DATA *ship , int min , int max , CHAR_DATA *ch )
 void damage_ship( SHIP_DATA *ship , int min , int max )
 {   
   int shield_dmg;
-  int damage = number_range( min , max );
+  int damg = number_range( min , max );
 
   if ( ship->shield > 0 )
     {   
-      shield_dmg = UMIN( ship->shield , damage );
-      damage -= shield_dmg;
+      shield_dmg = UMIN( ship->shield , damg );
+      damg -= shield_dmg;
       ship->shield -= shield_dmg;
       if ( ship->shield == 0 )
 	echo_to_cockpit( AT_BLOOD , ship , "Shields down..." );    	  
     }
     
-  if ( damage > 0 )
+  if ( damg > 0 )
     {
       if ( number_range(1, 100) <= 5 && ship->shipstate != SHIP_DISABLED )
         {
@@ -2706,7 +2697,7 @@ void damage_ship( SHIP_DATA *ship , int min , int max )
         }
     }
     
-  ship->hull -= damage*5;
+  ship->hull -= damg*5;
     
   if ( ship->hull <= 0 )
     {
@@ -3497,92 +3488,93 @@ void landship( SHIP_DATA *ship, char *argument )
 
 void do_accelerate( CHAR_DATA *ch, char *argument )
 {
-    int chance;
-    int change;
-    SHIP_DATA *ship;
-    char buf[MAX_STRING_LENGTH];
-    
-    	        if (  (ship = ship_from_pilotseat(ch->in_room))  == NULL )
-    	        {
-    	            send_to_char("&RYou must be at the controls of a ship to do that!\r\n",ch);
-    	            return;
-    	        }
-                
-                if ( ship->ship_class > SPACE_STATION )
-    	        {
-    	            send_to_char("&RThis isn't a spacecraft!\r\n",ch);
-    	            return;
-    	        }
-    	        
-                
-                if ( autofly(ship) )
-    	        {
-    	            send_to_char("&RYou'll have to turn off the ships autopilot first.\r\n",ch);
-    	            return;
-    	        }
-    	        
-                if  ( ship->ship_class == SPACE_STATION )
-                {
-                   send_to_char( "&RPlatforms can't move!\r\n" , ch );
-                   return;
-                }   
+  int chance = 0;
+  int change = 0;
+  SHIP_DATA *ship = NULL;
+  char buf[MAX_STRING_LENGTH];
 
-                if (ship->shipstate == SHIP_HYPERSPACE)
-                {
-                  send_to_char("&RYou can only do that in realspace!\r\n",ch);
-                  return;   
-                }
-                if (ship->shipstate == SHIP_DISABLED)
-    	        {
-    	            send_to_char("&RThe ships drive is disabled. Unable to accelerate.\r\n",ch);
-    	            return;
-    	        }
-    	        if (ship->shipstate == SHIP_DOCKED)
-    	        {
-    	            send_to_char("&RYou can't do that until after you've launched!\r\n",ch);
-    	            return;
-    	        }
-    	        if ( ship->energy < abs((atoi(argument)-abs(ship->currspeed))/10) )
-    	        {
-    	           send_to_char("&RTheres not enough fuel!\r\n",ch);
-    	           return;
-    	        }
-    	        
-                chance = character_skill_level( ch, gsn_spacecraft );
+  if (  (ship = ship_from_pilotseat(ch->in_room))  == NULL )
+    {
+      send_to_char("&RYou must be at the controls of a ship to do that!\r\n",
+		   ch);
+      return;
+    }
 
-                if ( number_percent( ) >= chance )
-    		{
-	           send_to_char("&RYou fail to work the controls properly.\r\n",ch);
-    	   	   return;	
-                }
-                
-    change = atoi(argument);
-                      
-    act( AT_PLAIN, "$n manipulates the ships controls.", ch,
-    NULL, argument , TO_ROOM );
-    
-    if ( change > ship->currspeed )
+  if ( ship->ship_class > SPACE_STATION )
     {
-       send_to_char( "&GAccelerating\r\n", ch);
-       echo_to_cockpit( AT_YELLOW , ship , "The ship begins to accelerate.");
-       sprintf( buf, "%s begins to speed up." , ship->name );
-       echo_to_system( AT_ORANGE , ship , buf , NULL );
+      send_to_char("&RThis isn't a spacecraft!\r\n",ch);
+      return;
     }
-    
-    if ( change < ship->currspeed )
+
+  if ( autofly(ship) )
     {
-       send_to_char( "&GDecelerating\r\n", ch);
-       echo_to_cockpit( AT_YELLOW , ship , "The ship begins to slow down.");
-       sprintf( buf, "%s begins to slow down." , ship->name );
-       echo_to_system( AT_ORANGE , ship , buf , NULL );
+      send_to_char("&RYou'll have to turn off the ships autopilot first.\r\n",
+		   ch);
+      return;
     }
-    		     
-    ship->energy -= abs((change-abs(ship->currspeed))/10);
-    
-    ship->currspeed = URANGE( 0 , change , ship->realspeed );         
-         
-    learn_from_success( ch, gsn_spacecraft );
-    	
+
+  if  ( ship->ship_class == SPACE_STATION )
+    {
+      send_to_char( "&RPlatforms can't move!\r\n" , ch );
+      return;
+    }   
+
+  if (ship->shipstate == SHIP_HYPERSPACE)
+    {
+      send_to_char("&RYou can only do that in realspace!\r\n",ch);
+      return;   
+    }
+
+  if (ship->shipstate == SHIP_DISABLED)
+    {
+      send_to_char("&RThe ships drive is disabled. Unable to accelerate.\r\n",
+		   ch);
+      return;
+    }
+
+  if (ship->shipstate == SHIP_DOCKED)
+    {
+      send_to_char("&RYou can't do that until after you've launched!\r\n",ch);
+      return;
+    }
+
+  if ( ship->energy < abs((atoi(argument)-abs(ship->currspeed))/10) )
+    {
+      send_to_char("&RTheres not enough fuel!\r\n",ch);
+      return;
+    }
+
+  chance = character_skill_level( ch, gsn_spacecraft );
+
+  if ( number_percent( ) >= chance )
+    {
+      send_to_char("&RYou fail to work the controls properly.\r\n",ch);
+      return;	
+    }
+
+  change = atoi(argument);
+  act( AT_PLAIN, "$n manipulates the ships controls.", ch,
+       NULL, argument , TO_ROOM );
+
+  if ( change > ship->currspeed )
+    {
+      send_to_char( "&GAccelerating\r\n", ch);
+      echo_to_cockpit( AT_YELLOW , ship , "The ship begins to accelerate.");
+      sprintf( buf, "%s begins to speed up." , ship->name );
+      echo_to_system( AT_ORANGE , ship , buf , NULL );
+    }
+
+  if ( change < ship->currspeed )
+    {
+      send_to_char( "&GDecelerating\r\n", ch);
+      echo_to_cockpit( AT_YELLOW , ship , "The ship begins to slow down.");
+      sprintf( buf, "%s begins to slow down." , ship->name );
+      echo_to_system( AT_ORANGE , ship , buf , NULL );
+    }
+
+  ship->energy -= abs((change-abs(ship->currspeed))/10);
+  ship->currspeed = URANGE( 0 , change , ship->realspeed );         
+  learn_from_success( ch, gsn_spacecraft );
 }
 
 void do_trajectory( CHAR_DATA *ch, char *argument )
@@ -4812,7 +4804,6 @@ void do_calculate(CHAR_DATA *ch, char *argument )
   int chance = 0, count = 0;
   SHIP_DATA *ship = NULL;
   PLANET_DATA *planet = NULL;
-  SPACE_DATA *starsystem = NULL;
     
   argument = one_argument( argument , arg1);
   argument = one_argument( argument , arg2);
@@ -4862,6 +4853,7 @@ void do_calculate(CHAR_DATA *ch, char *argument )
 
   if (argument[0] == '\0')
     {
+      SPACE_DATA * starsystem = NULL;
       send_to_char("&WFormat: Calculate <starsystem> <entry x> <entry y> <entry z>\r\n&wPossible destinations:\r\n",ch);
       for ( starsystem = first_starsystem; starsystem; starsystem = starsystem->next )
 	{
@@ -5420,28 +5412,27 @@ void do_drive( CHAR_DATA *ch, char *argument )
 
 }
 
-ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship, EXIT_DATA  *pexit , int fall )
+ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship, EXIT_DATA *pexit, int fall )
 {
-    ROOM_INDEX_DATA *in_room;
-    ROOM_INDEX_DATA *to_room;
-    ROOM_INDEX_DATA *from_room;
-    ROOM_INDEX_DATA *original;
-    char buf[MAX_STRING_LENGTH];
-    const char *txt;
-    const char *dtxt;
-    ch_ret retcode;
-    short door, distance;
-    bool drunk = FALSE;
-    CHAR_DATA * rch;
-    CHAR_DATA * next_rch;
-    
+  ROOM_INDEX_DATA *in_room = NULL;
+  ROOM_INDEX_DATA *to_room = NULL;
+  ROOM_INDEX_DATA *from_room = NULL;
+  ROOM_INDEX_DATA *original = NULL;
+  char buf[MAX_STRING_LENGTH];
+  const char *txt = NULL;
+  const char *dtxt = NULL;
+  ch_ret retcode = rNONE;
+  short door = 0, distance = 0;
+  bool drunk = FALSE;
+  CHAR_DATA * rch = NULL;
+  CHAR_DATA * next_rch = NULL;
 
-    if ( !IS_NPC( ch ) )
-      if ( IS_DRUNK( ch, 2 ) && ( ch->position != POS_SHOVE )
-	&& ( ch->position != POS_DRAG ) )
-	drunk = TRUE;
+  if ( !IS_NPC( ch ) )
+    if ( IS_DRUNK( ch, 2 ) && ( ch->position != POS_SHOVE )
+	 && ( ch->position != POS_DRAG ) )
+      drunk = TRUE;
 
-    if ( drunk && !fall )
+  if ( drunk && !fall )
     {
       door = number_door();
       pexit = get_exit( get_room_index(ship->location), door );
@@ -5455,249 +5446,238 @@ ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship, EXIT_DATA  *pexit , int fall 
     }
 #endif
 
-    retcode = rNONE;
-    txt = NULL;
-
     in_room = get_room_index(ship->location);
     from_room = in_room;
+
     if ( !pexit || (to_room = pexit->to_room) == NULL )
-    {
+      {
 	if ( drunk )
-	  send_to_char( "You drive into a wall in your drunken state.\r\n", ch );
-	 else
+	  send_to_char( "You drive into a wall in your drunken state.\r\n",
+			ch );
+	else
 	  send_to_char( "Alas, you cannot go that way.\r\n", ch );
 	return rNONE;
-    }
+      }
 
     door = pexit->vdir;
     distance = pexit->distance;
 
     if ( IS_SET( pexit->exit_info, EX_WINDOW )
-    &&  !IS_SET( pexit->exit_info, EX_ISDOOR ) )
-    {
+	 && !IS_SET( pexit->exit_info, EX_ISDOOR ) )
+      {
 	send_to_char( "Alas, you cannot go that way.\r\n", ch );
 	return rNONE;
-    }
+      }
 
     if (  IS_SET(pexit->exit_info, EX_PORTAL) 
-       && IS_NPC(ch) )
-    {
+	  && IS_NPC(ch) )
+      {
         act( AT_PLAIN, "Mobs can't use portals.", ch, NULL, NULL, TO_CHAR );
 	return rNONE;
-    }
+      }
 
     if ( IS_SET(pexit->exit_info, EX_NOMOB)
-	&& IS_NPC(ch) )
-    {
+	 && IS_NPC(ch) )
+      {
 	act( AT_PLAIN, "Mobs can't enter there.", ch, NULL, NULL, TO_CHAR );
 	return rNONE;
-    }
+      }
 
     if ( IS_SET(pexit->exit_info, EX_CLOSED)
-    && (IS_SET(pexit->exit_info, EX_NOPASSDOOR)) )
-    {
+	 && (IS_SET(pexit->exit_info, EX_NOPASSDOOR)) )
+      {
 	if ( !IS_SET( pexit->exit_info, EX_SECRET )
-	&&   !IS_SET( pexit->exit_info, EX_DIG ) )
-	{
-	  if ( drunk )
+	     &&   !IS_SET( pexit->exit_info, EX_DIG ) )
 	  {
-	    act( AT_PLAIN, "$n drives into the $d in $s drunken state.", ch,
-		NULL, pexit->keyword, TO_ROOM );
-	    act( AT_PLAIN, "You drive into the $d in your drunken state.", ch,
-		NULL, pexit->keyword, TO_CHAR ); 
+	    if ( drunk )
+	      {
+		act( AT_PLAIN, "$n drives into the $d in $s drunken state.",
+		     ch, NULL, pexit->keyword, TO_ROOM );
+		act( AT_PLAIN, "You drive into the $d in your drunken state.",
+		     ch, NULL, pexit->keyword, TO_CHAR ); 
+	      }
+	    else
+	      act( AT_PLAIN, "The $d is closed.", ch, NULL,
+		   pexit->keyword, TO_CHAR );
 	  }
-	 else
-	  act( AT_PLAIN, "The $d is closed.", ch, NULL, pexit->keyword, TO_CHAR );
-	}
-       else
-	{
-	  if ( drunk )
-	    send_to_char( "You hit a wall in your drunken state.\r\n", ch );
-	   else
-	    send_to_char( "Alas, you cannot go that way.\r\n", ch );
-	}
+	else
+	  {
+	    if ( drunk )
+	      send_to_char( "You hit a wall in your drunken state.\r\n", ch );
+	    else
+	      send_to_char( "Alas, you cannot go that way.\r\n", ch );
+	  }
 
 	return rNONE;
-    }
+      }
 
     if ( room_is_private( ch, to_room ) )
-    {
+      {
 	send_to_char( "That room is private right now.\r\n", ch );
 	return rNONE;
-    }
+      }
 
     if ( !fall )
-    {
+      {
         if ( IS_SET( to_room->room_flags, ROOM_INDOORS ) 
-        || IS_SET( to_room->room_flags, ROOM_SPACECRAFT )  
-        || to_room->sector_type == SECT_INSIDE ) 
-	{
-		send_to_char( "You can't drive indoors!\r\n", ch );
-		return rNONE;
-	}
+	     || IS_SET( to_room->room_flags, ROOM_SPACECRAFT )  
+	     || to_room->sector_type == SECT_INSIDE ) 
+	  {
+	    send_to_char( "You can't drive indoors!\r\n", ch );
+	    return rNONE;
+	  }
         
 	if ( in_room->sector_type == SECT_AIR
-	||   to_room->sector_type == SECT_AIR
-	||   IS_SET( pexit->exit_info, EX_FLY ) )
-	{
+	     ||   to_room->sector_type == SECT_AIR
+	     ||   IS_SET( pexit->exit_info, EX_FLY ) )
+	  {
             if ( ship->ship_class > AIRCRAFT )
-	    {
+	      {
 		send_to_char( "You'd need to fly to go there.\r\n", ch );
 		return rNONE;
-	    }
-	}
+	      }
+	  }
 
 	if ( in_room->sector_type == SECT_WATER_NOSWIM
-	||   to_room->sector_type == SECT_WATER_NOSWIM 
-	||   to_room->sector_type == SECT_WATER_SWIM 
-	||   to_room->sector_type == SECT_UNDERWATER
-	||   to_room->sector_type == SECT_OCEANFLOOR )
-	{
-
+	     ||   to_room->sector_type == SECT_WATER_NOSWIM 
+	     ||   to_room->sector_type == SECT_WATER_SWIM 
+	     ||   to_room->sector_type == SECT_UNDERWATER
+	     ||   to_room->sector_type == SECT_OCEANFLOOR )
+	  {
 	    if ( ship->ship_class != BOAT && ship->ship_class != SUBMARINE )
-	    {
+	      {
 		send_to_char( "You'd need a boat to go there.\r\n", ch );
 		return rNONE;
-	    }
-	    	    
-	}
+	      }
+	  }
 
 	if ( to_room->sector_type == SECT_UNDERWATER
-	||   to_room->sector_type == SECT_OCEANFLOOR )
-	{
-
+	     ||   to_room->sector_type == SECT_OCEANFLOOR )
+	  {
 	    if ( ship->ship_class != SUBMARINE )
-	    {
+	      {
 		send_to_char( "You'd need a submarine to go there.\r\n", ch );
 		return rNONE;
-	    }
-	    	    
-	}
+	      }
+	  }
 
 	if ( IS_SET( pexit->exit_info, EX_CLIMB ) )
-	{
-
+	  {
 	    if ( ship->ship_class > AIRCRAFT )
-	    {
-		send_to_char( "You need to fly or climb to get up there.\r\n", ch );
+	      {
+		send_to_char( "You need to fly or climb to get up there.\r\n",
+			      ch );
 		return rNONE;
-	    }
-	}
-
-    }
-
-    if ( to_room->tunnel > 0 )
-    {
-	CHAR_DATA *ctmp;
-	int count = 0;
-	
-	for ( ctmp = to_room->first_person; ctmp; ctmp = ctmp->next_in_room )
-	  if ( ++count >= to_room->tunnel )
-	  {
-		  send_to_char( "There is no room for you in there.\r\n", ch );
-		return rNONE;
-	  }
-    }
-
-      if ( fall )
-        txt = "falls";
-      else
-      if ( !txt )
-      {
-	  if (  ship->ship_class < BOAT )
-	      txt = "fly";
-	  else
-	  if ( ship->ship_class <= SUBMARINE  )
-	  {
-	      txt = "float";
-	  }
-	  else
-	  if ( ship->ship_class > SUBMARINE  )
-	  {
-	      txt = "drive";
+	      }
 	  }
       }
-      sprintf( buf, "$n %ss the vehicle $T.", txt );
-      act( AT_ACTION, buf, ch, NULL, dir_name[door], TO_ROOM );
-      sprintf( buf, "You %s the vehicle $T.", txt );
-      act( AT_ACTION, buf, ch, NULL, dir_name[door], TO_CHAR );
-      sprintf( buf, "%s %ss %s.", ship->name, txt, dir_name[door] );
-      echo_to_room( AT_ACTION , get_room_index(ship->location) , buf );
 
-      extract_ship( ship );
-      ship_to_room(ship, to_room->vnum );
-      
-      ship->location = to_room->vnum;
-      ship->lastdoc = ship->location;
-    
-      if ( fall )
-        txt = "falls";
-      else
-	  if (  ship->ship_class < BOAT )
-	      txt = "flys in";
-	  else
-	  if ( ship->ship_class < LAND_VEHICLE  )
+    if ( to_room->tunnel > 0 )
+      {
+	CHAR_DATA *ctmp;
+	int count = 0;
+
+	for ( ctmp = to_room->first_person; ctmp; ctmp = ctmp->next_in_room )
+	  if ( ++count >= to_room->tunnel )
+	    {
+	      send_to_char( "There is no room for you in there.\r\n", ch );
+	      return rNONE;
+	    }
+      }
+
+    if ( fall )
+      txt = "falls";
+    else if ( !txt )
+      {
+	if (  ship->ship_class < BOAT )
+	  txt = "fly";
+	else if ( ship->ship_class <= SUBMARINE  )
 	  {
-	      txt = "floats in";
+	    txt = "float";
 	  }
-	  else
-	  if ( ship->ship_class == LAND_VEHICLE  )
+	else if ( ship->ship_class > SUBMARINE  )
 	  {
-	      txt = "drives in";
+	    txt = "drive";
 	  }
+      }
 
-      switch( door )
-	{
-	default:
-	  dtxt = "somewhere";
-	  break;
+    sprintf( buf, "$n %ss the vehicle $T.", txt );
+    act( AT_ACTION, buf, ch, NULL, dir_name[door], TO_ROOM );
+    sprintf( buf, "You %s the vehicle $T.", txt );
+    act( AT_ACTION, buf, ch, NULL, dir_name[door], TO_CHAR );
+    sprintf( buf, "%s %ss %s.", ship->name, txt, dir_name[door] );
+    echo_to_room( AT_ACTION , get_room_index(ship->location) , buf );
 
-	case 0:
-	  dtxt = "the south";
-	  break;
+    extract_ship( ship );
+    ship_to_room(ship, to_room->vnum );
+    ship->location = to_room->vnum;
+    ship->lastdoc = ship->location;
 
-	case 1:
-	  dtxt = "the west";
-	  break;
+    if ( fall )
+      txt = "falls";
+    else if (  ship->ship_class < BOAT )
+      txt = "flys in";
+    else if ( ship->ship_class < LAND_VEHICLE  )
+      {
+	txt = "floats in";
+      }
+    else if ( ship->ship_class == LAND_VEHICLE  )
+      {
+	txt = "drives in";
+      }
 
-	case 2:
-	  dtxt = "the north";
-	  break;
+    switch( door )
+      {
+      default:
+	dtxt = "somewhere";
+	break;
 
-	case 3:
-	  dtxt = "the east";
-	  break;
+      case 0:
+	dtxt = "the south";
+	break;
 
-	case 4:
-	  dtxt = "below";
-	  break;
+      case 1:
+	dtxt = "the west";
+	break;
 
-	case 5:
-	  dtxt = "above";
-	  break;
+      case 2:
+	dtxt = "the north";
+	break;
 
-	case 6:
-	  dtxt = "the south-west";
-	  break;
+      case 3:
+	dtxt = "the east";
+	break;
 
-	case 7:
-	  dtxt = "the south-east";
-	  break;
+      case 4:
+	dtxt = "below";
+	break;
 
-	case 8:
-	  dtxt = "the north-west";
-	  break;
+      case 5:
+	dtxt = "above";
+	break;
 
-	case 9:
-	  dtxt = "the north-east";
-	  break;
-	}
+      case 6:
+	dtxt = "the south-west";
+	break;
+
+      case 7:
+	dtxt = "the south-east";
+	break;
+
+      case 8:
+	dtxt = "the north-west";
+	break;
+
+      case 9:
+	dtxt = "the north-east";
+	break;
+      }
 
     sprintf( buf, "%s %s from %s.", ship->name, txt, dtxt );
     echo_to_room( AT_ACTION , get_room_index(ship->location) , buf );
-    
+
     for ( rch = ch->in_room->last_person ; rch ; rch = next_rch )
-    { 
+      {
         next_rch = rch->prev_in_room;
         original = rch->in_room;
         char_from_room( rch );
@@ -5705,7 +5685,7 @@ ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship, EXIT_DATA  *pexit , int fall 
         do_look( rch, const_char_to_nonconst("auto") );
         char_from_room( rch );
         char_to_room( rch, original );
-    }
+      }
 
     return retcode;
 }
@@ -5777,18 +5757,7 @@ void do_chaff( CHAR_DATA *ch, char *argument )
 
 bool autofly( SHIP_DATA *ship )
 {
- 
-     if (!ship)
-        return FALSE;
-     
-     if ( ship->type == MOB_SHIP )
-        return TRUE;
-     
-     if ( ship->autopilot )
-        return TRUE;
-     
-     return FALSE;   
-        
+  return ship->type == MOB_SHIP || ship->autopilot;
 }
 
 void do_rentship( CHAR_DATA *ch, char *argument )

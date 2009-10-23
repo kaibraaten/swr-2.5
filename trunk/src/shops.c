@@ -8,13 +8,10 @@
  * Local functions
  */
 
-#define	CD	CHAR_DATA
-CD *	find_keeper	args( ( CHAR_DATA *ch ) );
-CD *	find_fixer	args( ( CHAR_DATA *ch ) );
-int	get_cost	args( ( CHAR_DATA *ch, CHAR_DATA *keeper,
-				OBJ_DATA *obj, bool fBuy ) );
-int 	get_repaircost  args( ( CHAR_DATA *keeper, OBJ_DATA *obj ) );
-#undef CD
+CHAR_DATA *find_keeper( CHAR_DATA *ch );
+CHAR_DATA *find_fixer( CHAR_DATA *ch );
+int get_cost( CHAR_DATA *ch, CHAR_DATA *keeper,	OBJ_DATA *obj, bool fBuy );
+int get_repaircost( CHAR_DATA *keeper, OBJ_DATA *obj );
 
 /*
  * Shopping commands.
@@ -96,8 +93,6 @@ CHAR_DATA *find_fixer( CHAR_DATA *ch )
     
     return keeper;
 }
-
-
 
 int get_cost( CHAR_DATA *ch, CHAR_DATA *keeper, OBJ_DATA *obj, bool fBuy )
 {
@@ -214,8 +209,6 @@ int get_repaircost( CHAR_DATA *keeper, OBJ_DATA *obj )
 
     return cost;
 }
-
-
 
 void do_buy( CHAR_DATA *ch, char *argument )
 {
@@ -514,8 +507,6 @@ void do_sell( CHAR_DATA *ch, char *argument )
     return;
 }
 
-
-
 void do_value( CHAR_DATA *ch, char *argument )
 {
     char buf[MAX_STRING_LENGTH];
@@ -563,7 +554,7 @@ void do_value( CHAR_DATA *ch, char *argument )
  * Repair a single object. Used when handling "repair all" - Gorog
  */
 void repair_one_obj( CHAR_DATA *ch, CHAR_DATA *keeper, OBJ_DATA *obj,
-                 char *arg, int maxgold, char *fixstr, char*fixstr2 )
+		     char *arg, int maxgold, char *fixstr, char*fixstr2 )
 {
    char buf[MAX_STRING_LENGTH];
    int cost;

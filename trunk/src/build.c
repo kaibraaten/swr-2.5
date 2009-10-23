@@ -3546,7 +3546,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
      */
     if ( !str_cmp( arg, "bexit" ) )
     {
-	EXIT_DATA *xit, *rxit;
+	EXIT_DATA *one_exit, *rxit;
 	char tmpcmd[MAX_INPUT_LENGTH];
 	ROOM_INDEX_DATA *tmploc;
 	long vnum;
@@ -3580,37 +3580,37 @@ void do_redit( CHAR_DATA *ch, char *argument )
 	exnum = edir;
 	if ( numnotdir )
 	{
-	    if ( (xit = get_exit_num(tmploc, edir)) != NULL )
-	      edir = xit->vdir;
+	    if ( (one_exit = get_exit_num(tmploc, edir)) != NULL )
+	      edir = one_exit->vdir;
 	}
 	else
-	    xit = get_exit(tmploc, edir);
+	    one_exit = get_exit(tmploc, edir);
 	rxit = NULL;
 	vnum = 0;
 	rvnum[0] = '\0';
-	if ( xit )
+	if ( one_exit )
 	{
-	    vnum = xit->vnum;
+	    vnum = one_exit->vnum;
 	    if ( arg3[0] != '\0' )
 	      sprintf( rvnum, "%ld", tmploc->vnum );
-	    if ( xit->to_room )
-	      rxit = get_exit(xit->to_room, rev_dir[edir]);
+	    if ( one_exit->to_room )
+	      rxit = get_exit(one_exit->to_room, rev_dir[edir]);
 	    else
 	      rxit = NULL;
 	}
 	sprintf( tmpcmd, "exit %s %s %s", arg2, arg3, argument );
 	do_redit( ch, tmpcmd );
 	if ( numnotdir )
-	  xit = get_exit_num(tmploc, exnum);
+	  one_exit = get_exit_num(tmploc, exnum);
 	else
-	  xit = get_exit(tmploc, edir);
-	if ( !rxit && xit )
+	  one_exit = get_exit(tmploc, edir);
+	if ( !rxit && one_exit )
 	{
-	    vnum = xit->vnum;
+	    vnum = one_exit->vnum;
 	    if ( arg3[0] != '\0' )
 	      sprintf( rvnum, "%ld", tmploc->vnum );
-	    if ( xit->to_room )
-	      rxit = get_exit(xit->to_room, rev_dir[edir]);
+	    if ( one_exit->to_room )
+	      rxit = get_exit(one_exit->to_room, rev_dir[edir]);
 	    else
 	      rxit = NULL;
 	}
@@ -3825,7 +3825,7 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
     EDITOR_DATA *edit;
     char cmd[MAX_INPUT_LENGTH];
     char buf[MAX_INPUT_LENGTH+1];
-    short x, line;
+    short line;
     bool save;
 
     if ( (d = ch->desc) == NULL )
@@ -4004,6 +4004,8 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
 		  send_to_char( "Out of range.\r\n> ", ch );
 		else
 		{
+		  int x = 0;
+
 		  for ( x = ++edit->numlines; x > line; x-- )
 			strcpy( edit->line[x], edit->line[x-1] );
 		  strcpy( edit->line[line], "" );
@@ -4014,33 +4016,38 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
 	}
 	if ( !str_cmp( cmd+1, "d" ) )
 	{
-	    if ( edit->numlines == 0 )
-		send_to_char( "Buffer is empty.\r\n> ", ch );
-	    else
+	  if ( edit->numlines == 0 )
+	    send_to_char( "Buffer is empty.\r\n> ", ch );
+	  else
 	    {
-		if ( argument[2] == ' ' )
-		  line = atoi( argument + 2 ) - 1;
-		else
-		  line = edit->on_line;
-		if ( line < 0 )
-		  line = edit->on_line;
-		if ( line < 0 || line > edit->numlines )
-		  send_to_char( "Out of range.\r\n> ", ch );
-		else
+	      if ( argument[2] == ' ' )
+		line = atoi( argument + 2 ) - 1;
+	      else
+		line = edit->on_line;
+
+	      if ( line < 0 )
+		line = edit->on_line;
+	      if ( line < 0 || line > edit->numlines )
+		send_to_char( "Out of range.\r\n> ", ch );
+	      else
 		{
+		  int x = 0;
 		  if ( line == 0 && edit->numlines == 1 )
-		  {
-			memset( edit, '\0', sizeof(EDITOR_DATA) );
-			edit->numlines = 0;
-			edit->on_line   = 0;
-			send_to_char( "Line deleted.\r\n> ", ch );
-			return;
-		  }
+		    {
+		      memset( edit, '\0', sizeof(EDITOR_DATA) );
+		      edit->numlines = 0;
+		      edit->on_line   = 0;
+		      send_to_char( "Line deleted.\r\n> ", ch );
+		      return;
+		    }
+
 		  for ( x = line; x < (edit->numlines - 1); x++ )
-			strcpy( edit->line[x], edit->line[x+1] );
+		    strcpy( edit->line[x], edit->line[x+1] );
 		  strcpy( edit->line[edit->numlines--], "" );
+
 		  if ( edit->on_line > edit->numlines )
 		    edit->on_line = edit->numlines;
+
 		  send_to_char( "Line deleted.\r\n> ", ch );
 		}
  	    }
@@ -4077,6 +4084,7 @@ void edit_buffer( CHAR_DATA *ch, char *argument )
 	      send_to_char( "Buffer is empty.\r\n> ", ch );
 	    else
 	    {
+	      int x = 0;
 	      send_to_char( "------------------\r\n", ch );
 	      for ( x = 0; x < edit->numlines; x++ )
 		 ch_printf( ch, "%2d> %s\r\n", x+1, edit->line[x] );

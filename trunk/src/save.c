@@ -14,14 +14,13 @@
 /*
  * Increment with every major format change.
  */
-#define SAVEVERSION	3
-
+#define SAVEVERSION 3
 
 /*
  * Array to keep track of equipment temporarily.		-Thoric
  */
 OBJ_DATA *save_equipment[MAX_WEAR][8];
-CHAR_DATA *quitting_char, *loading_char, *saving_char;
+CHAR_DATA *quitting_char = NULL, *loading_char = NULL, *saving_char = NULL;
 
 int file_ver = 0;
 extern FILE *fpArea;
@@ -45,9 +44,8 @@ void save_home( const CHAR_DATA *ch )
 {
   if ( ch->plr_home )
     {
-      FILE *fp;
+      FILE *fp = NULL;
       char filename[256];
-      OBJ_DATA *contents;
 
       sprintf( filename, "%s%c/%s.home", PLAYER_DIR, tolower((int)ch->name[0]),
 	       capitalize( ch->name ) );
@@ -57,7 +55,7 @@ void save_home( const CHAR_DATA *ch )
     	}
       else
     	{
-	  contents = ch->plr_home->last_content;
+	  OBJ_DATA *contents = ch->plr_home->last_content;
 
 	  if (contents)
 	    fwrite_obj(ch, contents, fp, 0, OS_CARRY );
@@ -146,32 +144,33 @@ void load_home( CHAR_DATA *ch )
  */
 void de_equip_char( CHAR_DATA *ch )
 {
-    char buf[MAX_STRING_LENGTH];
-    OBJ_DATA *obj;
-    int x,y;
+  char buf[MAX_STRING_LENGTH];
+  OBJ_DATA *obj = NULL;
+  int x = 0, y = 0;
 
-    for ( x = 0; x < MAX_WEAR; x++ )
-	for ( y = 0; y < MAX_LAYERS; y++ )
-	    save_equipment[x][y] = NULL;
-    for ( obj = ch->first_carrying; obj; obj = obj->next_content )
-	if ( obj->wear_loc > -1 && obj->wear_loc < MAX_WEAR )
-	{
-	    
-		for ( x = 0; x < MAX_LAYERS; x++ )
-		   if ( !save_equipment[obj->wear_loc][x] )
-		   {
-			save_equipment[obj->wear_loc][x] = obj;
-			break;
-		   }
-		if ( x == MAX_LAYERS )
-		{
-		    sprintf( buf, "%s had on more than %d layers of clothing in one location (%d): %s",
-			ch->name, MAX_LAYERS, obj->wear_loc, obj->name );
-		    bug( buf, 0 );
-		}
-	    
-	    unequip_char(ch, obj);
-	}
+  for ( x = 0; x < MAX_WEAR; x++ )
+    for ( y = 0; y < MAX_LAYERS; y++ )
+      save_equipment[x][y] = NULL;
+
+  for ( obj = ch->first_carrying; obj; obj = obj->next_content )
+    if ( obj->wear_loc > -1 && obj->wear_loc < MAX_WEAR )
+      {
+	for ( x = 0; x < MAX_LAYERS; x++ )
+	  if ( !save_equipment[obj->wear_loc][x] )
+	    {
+	      save_equipment[obj->wear_loc][x] = obj;
+	      break;
+	    }
+
+	if ( x == MAX_LAYERS )
+	  {
+	    sprintf( buf, "%s had on more than %d layers of clothing in one location (%d): %s",
+		     ch->name, MAX_LAYERS, obj->wear_loc, obj->name );
+	    bug( buf, 0 );
+	  }
+
+	unequip_char(ch, obj);
+      }
 }
 
 /*
@@ -179,18 +178,18 @@ void de_equip_char( CHAR_DATA *ch )
  */
 void re_equip_char( CHAR_DATA *ch )
 {
-    int x,y;
+  int x,y;
 
-    for ( x = 0; x < MAX_WEAR; x++ )
-	for ( y = 0; y < MAX_LAYERS; y++ )
-	   if ( save_equipment[x][y] != NULL )
-	   {
-		if ( quitting_char != ch )
-		   equip_char(ch, save_equipment[x][y], x);
-		save_equipment[x][y] = NULL;
-	   }
-	   else
-		break;
+  for ( x = 0; x < MAX_WEAR; x++ )
+    for ( y = 0; y < MAX_LAYERS; y++ )
+      if ( save_equipment[x][y] != NULL )
+	{
+	  if ( quitting_char != ch )
+	    equip_char(ch, save_equipment[x][y], x);
+	  save_equipment[x][y] = NULL;
+	}
+      else
+	break;
 }
 
 
@@ -313,8 +312,6 @@ void save_clone( CHAR_DATA *ch )
     saving_char   = NULL;
     return;
 }
-
-
 
 /*
  * Write the char.
@@ -925,7 +922,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
     short killcnt = 0;
     bool fMatch = FALSE;
     time_t lastplayed = 0;
-    int sn = 0, extra = 0;
+    int extra = 0;
          
     file_ver = 0;
 
@@ -1305,6 +1302,7 @@ void fread_char( CHAR_DATA *ch, FILE *fp, bool preload )
 		  word = "End";
 		else
 		{
+		  int sn = 0;
 		  value = fread_number( fp );
 		  if ( file_ver < 3 )
 		    sn = skill_lookup( fread_word( fp ) );
@@ -1820,7 +1818,7 @@ void do_last( CHAR_DATA *ch, char *argument )
 
 void write_corpses( const CHAR_DATA *ch, const char *name )
 {
-  OBJ_DATA *corpse;
+  OBJ_DATA *corpse = NULL;
   FILE *fp = NULL;
   
   /* Name and ch support so that we dont have to have a char to save their

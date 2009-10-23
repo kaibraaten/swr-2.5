@@ -960,9 +960,7 @@ void do_eat( CHAR_DATA *ch, char *argument )
 
 	if ( !IS_NPC(ch) )
 	{
-	    int condition;
-
-	    condition = ch->pcdata->condition[COND_FULL];
+	    int condition = ch->pcdata->condition[COND_FULL];
 	    gain_condition( ch, COND_FULL, (obj->value[0] * foodcond) / 10 );
 	    if ( condition <= 1 && ch->pcdata->condition[COND_FULL] > 1 )
 		send_to_char( "You are no longer hungry.\r\n", ch );
@@ -1423,8 +1421,6 @@ void do_bank( CHAR_DATA *ch, char *argument )
       do_bank( ch , const_char_to_nonconst("") );
       return;
     }
-    
-        
 }
 
 void do_dig( CHAR_DATA *ch, char *argument )

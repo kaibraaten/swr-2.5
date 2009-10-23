@@ -204,7 +204,7 @@ int main( int argc, char **argv )
 }
 
 
-SOCKET init_socket( int port )
+SOCKET init_socket( int listen_port )
 {
   struct sockaddr_in	 sa;
 #ifdef WIN32
@@ -248,7 +248,7 @@ SOCKET init_socket( int port )
 
   memset(&sa, '\0', sizeof(sa));
   sa.sin_family   = AF_INET; /* hp->h_addrtype; */
-  sa.sin_port	    = htons( port );
+  sa.sin_port	    = htons( listen_port );
 
   if ( bind( fd, (struct sockaddr *) &sa, sizeof(sa) ) == SOCKET_ERROR )
     {
@@ -1707,7 +1707,7 @@ void display_prompt( DESCRIPTOR_DATA *d )
   const char *prompt = NULL;
   char buf[MAX_STRING_LENGTH];
   char *pbuf = buf;
-  unsigned int stat = 0;
+  unsigned int p_stat = 0;
 
   if ( !ch )
   {
@@ -1760,15 +1760,15 @@ void display_prompt( DESCRIPTOR_DATA *d )
       break;
     case '&':
     case '^':
-      stat = make_color_sequence(&prompt[-1], pbuf, d);
-      if ( stat < 0 )
+      p_stat = make_color_sequence(&prompt[-1], pbuf, d);
+      if ( p_stat < 0 )
         --prompt;
-      else if ( stat > 0 )
-        pbuf += stat;
+      else if ( p_stat > 0 )
+        pbuf += p_stat;
       break;
     case '%':
       *pbuf = '\0';
-      stat = 0x80000000;
+      p_stat = 0x80000000;
       switch(*prompt)
       {
       case '%':
@@ -1805,10 +1805,10 @@ void display_prompt( DESCRIPTOR_DATA *d )
 	  strcpy(pbuf, "dead");
 	break;
       case 'u':
-	stat = num_descriptors;
+	p_stat = num_descriptors;
 	break;
       case 'U':
-	stat = sysdata.maxplayers;
+	p_stat = sysdata.maxplayers;
 	break;
       case 'v':
       case 'V':
@@ -1824,11 +1824,11 @@ void display_prompt( DESCRIPTOR_DATA *d )
 	  strcpy(pbuf, "too tired to move");
 	break;
       case 'g':
-	stat = ch->gold;
+	p_stat = ch->gold;
 	break;
       case 'r':
 	if ( IS_IMMORTAL(och) )
-	  stat = ch->in_room->vnum;
+	  p_stat = ch->in_room->vnum;
 	break;
       case 'R':
 	if ( IS_SET(och->act, PLR_ROOMVNUM) )
@@ -1843,12 +1843,12 @@ void display_prompt( DESCRIPTOR_DATA *d )
 	  sprintf(pbuf, "(Invis) " );
 	break;
       case 'I':
-	stat = (IS_NPC(ch) ? (IS_SET(ch->act, ACT_MOBINVIS) ? ch->mobinvis : 0)
+	p_stat = (IS_NPC(ch) ? (IS_SET(ch->act, ACT_MOBINVIS) ? ch->mobinvis : 0)
 	     : (IS_SET(ch->act, PLR_WIZINVIS) ? ch->pcdata->wizinvis : 0));
 	break;
       }
-      if ( stat != 0x80000000 )
-	sprintf(pbuf, "%d", stat);
+      if ( p_stat != 0x80000000 )
+	sprintf(pbuf, "%d", p_stat);
       pbuf += strlen(pbuf);
       break;
     }
