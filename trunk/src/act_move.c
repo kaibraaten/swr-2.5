@@ -523,27 +523,7 @@ ch_ret move_char( CHAR_DATA *ch, EXIT_DATA *pexit, int fall )
 
     if ( !fall && !IS_NPC(ch) )
     {
-	/*int iClass;*/
 	int move;
-/* Pretty sure we don't need to check for guilds anymore now that we have
-   the new dh. -- Narn
-*/
-/*
-	for ( iClass = 0; iClass < MAX_CLASS; iClass++ )
-	{
-	    if ( iClass != ch->class
-	    &&   to_room->vnum == class_table[iClass]->guild )
-	    {
-		send_to_char( "You aren't allowed in there.\r\n", ch );
-		return rNONE;
-	    }
-	}
-*/
-
-/* Prevent deadlies from entering a nopkill-flagged area from a 
-   non-flagged area, but allow them to move around if already
-   inside a nopkill area. - Blodkai
-*/
 
 	if ( in_room->sector_type == SECT_AIR
 	||   to_room->sector_type == SECT_AIR
