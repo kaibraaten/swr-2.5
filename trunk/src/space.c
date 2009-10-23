@@ -53,6 +53,247 @@ void echo_to_room_dnr(int ecolor, ROOM_INDEX_DATA *room, const char *argument)
     }
 }
 
+bool laserfire_hits( SHIP_DATA *ship, SHIP_DATA *target, int chance )
+{
+  char buf[MAX_STRING_LENGTH];
+
+  if ( number_percent() > chance )
+    {
+      sprintf( buf , "Lasers fire from %s at you but miss." , ship->name);
+      echo_to_cockpit( AT_ORANGE , target , buf );
+      sprintf( buf , "The ship's lasers fire at %s but miss." ,
+	       target->name);
+      echo_to_cockpit( AT_ORANGE , ship , buf );
+      sprintf( buf, "Laserfire from %s barely misses %s." ,
+	       ship->name , target->name );
+      echo_to_system( AT_ORANGE , ship , buf , target );
+      return FALSE;
+    }
+
+  sprintf( buf, "Laserfire from %s hits %s." , ship->name, target->name );
+  echo_to_system( AT_ORANGE , ship , buf , target );
+  sprintf( buf , "You are hit by lasers from %s!" , ship->name);
+  echo_to_cockpit( AT_BLOOD , target , buf );
+  sprintf( buf , "Your ship's lasers hit %s!." , target->name);
+  echo_to_cockpit( AT_YELLOW , ship , buf );
+  echo_to_ship( AT_RED, target,
+		"A small explosion vibrates through the ship." );
+
+  return TRUE;
+}
+
+
+bool missile_launcher_can_be_fired( const CHAR_DATA *ch,
+				    const SHIP_DATA *ship )
+{
+  if (ship->missilestate == MISSILE_DAMAGED)
+    {
+      send_to_char("&RThe ships missile launchers are dammaged.\r\n",ch);
+      return FALSE;
+    }
+
+  if (ship->missiles <= 0)
+    {
+      send_to_char("&RYou have no missiles to fire!\r\n",ch);
+      return FALSE;
+    }
+
+  if (ship->missilestate != MISSILE_READY )
+    {
+      send_to_char("&RThe missiles are still reloading.\r\n",ch);
+      return FALSE;
+    }
+
+  if (ship->target == NULL )
+    {
+      send_to_char("&RYou need to choose a target first.\r\n",ch);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+bool laser_can_be_fired( const CHAR_DATA *ch, const SHIP_DATA *ship )
+{
+  if (ship->laserstate == LASER_DAMAGED)
+    {
+      send_to_char("&RThe ships main laser is damaged.\r\n",ch);
+      return FALSE;
+    }
+
+  if (ship->laserstate >= ship->lasers )
+    {
+      send_to_char("&RThe lasers are still recharging.\r\n",ch);
+      return FALSE;
+    }
+
+  if (ship->target == NULL )
+    {
+      send_to_char("&RYou need to choose a target first.\r\n",ch);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+bool turret_can_be_fired( const CHAR_DATA *ch, const TURRET_DATA *turret )
+{
+  if (turret->laserstate == LASER_DAMAGED)
+    {
+      send_to_char("&RThe turret is damaged.\r\n",ch);
+      return FALSE;
+    }
+
+  if (turret->laserstate > 1 )
+    {
+      send_to_char("&RThe lasers are still recharging.\r\n",ch);
+      return FALSE;
+    }
+
+  if (turret->target == NULL )
+    {
+      send_to_char("&RYou need to choose a target first.\r\n",ch);
+      return FALSE;
+    }
+
+  return TRUE;
+}
+
+void ship_acquire_target( SHIP_DATA *ship, SHIP_DATA *target )
+{
+  char buf[MAX_STRING_LENGTH];
+  ship->target = target;
+  sprintf( buf , "You are being targetted by %s.",
+           ship->name);
+  echo_to_cockpit( AT_BLOOD , target , buf );
+}
+
+int laser_hit_modifier( const SHIP_DATA *ship, const SHIP_DATA *target )
+{
+  int chance = 0;
+  chance += target->model*5;
+  chance -= target->manuever/10;
+  chance -= target->currspeed/20;
+  chance -= ( abs((int)(target->pos.x - ship->pos.x))/70 );
+  chance -= ( abs((int)(target->pos.y - ship->pos.y))/70 );
+  chance -= ( abs((int)(target->pos.z - ship->pos.z))/70 );
+  chance = URANGE( 10 , chance , 90 );
+
+  return chance;
+}
+
+int missile_hit_modifier( const SHIP_DATA *ship,
+				 const SHIP_DATA *target )
+{
+  int chance = 0;
+  chance -= target->manuever/5;
+  chance -= target->currspeed/20;
+  chance += target->model*target->model*2;
+  chance -= ( abs((int)(target->pos.x - ship->pos.x))/100 );
+  chance -= ( abs((int)(target->pos.y - ship->pos.y))/100 );
+  chance -= ( abs((int)(target->pos.z - ship->pos.z))/100 );
+  chance += ( 30 );
+  chance = URANGE( 20 , chance , 80 );
+
+  return chance;
+}
+
+PLANET_DATA *find_planet_in_range( SHIP_DATA *ship, int distance )
+{
+  PLANET_DATA *planet = NULL;
+
+  if( ship->starsystem )
+    {
+      for ( planet = ship->starsystem->first_planet;
+	    planet; planet = planet->next_in_system )
+	{
+	  if( ship_distance_to_planet( ship, planet ) <= distance )
+	    {
+	      break;
+	    }
+	}
+    }
+
+  return planet;
+}
+
+SHIP_DATA *find_ship_in_range( SHIP_DATA *ship, int distance )
+{
+  SHIP_DATA *target = NULL;
+
+  if( ship->starsystem )
+    {
+      for( target = ship->starsystem->first_ship; target;
+           target = target->next_in_starsystem )
+        {
+          if( target != ship && ship_distance_to_ship( ship, target ) <= 500 )
+            {
+              break;
+            }
+        }
+    }
+
+  return target;
+}
+
+void ship_jump_to_lightspeed( SHIP_DATA *ship )
+{
+  char buf[MAX_STRING_LENGTH];
+  sprintf( buf ,"%s disappears from your scanner." , ship->name );
+  echo_to_system( AT_YELLOW, ship, buf , NULL );
+
+  ship_from_starsystem( ship , ship->starsystem );
+  ship->shipstate = SHIP_HYPERSPACE;
+
+  echo_to_ship( AT_YELLOW , ship , "The ship lurches slightly as it makes the jump to lightspeed." );
+  echo_to_cockpit( AT_YELLOW , ship , "The stars become streaks of light as youenter hyperspace.");
+
+  ship->energy -= (100+ship->hyperdistance);
+  vector_copy( &ship->pos, &ship->jump );
+}
+
+void missile_explode( MISSILE_DATA *missile )
+{
+  if ( missile->target->chaff_released <= 0)
+    {
+      SHIP_DATA *ship = missile->fired_from;
+      SHIP_DATA *target = missile->target;
+      char buf[MAX_STRING_LENGTH];
+      CHAR_DATA *ch = NULL;
+      bool ch_found = FALSE;
+
+      echo_to_room( AT_YELLOW, ship->gunseat,
+		    "Your missile hits its target dead on!" );
+      echo_to_cockpit( AT_BLOOD, target, "The ship is hit by a missile.");
+      echo_to_ship( AT_RED, target,
+		    "A loud explosion shakes the ship violently!" );
+      sprintf( buf, "You see a small explosion as %s is hit by a missile",
+	       target->name );
+      echo_to_system( AT_ORANGE, target, buf, ship );
+
+      for ( ch = first_char; ch; ch = ch->next )
+	{
+	  if ( !IS_NPC( ch )
+	       && nifty_is_name( missile->fired_by, ch->name) )
+	    {
+	      ch_found = TRUE;
+	      break;
+	    }
+	}
+
+      damage_ship( target, 30, 50, ch_found ? ch : NULL );
+      extract_missile( missile );
+    }
+  else
+    {
+      echo_to_room( AT_YELLOW, missile->fired_from->gunseat,
+		    "Your missile explodes harmlessly in a cloud of chaff!" );
+      echo_to_cockpit( AT_YELLOW, missile->target,
+		       "A missile explodes in your chaff.");
+      extract_missile( missile );
+    }
+}
+
 void move_missiles( void )
 {
   MISSILE_DATA *missile = NULL;
@@ -60,9 +301,7 @@ void move_missiles( void )
 
   for ( missile = first_missile; missile; missile = m_next )
     {
-      SHIP_DATA *ship = missile->fired_from;
       SHIP_DATA *target = missile->target;
-      bool ch_found = FALSE;
 
       m_next = missile->next;
 
@@ -74,43 +313,7 @@ void move_missiles( void )
 
           if( missile_distance_to_ship( missile, target ) <= 20 )
             {
-              if ( target->chaff_released <= 0)
-		{
-		  if ( target->chaff_released <= 0)
-		    {
-		      char buf[MAX_STRING_LENGTH];
-		      CHAR_DATA *ch = NULL;
-
-		      echo_to_room( AT_YELLOW , ship->gunseat , "Your missile hits its target dead on!" );
-		      echo_to_cockpit( AT_BLOOD, target, "The ship is hit by a missile.");
-		      echo_to_ship( AT_RED , target , "A loud explosion shakes the ship violently!" );
-		      sprintf( buf, "You see a small explosion as %s is hit by a missile" , target->name );
-		      echo_to_system( AT_ORANGE , target , buf , ship );
-
-		      for ( ch = first_char; ch; ch = ch->next )
-			{
-			  if ( !IS_NPC( ch )
-			       && nifty_is_name( missile->fired_by, ch->name) )
-			    {
-			      ch_found = TRUE;
-			      damage_ship_ch( target , 30 , 50 , ch );
-			    }
-			}
-
-		      if ( !ch_found )
-			damage_ship( target , 30 , 50 );
-
-		      extract_missile( missile );
-		    }
-		  else
-		    {
-		      echo_to_room( AT_YELLOW , ship->gunseat , "Your missile explodes harmlessly in a cloud of chaff!" );
-		      echo_to_cockpit( AT_YELLOW, target, "A missile explodes in your chaff.");
-		      extract_missile( missile );
-		    }
-		}
-
-              continue;
+	      missile_explode( missile );
             }
           else
             {
@@ -119,19 +322,17 @@ void move_missiles( void )
               if (missile->age >= 50)
                 {
                   extract_missile( missile );
-                  continue;
                 }
             }
         }
       else
         {
           extract_missile( missile );
-          continue;
         }
     }
 }
 
-static void ship_crash_with_star( SHIP_DATA *ship, const char *star_name )
+void ship_crash_with_star( SHIP_DATA *ship, const char *star_name )
 {
   char buf[MAX_STRING_LENGTH];
   echo_to_cockpit( AT_BLOOD+AT_BLINK, ship, "You fly directly into the sun.");
@@ -140,14 +341,24 @@ static void ship_crash_with_star( SHIP_DATA *ship, const char *star_name )
   destroy_ship(ship, NULL);
 }
 
-void move_ships()
+void ship_begin_orbit( SHIP_DATA *ship, const PLANET_DATA *planet )
+{
+  char buf[MAX_STRING_LENGTH];
+  sprintf( buf , "You begin orbitting %s.", planet->name);
+  echo_to_cockpit( AT_YELLOW, ship, buf);
+  sprintf( buf , "%s begins orbiting %s.",
+	   ship->name, planet->name );
+  echo_to_system( AT_ORANGE , ship , buf , NULL );
+  ship->currspeed = 0;
+}
+
+void move_ships( void )
 {
   SHIP_DATA *ship = NULL;
   SHIP_DATA *nextship = NULL;
 
   for ( ship = first_ship; ship; ship = nextship )
     {
-      char buf[MAX_STRING_LENGTH];
       nextship = ship->next;
      
       if ( !ship->starsystem )
@@ -174,21 +385,11 @@ void move_ships()
 
       if ( ship->currspeed > 0 )
         { 
-	  PLANET_DATA *planet = NULL;
+	  PLANET_DATA *planet = find_planet_in_range( ship, 10 );
 
-          for ( planet = ship->starsystem->first_planet;
-		planet; planet = planet->next_in_system )      
+	  if( planet )
 	    {
-	      if( ship_distance_to_planet( ship, planet ) < 10 )
-		{
-		  sprintf( buf , "You begin orbitting %s.", planet->name); 
-		  echo_to_cockpit( AT_YELLOW, ship, buf);
-		  sprintf( buf , "%s begins orbiting %s.",
-			   ship->name, planet->name ); 
-		  echo_to_system( AT_ORANGE , ship , buf , NULL );
-		  ship->currspeed = 0;
-		  continue;
-		}            
+	      ship_begin_orbit( ship, planet );
 	    }
         }
     }
@@ -196,7 +397,7 @@ void move_ships()
   handle_ship_collision();
 }
 
-static void handle_ship_collision( void )
+void handle_ship_collision( void )
 {
   SHIP_DATA *ship = NULL;
   SHIP_DATA *nextship = NULL;
@@ -211,13 +412,13 @@ static void handle_ship_collision( void )
 			   "You have collided with another ship!" );
 	  echo_to_ship( AT_RED, ship,
 			"A loud explosion shakes the ship violently!" );   
-	  damage_ship( ship , ship->collision , ship->collision );
+	  damage_ship( ship , ship->collision , ship->collision, NULL );
 	  ship->collision = 0;
 	}
     }
 }
 
-static void ship_handle_autofly_combat( SHIP_DATA *ship )
+void ship_handle_autofly_combat( SHIP_DATA *ship )
 {
   int chance = 100;
   SHIP_DATA * target = ship->target;
@@ -236,39 +437,14 @@ static void ship_handle_autofly_combat( SHIP_DATA *ship )
 	  if ( ship->ship_class == SPACE_STATION
 	       || ship_is_facing_ship( ship , target ) )
 	    {
-	      char buf[MAX_STRING_LENGTH];
-	      chance += target->model*10;
-	      chance -= target->manuever/10;
-	      chance -= target->currspeed/20;
-	      chance -= ( abs((int)(target->pos.x - ship->pos.x))/70 );
-	      chance -= ( abs((int)(target->pos.y - ship->pos.y))/70 );
-	      chance -= ( abs((int)(target->pos.z - ship->pos.z))/70 );
-	      chance = URANGE( 10 , chance , 90 );
+	      chance += laser_hit_modifier( ship, target );
 
-	      if ( number_percent( ) > chance )
+	      if( laserfire_hits( ship, target, chance ) )
 		{
-		  sprintf( buf, "%s fires at you but misses.",
-			   ship->name);
-		  echo_to_cockpit( AT_ORANGE , target , buf );
-		  sprintf( buf, "Laserfire from %s barely misses %s.",
-			   ship->name , target->name );
-		  echo_to_system( AT_ORANGE , target , buf , NULL );
-		}
-	      else
-		{
-		  sprintf( buf, "Laserfire from %s hits %s.",
-			   ship->name, target->name );
-		  echo_to_system( AT_ORANGE , target , buf , NULL );
-		  sprintf( buf , "You are hit by lasers from %s!",
-			   ship->name);
-		  echo_to_cockpit( AT_BLOOD , target , buf );
-		  echo_to_ship( AT_RED, target,
-				"A small explosion vibrates through the ship." );
-
 		  if ( autofly( target ) )
 		    target->target = ship;
 
-		  damage_ship( target , 5 , 10 );
+		  damage_ship( target , 5 , 10, NULL );
 		}
 
 	      ship->laserstate++;
@@ -277,7 +453,7 @@ static void ship_handle_autofly_combat( SHIP_DATA *ship )
     }
 }
 
-static void ship_reload_missiles( SHIP_DATA *ship )
+void ship_reload_missiles( SHIP_DATA *ship )
 {
   if (ship->missilestate == MISSILE_RELOAD_2)
     {
@@ -296,7 +472,7 @@ static void ship_reload_missiles( SHIP_DATA *ship )
     ship->missilestate = MISSILE_RELOAD;
 }
 
-static void ship_update_laserstate( SHIP_DATA *ship )
+void ship_update_laserstate( SHIP_DATA *ship )
 {
   TURRET_DATA *turret = NULL;
 
@@ -316,7 +492,7 @@ static void ship_update_laserstate( SHIP_DATA *ship )
     }
 }
 
-void recharge_ships()
+void recharge_ships( void )
 {
   SHIP_DATA *ship = NULL;
   SHIP_DATA *nextship = NULL;
@@ -336,7 +512,7 @@ void recharge_ships()
     }
 }
 
-static void ship_update_energy( SHIP_DATA *ship )
+void ship_update_energy( SHIP_DATA *ship )
 {
   if( ship->starsystem )
     {
@@ -357,7 +533,7 @@ static void ship_update_energy( SHIP_DATA *ship )
     }
 }
 
-static void ship_update_shipstate( SHIP_DATA *ship )
+void ship_update_shipstate( SHIP_DATA *ship )
 {
   if (ship->shipstate == SHIP_BUSY_3)
     {
@@ -384,7 +560,31 @@ static void ship_update_shipstate( SHIP_DATA *ship )
     ship->shipstate = SHIP_LAUNCH_2;
 }
 
-static void ship_update_hyperspace( SHIP_DATA *ship )
+void ship_drop_from_hyperspace( SHIP_DATA *ship )
+{
+  ship_to_starsystem (ship, ship->currjump);
+
+  if (ship->starsystem == NULL)
+    {
+      echo_to_cockpit( AT_RED, ship,
+		       "Ship lost in Hyperspace. Make new calculations.");
+    }
+  else
+    {
+      char buf[MAX_STRING_LENGTH];
+      echo_to_room( AT_YELLOW, ship->pilotseat, "Hyperjump complete.");
+      echo_to_ship(AT_YELLOW, ship,
+		   "The ship lurches slightly as it comes out of hyperspace.");
+      sprintf( buf ,"%s enters the starsystem at %.0f %.0f %.0f",
+	       ship->name, ship->pos.x, ship->pos.y, ship->pos.z );
+      echo_to_system( AT_YELLOW, ship, buf , NULL );
+      ship->shipstate = SHIP_READY;
+      STRFREE( ship->home );
+      ship->home = STRALLOC( ship->starsystem->name );
+    }
+}
+
+void ship_update_hyperspace( SHIP_DATA *ship )
 {
   if (ship->shipstate == SHIP_HYPERSPACE)
     {
@@ -392,24 +592,7 @@ static void ship_update_hyperspace( SHIP_DATA *ship )
 
       if (ship->hyperdistance <= 0)
 	{
-	  ship_to_starsystem (ship, ship->currjump);
-
-	  if (ship->starsystem == NULL)
-	    {
-	      echo_to_cockpit( AT_RED, ship, "Ship lost in Hyperspace. Make new calculations.");
-	    }
-	  else
-	    {
-	      char buf[MAX_STRING_LENGTH];
-	      echo_to_room( AT_YELLOW, ship->pilotseat, "Hyperjump complete.");
-	      echo_to_ship( AT_YELLOW, ship, "The ship lurches slightly as it comes out of hyperspace.");
-	      sprintf( buf ,"%s enters the starsystem at %.0f %.0f %.0f",
- 		       ship->name, ship->pos.x, ship->pos.y, ship->pos.z );
-	      echo_to_system( AT_YELLOW, ship, buf , NULL );
-	      ship->shipstate = SHIP_READY;
-	      STRFREE( ship->home );
-	      ship->home = STRALLOC( ship->starsystem->name );
-	    }
+	  ship_drop_from_hyperspace( ship );
 	}
       else
 	{
@@ -422,7 +605,7 @@ static void ship_update_hyperspace( SHIP_DATA *ship )
     }
 }
 
-static void ship_update_shields( SHIP_DATA *ship )
+void ship_update_shields( SHIP_DATA *ship )
 {
   ship->shield = UMAX( 0 , ship->shield - 1 - ship->model/5);
 
@@ -449,7 +632,7 @@ static void ship_update_shields( SHIP_DATA *ship )
     }
 }
 
-static void ship_show_space_prompt( const SHIP_DATA *ship )
+void ship_show_space_prompt( const SHIP_DATA *ship )
 {
   if ( ship->starsystem && ship->currspeed > 0 )
     {
@@ -465,9 +648,9 @@ static void ship_show_space_prompt( const SHIP_DATA *ship )
     }
 }
 
-static void ship_echo_proximity_alert( const SHIP_DATA *ship,
-				       const char *target_name,
-				       const Vector3 *target_position )
+void ship_echo_proximity_alert( const SHIP_DATA *ship,
+				const char *target_name,
+				const Vector3 *target_position )
 {
   char buf[MAX_STRING_LENGTH];
   sprintf( buf, "Proximity alert: %s  %.0f %.0f %.0f", target_name,
@@ -475,7 +658,7 @@ static void ship_echo_proximity_alert( const SHIP_DATA *ship,
   echo_to_room( AT_RED , ship->pilotseat,  buf );
 }
 
-static void ship_check_proximity( const SHIP_DATA *ship )
+void ship_check_proximity( const SHIP_DATA *ship )
 {
   if ( ship->starsystem )
     {
@@ -514,7 +697,7 @@ static void ship_check_proximity( const SHIP_DATA *ship )
     }
 }
 
-static void ship_show_combat_prompt( SHIP_DATA *ship )
+void ship_show_combat_prompt( SHIP_DATA *ship )
 {
   if (ship->target)
     {
@@ -530,7 +713,7 @@ static void ship_show_combat_prompt( SHIP_DATA *ship )
     }
 }
 
-static void ship_warn_on_low_fuel( const SHIP_DATA *ship )
+void ship_warn_on_low_fuel( const SHIP_DATA *ship )
 {
   if (ship->energy < 100 && ship->starsystem )
     {
@@ -538,7 +721,7 @@ static void ship_warn_on_low_fuel( const SHIP_DATA *ship )
     }
 }
 
-static void ship_update_autotrack( SHIP_DATA *ship )
+void ship_update_autotrack( SHIP_DATA *ship )
 {
   if( ship->autotrack && ship->target && ship->ship_class < SPACE_STATION )
     {
@@ -578,7 +761,7 @@ static void ship_update_autotrack( SHIP_DATA *ship )
     }
 }
 
-static void spacestation_regenerate_missiles( SHIP_DATA *ship )
+void spacestation_regenerate_missiles( SHIP_DATA *ship )
 {
   if ( ship->ship_class == SPACE_STATION
        && ship->target == NULL )
@@ -588,7 +771,7 @@ static void spacestation_regenerate_missiles( SHIP_DATA *ship )
     }
 }
 
-static void ship_respawn_mob_ship( SHIP_DATA *ship )
+void ship_respawn_mob_ship( SHIP_DATA *ship )
 {
   if( ( ship->ship_class == SPACE_STATION
 	|| ship->type == MOB_SHIP ) && ship->home )
@@ -605,7 +788,7 @@ static void ship_respawn_mob_ship( SHIP_DATA *ship )
     }
 }
 
-static void ship_handle_autoflying_clanship( SHIP_DATA *ship, CLAN_DATA *clan )
+void ship_handle_autoflying_clanship( SHIP_DATA *ship, CLAN_DATA *clan )
 {
   SHIP_DATA *target = NULL;
 
@@ -651,10 +834,7 @@ static void ship_handle_autoflying_clanship( SHIP_DATA *ship, CLAN_DATA *clan )
 
       if ( targetok == 1 && target->target )
 	{
-	  ship->target = target->target;
-	  sprintf( buf , "You are being targetted by %s.",
-		   ship->name);
-	  echo_to_cockpit( AT_BLOOD , target->target , buf );
+	  ship_acquire_target( ship, target->target );
 	  break;
 	}
 
@@ -692,19 +872,33 @@ static void ship_handle_autoflying_clanship( SHIP_DATA *ship, CLAN_DATA *clan )
       if ( targetok >= 0 )
 	continue;
 
-      ship->target = target;
       sprintf( buf , "You are being scanned by %s.",
 	       ship->name);
       echo_to_cockpit( AT_WHITE , target , buf );
-      sprintf( buf , "You are being targetted by %s.",
-	       ship->name);
-      echo_to_cockpit( AT_BLOOD , target , buf );
-
+      ship_acquire_target( ship, target );
       break;
     }
 }
 
-static void ship_handle_autoflying_has_target( SHIP_DATA *ship )
+void ship_fire_missile( SHIP_DATA *ship, SHIP_DATA *target )
+{
+  char buf[MAX_STRING_LENGTH];
+  new_missile( ship , target , NULL );
+  ship->missiles-- ;
+  sprintf( buf , "Incoming missile from %s." ,
+	   ship->name);
+  echo_to_cockpit( AT_BLOOD , target , buf );
+  sprintf( buf, "%s fires a missile towards %s.",
+	   ship->name, target->name );
+  echo_to_system( AT_ORANGE , target , buf , NULL);
+
+  if ( ship->ship_class == SPACE_STATION )
+    ship->missilestate = MISSILE_RELOAD_2;
+  else
+    ship->missilestate = MISSILE_FIRED;
+}
+
+void ship_handle_autoflying_has_target( SHIP_DATA *ship )
 {
   SHIP_DATA *target = ship->target;
   ship->autotrack = TRUE;
@@ -722,19 +916,10 @@ static void ship_handle_autoflying_has_target( SHIP_DATA *ship )
       && ship_distance_to_ship( ship, target ) > 5000
       && number_bits(2) == 0 )
     {
-      char buf[MAX_STRING_LENGTH];
       ship->currjump = ship->starsystem;
       ship->hyperdistance = 1;
 
-      sprintf( buf ,"%s disappears from your scanner.",
-	       ship->name );
-      echo_to_system( AT_YELLOW, ship, buf , NULL );
-
-      ship_from_starsystem( ship , ship->starsystem );
-      ship->shipstate = SHIP_HYPERSPACE;
-
-      ship->energy -= 100;
-      vector_copy( &ship->jump, &target->pos );
+      ship_jump_to_lightspeed( ship );
     }
 
   if (ship->shipstate != SHIP_HYPERSPACE && ship->energy > 25
@@ -746,14 +931,7 @@ static void ship_handle_autoflying_has_target( SHIP_DATA *ship )
       if ( ship->ship_class == SPACE_STATION
 	   || ship_is_facing_ship( ship, target ) )
 	{
-	  int chance = 100 - target->manuever/5;
-	  chance -= target->currspeed/20;
-	  chance += target->model*target->model*2;
-	  chance -= ( abs((int)(target->pos.x - ship->pos.x))/100 );
-	  chance -= ( abs((int)(target->pos.y - ship->pos.y))/100 );
-	  chance -= ( abs((int)(target->pos.z - ship->pos.z))/100 );
-	  chance += ( 30 );
-	  chance = URANGE( 10, chance, 90 );
+	  int chance = 100 + missile_hit_modifier( ship, target );
 
 	  if ( number_percent( ) > chance )
 	    {
@@ -761,20 +939,7 @@ static void ship_handle_autoflying_has_target( SHIP_DATA *ship )
 	    }
 	  else
 	    {
-	      char buf[MAX_STRING_LENGTH];
-	      new_missile( ship , target , NULL );
-	      ship->missiles-- ;
-	      sprintf( buf , "Incoming missile from %s." ,
-		       ship->name);
-	      echo_to_cockpit( AT_BLOOD , target , buf );
-	      sprintf( buf, "%s fires a missile towards %s.",
-		       ship->name, target->name );
-	      echo_to_system( AT_ORANGE , target , buf , NULL);
-
-	      if ( ship->ship_class == SPACE_STATION )
-		ship->missilestate = MISSILE_RELOAD_2;
-	      else
-		ship->missilestate = MISSILE_FIRED;
+	      ship_fire_missile( ship, target );
 	    }
 	}
     }
@@ -789,7 +954,7 @@ static void ship_handle_autoflying_has_target( SHIP_DATA *ship )
     ship->shipstate =  SHIP_READY;
 }
 
-static void ship_handle_autoflying( SHIP_DATA *ship )
+void ship_handle_autoflying( SHIP_DATA *ship )
 {
   if( autofly( ship ) )
     {
@@ -799,7 +964,7 @@ static void ship_handle_autoflying( SHIP_DATA *ship )
 	    {
 	      ship_handle_autoflying_has_target( ship );
 	    }
-	  else /* if( ship->target ) */
+	  else
 	    {
 	      CLAN_DATA * clan = NULL;
 	      CLAN_DATA * shipclan = NULL;
@@ -813,9 +978,9 @@ static void ship_handle_autoflying( SHIP_DATA *ship )
 	      if( shipclan )
 		{
 		  ship_handle_autoflying_clanship( ship, shipclan );
-		} /* if shipclan */
+		}
 	    }
-	} /* if( ship->starsystem ) */
+	}
       else
 	{
 	  ship_respawn_mob_ship( ship );
@@ -823,7 +988,7 @@ static void ship_handle_autoflying( SHIP_DATA *ship )
     }
 }
 
-void update_space()
+void update_space( void )
 {
   SHIP_DATA *ship = 0;
   SHIP_DATA *nextship = 0;
@@ -856,7 +1021,7 @@ void update_space()
     }
 }
 
-void write_starsystem_list( )
+void write_starsystem_list( void )
 {
   SPACE_DATA *tstarsystem = NULL;
   FILE *fpout = NULL;
@@ -935,7 +1100,6 @@ void save_starsystem( const SPACE_DATA *starsystem )
 {
   FILE *fp = NULL;
   char filename[256];
-  char buf[MAX_STRING_LENGTH];
 
   if ( !starsystem )
     {
@@ -945,8 +1109,7 @@ void save_starsystem( const SPACE_DATA *starsystem )
 
   if ( !starsystem->filename || starsystem->filename[0] == '\0' )
     {
-      sprintf( buf, "save_starsystem: %s has no filename", starsystem->name );
-      bug( buf, 0 );
+      bug( "save_starsystem: %s has no filename", starsystem->name );
       return;
     }
 
@@ -1127,7 +1290,7 @@ bool load_starsystem( const char *starsystemfile )
 /*
  * Load in all the starsystem files.
  */
-void load_space()
+void load_space( void )
 {
   FILE *fpList = NULL;
   char starsystemlist[256];
@@ -1175,7 +1338,8 @@ void do_setstarsystem( CHAR_DATA *ch, char *argument )
 
     if ( arg2[0] == '\0' || arg1[0] == '\0' )
     {
-	send_to_char( "Usage: setstarsystem <starsystem> <field> <values>\r\n", ch );
+	send_to_char( "Usage: setstarsystem <starsystem> <field> <values>\r\n",
+		      ch );
 	send_to_char( "\r\nField being one of:\r\n", ch );
 	send_to_char( "name filename\r\n", ch );
 	send_to_char( "star1 s1x s1y s1z\r\n", ch );
@@ -1279,7 +1443,7 @@ void do_setstarsystem( CHAR_DATA *ch, char *argument )
     return;
 }
 
-static void showstarsystem( const CHAR_DATA *ch, const SPACE_DATA *starsystem )
+void showstarsystem( const CHAR_DATA *ch, const SPACE_DATA *starsystem )
 {   
   PLANET_DATA * planet;
     
@@ -1706,7 +1870,6 @@ void save_ship( const SHIP_DATA *ship )
  */
 void fread_ship( SHIP_DATA *ship, FILE *fp )
 {
-  char buf[MAX_STRING_LENGTH];
   bool fMatch = FALSE;
   int dIndex = 0;
 
@@ -1833,8 +1996,7 @@ void fread_ship( SHIP_DATA *ship, FILE *fp )
 	
       if ( !fMatch )
 	{
-	  sprintf( buf, "Fread_ship: no match: %s", word );
-	  bug( buf, 0 );
+	  bug( "Fread_ship: no match: %s", word );
 	}
     }
 }
@@ -2619,14 +2781,13 @@ bool extract_ship( SHIP_DATA *ship )
     return TRUE;
 }
 
-void damage_ship_ch( SHIP_DATA *ship , int min , int max , CHAR_DATA *ch )
+void damage_ship( SHIP_DATA *ship , int min , int max , CHAR_DATA *ch )
 {   
-  int shield_dmg = 0;
   int damg = number_range( min , max );
 
   if ( ship->shield > 0 )
     {   
-      shield_dmg = UMIN( ship->shield , damg );
+      int shield_dmg = UMIN( ship->shield , damg );
       damg -= shield_dmg;
       ship->shield -= shield_dmg;
       if ( ship->shield == 0 )
@@ -2637,22 +2798,24 @@ void damage_ship_ch( SHIP_DATA *ship , int min , int max , CHAR_DATA *ch )
     {
       if ( number_range(1, 100) <= 5 && ship->shipstate != SHIP_DISABLED )
         {
-	  echo_to_cockpit( AT_BLOOD + AT_BLINK , ship , "Ships Drive DAMAGED!" );   
+	  echo_to_cockpit( AT_BLOOD + AT_BLINK, ship, "Ship's drive DAMAGED!");
 	  ship->shipstate = SHIP_DISABLED;
         }
         
-      if ( number_range(1, 100) <= 5 && ship->missilestate != MISSILE_DAMAGED && ship->maxmissiles > 0 )
+      if ( number_range(1, 100) <= 5 && ship->missilestate != MISSILE_DAMAGED
+	   && ship->maxmissiles > 0 )
         {
-	  echo_to_room( AT_BLOOD + AT_BLINK , ship->gunseat , "Ships Missile Launcher DAMAGED!" );   
+	  echo_to_room( AT_BLOOD + AT_BLINK, ship->gunseat,
+			"Ship's missile launcher DAMAGED!" );   
 	  ship->missilestate = MISSILE_DAMAGED;
         }
         
       if ( number_range(1, 100) <= 2 && ship->laserstate != LASER_DAMAGED )
         {
-	  echo_to_room( AT_BLOOD + AT_BLINK , ship->gunseat , "Lasers DAMAGED!" );   
+	  echo_to_room( AT_BLOOD + AT_BLINK, ship->gunseat,
+			"Lasers DAMAGED!" );   
 	  ship->laserstate = LASER_DAMAGED;
         }
-    
     }
     
   ship->hull -= damg*5;
@@ -2668,48 +2831,7 @@ void damage_ship_ch( SHIP_DATA *ship , int min , int max , CHAR_DATA *ch )
 		     "WARNING! Ship hull severely damaged!" );    	  
 }
 
-void damage_ship( SHIP_DATA *ship , int min , int max )
-{   
-  int shield_dmg;
-  int damg = number_range( min , max );
-
-  if ( ship->shield > 0 )
-    {   
-      shield_dmg = UMIN( ship->shield , damg );
-      damg -= shield_dmg;
-      ship->shield -= shield_dmg;
-      if ( ship->shield == 0 )
-	echo_to_cockpit( AT_BLOOD , ship , "Shields down..." );    	  
-    }
-    
-  if ( damg > 0 )
-    {
-      if ( number_range(1, 100) <= 5 && ship->shipstate != SHIP_DISABLED )
-        {
-	  echo_to_cockpit( AT_BLOOD + AT_BLINK , ship , "Ships Drive DAMAGED!" );   
-	  ship->shipstate = SHIP_DISABLED;
-        }
-        
-      if ( number_range(1, 100) <= 5 && ship->missilestate != MISSILE_DAMAGED && ship->maxmissiles > 0 )
-        {
-	  echo_to_room( AT_BLOOD + AT_BLINK , ship->gunseat , "Ships Missile Launcher DAMAGED!" );   
-	  ship->missilestate = MISSILE_DAMAGED;
-        }
-    }
-    
-  ship->hull -= damg*5;
-    
-  if ( ship->hull <= 0 )
-    {
-      destroy_ship( ship , NULL );
-      return;
-    }
-    
-  if ( ship->hull <= ship->maxhull/20 )
-    echo_to_cockpit( AT_BLOOD+ AT_BLINK , ship , "WARNING! Ship hull severely damaged!" );    	  
-}
-
-static void ship_clear_turret_targets( SHIP_DATA *ship )
+void ship_clear_turret_targets( SHIP_DATA *ship )
 {
   TURRET_DATA *turret = NULL;
 
@@ -2719,7 +2841,7 @@ static void ship_clear_turret_targets( SHIP_DATA *ship )
     }
 }
 
-static void ship_free_room_descriptions( SHIP_DATA *ship )
+void ship_free_room_descriptions( SHIP_DATA *ship )
 {
   size_t dIndex = 0;
 
@@ -2732,7 +2854,7 @@ static void ship_free_room_descriptions( SHIP_DATA *ship )
     }
 }
 
-static void ship_untarget_by_attackers( const SHIP_DATA *ship )
+void ship_untarget_by_attackers( const SHIP_DATA *ship )
 {
   SHIP_DATA *att = NULL;
 
@@ -2755,7 +2877,7 @@ static void ship_untarget_by_attackers( const SHIP_DATA *ship )
     }
 }
 
-static void ship_untarget_by_missiles( const SHIP_DATA *ship )
+void ship_untarget_by_missiles( const SHIP_DATA *ship )
 {
   MISSILE_DATA *missile = NULL;
   MISSILE_DATA *m_next = NULL;
@@ -2772,7 +2894,7 @@ static void ship_untarget_by_missiles( const SHIP_DATA *ship )
     }
 }
 
-static void destroy_ship_kill_characters( const SHIP_DATA *ship,
+void destroy_ship_kill_characters( const SHIP_DATA *ship,
 					  CHAR_DATA *killer )
 {
   ROOM_INDEX_DATA *room = NULL;
@@ -2863,10 +2985,10 @@ void destroy_ship( SHIP_DATA *ship , CHAR_DATA *killer )
   sprintf( buf , "%s destroyed by %s", ship->name,
 	   killer ? killer->name : "(none)" );
   log_string( buf );
-  echo_to_ship( AT_WHITE , ship , "The ship is shaken by a FATAL explosion. You realize its escape or perish.");
-  echo_to_ship( AT_WHITE , ship , "The last thing you remember is reaching for the escape pod release lever.");
-  echo_to_ship( AT_WHITE + AT_BLINK , ship , "A blinding flash of light.");
-  echo_to_ship( AT_WHITE, ship , "And then darkness....");
+  echo_to_ship( AT_WHITE, ship, "The ship is shaken by a FATAL explosion. You realize its escape or perish.");
+  echo_to_ship( AT_WHITE, ship, "The last thing you remember is reaching for the escape pod release lever.");
+  echo_to_ship( AT_WHITE + AT_BLINK, ship, "A blinding flash of light.");
+  echo_to_ship( AT_WHITE, ship, "And then darkness....");
 
   destroy_ship_kill_characters( ship, killer );
 
@@ -3469,7 +3591,7 @@ void landship( SHIP_DATA *ship, char *argument )
          
   echo_to_room( AT_YELLOW , ship->pilotseat, "Landing sequence complete.");
   echo_to_ship( AT_YELLOW , ship , "You feel a slight thud as the ship sets down on the ground."); 
-  sprintf( buf ,"%s disapears from your scanner." , ship->name  );
+  sprintf( buf ,"%s disappears from your scanner." , ship->name  );
   echo_to_system( AT_YELLOW, ship, buf , NULL );
     
   ship->location = destination;
@@ -3601,7 +3723,8 @@ void do_trajectory( CHAR_DATA *ch, char *argument )
     	        
   if ( autofly(ship))
     {
-      send_to_char("&RYou'll have to turn off the ships autopilot first.\r\n",ch);
+      send_to_char("&RYou'll have to turn off the ships autopilot first.\r\n",
+		   ch);
       return;
     }
     	        
@@ -3643,7 +3766,7 @@ void do_trajectory( CHAR_DATA *ch, char *argument )
 
   chance = character_skill_level( ch, gsn_spacecraft );
 
-  if ( number_percent( ) > chance )
+  if ( number_percent() > chance )
     { 
       send_to_char("&RYou fail to work the controls properly.\r\n",ch);
       return;	
@@ -4281,518 +4404,456 @@ void do_status(CHAR_DATA *ch, char *argument )
 
 void do_hyperspace(CHAR_DATA *ch, char *argument )
 {
-    int chance;
-    SHIP_DATA *ship;
-    SHIP_DATA *eShip;
-    char buf[MAX_STRING_LENGTH];
-   
-        if (  (ship = ship_from_pilotseat(ch->in_room))  == NULL )
-        {
-            send_to_char("&RYou must be in control of a ship to do that!\r\n",ch);
-            return;
-        }
-        
-        if ( ship->ship_class > SPACE_STATION )
-    	        {
-    	            send_to_char("&RThis isn't a spacecraft!\r\n",ch);
-    	            return;
-    	        }
-    	        
-        
-        if ( autofly(ship)  )
-    	        {
-    	            send_to_char("&RYou'll have to turn off the ships autopilot first.\r\n",ch);
-    	            return;
-    	        }
-    	        
-        
-                if  ( ship->ship_class == SPACE_STATION )
-                {
-                   send_to_char( "&RPlatforms can't move!\r\n" , ch );
-                   return;
-                }       
-                if (ship->hyperspeed == 0)
-                {
-                  send_to_char("&RThis ship is not equipped with a hyperdrive!\r\n",ch);
-                  return;   
-                }
-                if (ship->shipstate == SHIP_HYPERSPACE)
-                {
-                  send_to_char("&RYou are already travelling lightspeed!\r\n",ch);
-                  return;   
-                }
-                if (ship->shipstate == SHIP_DISABLED)
-    	        {
-    	            send_to_char("&RThe ships drive is disabled. Unable to manuever.\r\n",ch);
-    	            return;
-    	        }
-    	        if (ship->shipstate == SHIP_DOCKED)
-    	        {
-    	            send_to_char("&RYou can't do that until after you've launched!\r\n",ch);
-    	            return;
-    	        }
-    	        if (ship->shipstate != SHIP_READY)
-    	        {
-    	            send_to_char("&RPlease wait until the ship has finished its current manouver.\r\n",ch);
-    	            return;
-    	        } 
-                if (!ship->currjump)
-    	        {
-    	            send_to_char("&RYou need to calculate your jump first!\r\n",ch);
-    	            return;
-    	        } 
+  int chance = 0;
+  SHIP_DATA *ship = 0;
+  SHIP_DATA *eShip = 0;
 
-        if ( ship->energy < (200+ship->hyperdistance) )
-        {
-              send_to_char("&RTheres not enough fuel!\r\n",ch);
-              return;
-        }
+  if (  (ship = ship_from_pilotseat(ch->in_room))  == NULL )
+    {
+      send_to_char("&RYou must be in control of a ship to do that!\r\n",ch);
+      return;
+    }
 
-        if ( ship->currspeed <= 0 )
-        {
-              send_to_char("&RYou need to speed up a little first!\r\n",ch);
-              return;
-        }
-    	
-    	for ( eShip = ship->starsystem->first_ship; eShip; eShip = eShip->next_in_starsystem )
-    	{
-    	   if ( eShip == ship )
-    	      continue;
-    	      
-	   if( ship_distance_to_ship( eShip, ship ) < 500 )
-           {
-              ch_printf(ch, "&RYou are too close to %s to make the jump to lightspeed.\r\n", eShip->name );
-              return;
-           }    	   
-    	}
-    	        
-        chance = character_skill_level( ch, gsn_spacecraft );
+  if ( ship->ship_class > SPACE_STATION )
+    {
+      send_to_char("&RThis isn't a spacecraft!\r\n",ch);
+      return;
+    }
 
-        if ( number_percent( ) > chance )
-        {
-            send_to_char("&RYou can't figure out which lever to use.\r\n",ch);
-    	   return;	
-        }
-    sprintf( buf ,"%s disapears from your scanner." , ship->name );
-    echo_to_system( AT_YELLOW, ship, buf , NULL );
+  if ( autofly(ship)  )
+    {
+      send_to_char("&RYou'll have to turn off the ships autopilot first.\r\n",
+		   ch);
+      return;
+    }
 
-    ship_from_starsystem( ship , ship->starsystem );
-    ship->shipstate = SHIP_HYPERSPACE;
-        
-    send_to_char( "&GYou push forward the hyperspeed lever.\r\n", ch);
-    act( AT_PLAIN, "$n pushes a lever forward on the control panel.", ch,
-         NULL, argument , TO_ROOM );
-    echo_to_ship( AT_YELLOW , ship , "The ship lurches slightly as it makes the jump to lightspeed." );     
-    echo_to_cockpit( AT_YELLOW , ship , "The stars become streaks of light as you enter hyperspace.");	  
-    
-    ship->energy -= (100+ship->hyperdistance);
-    
-    vector_copy( &ship->pos, &ship->jump );
-    
-    learn_from_success( ch, gsn_spacecraft );
+  if  ( ship->ship_class == SPACE_STATION )
+    {
+      send_to_char( "&RPlatforms can't move!\r\n" , ch );
+      return;
+    }
+
+  if (ship->hyperspeed == 0)
+    {
+      send_to_char("&RThis ship is not equipped with a hyperdrive!\r\n",ch);
+      return;   
+    }
+
+  if (ship->shipstate == SHIP_HYPERSPACE)
+    {
+      send_to_char("&RYou are already travelling lightspeed!\r\n",ch);
+      return;   
+    }
+
+  if (ship->shipstate == SHIP_DISABLED)
+    {
+      send_to_char("&RThe ships drive is disabled. Unable to manuever.\r\n",
+		   ch);
+      return;
+    }
+
+  if (ship->shipstate == SHIP_DOCKED)
+    {
+      send_to_char("&RYou can't do that until after you've launched!\r\n",ch);
+      return;
+    }
+
+  if (ship->shipstate != SHIP_READY)
+    {
+      send_to_char("&RPlease wait until the ship has finished its current manouver.\r\n",ch);
+      return;
+    }
+
+  if (!ship->currjump)
+    {
+      send_to_char("&RYou need to calculate your jump first!\r\n",ch);
+      return;
+    }
+
+  if ( ship->energy < (200+ship->hyperdistance) )
+    {
+      send_to_char("&RTheres not enough fuel!\r\n",ch);
+      return;
+    }
+
+  if ( ship->currspeed <= 0 )
+    {
+      send_to_char("&RYou need to speed up a little first!\r\n",ch);
+      return;
+    }
+
+  if( ( eShip = find_ship_in_range( ship, 500 ) ) )
+    {
+      ch_printf(ch, "&RYou are too close to %s to make the jump to lightspeed.\r\n", eShip->name );
+      return;
+    }
+
+  chance = character_skill_level( ch, gsn_spacecraft );
+
+  if ( number_percent( ) > chance )
+    {
+      send_to_char("&RYou can't figure out which lever to use.\r\n",ch);
+      return;	
+    }
+
+  send_to_char( "&GYou push forward the hyperspeed lever.\r\n", ch);
+  act( AT_PLAIN, "$n pushes a lever forward on the control panel.", ch,
+       NULL, argument , TO_ROOM );
+
+  ship_jump_to_lightspeed( ship );
+
+  learn_from_success( ch, gsn_spacecraft );
 }
 
     
 void do_target(CHAR_DATA *ch, char *argument )
 {
-    char arg[MAX_INPUT_LENGTH];
-    int chance;
-    SHIP_DATA *ship;
-    SHIP_DATA *target;
-    char buf[MAX_STRING_LENGTH];
-    TURRET_DATA *turret = NULL;
-        
-    strcpy( arg, argument );    
-    
-    switch( ch->substate )
-    { 
-    	default:
-    	        if (  (ship = ship_from_turret(ch->in_room))  == NULL )
-    	        {
-    	            send_to_char("&RYou must be in the gunners seat or turret of a ship to do that!\r\n",ch);
-    	            return;
-    	        }
-                
-                if ( ship->ship_class > SPACE_STATION )
-    	        {
-    	            send_to_char("&RThis isn't a spacecraft!\r\n",ch);
-    	            return;
-    	        }
-    	        
-                if (ship->shipstate == SHIP_HYPERSPACE)
-                {
-                  send_to_char("&RYou can only do that in realspace!\r\n",ch);
-                  return;   
-                }              
-    	        if (! ship->starsystem )
-    	        {
-    	            send_to_char("&RYou can't do that until you've finished launching!\r\n",ch);
-    	            return;
-    	        }
-                
-                if ( autofly(ship) )
-    	        {
-    	            send_to_char("&RYou'll have to turn off the ships autopilot first....\r\n",ch);
-    	            return;
-    	        }
-    	            
-                if (arg[0] == '\0')
-    	        {
-    	            send_to_char("&RYou need to specify a target!\r\n",ch);
-    	            return;
-    	        }
-                
-                if ( !str_cmp( arg, "none") )
-    	        {
-    	            send_to_char("&GTarget set to none.\r\n",ch);
-    	            ship->target = NULL;
-    	            return;
-    	        }
-                
-                target = get_ship_here( arg, ship->starsystem );
-                if (  target == NULL )
-                {
-                    send_to_char("&RThat ship isn't here!\r\n",ch);
-                    return;
-                }
-                
-                if (  target == ship )
-                {
-                    send_to_char("&RYou can't target your own ship!\r\n",ch);
-                    return;
-                }
-                
-                if ( !str_cmp(target->owner, ship->owner) && str_cmp( target->owner , "" ) )
-                {
-                    send_to_char("&RThat ship has the same owner... try targetting an enemy ship instead!\r\n",ch);
-                    return;
-                }
-                
-		if( ship_distance_to_ship( ship, target ) > 5000 )
-                {
-                    send_to_char("&RThat ship is too far away to target.\r\n",ch);
-                    return;
-                }
-                
-                chance = character_skill_level( ch, gsn_weaponsystems );
+  char arg[MAX_INPUT_LENGTH];
+  int chance;
+  SHIP_DATA *ship;
+  SHIP_DATA *target;
+  char buf[MAX_STRING_LENGTH];
+  TURRET_DATA *turret = NULL;
 
-                if ( number_percent( ) < chance )
-    		{
-    		   send_to_char( "&GTracking target.\r\n", ch);
-    		   act( AT_PLAIN, "$n makes some adjustments on the targeting computer.", ch,
-		        NULL, argument , TO_ROOM );
-    		   add_timer ( ch , TIMER_DO_FUN , 1 , do_target , 1 );
-    		   ch->dest_buf = str_dup(arg);
-    		   return;
-	        }
-	        send_to_char("&RYou fail to work the controls properly.\r\n",ch);
-	        learn_from_failure( ch, gsn_weaponsystems );
-    	   	return;	
-    	
-    	case 1:
-    		if ( !ch->dest_buf )
-    		   return;
-    		strcpy(arg, (const char*) ch->dest_buf);
-    		DISPOSE( ch->dest_buf);
-    		break;
-    		
-    	case SUB_TIMER_DO_ABORT:
-    		DISPOSE( ch->dest_buf );
-    		ch->substate = SUB_NONE;
-    	        send_to_char("&RYour concentration is broken. You fail to lock onto your target.\r\n", ch);
-    		return;
+  strcpy( arg, argument );    
+
+  switch( ch->substate )
+    { 
+    default:
+      if (  (ship = ship_from_turret(ch->in_room))  == NULL )
+	{
+	  send_to_char("&RYou must be in the gunners seat or turret of a ship to do that!\r\n",ch);
+	  return;
+	}
+
+      if ( ship->ship_class > SPACE_STATION )
+	{
+	  send_to_char("&RThis isn't a spacecraft!\r\n",ch);
+	  return;
+	}
+
+      if (ship->shipstate == SHIP_HYPERSPACE)
+	{
+	  send_to_char("&RYou can only do that in realspace!\r\n",ch);
+	  return;   
+	}
+
+      if (! ship->starsystem )
+	{
+	  send_to_char("&RYou can't do that until you've finished launching!\r\n",ch);
+	  return;
+	}
+
+      if ( autofly(ship) )
+	{
+	  send_to_char("&RYou'll have to turn off the ships autopilot first....\r\n",ch);
+	  return;
+	}
+
+      if (arg[0] == '\0')
+	{
+	  send_to_char("&RYou need to specify a target!\r\n",ch);
+	  return;
+	}
+
+      if ( !str_cmp( arg, "none") )
+	{
+	  send_to_char("&GTarget set to none.\r\n",ch);
+	  ship->target = NULL;
+	  return;
+	}
+
+      target = get_ship_here( arg, ship->starsystem );
+
+      if (  target == NULL )
+	{
+	  send_to_char("&RThat ship isn't here!\r\n",ch);
+	  return;
+	}
+
+      if (  target == ship )
+	{
+	  send_to_char("&RYou can't target your own ship!\r\n",ch);
+	  return;
+	}
+
+      if ( !str_cmp(target->owner, ship->owner) && str_cmp( target->owner , "" ) )
+	{
+	  send_to_char("&RThat ship has the same owner... try targetting an enemy ship instead!\r\n",ch);
+	  return;
+	}
+
+      if( ship_distance_to_ship( ship, target ) > 5000 )
+	{
+	  send_to_char("&RThat ship is too far away to target.\r\n",ch);
+	  return;
+	}
+
+      chance = character_skill_level( ch, gsn_weaponsystems );
+
+      if ( number_percent( ) < chance )
+	{
+	  send_to_char( "&GTracking target.\r\n", ch);
+	  act( AT_PLAIN, "$n makes some adjustments on the targeting computer.", ch,
+	       NULL, argument , TO_ROOM );
+	  add_timer ( ch , TIMER_DO_FUN , 1 , do_target , 1 );
+	  ch->dest_buf = str_dup(arg);
+	  return;
+	}
+
+      send_to_char("&RYou fail to work the controls properly.\r\n",ch);
+      learn_from_failure( ch, gsn_weaponsystems );
+      return;	
+
+    case 1:
+      if ( !ch->dest_buf )
+	return;
+      strcpy(arg, (const char*) ch->dest_buf);
+      DISPOSE( ch->dest_buf);
+      break;
+
+    case SUB_TIMER_DO_ABORT:
+      DISPOSE( ch->dest_buf );
+      ch->substate = SUB_NONE;
+      send_to_char("&RYour concentration is broken. You fail to lock onto your target.\r\n", ch);
+      return;
     }
-    
-    ch->substate = SUB_NONE;
-    
-    if ( (ship = ship_from_turret(ch->in_room)) == NULL )
+
+  ch->substate = SUB_NONE;
+
+  if ( (ship = ship_from_turret(ch->in_room)) == NULL )
     {  
-       return;
+      return;
     }
-    
-    target = get_ship_here( arg, ship->starsystem );
-    if (  target == NULL || target == ship)
+
+  target = get_ship_here( arg, ship->starsystem );
+
+  if (  target == NULL || target == ship)
     {
-           send_to_char("&RThe ship has left the starsytem. Targeting aborted.\r\n",ch);
-           return;
+      send_to_char("&RThe ship has left the starsytem. Targeting aborted.\r\n",
+		   ch);
+      return;
     }
-    
-    if ( ch->in_room == ship->gunseat )
-        ship->target = target;
-    else
+
+  if ( ch->in_room == ship->gunseat )
     {
-        for ( turret = ship->first_turret ; turret ; turret = turret->next )    
-          if ( turret->room == ch->in_room )
-             break;
-             
-        if ( !turret )
-           return;
-           
-        turret->target = target;
+      ship->target = target;
     }
-        
-    send_to_char( "&GTarget Locked.\r\n", ch);
-    sprintf( buf , "You are being targetted by %s." , ship->name);  
-    echo_to_cockpit( AT_BLOOD , target , buf );
-       	      
-    learn_from_success( ch, gsn_weaponsystems );
-    	
-    if ( autofly(target) && !target->target)
+  else
     {
-       sprintf( buf , "You are being targetted by %s." , target->name);  
-       echo_to_cockpit( AT_BLOOD , ship , buf );
-       target->target = ship;
+      for ( turret = ship->first_turret ; turret ; turret = turret->next )    
+	if ( turret->room == ch->in_room )
+	  break;
+
+      if ( !turret )
+	return;
+
+      turret->target = target;
+    }
+
+  send_to_char( "&GTarget Locked.\r\n", ch);
+  sprintf( buf , "You are being targetted by %s." , ship->name);  
+  echo_to_cockpit( AT_BLOOD , target , buf );
+
+  learn_from_success( ch, gsn_weaponsystems );
+
+  if ( autofly(target) && !target->target)
+    {
+      ship_acquire_target( target, ship );
     }
 }
 
 void do_fire(CHAR_DATA *ch, char *argument )
 {
-    int chance = 0;
-    SHIP_DATA *ship = NULL;
-    SHIP_DATA *target = NULL;
-    char buf[MAX_STRING_LENGTH];
-    TURRET_DATA *turret = NULL;
-    int skill_level = 0;
+  int chance = 0;
+  SHIP_DATA *ship = NULL;
+  SHIP_DATA *target = NULL;
+  TURRET_DATA *turret = NULL;
+  int skill_level = 0;
 
-        if (  (ship = ship_from_turret(ch->in_room))  == NULL )
-        {
-            send_to_char("&RYou must be in the gunners chair or turret of a ship to do that!\r\n",ch);
-            return;
-        }
-        
-        if ( ship->ship_class > SPACE_STATION )
-    	        {
-    	            send_to_char("&RThis isn't a spacecraft!\r\n",ch);
-    	            return;
-    	        }
-    	        
-        if (ship->shipstate == SHIP_HYPERSPACE)
-        {
-             send_to_char("&RYou can only do that in realspace!\r\n",ch);
-             return;   
-        }
-    	if (ship->starsystem == NULL)
-    	{
-    	     send_to_char("&RYou can't do that until after you've finished launching!\r\n",ch);
-    	     return;
-    	}
-    	if ( ship->energy <5 )
-        {
-             send_to_char("&RTheres not enough energy left to fire!\r\n",ch);
-             return;
-        }   
-  
-	if ( autofly(ship) )
-	  {
-	    send_to_char("&RYou'll have to turn off the ships autopilot first.\r\n",ch);
-	    return;
-	  }
-    	              
-	skill_level = character_skill_level( ch, gsn_weaponsystems )
-	  + ch->perm_dex * 2 + character_skill_level( ch, gsn_spacecombat ) / 2;
+  if (  (ship = ship_from_turret(ch->in_room))  == NULL )
+    {
+      send_to_char("&RYou must be in the gunners chair or turret of a ship to do that!\r\n",ch);
+      return;
+    }
 
-        chance = IS_NPC(ch) ? 100 : skill_level;
-        
-    	if ( !str_prefix( argument , "lasers") )
-    	{
-    	      if ( ch->in_room == ship->gunseat )
-              {
-                  if (ship->laserstate == LASER_DAMAGED)
-    	          {
-    	                  send_to_char("&RThe ships main laser is damaged.\r\n",ch);
-    	      	          return;
-    	     	  } 
-             	  if (ship->laserstate >= ship->lasers )
-    	     	  {
-    	     		send_to_char("&RThe lasers are still recharging.\r\n",ch);
-    	     		return;
-    	     	  }
-    	     	  if (ship->target == NULL )
-    	     	  {
-    	     		send_to_char("&RYou need to choose a target first.\r\n",ch);
-    	     		return;
-    	     	  }    	    
-    	     	  target = ship->target;
-              }    
-              else
-              {
-                  for ( turret = ship->first_turret ; turret ; turret = turret->next )    
-                    if ( turret->room == ch->in_room )
-                      break;
-              
-                  if ( !turret )
-    	          {
-    	                  send_to_char("&RThis turret is out of order.\r\n",ch);
-    	      	          return;
-    	     	  } 
-                                       
-                  if (turret->laserstate == LASER_DAMAGED)
-    	          {
-    	                  send_to_char("&RThe turret is damaged.\r\n",ch);
-    	      	          return;
-    	     	  } 
-             	  if (turret->laserstate > 1 )
-    	     	  {
-    	     		send_to_char("&RThe lasers are still recharging.\r\n",ch);
-    	     		return;
-    	     	  }
-    	     	  if (turret->target == NULL )
-    	     	  {
-    	     		send_to_char("&RYou need to choose a target first.\r\n",ch);
-    	     		return;
-    	     	  }    	    
-    	     	  target = turret->target;
-              }
-    	
-    	     if (target->starsystem != ship->starsystem)
-    	     {
-    	     	send_to_char("&RYour target seems to have left.\r\n",ch);
-    	        ship->target = NULL; 
-    	     	return;
-    	     } 
+  if ( ship->ship_class > SPACE_STATION )
+    {
+      send_to_char("&RThis isn't a spacecraft!\r\n",ch);
+      return;
+    }
 
-	     if( ship_distance_to_ship( target, ship ) > 1000 )
-             {
-                send_to_char("&RThat ship is out of laser range.\r\n",ch);
-    	     	return;
-             } 
+  if (ship->shipstate == SHIP_HYPERSPACE)
+    {
+      send_to_char("&RYou can only do that in realspace!\r\n",ch);
+      return;   
+    }
 
-             if ( ship->ship_class < SPACE_STATION
-		  && !ship_is_facing_ship( ship, target ) )
-             {
-                send_to_char("&RThe main laser can only fire forward. You'll need to turn your ship!\r\n",ch);
-    	     	return;
-             }      
-             if ( ch->in_room == ship->gunseat )
-                 ship->laserstate++;
-             else
-                 turret->laserstate++;
-             chance += target->model*5;
-             chance -= target->manuever/10;
-             chance -= target->currspeed/20;
-             chance -= ( abs((int)(target->pos.x - ship->pos.x))/70 );
-             chance -= ( abs((int)(target->pos.y - ship->pos.y))/70 );
-             chance -= ( abs((int)(target->pos.z - ship->pos.z))/70 );
-             chance = URANGE( 10 , chance , 90 );
-             act( AT_PLAIN, "$n presses the fire button.", ch,
-                  NULL, argument , TO_ROOM );
-             if ( number_percent( ) > chance )
-             {  
-                sprintf( buf , "Lasers fire from %s at you but miss." , ship->name);  
-                echo_to_cockpit( AT_ORANGE , target , buf );           
-                sprintf( buf , "The ships lasers fire at %s but miss." , target->name);  
-                echo_to_cockpit( AT_ORANGE , ship , buf );           
-    	        sprintf( buf, "Laserfire from %s barely misses %s." , ship->name , target->name );
-                echo_to_system( AT_ORANGE , ship , buf , target );
-    	        return;	
-             } 
-             sprintf( buf, "Laserfire from %s hits %s." , ship->name, target->name );
-             echo_to_system( AT_ORANGE , ship , buf , target );
-             sprintf( buf , "You are hit by lasers from %s!" , ship->name);  
-             echo_to_cockpit( AT_BLOOD , target , buf );           
-             sprintf( buf , "Your ships lasers hit %s!." , target->name);  
-             echo_to_cockpit( AT_YELLOW , ship , buf );           
-             learn_from_success( ch, gsn_spacecombat );
-             echo_to_ship( AT_RED , target , "A small explosion vibrates through the ship." );           
-             if ( turret )
-                damage_ship_ch( target , 15 , 25 , ch );
-             else
-                damage_ship_ch( target , 5 , 10 , ch );
-                         
-             if ( target->starsystem && autofly(target) && target->target != ship )
-             {
-                target->target = ship; 
-                sprintf( buf , "You are being targetted by %s." , target->name);  
-                echo_to_cockpit( AT_BLOOD , ship , buf );
-             }
-             
-             return;
-    	}
-        
-        if ( !str_prefix( argument , "missile") )
-    	{
-    	     if (ship->missilestate == MISSILE_DAMAGED)
-    	     {
-    	        send_to_char("&RThe ships missile launchers are dammaged.\r\n",ch);
-    	      	return;
-    	     } 
-             if (ship->missiles <= 0)
-    	     {
-    	     	send_to_char("&RYou have no missiles to fire!\r\n",ch);
-    	        return;
-    	     }
-    	     if (ship->missilestate != MISSILE_READY )
-    	     {
-    	     	send_to_char("&RThe missiles are still reloading.\r\n",ch);
-    	     	return;
-    	     }
-    	     if (ship->target == NULL )
-    	     {
-    	     	send_to_char("&RYou need to choose a target first.\r\n",ch);
-    	     	return;
-    	     }    	    
-    	     target = ship->target;
-             if (ship->target->starsystem != ship->starsystem)
-    	     {
-    	     	send_to_char("&RYour target seems to have left.\r\n",ch);
-    	        ship->target = NULL; 
-    	     	return;
-    	     } 
+  if (ship->starsystem == NULL)
+    {
+      send_to_char("&RYou can't do that until after you've finished launching!\r\n",ch);
+      return;
+    }
 
-	     if( ship_distance_to_ship( ship, target ) > 1000 )
-             {
-                send_to_char("&RThat ship is out of missile range.\r\n",ch);
-    	     	return;
-             } 
-             if ( ship->ship_class < SPACE_STATION
-		  && !ship_is_facing_ship( ship, target ) )
-             {
-                send_to_char("&RMissiles can only fire in a forward. You'll need to turn your ship!\r\n",ch);
-    	     	return;
-             }      
-             chance -= target->manuever/5;
-             chance -= target->currspeed/20;
-             chance += target->model*target->model*2;
-             chance -= ( abs((int)(target->pos.x - ship->pos.x))/100 );
-             chance -= ( abs((int)(target->pos.y - ship->pos.y))/100 );
-             chance -= ( abs((int)(target->pos.z - ship->pos.z))/100 );
-	     chance += ( 30 );
-             chance = URANGE( 20 , chance , 80 );
-             act( AT_PLAIN, "$n presses the fire button.", ch,
-                  NULL, argument , TO_ROOM );
-             if ( number_percent( ) > chance )
-             {
-                send_to_char( "&RYou fail to lock onto your target!", ch );
-                ship->missilestate = MISSILE_RELOAD_2;
-    	        return;	
-             } 
-             new_missile( ship , target , ch  );
-             ship->missiles-- ;
-             act( AT_PLAIN, "$n presses the fire button.", ch,
-                  NULL, argument , TO_ROOM );
-             echo_to_cockpit( AT_YELLOW , ship , "Missiles launched.");
-             sprintf( buf , "Incoming missile from %s." , ship->name);  
-             echo_to_cockpit( AT_BLOOD , target , buf );
-             sprintf( buf, "%s fires a missile towards %s." , ship->name, target->name );
-             echo_to_system( AT_ORANGE , ship , buf , target );
-             learn_from_success( ch, gsn_weaponsystems );
-             if ( ship->ship_class == SPACE_STATION )
-                   ship->missilestate = MISSILE_RELOAD;
-             else
-                   ship->missilestate = MISSILE_FIRED;
-             
-             if ( autofly(target) && target->target != ship )
-             {
-                target->target = ship; 
-                sprintf( buf , "You are being targetted by %s." , target->name);  
-                echo_to_cockpit( AT_BLOOD , ship , buf );
-             }
-             
-             return;
-    	}
-        
-        send_to_char( "&RYou can't fire that!\r\n" , ch);
-    	
+  if ( ship->energy < 5 )
+    {
+      send_to_char("&RTheres not enough energy left to fire!\r\n",ch);
+      return;
+    }
+
+  if ( autofly(ship) )
+    {
+      send_to_char("&RYou'll have to turn off the ships autopilot first.\r\n",
+		   ch);
+      return;
+    }
+
+  skill_level = character_skill_level( ch, gsn_weaponsystems )
+    + ch->perm_dex * 2 + character_skill_level( ch, gsn_spacecombat ) / 2;
+
+  chance = IS_NPC(ch) ? 100 : skill_level;
+
+  if ( !str_prefix( argument , "lasers") )
+    {
+      if ( ch->in_room == ship->gunseat )
+	{
+	  if( !laser_can_be_fired( ch, ship ) )
+	    {
+	      return;
+	    }
+
+	  target = ship->target;
+	}
+      else
+	{
+	  for ( turret = ship->first_turret ; turret ; turret = turret->next )
+	    if ( turret->room == ch->in_room )
+	      break;
+
+	  if ( !turret )
+	    {
+	      send_to_char("&RThis turret is out of order.\r\n",ch);
+	      return;
+	    }
+
+	  if( !turret_can_be_fired( ch, turret ) )
+	    {
+	      return;
+	    }    	    
+
+	  target = turret->target;
+	}
+
+      if (target->starsystem != ship->starsystem)
+	{
+	  send_to_char("&RYour target seems to have left.\r\n",ch);
+	  ship->target = NULL; 
+	  return;
+	} 
+
+      if( ship_distance_to_ship( target, ship ) > 1000 )
+	{
+	  send_to_char("&RThat ship is out of laser range.\r\n",ch);
+	  return;
+	} 
+
+      if ( ship->ship_class < SPACE_STATION
+	   && !ship_is_facing_ship( ship, target )
+	   && !turret )
+	{
+	  send_to_char("&RThe main laser can only fire forward. You'll need to turn your ship!\r\n",ch);
+	  return;
+	}
+
+      if ( ch->in_room == ship->gunseat )
+	ship->laserstate++;
+      else
+	turret->laserstate++;
+
+      chance += laser_hit_modifier( ship, target );
+
+      act( AT_PLAIN, "$n presses the fire button.", ch,
+	   NULL, argument , TO_ROOM );
+
+      if( !laserfire_hits( ship, target, chance ) )
+	{
+	  return;
+	}
+
+      learn_from_success( ch, gsn_spacecombat );
+
+      if ( turret )
+	damage_ship( target , 15 , 25 , ch );
+      else
+	damage_ship( target , 5 , 10 , ch );
+
+      if ( target->starsystem && autofly(target) && target->target != ship )
+	{
+	  ship_acquire_target( target, ship );
+	}
+
+      return;
+    }
+
+  if ( !str_prefix( argument , "missile") )
+    {
+      if( !missile_launcher_can_be_fired( ch, ship ) )
+	{
+	  return;
+	}
+
+      target = ship->target;
+
+      if (ship->target->starsystem != ship->starsystem)
+	{
+	  send_to_char("&RYour target seems to have left.\r\n",ch);
+	  ship->target = NULL; 
+	  return;
+	} 
+
+      if( ship_distance_to_ship( ship, target ) > 1000 )
+	{
+	  send_to_char("&RThat ship is out of missile range.\r\n",ch);
+	  return;
+	}
+
+      if ( ship->ship_class < SPACE_STATION
+	   && !ship_is_facing_ship( ship, target ) )
+	{
+	  send_to_char("&RMissiles can only fire in a forward. You'll need to turn your ship!\r\n",ch);
+	  return;
+	}
+
+      chance += missile_hit_modifier( ship, target );
+
+      act( AT_PLAIN, "$n presses the fire button.", ch,
+	   NULL, argument , TO_ROOM );
+
+      if ( number_percent() > chance )
+	{
+	  send_to_char( "&RYou fail to lock onto your target!", ch );
+	  ship->missilestate = MISSILE_RELOAD_2;
+	  return;	
+	}
+
+      echo_to_cockpit( AT_YELLOW , ship , "Missiles launched.");
+      ship_fire_missile( ship, target );
+      learn_from_success( ch, gsn_weaponsystems );
+
+      if ( ship->ship_class == SPACE_STATION )
+	ship->missilestate = MISSILE_RELOAD;
+      else
+	ship->missilestate = MISSILE_FIRED;
+
+      if ( autofly(target) && target->target != ship )
+	{
+	  ship_acquire_target( target, ship );
+	}
+
+      return;
+    }
+
+  send_to_char( "&RYou can't fire that!\r\n" , ch);
 }
 
 
