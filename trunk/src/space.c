@@ -1768,8 +1768,8 @@ void fread_ship( SHIP_DATA *ship, FILE *fp )
 	      ship->prev_in_room=NULL;
 	      ship->first_turret=NULL;
 	      ship->last_turret=NULL;
-	      ship->first_hanger=NULL;
-	      ship->last_hanger=NULL;
+	      ship->first_hangar=NULL;
+	      ship->last_hangar=NULL;
 	      create_ship_rooms(ship);
 	      return;
 	    }
@@ -3375,7 +3375,7 @@ void do_land( CHAR_DATA *ch, char *argument )
 	    } 
 	  if ( target->ship_class != SPACE_STATION )
 	    {
-	      send_to_char("&RThat ship has no hanger for you to land in!\r\n",ch);
+	      send_to_char("&RThat ship has no hangar for you to land in!\r\n",ch);
 	      return;
 	    }
 
@@ -5786,8 +5786,8 @@ SHIP_DATA *ship_create( void )
   s->starsystem         = NULL;
   s->first_turret       = NULL;
   s->last_turret        = NULL;
-  s->first_hanger       = NULL;
-  s->last_hanger        = NULL;
+  s->first_hangar       = NULL;
+  s->last_hangar        = NULL;
   s->filename           = NULL;
   s->name               = NULL;
   s->home               = NULL;

@@ -20,9 +20,6 @@ void init_supermob( void );
  * Globals.
  */
 
-WIZENT *first_wiz = NULL;
-WIZENT *last_wiz = NULL;
-
 time_t last_restore_all_time = 0;
 
 HELP_DATA *first_help = NULL;
@@ -3838,7 +3835,7 @@ void free_turret( TURRET_DATA *turret )
   DISPOSE( turret );
 }
 
-void free_hangar( HANGER_DATA *hangar )
+void free_hangar( HANGAR_DATA *hangar )
 {
   DISPOSE( hangar );
 }
@@ -3854,10 +3851,10 @@ void free_ship( SHIP_DATA *ship )
       free_turret( turret );
     }
 
-  while( ship->first_hanger )
+  while( ship->first_hangar )
     {
-      HANGER_DATA *hangar = ship->first_hanger;
-      ship->first_hanger = hangar->next;
+      HANGAR_DATA *hangar = ship->first_hangar;
+      ship->first_hangar = hangar->next;
       free_hangar( hangar );
     }
 
