@@ -57,8 +57,6 @@ int nummobsloaded = 0;
 int numobjsloaded = 0;
 int physicalobjects = 0;
 
-MAP_INDEX_DATA *first_map = NULL;	/* maps */
-
 AUCTION_DATA *auction = NULL;	/* auctions */
 OBJ_DATA *supermob_obj = NULL;
 
@@ -1921,13 +1919,6 @@ void clear_char( CHAR_DATA *ch )
   ch->mod_cha		= 0;
   ch->mod_con		= 0;
   ch->mod_lck		= 0;
-  ch->pagelen           = 24; 		     /* BUILD INTERFACE */
-  ch->inter_page 	= NO_PAGE;           /* BUILD INTERFACE */
-  ch->inter_type 	= NO_TYPE;           /* BUILD INTERFACE */
-  ch->inter_editing    	= NULL;              /* BUILD INTERFACE */
-  ch->inter_editing_vnum= -1;                /* BUILD INTERFACE */
-  ch->inter_substate   	= SUB_NORTH;         /* BUILD INTERFACE */
-  ch->plr_home          = NULL;
 }
 
 /*
@@ -1963,9 +1954,6 @@ void free_char( CHAR_DATA *ch )
 
   if ( ch->editor )
     stop_editing( ch );
-
-  if ( ch->inter_editing )
-    DISPOSE( ch->inter_editing );
 
   stop_hunting( ch );
   stop_hating ( ch );
