@@ -88,7 +88,7 @@ void do_copyover (CHAR_DATA *ch, char * argument)
   /* For each playing descriptor, save its state */
   for (d = first_descriptor; d ; d = d_next)
     {
-      CHAR_DATA * och = CH(d);
+      CHAR_DATA * och = d->original ? d->original : d->character;
       d_next = d->next; /* We delete from the list , so need to save this */
 
       if (!d->character || d->connected != CON_PLAYING) /* drop those logging on */

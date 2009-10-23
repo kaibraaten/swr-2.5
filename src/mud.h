@@ -15,8 +15,7 @@ typedef long clock_t;
 
 #include <time.h>
 
-#include "vector3.h"
-#include "os.h"
+#include <swr_support.h>
 
 typedef	int				ch_ret;
 typedef	int				obj_ret;
@@ -37,39 +36,6 @@ typedef	int				obj_ret;
 #define DECLARE_SPELL_FUN( fun )	SPELL_FUN fun
 #endif
 
-
-/*
- * Short scalar types.
- * Diavolo reports AIX compiler has bugs with short types.
- */
-#ifndef __cplusplus
-#if	!defined(FALSE)
-#define FALSE	 0
-#endif
-
-#if	!defined(TRUE)
-#define TRUE	 1
-#endif
-
-#if	defined(_AIX)
-#if	!defined(const)
-#define const
-#endif
-typedef int				bool;
-#define unix
-#else
-typedef unsigned char			bool;
-#endif
-#else
-#ifndef __STORMGCC__
-#define TRUE true
-#define FALSE false
-#endif /* StormC4 */
-#endif /* __cplusplus */
-
-#if     !defined(BERR)
-#define BERR     255
-#endif
 
 /*
  * Structure types.
@@ -135,7 +101,6 @@ typedef bool	SPEC_FUN	args( ( CHAR_DATA *ch ) );
 typedef ch_ret	SPELL_FUN	args( ( int sn, int level, CHAR_DATA *ch, void *vo ) );
 
 #define DUR_CONV	23.333333333333333333333333
-#define HIDDEN_TILDE	'*'
 
 #define BV00		(1 <<  0)
 #define BV01		(1 <<  1)
@@ -170,16 +135,6 @@ typedef ch_ret	SPELL_FUN	args( ( int sn, int level, CHAR_DATA *ch, void *vo ) );
 #define BV30		(1 << 30)
 #define BV31		(1 << 31)
 /* 32 USED! DO NOT ADD MORE! SB */
-
-/*
- * String and memory management parameters.
- */
-#define MAX_KEY_HASH		 2048
-#define MAX_STRING_LENGTH	 4096  /* buf */
-#define MAX_INPUT_LENGTH	 1024  /* arg */
-#define MAX_INBUF_SIZE		 1024
-
-#define HASHSTR			 /* use string hashing */
 
 #define	MAX_LAYERS		 8	/* maximum clothing layers */
 #define MAX_NEST	       100	/* maximum container nesting */
@@ -2344,198 +2299,6 @@ extern	short	gsn_bludgeons;
 
 extern  short  gsn_grip;
 
-
-/*
- * Utility macros.
- */
-int umin( int check, int ncheck );
-int umax( int check, int ncheck );
-int urange( int mincheck, int check, int maxcheck );
-
-#define UMIN( a, b )      ( umin( (a), (b) ) )
-#define UMAX( a, b )      ( umax( (a), (b) ) )
-#define URANGE(a, b, c )  ( urange( (a), (b), (c) ) )
-#define LOWER(c)		((char) tolower((int)(c)))
-#define UPPER(c)		((char) toupper((int)(c)))
-#define IS_SET(flag, bit)       ((flag) & (bit))
-#define SET_BIT(var, bit)	((var) |= (bit))
-#define REMOVE_BIT(var, bit)	((var) &= ~(bit))
-#define TOGGLE_BIT(var, bit)	((var) ^= (bit))
-#define CH(d) ((d)->original ? (d)->original : (d)->character)
-
-#if defined(KEY)
-#undef KEY
-#endif
-
-#define KEY( literal, field, value )                                    \
-  if ( !str_cmp( word, literal ) )        \
-    {                                       \
-  field  = value;                     \
-  fMatch = TRUE;                      \
-  break;                              \
-    }
-
-/*
- * Memory allocation macros.
- */
-
-#define CREATE(result, type, number)				\
-do								\
-{								\
-   if (!((result) = (type *) calloc ((number), sizeof(type))))	\
-	{ perror("malloc failure"); abort(); }			\
-} while(0)
-
-#define RECREATE(result,type,number)				\
-do								\
-{								\
-  if (!((result) = (type *) realloc ((result), sizeof(type) * (number))))\
-	{ perror("realloc failure"); abort(); }			\
-} while(0)
-
-
-#define DISPOSE(point) 						\
-do								\
-{								\
-  if (!(point))							\
-  {								\
-	bug( "Freeing null pointer" ); \
-	fprintf( stderr, "DISPOSEing NULL in %s, line %d\n", __FILE__, __LINE__ ); \
-  }								\
-  else free(point);						\
-  point = NULL;							\
-} while(0)
-
-#ifdef HASHSTR
-#define STRALLOC(point)		str_alloc((point))
-#define QUICKLINK(point)        quick_link((point))
-#define STRFREE(point)						\
-do								\
-{								\
-  if (!(point))							\
-  {								\
-	bug( "Freeing null pointer" );	 			\
-	fprintf( stderr, "STRFREEing NULL in %s, line %d\n", __FILE__, __LINE__ ); \
-  }								\
-  else if (str_free((point))==-1) 				\
-    fprintf( stderr, "STRFREEing bad pointer in %s, line %d\n", __FILE__, __LINE__ ); \
-} while(0)
-#else
-#define STRALLOC(point)		str_dup((point))
-#define QUICKLINK(point)        str_dup((point))
-#define STRFREE(point)						\
-do								\
-{								\
-  if (!(point))							\
-  {								\
-	bug( "Freeing null pointer" );				\
-	fprintf( stderr, "STRFREEing NULL in %s, line %d\n", __FILE__, __LINE__ ); \
-  }								\
-  else free((point));						\
-} while(0)
-#endif
-
-/* double-linked list handling macros -Thoric */
-
-#define LINK(link, first, last, next, prev)			\
-do								\
-{								\
-    if ( !(first) )						\
-      (first)			= (link);			\
-    else							\
-      (last)->next		= (link);			\
-    (link)->next		= NULL;				\
-    (link)->prev		= (last);			\
-    (last)			= (link);			\
-} while(0)
-
-#define INSERT(link, insert, first, next, prev)			\
-do								\
-{								\
-    (link)->prev		= (insert)->prev;		\
-    if ( !(insert)->prev )					\
-      (first)			= (link);			\
-    else							\
-      (insert)->prev->next	= (link);			\
-    (insert)->prev		= (link);			\
-    (link)->next		= (insert);			\
-} while(0)
-
-#define UNLINK(link, first, last, next, prev)			\
-do								\
-{								\
-    if ( !(link)->prev )					\
-      (first)			= (link)->next;			\
-    else							\
-      (link)->prev->next	= (link)->next;			\
-    if ( !(link)->next )					\
-      (last)			= (link)->prev;			\
-    else							\
-      (link)->next->prev	= (link)->prev;			\
-} while(0)
-
-
-#define CHECK_LINKS(first, last, next, prev, type)		\
-do {								\
-  type *ptr, *pptr = NULL;					\
-  if ( !(first) && !(last) )					\
-    break;							\
-  if ( !(first) )						\
-  {								\
-    bug( "CHECK_LINKS: last with NULL first!  %s.",		\
-        __STRING(first) );					\
-    for ( ptr = (last); ptr->prev; ptr = ptr->prev );		\
-    (first) = ptr;						\
-  }								\
-  else if ( !(last) )						\
-  {								\
-    bug( "CHECK_LINKS: first with NULL last!  %s.",		\
-        __STRING(first) );					\
-    for ( ptr = (first); ptr->next; ptr = ptr->next );		\
-    (last) = ptr;						\
-  }								\
-  if ( (first) )						\
-  {								\
-    for ( ptr = (first); ptr; ptr = ptr->next )			\
-    {								\
-      if ( ptr->prev != pptr )					\
-      {								\
-        bug( "CHECK_LINKS(%s): %p:->prev != %p.  Fixing.",	\
-            __STRING(first), ptr, pptr );			\
-        ptr->prev = pptr;					\
-      }								\
-      if ( ptr->prev && ptr->prev->next != ptr )		\
-      {								\
-        bug( "CHECK_LINKS(%s): %p:->prev->next != %p.  Fixing.",\
-            __STRING(first), ptr, ptr );			\
-        ptr->prev->next = ptr;					\
-      }								\
-      pptr = ptr;						\
-    }								\
-    pptr = NULL;						\
-  }								\
-  if ( (last) )							\
-  {								\
-    for ( ptr = (last); ptr; ptr = ptr->prev )			\
-    {								\
-      if ( ptr->next != pptr )					\
-      {								\
-        bug( "CHECK_LINKS (%s): %p:->next != %p.  Fixing.",	\
-            __STRING(first), ptr, pptr );			\
-        ptr->next = pptr;					\
-      }								\
-      if ( ptr->next && ptr->next->prev != ptr )		\
-      {								\
-        bug( "CHECK_LINKS(%s): %p:->next->prev != %p.  Fixing.",\
-            __STRING(first), ptr, ptr );			\
-        ptr->next->prev = ptr;					\
-      }								\
-      pptr = ptr;						\
-    }								\
-  }								\
-} while(0)
-
-
 #define ASSIGN_GSN(gsn, skill)					\
 do								\
 {								\
@@ -3398,7 +3161,6 @@ void	free_note	args( ( NOTE_DATA *pnote ) );
 char *	flag_string	args( ( int bitvector, const char * const flagarray[] ) );
 int	get_mpflag	args( ( const char *flag ) );
 int	get_dir		args( ( const char *txt  ) );
-char *	strip_cr	args( ( const char *str  ) );
 int     get_vip_flag    args( ( const char *flag ) );
 int     get_wanted_flag args( ( const char *flag ) );
 void    save_some_areas args( ( ) );
@@ -3498,9 +3260,7 @@ void free_ban( BAN_DATA* );
 void save_sysdata( void );
 bool is_valid_filename( const CHAR_DATA *ch, const char *direct,
 			const char *filename );
-void replace_char( char *buf, char replace, char with );
 void	show_file	args( ( const CHAR_DATA *ch, const char *filename ) );
-char *	str_dup		args( ( const char *str ) );
 void	boot_db		args( ( bool fCopyOver ) );
 void	area_update	args( ( void ) );
 void	add_char	args( ( CHAR_DATA *ch ) );
@@ -3512,14 +3272,6 @@ char *	get_extra_descr	args( ( const char *name, EXTRA_DESCR_DATA *ed ) );
 MID *	get_mob_index	args( ( long vnum ) );
 OID *	get_obj_index	args( ( long vnum ) );
 RID *	get_room_index	args( ( long vnum ) );
-char	fread_letter	args( ( FILE *fp ) );
-float fread_float( FILE *fp );
-int	fread_number	args( ( FILE *fp ) );
-char *	fread_string	args( ( FILE *fp ) );
-char *	fread_string_nohash args( ( FILE *fp ) );
-void	fread_to_eol	args( ( FILE *fp ) );
-char *	fread_word	args( ( FILE *fp ) );
-char *	fread_line	args( ( FILE *fp ) );
 int	number_fuzzy	args( ( int number ) );
 int	number_range	args( ( int from, int to ) );
 int	number_percent	args( ( void ) );
@@ -3528,17 +3280,6 @@ int	number_bits	args( ( int width ) );
 int	number_mm	args( ( void ) );
 int	dice		args( ( int number, int size ) );
 int	interpolate	args( ( int level, int value_00, int value_32 ) );
-void	smash_tilde	args( ( char *str ) );
-void	hide_tilde	args( ( char *str ) );
-char *	show_tilde	args( ( char *str ) );
-bool	str_cmp		args( ( const char *astr, const char *bstr ) );
-bool	str_prefix	args( ( const char *astr, const char *bstr ) );
-bool	str_infix	args( ( const char *astr, const char *bstr ) );
-bool	str_suffix	args( ( const char *astr, const char *bstr ) );
-char *	capitalize	args( ( const char *str ) );
-char *	strlower	args( ( const char *str ) );
-char *	strupper	args( ( const char *str ) );
-const char *  aoran		args( ( const char *str ) );
 void	append_file	args( ( CHAR_DATA *ch, const char *file, const char *str ) );
 void	append_to_file	args( ( const char *file, const char *str ) );
 void	bug		args( ( const char *str, ... ) );
@@ -3684,10 +3425,6 @@ short  get_curr_frc	args( ( const CHAR_DATA *ch ) );
 bool	can_take_proto	args( ( const CHAR_DATA *ch ) );
 int	can_carry_n	args( ( const CHAR_DATA *ch ) );
 int	can_carry_w	args( ( const CHAR_DATA *ch ) );
-bool	is_name		args( ( const char *str, char *namelist ) );
-bool	is_name_prefix	args( ( const char *str, char *namelist ) );
-bool	nifty_is_name	args( ( char *str, char *namelist ) );
-bool	nifty_is_name_prefix args( ( char *str, char *namelist ) );
 void	affect_modify	args( ( CHAR_DATA *ch, AFFECT_DATA *paf, bool fAdd ) );
 void	affect_to_char	args( ( CHAR_DATA *ch, AFFECT_DATA *paf ) );
 void	affect_remove	args( ( CHAR_DATA *ch, AFFECT_DATA *paf ) );
@@ -3775,10 +3512,6 @@ int	times_killed	args( ( const CHAR_DATA *ch, const CHAR_DATA *mob ) );
 /* interp.c */
 bool	check_pos	args( ( const CHAR_DATA *ch, short position ) );
 void	interpret	args( ( CHAR_DATA *ch, char *argument ) );
-bool	is_number	args( ( const char *arg ) );
-int	number_argument	args( ( const char *argument, char *arg ) );
-char *	one_argument	args( ( char *argument, char *arg_first ) );
-char *	one_argument2	args( ( char *argument, char *arg_first ) );
 ST *	find_social	args( ( const char *command ) );
 CMDTYPE *find_command	args( ( const char *command ) );
 void	hash_commands	args( ( ) );
@@ -3857,18 +3590,6 @@ void    reboot_check    args( ( char *arg ) );
 #endif
 void    auction_update  args( ( void ) );
 void	remove_portal	args( ( OBJ_DATA *portal ) );
-
-/* hashstr.c */
-char *	str_alloc	args( ( const char *str ) );
-char *	quick_link	args( ( const char *str ) );
-int	str_free	args( ( char *str ) );
-void	show_hash	args( ( int count ) );
-char *	hash_stats	args( ( void ) );
-char *	check_hash	args( ( char *str ) );
-void	hash_dump	args( ( int hash ) );
-void	show_high_hash	args( ( int top ) );
-
-/* newscore.c */
 
 #undef	SK
 #undef	CO
