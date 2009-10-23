@@ -210,26 +210,6 @@ const char *	const	mprog_flags [] =
 "speechiw", "pull", "push", "sleep", "rest", "leave", "script", "use"
 };
 
-
-char *flag_string( int bitvector, const char * const flagarray[] )
-{
-    static char buf[MAX_STRING_LENGTH];
-    int x;
-
-    buf[0] = '\0';
-    for ( x = 0; x < 32 ; x++ )
-      if ( IS_SET( bitvector, 1 << x ) )
-      {
-	strcat( buf, flagarray[x] );
-	strcat( buf, " " );
-      }
-    if ( (x=strlen( buf )) > 0 )
-      buf[--x] = '\0';
-    
-    return buf;
-}
-
-
 bool can_rmodify( const CHAR_DATA *ch, const ROOM_INDEX_DATA *room )
 {
   if ( IS_NPC( ch ) )
@@ -2836,54 +2816,98 @@ void do_rset( CHAR_DATA *ch, char *argument )
  */
 int get_dir( const char *txt )
 {
-    int edir;
-    char c1,c2;
+  int edir;
+  char c1,c2;
 
-    if ( !str_cmp( txt, "northeast" ) )
-      return DIR_NORTHEAST;
-    if ( !str_cmp( txt, "northwest" ) )
-      return DIR_NORTHWEST;
-    if ( !str_cmp( txt, "southeast" ) )
-      return DIR_SOUTHEAST;
-    if ( !str_cmp( txt, "southwest" ) )
-      return DIR_SOUTHWEST;
-    if ( !str_cmp( txt, "somewhere" ) )
-      return 10;
+  if ( !str_cmp( txt, "northeast" ) )
+    return DIR_NORTHEAST;
+  if ( !str_cmp( txt, "northwest" ) )
+    return DIR_NORTHWEST;
+  if ( !str_cmp( txt, "southeast" ) )
+    return DIR_SOUTHEAST;
+  if ( !str_cmp( txt, "southwest" ) )
+    return DIR_SOUTHWEST;
+  if ( !str_cmp( txt, "somewhere" ) )
+    return DIR_SOMEWHERE;
 
-    c1 = txt[0];
-    if ( c1 == '\0' )
-      return 0;
-    c2 = txt[1];
-    edir = 0;
-    switch ( c1 )
+  c1 = txt[0];
+
+  if ( c1 == '\0' )
+    return 0;
+
+  c2 = txt[1];
+  edir = 0;
+
+  switch ( c1 )
     {
-	  case 'n':
-	  switch ( c2 )
-	  {
-		    default:   edir = 0; break;	/* north */
-		    case 'e':  edir = 6; break; /* ne	 */
-		    case 'w':  edir = 7; break; /* nw	 */
-	  }
-	  break;    case '0':  edir = 0; break; /* north */
-	  case 'e': case '1':  edir = 1; break; /* east  */
-	  case 's':
-	  switch ( c2 )
-	  {
-		    default:   edir = 2; break; /* south */
-		    case 'e':  edir = 8; break; /* se	 */
-		    case 'w':  edir = 9; break; /* sw	 */
-	  }
-	  break;    case '2':  edir = 2; break; /* south */
-	  case 'w': case '3':  edir = 3; break; /* west	 */
-	  case 'u': case '4':  edir = 4; break; /* up	 */
-	  case 'd': case '5':  edir = 5; break; /* down	 */
-		    case '6':  edir = 6; break; /* ne	 */
-		    case '7':  edir = 7; break; /* nw	 */
-		    case '8':  edir = 8; break; /* se	 */
-		    case '9':  edir = 9; break; /* sw	 */
-		    case '?':  edir = 10;break; /* somewhere */
+    case 'n':
+      switch ( c2 )
+	{
+	default:
+	  edir = DIR_NORTH;
+	  break;	/* north */
+	case 'e':
+	  edir = DIR_NORTHEAST;
+	  break; /* ne	 */
+	case 'w':
+	  edir = DIR_NORTHWEST;
+	  break; /* nw	 */
+	}
+      break;
+    case '0':
+      edir = DIR_NORTH;
+      break; /* north */
+    case 'e':
+    case '1':
+      edir = DIR_EAST;
+      break; /* east  */
+    case 's':
+      switch ( c2 )
+	{
+	default:
+	  edir = DIR_SOUTH;
+	  break; /* south */
+	case 'e':
+	  edir = DIR_SOUTHEAST;
+	  break; /* se	 */
+	case 'w':
+	  edir = DIR_SOUTHWEST;
+	  break; /* sw	 */
+	}
+      break;
+    case '2':
+      edir = DIR_SOUTH;
+      break; /* south */
+    case 'w':
+    case '3':
+      edir = DIR_WEST;
+      break; /* west	 */
+    case 'u':
+    case '4':
+      edir = DIR_UP;
+      break; /* up	 */
+    case 'd':
+    case '5':
+      edir = DIR_DOWN;
+      break; /* down	 */
+    case '6':
+      edir = DIR_NORTHEAST;
+      break; /* ne	 */
+    case '7':
+      edir = DIR_NORTHWEST;
+      break; /* nw	 */
+    case '8':
+      edir = DIR_SOUTHEAST;
+      break; /* se	 */
+    case '9':
+      edir = DIR_SOUTHWEST;
+      break; /* sw	 */
+    case '?':
+      edir = DIR_SOMEWHERE;
+      break; /* somewhere */
     }
-    return edir;
+
+  return edir;
 }
 
 void do_redit( CHAR_DATA *ch, char *argument )

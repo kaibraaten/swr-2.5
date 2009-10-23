@@ -1,4 +1,5 @@
 #include <time.h>
+#include <string.h>
 #include "swr_support.h"
 
 int umin( int check, int ncheck )
@@ -205,4 +206,22 @@ int number_door( void )
 int interpolate( int level, int value_00, int value_32 )
 {
   return value_00 + level * (value_32 - value_00) / 32;
+}
+
+char *flag_string( int bitvector, const char * const flagarray[] )
+{
+  static char buf[MAX_STRING_LENGTH];
+  int x;
+
+  buf[0] = '\0';
+  for ( x = 0; x < 32 ; x++ )
+    if ( IS_SET( bitvector, 1 << x ) )
+      {
+        strcat( buf, flagarray[x] );
+        strcat( buf, " " );
+      }
+  if ( (x=strlen( buf )) > 0 )
+    buf[--x] = '\0';
+
+  return buf;
 }

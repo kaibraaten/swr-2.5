@@ -1038,6 +1038,7 @@ void do_clan_withdraw( CHAR_DATA *ch, char *argument )
     
     clan->funds -= amount;
     ch->gold += amount;
+    save_char_obj( ch );
     save_clan ( clan );
             
 }
@@ -1087,7 +1088,7 @@ void do_clan_donate( CHAR_DATA *ch, char *argument )
     clan->funds += amount;
     ch->gold -= amount;
     save_clan ( clan );
-            
+    save_char_obj( ch );
 }
 
 
@@ -1494,6 +1495,8 @@ void clan_decrease_vehicles_owned( CLAN_DATA *clan, const SHIP_DATA *ship )
         {
           clan->vehicles--;
         }
+
+      save_clan( clan );
     }
 }
 

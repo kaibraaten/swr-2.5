@@ -3145,7 +3145,6 @@ void	echo_to_area	args( ( const AREA_DATA * area , short AT_COLOR,
 				const char *argument,
 				short tar ) );
 void   	get_reboot_string args( ( void ) );
-struct tm *update_time  args( ( struct tm *old_time ) );
 void	free_social	args( ( SOCIALTYPE *social ) );
 void	add_social	args( ( SOCIALTYPE *social ) );
 void	free_command	args( ( CMDTYPE *command ) );
@@ -3159,7 +3158,6 @@ BD *	get_board	args( ( const OBJ_DATA *obj ) );
 void	free_note	args( ( NOTE_DATA *pnote ) );
 
 /* build.c */
-char *	flag_string	args( ( int bitvector, const char * const flagarray[] ) );
 int	get_mpflag	args( ( const char *flag ) );
 int	get_dir		args( ( const char *txt  ) );
 int     get_vip_flag    args( ( const char *flag ) );

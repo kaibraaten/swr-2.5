@@ -3137,14 +3137,6 @@ void do_bestow( CHAR_DATA *ch, char *argument )
     send_to_char( "Done.\r\n", ch );
 }
 
-struct tm *update_time ( struct tm *old_time )
-{
-   time_t time;
-
-   time = mktime(old_time); 
-   return localtime(&time);
-}
-
 void do_set_boot_time( CHAR_DATA *ch, char *argument)
 {
    char arg[MAX_INPUT_LENGTH];

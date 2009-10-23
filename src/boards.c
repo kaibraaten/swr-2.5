@@ -40,27 +40,6 @@ bool can_remove( CHAR_DATA *ch, BOARD_DATA *board )
 bool can_read( CHAR_DATA *ch, BOARD_DATA *board )
 {
     return TRUE;
-
-/*
-
-  if ( IS_IMMORTAL( ch )  )
-    return TRUE;
-
-  if ( board->read_group[0] != '\0' )
-  {
-    if ( ch->pcdata->clan && !str_cmp( ch->pcdata->clan->name, board->read_group ) ) 
-      return TRUE; 
-    
-  }
-  if ( board->extra_readers[0] != '\0' )
-  {
-    if ( is_name( ch->name, board->extra_readers ) )
-      return TRUE;
-  } 
-  return FALSE;
-
-*/
-
 }
 
 bool can_post( CHAR_DATA *ch, BOARD_DATA *board )
