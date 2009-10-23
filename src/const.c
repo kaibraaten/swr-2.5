@@ -2,16 +2,6 @@
 #include <stdio.h>
 #include "mud.h"
 
-/* undef these at EOF */
-#define AM 95
-#define AC 95
-#define AT 85
-#define AW 85
-#define AV 95
-#define AD 95
-#define AR 90
-#define AA 95
-
 /*
  * Attribute bonus tables.
  */
@@ -304,23 +294,3 @@ const char *	const	attack_table[] =
     "blast",  "pound", "crush", "shot", "bite",
     "pierce", "suction"
 };
-
-
-
-/*
- * The skill and spell table.
- * Slot numbers must never be changed as they appear in #OBJECTS sections.
- */
-#define SLOT(n)	n
-#define LI LEVEL_IMMORTAL
-
-#undef AM 
-#undef AC 
-#undef AT 
-#undef AW 
-#undef AV 
-#undef AD 
-#undef AR
-#undef AA
-
-#undef LI

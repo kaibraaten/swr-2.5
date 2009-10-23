@@ -519,3 +519,17 @@ char *fread_word( FILE *fp )
     exit( 1 );
     return NULL;
 }
+
+/*
+ * Append a string to a file.
+ */
+void append_to_file( const char *file, const char *str )
+{
+  FILE *fp;
+
+  if ( ( fp = fopen( file, "a" ) ) )
+    {
+      fprintf( fp, "%s\n", str );
+      fclose( fp );
+    }
+}

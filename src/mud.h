@@ -3272,7 +3272,6 @@ MID *	get_mob_index	args( ( long vnum ) );
 OID *	get_obj_index	args( ( long vnum ) );
 RID *	get_room_index	args( ( long vnum ) );
 void	append_file	args( ( CHAR_DATA *ch, const char *file, const char *str ) );
-void	append_to_file	args( ( const char *file, const char *str ) );
 void	bug		args( ( const char *str, ... ) );
 void	log_string_plus	args( ( const char *str, short log_type ) );
 RID *	make_room	args( ( long vnum ) );
@@ -3485,7 +3484,7 @@ TIMER * get_timerptr	args( ( const CHAR_DATA *ch, short type ) );
 short	get_timer	args( ( const CHAR_DATA *ch, short type ) );
 void	extract_timer	args( ( CHAR_DATA *ch, TIMER *timer ) );
 void	remove_timer	args( ( CHAR_DATA *ch, short type ) );
-bool	chance  	args( ( const CHAR_DATA *ch, short percent ) );
+bool luck_check( const CHAR_DATA *ch, short percent );
 OD *	clone_object	args( ( const OBJ_DATA *obj ) );
 void	split_obj	args( ( OBJ_DATA *obj, int num ) );
 void	separate_obj	args( ( OBJ_DATA *obj ) );
@@ -3864,8 +3863,6 @@ void oprog_act_trigger( char *buf, OBJ_DATA *mobj, CHAR_DATA *ch,
 void rprog_act_trigger( char *buf, ROOM_INDEX_DATA *room, CHAR_DATA *ch,
 			OBJ_DATA *obj, void *vo );
 #endif
-
-char *const_char_to_nonconst( const char* );
 
 #define send_to_char  send_to_char_color
 #define send_to_pager send_to_pager_color

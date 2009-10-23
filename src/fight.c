@@ -14,33 +14,30 @@ extern CHAR_DATA *	gch_prev;
 
 /* From Skills.c */
 int ris_save( CHAR_DATA *ch, int chance, int ris );
-void        write_ship_list args( ( void ) );
+void write_ship_list( void );
 
 /*
  * Local functions.
  */
-void	dam_message	args( ( CHAR_DATA *ch, CHAR_DATA *victim, int dam,
-			    int dt ) );
-int	align_compute	args( ( CHAR_DATA *gch, CHAR_DATA *victim ) );
-ch_ret	one_hit		args( ( CHAR_DATA *ch, CHAR_DATA *victim, int dt ) );
-int	obj_hitroll	args( ( OBJ_DATA *obj ) );
-bool    get_cover( CHAR_DATA *ch );
-bool	dual_flip = FALSE;
-
+static void dam_message( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt );
+static int align_compute( const CHAR_DATA *gch, const CHAR_DATA *victim );
+ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt );
+static int obj_hitroll( OBJ_DATA *obj );
+static bool get_cover( CHAR_DATA *ch );
+static bool dual_flip = FALSE;
 
 /*
  * Check to see if weapon is poisoned.
  */
-bool is_wielding_poisoned( CHAR_DATA *ch )
+bool is_wielding_poisoned( const CHAR_DATA *ch )
 {
-         OBJ_DATA *obj;
+  OBJ_DATA *obj;
 
-         if ( ( obj = get_eq_char( ch, WEAR_WIELD ) 	)
-         &&   (IS_SET( obj->extra_flags, ITEM_POISONED) )	)
-                  return TRUE;
+  if ( ( obj = get_eq_char( ch, WEAR_WIELD ) 	)
+       &&   (IS_SET( obj->extra_flags, ITEM_POISONED) )	)
+    return TRUE;
 
-         return FALSE;
-
+  return FALSE;
 }
 
 /*
@@ -144,16 +141,15 @@ int max_fight( const CHAR_DATA *ch )
 void violence_update( void )
 {
     char buf[MAX_STRING_LENGTH];
-    CHAR_DATA *ch;
-    CHAR_DATA *lst_ch;
-    CHAR_DATA *victim;
-    CHAR_DATA *rch, *rch_next;
-    AFFECT_DATA *paf, *paf_next;
-    TIMER	*timer, *timer_next;
-    ch_ret     retcode;
-    SKILLTYPE	*skill;
+    CHAR_DATA *ch = NULL;
+    CHAR_DATA *lst_ch = NULL;
+    CHAR_DATA *victim = NULL;
+    CHAR_DATA *rch = NULL, *rch_next = NULL;
+    AFFECT_DATA *paf = NULL, *paf_next = NULL;
+    TIMER	*timer = NULL, *timer_next = NULL;
+    ch_ret     retcode = rNONE;
+    SKILLTYPE	*skill = NULL;
 
-    lst_ch = NULL;
     for ( ch = last_char; ch; lst_ch = ch, ch = gch_prev )
     {
 	set_cur_char( ch );
@@ -1066,14 +1062,12 @@ short ris_damage( const CHAR_DATA *ch, short dam, int ris )
 ch_ret damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
 {
     char buf1[MAX_STRING_LENGTH];
-    short dameq;
-    bool npcvict;
-    bool loot;
-    OBJ_DATA *damobj;
-    ch_ret retcode;
-    int init_gold, new_gold, gold_diff;
-
-    retcode = rNONE;
+    short dameq = 0;
+    bool npcvict = FALSE;
+    bool loot = FALSE;
+    OBJ_DATA *damobj = NULL;
+    ch_ret retcode = rNONE;
+    int init_gold = 0, new_gold = 0, gold_diff = 0;
 
     if ( !ch )
     {
@@ -1976,15 +1970,12 @@ else
   return;
 }
 
-
-
-int align_compute( CHAR_DATA *gch, CHAR_DATA *victim )
+int align_compute( const CHAR_DATA *gch, const CHAR_DATA *victim )
 {
-    return URANGE ( -1000, 
-                     (int) ( gch->alignment - victim->alignment/5 ),
-                     1000 );
+  return URANGE ( -1000, 
+		  (int) ( gch->alignment - victim->alignment/5 ),
+		  1000 );
 }
-
 
 void dam_message( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt )
 {
@@ -2156,19 +2147,6 @@ void do_kill( CHAR_DATA *ch, char *argument )
 	    send_to_char( "You must MURDER a player.\r\n", ch );
 	    return;
     }
-
-   /*
-    *
-    else
-    {
-	if ( IS_AFFECTED(victim, AFF_CHARM) && victim->master != NULL )
-	{
-	    send_to_char( "You must MURDER a charmed creature.\r\n", ch );
-	    return;
-	}
-    }
-    *
-    */
 
     if ( victim == ch )
     {

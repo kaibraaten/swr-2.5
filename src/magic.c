@@ -543,7 +543,7 @@ bool saves_poison_death( int level, const CHAR_DATA *victim )
 
     save = 50 + ( victim->top_level - level - victim->saving_poison_death ) * 2;
     save = URANGE( 5, save, 95 );
-    return chance( victim, save );
+    return luck_check( victim, save );
 }
 bool saves_wands( int level, const CHAR_DATA *victim )
 {
@@ -554,7 +554,7 @@ bool saves_wands( int level, const CHAR_DATA *victim )
 
     save = 50 + ( victim->top_level - level - victim->saving_wand ) * 2;
     save = URANGE( 5, save, 95 );
-    return chance( victim, save );
+    return luck_check( victim, save );
 }
 bool saves_para_petri( int level, const CHAR_DATA *victim )
 {
@@ -562,7 +562,7 @@ bool saves_para_petri( int level, const CHAR_DATA *victim )
 
     save = 50 + ( victim->top_level - level - victim->saving_para_petri ) * 2;
     save = URANGE( 5, save, 95 );
-    return chance( victim, save );
+    return luck_check( victim, save );
 }
 bool saves_breath( int level, const CHAR_DATA *victim )
 {
@@ -570,7 +570,7 @@ bool saves_breath( int level, const CHAR_DATA *victim )
 
     save = 50 + ( victim->top_level - level - victim->saving_breath ) * 2;
     save = URANGE( 5, save, 95 );
-    return chance( victim, save );
+    return luck_check( victim, save );
 }
 bool saves_spell_staff( int level, const CHAR_DATA *victim )
 {
@@ -583,7 +583,7 @@ bool saves_spell_staff( int level, const CHAR_DATA *victim )
       level -= 5;
     save = 50 + ( victim->top_level - level - victim->saving_spell_staff ) * 2;
     save = URANGE( 5, save, 95 );
-    return chance( victim, save );
+    return luck_check( victim, save );
 }
 
 
@@ -1153,7 +1153,7 @@ ch_ret obj_cast_spell( int sn, int level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_
      */
     if ( (skill->target == TAR_CHAR_OFFENSIVE
     ||    number_bits(7) == 1)	/* 1/128 chance if non-offensive */
-    &&   !chance( ch, 95 + levdiff ) )
+    &&   !luck_check( ch, 95 + levdiff ) )
     {
 	switch( number_bits(2) )
 	{
@@ -1528,7 +1528,7 @@ ch_ret spell_identify( int sn, int level, CHAR_DATA *ch, void *vo )
       ch_printf(ch, "%s appears to be level %d.\r\n", victim->name, victim->top_level);
     }
 
-    if ( (chance(ch, 50) && ch->top_level >= victim->top_level + 10 )
+    if ( (luck_check(ch, 50) && ch->top_level >= victim->top_level + 10 )
     ||    IS_IMMORTAL(ch) )
     {
     ch_printf(ch, "%s appears to be affected by: ", victim->name);
@@ -1619,7 +1619,7 @@ ch_ret spell_invis( int sn, int level, CHAR_DATA *ch, void *vo )
 	if (obj)
 	{
 	    if ( IS_OBJ_STAT(obj, ITEM_INVIS) 
-	    ||   chance(ch, 40 + level / 10))
+	    ||   luck_check(ch, 40 + level / 10))
             {
 		failed_casting( skill, ch, NULL, NULL );
 		return rSPELL_FAILED;
@@ -1823,7 +1823,7 @@ ch_ret spell_possess( int sn, int level, CHAR_DATA *ch, void *vo )
     if ( IS_AFFECTED(victim, AFF_POSSESS)
     ||   level < (victim->top_level + 30) 
     ||  victim->desc
-    ||  !chance(ch, 25) )
+    ||  !luck_check(ch, 25) )
     {
 	failed_casting( skill, ch, victim, NULL );
 	return rSPELL_FAILED;
@@ -2432,7 +2432,7 @@ ch_ret spell_obj_inv( int sn, int level, CHAR_DATA *ch, void *vo )
 	  return rNONE;
 	case SA_OBSCURE:			/* make obj invis */
 	  if ( IS_OBJ_STAT(obj, ITEM_INVIS) 
-	  ||   chance(ch, skill->dice ? dice_parse(ch, level, skill->dice) : 20))
+	  ||   luck_check(ch, skill->dice ? dice_parse(ch, level, skill->dice) : 20))
           {
 	     failed_casting( skill, ch, NULL, NULL );
      	     return rSPELL_FAILED;

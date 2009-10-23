@@ -1,5 +1,5 @@
 ODIR = obj
-_OBJ = bet.o file_read.o hashstr.o misc.o os_unix.o sha256.o string_handling.o time_fun.o vector3.o
+_OBJ = bet.o file_io.o hashstr.o misc.o os_unix.o sha256.o string_handling.o time_fun.o vector3.o
 OBJ  = $(patsubst %,$(ODIR)/%,$(_OBJ))
 DEPS =
 CC = gcc

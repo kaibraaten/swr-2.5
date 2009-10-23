@@ -205,45 +205,33 @@ bool MOBtrigger = TRUE;
  */
 void init_mm( void );
 
-void	boot_log	args( ( const char *str, ... ) );
-void	load_area	args( ( FILE *fp ) );
-void    load_flags      args( ( AREA_DATA *tarea, FILE *fp ) );
-void	load_helps	args( ( AREA_DATA *tarea, FILE *fp ) );
-void	load_mobiles	args( ( AREA_DATA *tarea, FILE *fp ) );
-void	load_objects	args( ( AREA_DATA *tarea, FILE *fp ) );
-void	load_rooms	args( ( AREA_DATA *tarea, FILE *fp ) );
-void	load_shops	args( ( AREA_DATA *tarea, FILE *fp ) );
-void 	load_repairs	args( ( AREA_DATA *tarea, FILE *fp ) );
-void	load_specials	args( ( AREA_DATA *tarea, FILE *fp ) );
-bool	load_systemdata	args( ( SYSTEM_DATA *sys ) );
-void    load_banlist    args( ( void ) );
-
-void	fix_exits	args( ( void ) );
+static void boot_log( const char *str, ... );
+static void load_area( FILE *fp );
+static void load_flags( AREA_DATA *tarea, FILE *fp );
+static void load_helps( AREA_DATA *tarea, FILE *fp );
+static void load_mobiles( AREA_DATA *tarea, FILE *fp );
+static void load_objects( AREA_DATA *tarea, FILE *fp );
+static void load_rooms( AREA_DATA *tarea, FILE *fp );
+static void load_shops( AREA_DATA *tarea, FILE *fp );
+static void load_repairs( AREA_DATA *tarea, FILE *fp );
+static void load_specials( AREA_DATA *tarea, FILE *fp );
+static bool load_systemdata( SYSTEM_DATA *sys );
+static void load_banlist( void );
+static void fix_exits( void );
 
 /*
  * External booting function
  */
-void	load_corpses	args( ( void ) );
+void load_corpses( void );
 
 /*
  * MUDprogram locals
  */
 
-int 		mprog_name_to_type	args ( ( char* name ) );
-MPROG_DATA *	mprog_file_read 	args ( ( char* f, MPROG_DATA* mprg,
-						MOB_INDEX_DATA *pMobIndex ) );
-/* int 		oprog_name_to_type	args ( ( char* name ) ); */
-MPROG_DATA *	oprog_file_read 	args ( ( char* f, MPROG_DATA* mprg,
-						OBJ_INDEX_DATA *pObjIndex ) );
-/* int 		rprog_name_to_type	args ( ( char* name ) ); */
-MPROG_DATA *	rprog_file_read 	args ( ( char* f, MPROG_DATA* mprg,
-						 ROOM_INDEX_DATA* ) );
-void   		mprog_read_programs     args ( ( FILE* fp,
-						MOB_INDEX_DATA *pMobIndex) );
-void   		oprog_read_programs     args ( ( FILE* fp,
-						OBJ_INDEX_DATA *pObjIndex) );
-void   		rprog_read_programs     args ( ( FILE* fp,
-						 ROOM_INDEX_DATA *pRoomIndex) );
+static int mprog_name_to_type( const char* name );
+static void mprog_read_programs( FILE* fp, MOB_INDEX_DATA *pMobIndex);
+static void oprog_read_programs( FILE* fp, OBJ_INDEX_DATA *pObjIndex);
+static void rprog_read_programs( FILE* fp, ROOM_INDEX_DATA *pRoomIndex);
 void unlink_social( SOCIALTYPE *social );
 
 void shutdown_mud( const char *reason )
@@ -592,7 +580,7 @@ void load_area( FILE *fp )
 /*
  * Load area flags. Narn, Mar/96 
  */
-void load_flags( AREA_DATA *tarea, FILE *fp )
+static void load_flags( AREA_DATA *tarea, FILE *fp )
 {
   const char *ln = NULL;
   int x1 = 0, x2 = 0;
@@ -2179,20 +2167,6 @@ void append_file( CHAR_DATA *ch, const char *file, const char *str )
 }
 
 /*
- * Append a string to a file.
- */
-void append_to_file( const char *file, const char *str )
-{
-  FILE *fp;
-
-  if ( ( fp = fopen( file, "a" ) ) )
-    {
-      fprintf( fp, "%s\n", str );
-      fclose( fp );
-    }
-}
-
-/*
  * Reports a bug.
  */
 void bug( const char *str, ... )
@@ -2357,12 +2331,23 @@ void log_string_plus( const char *str, short log_type )
     return;
 }
 
+/* From Erwin */
+void log_printf( const char *fmt, ... )
+{
+  char buf[MAX_STRING_LENGTH * 2];
+  va_list args;
+  va_start( args, fmt );
+  vsprintf( buf, fmt, args );
+  va_end( args );
+
+  log_string( buf );
+}
 
 /* mud prog functions */
 
 /* This routine reads in scripts of MUDprograms from a file */
 
-int mprog_name_to_type ( char *name )
+int mprog_name_to_type ( const char *name )
 {
       if ( !str_cmp( name, "in_file_prog"   ) )	return IN_FILE_PROG;
    if ( !str_cmp( name, "act_prog"       ) )    return ACT_PROG;
@@ -2778,7 +2763,7 @@ bool delete_room( ROOM_INDEX_DATA *room )
     STRFREE( room->description );
 
     /* Free up the ram held by the room index itself. */
-    free( room );
+    DISPOSE( room );
 
     top_room--;
     return TRUE;
@@ -2801,38 +2786,38 @@ bool delete_mob( MOB_INDEX_DATA *mob )
  */
 ROOM_INDEX_DATA *make_room( long vnum )
 {
-	ROOM_INDEX_DATA *pRoomIndex;
-	int	iHash;
+  ROOM_INDEX_DATA *pRoomIndex;
+  int	iHash;
 
-	CREATE( pRoomIndex, ROOM_INDEX_DATA, 1 );
-	pRoomIndex->first_person	= NULL;
-	pRoomIndex->last_person		= NULL;
-	pRoomIndex->first_content	= NULL;
-	pRoomIndex->last_content	= NULL;
-	pRoomIndex->first_extradesc	= NULL;
-	pRoomIndex->last_extradesc	= NULL;
-	pRoomIndex->first_ship          = NULL;
-	pRoomIndex->last_ship		= NULL;
-	pRoomIndex->next_in_area         = NULL;
-	pRoomIndex->prev_in_area	= NULL;
-	  pRoomIndex->next_in_ship      = NULL;
-	  pRoomIndex->prev_in_ship      = NULL;
-	pRoomIndex->area		= NULL;
-	pRoomIndex->vnum		= vnum;
-	pRoomIndex->name		= STRALLOC("Floating in a void");
-	pRoomIndex->description		= STRALLOC("");
-	pRoomIndex->room_flags		= 0;
-	pRoomIndex->sector_type		= 1;
-	pRoomIndex->light		= 0;
-	pRoomIndex->first_exit		= NULL;
-	pRoomIndex->last_exit		= NULL;
+  CREATE( pRoomIndex, ROOM_INDEX_DATA, 1 );
+  pRoomIndex->first_person	= NULL;
+  pRoomIndex->last_person		= NULL;
+  pRoomIndex->first_content	= NULL;
+  pRoomIndex->last_content	= NULL;
+  pRoomIndex->first_extradesc	= NULL;
+  pRoomIndex->last_extradesc	= NULL;
+  pRoomIndex->first_ship          = NULL;
+  pRoomIndex->last_ship		= NULL;
+  pRoomIndex->next_in_area         = NULL;
+  pRoomIndex->prev_in_area	= NULL;
+  pRoomIndex->next_in_ship      = NULL;
+  pRoomIndex->prev_in_ship      = NULL;
+  pRoomIndex->area		= NULL;
+  pRoomIndex->vnum		= vnum;
+  pRoomIndex->name		= STRALLOC("Floating in a void");
+  pRoomIndex->description		= STRALLOC("");
+  pRoomIndex->room_flags		= 0;
+  pRoomIndex->sector_type		= 1;
+  pRoomIndex->light		= 0;
+  pRoomIndex->first_exit		= NULL;
+  pRoomIndex->last_exit		= NULL;
 
-	iHash			= vnum % MAX_KEY_HASH;
-	pRoomIndex->next	= room_index_hash[iHash];
-	room_index_hash[iHash]	= pRoomIndex;
-	top_room++;
+  iHash			= vnum % MAX_KEY_HASH;
+  pRoomIndex->next	= room_index_hash[iHash];
+  room_index_hash[iHash]	= pRoomIndex;
+  top_room++;
 
-	return pRoomIndex;
+  return pRoomIndex;
 }
 
 ROOM_INDEX_DATA *make_ship_room( SHIP_DATA * ship )
@@ -3092,7 +3077,8 @@ MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
  * to_room and vnum.						-Thoric
  * Exits are inserted into the linked list based on vdir.
  */
-EXIT_DATA *make_exit( ROOM_INDEX_DATA *pRoomIndex, ROOM_INDEX_DATA *to_room, short door )
+EXIT_DATA *make_exit( ROOM_INDEX_DATA *pRoomIndex, ROOM_INDEX_DATA *to_room,
+		      short door )
 {
 	EXIT_DATA *pexit, *texit;
 	bool broke;
@@ -3147,45 +3133,43 @@ EXIT_DATA *make_exit( ROOM_INDEX_DATA *pRoomIndex, ROOM_INDEX_DATA *to_room, sho
 
 void fix_area_exits( AREA_DATA *tarea )
 {
-    ROOM_INDEX_DATA *pRoomIndex;
-    EXIT_DATA *pexit, *rev_exit;
-    long rnum;
-    bool fexit;
+  ROOM_INDEX_DATA *pRoomIndex = NULL;
+  EXIT_DATA *pexit = NULL, *rev_exit = NULL;
 
-    for ( pRoomIndex = tarea->first_room ; pRoomIndex ; pRoomIndex = pRoomIndex->next_in_area )
+  for ( pRoomIndex = tarea->first_room ; pRoomIndex ; pRoomIndex = pRoomIndex->next_in_area )
     {
-	rnum = pRoomIndex->vnum;
+      bool fexit = FALSE;
 
-	fexit = FALSE;
-	for ( pexit = pRoomIndex->first_exit; pexit; pexit = pexit->next )
+
+      for ( pexit = pRoomIndex->first_exit; pexit; pexit = pexit->next )
 	{
-		fexit = TRUE;
-		pexit->rvnum = pRoomIndex->vnum;
-		if ( pexit->vnum <= 0 )
-	       	  pexit->to_room = NULL;
-		else
-		  pexit->to_room = get_room_index( pexit->vnum );
+	  fexit = TRUE;
+	  pexit->rvnum = pRoomIndex->vnum;
+
+	  if ( pexit->vnum <= 0 )
+	    pexit->to_room = NULL;
+	  else
+	    pexit->to_room = get_room_index( pexit->vnum );
 	}
-	if ( !fexit )
-	  SET_BIT( pRoomIndex->room_flags, ROOM_NO_MOB );
+
+      if ( !fexit )
+	SET_BIT( pRoomIndex->room_flags, ROOM_NO_MOB );
     }
 
 
-    for ( pRoomIndex = tarea->first_room ; pRoomIndex ; pRoomIndex = pRoomIndex->next_in_area )
+  for ( pRoomIndex = tarea->first_room ; pRoomIndex ; pRoomIndex = pRoomIndex->next_in_area )
     {
-	rnum = pRoomIndex->vnum;
-
-	for ( pexit = pRoomIndex->first_exit; pexit; pexit = pexit->next )
+      for ( pexit = pRoomIndex->first_exit; pexit; pexit = pexit->next )
 	{
-		if ( pexit->to_room && !pexit->rexit )
+	  if ( pexit->to_room && !pexit->rexit )
+	    {
+	      rev_exit = get_exit_to( pexit->to_room, rev_dir[pexit->vdir], pRoomIndex->vnum );
+	      if ( rev_exit )
 		{
-		   rev_exit = get_exit_to( pexit->to_room, rev_dir[pexit->vdir], pRoomIndex->vnum );
-		   if ( rev_exit )
-		   {
-			pexit->rexit	= rev_exit;
-			rev_exit->rexit	= pexit;
-		   }
+		  pexit->rexit	= rev_exit;
+		  rev_exit->rexit	= pexit;
 		}
+	    }
 	}
     }
 }

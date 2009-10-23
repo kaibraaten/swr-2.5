@@ -13,7 +13,7 @@ void wear_obj( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace, short wear_bit );
 bool job_trigger( CHAR_DATA *victim, CHAR_DATA *ch, OBJ_DATA *obj );
 void wear_obj_dispatch_fun( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace,
                             int wear_loc );
-void write_corpses( CHAR_DATA *ch, char *name );
+void write_corpses( const CHAR_DATA *ch, const char *name );
 
 /*
  * how resistant an object is to damage				-Thoric
@@ -39,6 +39,18 @@ short get_obj_resistance( const OBJ_DATA *obj )
   return URANGE(10, resist, 99);
 }
 
+char *obj_short( const OBJ_DATA *obj )
+{
+  static char buf[MAX_STRING_LENGTH];
+
+  if ( obj->count > 1 )
+    {
+      sprintf( buf, "%s (%d)", obj->short_descr, obj->count );
+      return buf;
+    }
+
+  return obj->short_descr;
+}
 
 void get_obj( CHAR_DATA *ch, OBJ_DATA *obj, OBJ_DATA *container )
 {
