@@ -359,7 +359,6 @@ void do_induct( CHAR_DATA *ch, char *argument )
     act( AT_MAGIC, "$n inducts $N into $t", ch, clan->name, victim, TO_NOTVICT );
     act( AT_MAGIC, "$n inducts you into $t", ch, clan->name, victim, TO_VICT );
     save_char_obj( victim );
-    return;
 }
 
 void do_outcast( CHAR_DATA *ch, char *argument )
@@ -440,6 +439,7 @@ void do_outcast( CHAR_DATA *ch, char *argument )
     victim->pcdata->bestowments = str_dup("");
     
     save_char_obj( victim );	/* clan gets saved when pfile is saved */
+    save_clan( clan ); /* Nope, it doesn't because pcdata->clan is NULL */
     return;
 }
 
@@ -979,10 +979,8 @@ void do_resign( CHAR_DATA *ch, char *argument )
     DISPOSE( ch->pcdata->bestowments );
     ch->pcdata->bestowments = str_dup("");
 
-    save_char_obj( ch );	/* clan gets saved when pfile is saved */
-    
-    return;
-
+    save_char_obj( ch );
+    save_clan( clan );
 }
 
 void do_clan_withdraw( CHAR_DATA *ch, char *argument )
@@ -1040,9 +1038,7 @@ void do_clan_withdraw( CHAR_DATA *ch, char *argument )
     ch->gold += amount;
     save_char_obj( ch );
     save_clan ( clan );
-            
 }
-
 
 void do_clan_donate( CHAR_DATA *ch, char *argument )
 {
@@ -1094,8 +1090,6 @@ void do_clan_donate( CHAR_DATA *ch, char *argument )
 
 void do_appoint ( CHAR_DATA *ch , char *argument )
 {
-    
-    char buf[MAX_STRING_LENGTH];
     char name[MAX_INPUT_LENGTH];
     char fname[MAX_STRING_LENGTH];
     struct stat fst;
@@ -1134,46 +1128,13 @@ void do_appoint ( CHAR_DATA *ch , char *argument )
 	return;
     }
     
-    strcpy ( buf , ch->pcdata->clan->leaders );
-    strcat( buf , " ");
-    strcat( buf , name );
-    
-    STRFREE( ch->pcdata->clan->leaders );
-    ch->pcdata->clan->leaders = STRALLOC( buf );
-
+    clan_add_leader( ch->pcdata->clan, name );
     save_clan ( ch->pcdata->clan );
         
 }
 
 void do_demote ( CHAR_DATA *ch , char *argument )
 {
-
-/*  disabled  */
-    
-    return;
-    
-    if ( IS_NPC( ch ) || !ch->pcdata )
-      return;
-
-    if ( !ch->pcdata->clan )
-    {
-	send_to_char( "Huh?\r\n", ch );
-	return;
-    }
-
-    if ( !clan_char_is_leader( ch->pcdata->clan, ch ) )
-    {
-	send_to_char( "Only your leaders can do that!\r\n", ch );
-	return;
-    }
-
-    if ( argument[0] == '\0' )
-    {
-	send_to_char( "Demote who?\r\n", ch );
-	return;
-    }
-    
-    save_clan ( ch->pcdata->clan );
         
 }
 
@@ -1358,11 +1319,8 @@ void do_overthrow( CHAR_DATA *ch , char * argument )
 
     ch_printf( ch, "OK. You are now a leader of %s.\r\n", ch->pcdata->clan->name );
     
-    STRFREE ( ch->pcdata->clan->leaders );
-    ch->pcdata->clan->leaders = STRALLOC ( ch->name );
-
-    save_char_obj( ch );	/* clan gets saved when pfile is saved */
-         
+    clan_add_leader( ch->pcdata->clan, ch->name );
+    save_char_obj( ch );
 }
 
 void do_war ( CHAR_DATA *ch , char *argument )
@@ -1513,6 +1471,7 @@ void clan_add_leader( CLAN_DATA *clan, const char *name )
       sprintf( buf, "%s %s", clan->leaders, name );
       STRFREE( clan->leaders );
       clan->leaders = STRALLOC( buf );
+      save_clan( clan );
     }
 }
 
@@ -1540,4 +1499,5 @@ void clan_remove_leader( CLAN_DATA *clan, const char *name )
 
   STRFREE( clan->leaders );
   clan->leaders = STRALLOC( tc );
+  save_clan( clan );
 }

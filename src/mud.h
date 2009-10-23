@@ -15,22 +15,10 @@
 typedef	int				ch_ret;
 typedef	int				obj_ret;
 
-/*
- * Accommodate old non-Ansi compilers.
- */
-#if defined(TRADITIONAL)
-#define const
-#define args( list )			( )
-#define DECLARE_DO_FUN( fun )		void fun( )
-#define DECLARE_SPEC_FUN( fun )		bool fun( )
-#define DECLARE_SPELL_FUN( fun )	ch_ret fun( )
-#else
 #define args( list )			list
 #define DECLARE_DO_FUN( fun )		DO_FUN    fun
 #define DECLARE_SPEC_FUN( fun )		SPEC_FUN  fun
 #define DECLARE_SPELL_FUN( fun )	SPELL_FUN fun
-#endif
-
 
 /*
  * Structure types.
@@ -47,7 +35,6 @@ typedef struct	descriptor_data		DESCRIPTOR_DATA;
 typedef struct	exit_data		EXIT_DATA;
 typedef struct	extra_descr_data	EXTRA_DESCR_DATA;
 typedef struct	help_data		HELP_DATA;
-typedef struct	menu_data		MENU_DATA;
 typedef struct	mob_index_data		MOB_INDEX_DATA;
 typedef struct	note_data		NOTE_DATA;
 typedef struct	board_data		BOARD_DATA;
@@ -64,13 +51,11 @@ typedef struct  planet_data		PLANET_DATA;
 typedef struct  guard_data		GUARD_DATA;
 typedef struct  space_data              SPACE_DATA;
 typedef	struct	clan_data		CLAN_DATA;
-typedef	struct	senate_data		SENATE_DATA;
 typedef struct  ship_data               SHIP_DATA;
-typedef struct  hanger_data             HANGER_DATA;
+typedef struct  hangar_data             HANGAR_DATA;
 typedef struct  turret_data             TURRET_DATA;
 typedef struct  ship_prototype_data     SHIP_PROTOTYPE;
 typedef struct  missile_data            MISSILE_DATA;
-typedef struct  tourney_data            TOURNEY_DATA;
 typedef struct	mob_prog_data		MPROG_DATA;
 typedef struct	mob_prog_act_list	MPROG_ACT_LIST;
 typedef	struct	editor_data		EDITOR_DATA;
@@ -84,14 +69,13 @@ typedef	struct	skill_type		SKILLTYPE;
 typedef	struct	social_type		SOCIALTYPE;
 typedef	struct	cmd_type		CMDTYPE;
 typedef	struct	killed_data		KILLED_DATA;
-typedef struct	wizent			WIZENT;
 
 /*
  * Function types.
  */
 typedef	void DO_FUN( CHAR_DATA *ch, char *argument );
-typedef bool	SPEC_FUN	args( ( CHAR_DATA *ch ) );
-typedef ch_ret	SPELL_FUN	args( ( int sn, int level, CHAR_DATA *ch, void *vo ) );
+typedef bool SPEC_FUN( CHAR_DATA *ch );
+typedef ch_ret SPELL_FUN( int sn, int level, CHAR_DATA *ch, void *vo );
 
 #define DUR_CONV	23.333333333333333333333333
 
@@ -195,6 +179,7 @@ typedef enum
   {
     DISASTER_ALIEN_INVASION
   } disaster_types;
+
 /*
  * do_who output structure -- Narn
  */ 
@@ -672,10 +657,10 @@ struct turret_data
     short      laserstate;
 };
 
-struct hanger_data
+struct hangar_data
 {
-    HANGER_DATA * next;
-    HANGER_DATA * prev;
+    HANGAR_DATA * next;
+    HANGAR_DATA * prev;
     ROOM_INDEX_DATA *room;
     bool        vehicle;
     bool        bayopen;
@@ -700,8 +685,8 @@ struct ship_data
   SPACE_DATA * starsystem;
   TURRET_DATA *first_turret;
   TURRET_DATA *last_turret;
-  HANGER_DATA *first_hanger;
-  HANGER_DATA *last_hanger;
+  HANGAR_DATA *first_hangar;
+  HANGAR_DATA *last_hangar;
   char *      filename;
   char *      name;
   char *      home;
@@ -2494,86 +2479,84 @@ extern	const char *	const	area_flags	[];
 /*
  * Global variables.
  */
-extern	int	numobjsloaded;
-extern	int	nummobsloaded;
-extern	int	physicalobjects;
-extern	int	num_descriptors;
-extern	struct	system_data		sysdata;
-extern	int	top_sn;
-extern	int	top_vroom;
+extern int numobjsloaded;
+extern int nummobsloaded;
+extern int physicalobjects;
+extern int num_descriptors;
+extern struct system_data sysdata;
+extern int top_sn;
+extern int top_vroom;
 
-extern		CMDTYPE		  *	command_hash	[126];
+extern CMDTYPE *command_hash[126];
 
-extern		SKILLTYPE	  *	skill_table	[MAX_SKILL];
-extern		SOCIALTYPE	  *	social_index	[27];
-extern		CHAR_DATA	  *	cur_char;
-extern		ROOM_INDEX_DATA	  *	cur_room;
-extern		bool			cur_char_died;
-extern		ch_ret			global_retcode;
+extern SKILLTYPE *skill_table[MAX_SKILL];
+extern SOCIALTYPE *social_index[27];
+extern CHAR_DATA *cur_char;
+extern ROOM_INDEX_DATA *cur_room;
+extern bool cur_char_died;
+extern ch_ret global_retcode;
 
-extern		int			cur_obj;
-extern		int			cur_obj_serial;
-extern		bool			cur_obj_extracted;
-extern		obj_ret			global_objcode;
+extern int cur_obj;
+extern int cur_obj_serial;
+extern bool cur_obj_extracted;
+extern obj_ret global_objcode;
 
-extern		HELP_DATA	  *	first_help;
-extern		HELP_DATA	  *	last_help;
-extern		SHOP_DATA	  *	first_shop;
-extern		SHOP_DATA	  *	last_shop;
-extern		REPAIR_DATA	  *	first_repair;
-extern		REPAIR_DATA	  *	last_repair;
+extern HELP_DATA *first_help;
+extern HELP_DATA *last_help;
+extern SHOP_DATA *first_shop;
+extern SHOP_DATA *last_shop;
+extern REPAIR_DATA *first_repair;
+extern REPAIR_DATA *last_repair;
 
-extern		BAN_DATA	  *	first_ban;
-extern		BAN_DATA	  *	last_ban;
-extern		BAN_DATA	  *	first_tban;
-extern		BAN_DATA	  *	last_tban;
-extern		CHAR_DATA	  *	first_char;
-extern		CHAR_DATA	  *	last_char;
-extern		DESCRIPTOR_DATA   *	first_descriptor;
-extern		DESCRIPTOR_DATA   *	last_descriptor;
-extern		BOARD_DATA	  *	first_board;
-extern		BOARD_DATA	  *	last_board;
-extern		OBJ_DATA	  *	first_object;
-extern		OBJ_DATA	  *	last_object;
-extern		CLAN_DATA	  *	first_clan;
-extern		CLAN_DATA	  *	last_clan;
-extern		GUARD_DATA	  *	first_guard;
-extern		GUARD_DATA	  *	last_guard;
-extern          SHIP_DATA         *     first_ship;
-extern          SHIP_DATA         *     last_ship;
-extern          SHIP_PROTOTYPE    *     first_ship_prototype;
-extern          SHIP_PROTOTYPE    *     last_ship_prototype;
-extern          SPACE_DATA        *     first_starsystem;
-extern          SPACE_DATA        *     last_starsystem;
-extern          PLANET_DATA       *     first_planet;
-extern          PLANET_DATA       *     last_planet;
-extern          SENATE_DATA       *     first_senator;
-extern          SENATE_DATA       *     last_senator;
-extern          VOTE_DATA         *     first_poll;
-extern          VOTE_DATA         *     last_poll;
-extern		AREA_DATA	  *	first_area;
-extern		AREA_DATA	  *	last_area;
-extern		AREA_DATA	  *	first_build;
-extern		AREA_DATA	  *	last_build;
-extern		TELEPORT_DATA	  *	first_teleport;
-extern		TELEPORT_DATA	  *	last_teleport;
-extern		OBJ_DATA	  *	extracted_obj_queue;
-extern		EXTRACT_CHAR_DATA *	extracted_char_queue;
-extern		OBJ_DATA	  *	save_equipment[MAX_WEAR][MAX_LAYERS];
-extern		CHAR_DATA	  *	quitting_char;
-extern		CHAR_DATA	  *	loading_char;
-extern		CHAR_DATA	  *	saving_char;
-extern		OBJ_DATA	  *	all_obj;
+extern BAN_DATA *first_ban;
+extern BAN_DATA *last_ban;
+extern BAN_DATA *first_tban;
+extern BAN_DATA *last_tban;
+extern CHAR_DATA *first_char;
+extern CHAR_DATA *last_char;
+extern DESCRIPTOR_DATA *first_descriptor;
+extern DESCRIPTOR_DATA *last_descriptor;
+extern BOARD_DATA *first_board;
+extern BOARD_DATA *last_board;
+extern OBJ_DATA *first_object;
+extern OBJ_DATA *last_object;
+extern CLAN_DATA *first_clan;
+extern CLAN_DATA *last_clan;
+extern GUARD_DATA *first_guard;
+extern GUARD_DATA *last_guard;
+extern SHIP_DATA *first_ship;
+extern SHIP_DATA *last_ship;
+extern SHIP_PROTOTYPE *first_ship_prototype;
+extern SHIP_PROTOTYPE *last_ship_prototype;
+extern SPACE_DATA *first_starsystem;
+extern SPACE_DATA *last_starsystem;
+extern PLANET_DATA *first_planet;
+extern PLANET_DATA *last_planet;
+extern VOTE_DATA *first_poll;
+extern VOTE_DATA *last_poll;
+extern AREA_DATA *first_area;
+extern AREA_DATA *last_area;
+extern AREA_DATA *first_build;
+extern AREA_DATA *last_build;
+extern TELEPORT_DATA *first_teleport;
+extern TELEPORT_DATA *last_teleport;
+extern OBJ_DATA *extracted_obj_queue;
+extern EXTRACT_CHAR_DATA *extracted_char_queue;
+extern OBJ_DATA *save_equipment[MAX_WEAR][MAX_LAYERS];
+extern CHAR_DATA *quitting_char;
+extern CHAR_DATA *loading_char;
+extern CHAR_DATA *saving_char;
+extern OBJ_DATA *al_obj;
 
-extern		char			bug_buf		[];
-extern		time_t			current_time;
-extern		bool			fLogAll;
-extern		char			log_buf		[];
-extern		TIME_INFO_DATA		time_info;
-extern		WEATHER_DATA		weather_info;
+extern char			bug_buf		[];
+extern time_t			current_time;
+extern bool			fLogAll;
+extern char			log_buf		[];
+extern TIME_INFO_DATA		time_info;
+extern WEATHER_DATA		weather_info;
 
-extern          AUCTION_DATA      *     auction;
-extern		struct act_prog_data *	mob_act_list;
+extern AUCTION_DATA      *     auction;
+extern struct act_prog_data *	mob_act_list;
 
 
 /*
@@ -3041,7 +3024,6 @@ DECLARE_SPELL_FUN(	spell_smaug		);
 #define BOARD_FILE	"boards.txt"		/* For bulletin boards	 */
 #define SHUTDOWN_FILE	"shutdown.txt"		/* For 'shutdown'	 */
 #define COPYOVER_FILE   SYSTEM_DIR "copyover.dat"
-#define EXE_FILE        "swr"
 #define ANSITITLE_FILE	SYSTEM_DIR "mudtitle.ans"
 #define ASCTITLE_FILE	SYSTEM_DIR "mudtitle.asc"
 #define BOOTLOG_FILE	SYSTEM_DIR "boot.txt"	  /* Boot up error file	 */
@@ -3050,7 +3032,6 @@ DECLARE_SPELL_FUN(	spell_smaug		);
 #define LOG_FILE	SYSTEM_DIR "log.txt"	  /* For talking in logged rooms */
 #define WHO_FILE	SYSTEM_DIR "WHO"	  /* Who output file	 */
 #define WEBWHO_FILE	SYSTEM_DIR "WEBWHO"	  /* WWW Who output file */
-#define REQUEST_PIPE	SYSTEM_DIR "REQUESTS"	  /* Request FIFO	 */
 #define SKILL_FILE	SYSTEM_DIR "skills.dat"   /* Skill table	 */
 #define SOCIAL_FILE	SYSTEM_DIR "socials.dat"  /* Socials		 */
 #define COMMAND_FILE	SYSTEM_DIR "commands.dat" /* Commands		 */
@@ -3386,182 +3367,177 @@ void	trip			args( ( CHAR_DATA *ch, CHAR_DATA *victim) );
 void character_extract_carried_objects( CHAR_DATA *ch );
 void room_extract_mobiles( ROOM_INDEX_DATA *room );
 void room_extract_contents( ROOM_INDEX_DATA *room );
-void    explode         args( ( OBJ_DATA *obj ) );
-short	get_trust	args( ( const CHAR_DATA *ch ) );
-short	get_age		args( ( const CHAR_DATA *ch ) );
-short	get_curr_str	args( ( const CHAR_DATA *ch ) );
-short	get_curr_int	args( ( const CHAR_DATA *ch ) );
-short	get_curr_wis	args( ( const CHAR_DATA *ch ) );
-short	get_curr_dex	args( ( const CHAR_DATA *ch ) );
-short	get_curr_con	args( ( const CHAR_DATA *ch ) );
-short	get_curr_cha	args( ( const CHAR_DATA *ch ) );
-short  get_curr_lck	args( ( const CHAR_DATA *ch ) );
-short  get_curr_frc	args( ( const CHAR_DATA *ch ) );
-bool	can_take_proto	args( ( const CHAR_DATA *ch ) );
-int	can_carry_n	args( ( const CHAR_DATA *ch ) );
-int	can_carry_w	args( ( const CHAR_DATA *ch ) );
-void	affect_modify	args( ( CHAR_DATA *ch, AFFECT_DATA *paf, bool fAdd ) );
-void	affect_to_char	args( ( CHAR_DATA *ch, AFFECT_DATA *paf ) );
-void	affect_remove	args( ( CHAR_DATA *ch, AFFECT_DATA *paf ) );
-void	affect_strip	args( ( CHAR_DATA *ch, int sn ) );
-bool	is_affected	args( ( const CHAR_DATA *ch, int sn ) );
-void	affect_join	args( ( CHAR_DATA *ch, AFFECT_DATA *paf ) );
-void	char_from_room	args( ( CHAR_DATA *ch ) );
-void	char_to_room	args( ( CHAR_DATA *ch, ROOM_INDEX_DATA *pRoomIndex ) );
-OD *	obj_to_char	args( ( OBJ_DATA *obj, CHAR_DATA *ch ) );
-void	obj_from_char	args( ( OBJ_DATA *obj ) );
-int	apply_ac	args( ( const OBJ_DATA *obj, int iWear ) );
-OD *	get_eq_char	args( ( const CHAR_DATA *ch, int iWear ) );
-void	equip_char	args( ( CHAR_DATA *ch, OBJ_DATA *obj, int iWear ) );
-void	unequip_char	args( ( CHAR_DATA *ch, OBJ_DATA *obj ) );
+void explode( OBJ_DATA *obj );
+short get_trust( const CHAR_DATA *ch );
+short get_age( const CHAR_DATA *ch );
+short get_curr_str( const CHAR_DATA *ch );
+short get_curr_int( const CHAR_DATA *ch );
+short get_curr_wis( const CHAR_DATA *ch );
+short get_curr_dex( const CHAR_DATA *ch );
+short get_curr_con( const CHAR_DATA *ch );
+short get_curr_cha( const CHAR_DATA *ch );
+short get_curr_lck( const CHAR_DATA *ch );
+short get_curr_frc( const CHAR_DATA *ch );
+bool can_take_proto( const CHAR_DATA *ch );
+int can_carry_n( const CHAR_DATA *ch );
+int can_carry_w( const CHAR_DATA *ch );
+void affect_modify( CHAR_DATA *ch, AFFECT_DATA *paf, bool fAdd );
+void affect_to_char( CHAR_DATA *ch, AFFECT_DATA *paf );
+void affect_remove( CHAR_DATA *ch, AFFECT_DATA *paf );
+void affect_strip( CHAR_DATA *ch, int sn );
+bool is_affected( const CHAR_DATA *ch, int sn );
+void affect_join( CHAR_DATA *ch, AFFECT_DATA *paf );
+void char_from_room( CHAR_DATA *ch );
+void char_to_room( CHAR_DATA *ch, ROOM_INDEX_DATA *pRoomIndex );
+OD * obj_to_char( OBJ_DATA *obj, CHAR_DATA *ch );
+void obj_from_char( OBJ_DATA *obj );
+int apply_ac( const OBJ_DATA *obj, int iWear );
+OD *get_eq_char( const CHAR_DATA *ch, int iWear );
+void equip_char( CHAR_DATA *ch, OBJ_DATA *obj, int iWear );
+void unequip_char( CHAR_DATA *ch, OBJ_DATA *obj );
 int count_obj_list( const OBJ_INDEX_DATA *obj, const OBJ_DATA *list );
-void	obj_from_room	args( ( OBJ_DATA *obj ) );
-OD *	obj_to_room	args( ( OBJ_DATA *obj, ROOM_INDEX_DATA *pRoomIndex ) );
-OD *	obj_to_obj	args( ( OBJ_DATA *obj, OBJ_DATA *obj_to ) );
-void	obj_from_obj	args( ( OBJ_DATA *obj ) );
-void	extract_obj	args( ( OBJ_DATA *obj ) );
-void	extract_exit	args( ( ROOM_INDEX_DATA *room, EXIT_DATA *pexit ) );
-void	extract_room	args( ( ROOM_INDEX_DATA *room ) );
-void	clean_room	args( ( ROOM_INDEX_DATA *room ) );
-void	clean_obj	args( ( OBJ_INDEX_DATA *obj ) );
-void	clean_mob	args( ( MOB_INDEX_DATA *mob ) );
-void	extract_char	args( ( CHAR_DATA *ch, bool fPull ) );
-CD *	get_char_room	args( ( const CHAR_DATA *ch, const char *argument ) );
-CD *	get_char_world	args( ( const CHAR_DATA *ch, const char *argument ) );
-OD *	get_obj_type	args( ( const OBJ_INDEX_DATA *pObjIndexData ) );
-OD *	get_obj_list	args( ( const CHAR_DATA *ch, const char *argument,
-				OBJ_DATA *list ) );
-OD *	get_obj_list_rev args( ( const CHAR_DATA *ch, const char *argument,
-			    OBJ_DATA *list ) );
-OD *	get_obj_carry	args( ( const CHAR_DATA *ch, const char *argument ) );
-OD *	get_obj_wear	args( ( const CHAR_DATA *ch, const char *argument ) );
-OD *	get_obj_here	args( ( const CHAR_DATA *ch, const char *argument ) );
-OD *	get_obj_world	args( ( const CHAR_DATA *ch, const char *argument ) );
-int	get_obj_number	args( ( const OBJ_DATA *obj ) );
-int	get_obj_weight	args( ( const OBJ_DATA *obj ) );
-bool	room_is_dark	args( ( const ROOM_INDEX_DATA *pRoomIndex ) );
-bool	room_is_private	args( ( const CHAR_DATA *ch, const ROOM_INDEX_DATA *pRoomIndex ) );
-bool	can_see		args( ( const CHAR_DATA *ch, const CHAR_DATA *victim ) );
-bool	can_see_obj	args( ( const CHAR_DATA *ch, const OBJ_DATA *obj ) );
-bool	can_drop_obj	args( ( const CHAR_DATA *ch, const OBJ_DATA *obj ) );
-const char *	item_type_name	args( ( const OBJ_DATA *obj ) );
-const char *	affect_loc_name	args( ( int location ) );
-char *	affect_bit_name	args( ( int vector ) );
-char *	extra_bit_name	args( ( int extra_flags ) );
-char *	magic_bit_name	args( ( int magic_flags ) );
-ch_ret	check_for_trap	args( ( CHAR_DATA *ch, OBJ_DATA *obj, int flag ) );
-ch_ret	check_room_for_traps args( ( CHAR_DATA *ch, int flag ) );
-bool	is_trapped	args( ( OBJ_DATA *obj ) );
-OD *	get_trap	args( ( OBJ_DATA *obj ) );
-ch_ret	spring_trap     args( ( CHAR_DATA *ch, OBJ_DATA *obj ) );
-void	fix_char	args( ( CHAR_DATA *ch ) );
-void	showaffect	args( ( const CHAR_DATA *ch, const AFFECT_DATA *paf ) );
-void	set_cur_obj	args( ( OBJ_DATA *obj ) );
-bool	obj_extracted	args( ( const OBJ_DATA *obj ) );
-void	queue_extracted_obj	args( ( OBJ_DATA *obj ) );
-void	clean_obj_queue	args( ( void ) );
-void	set_cur_char	args( ( CHAR_DATA *ch ) );
-bool	char_died	args( ( const CHAR_DATA *ch ) );
-void	queue_extracted_char	args( ( CHAR_DATA *ch, bool extract ) );
-void	clean_char_queue	args( ( void ) );
-void	add_timer	args( ( CHAR_DATA *ch, short type, short count, DO_FUN *fun, int value ) );
-TIMER * get_timerptr	args( ( const CHAR_DATA *ch, short type ) );
-short	get_timer	args( ( const CHAR_DATA *ch, short type ) );
-void	extract_timer	args( ( CHAR_DATA *ch, TIMER *timer ) );
-void	remove_timer	args( ( CHAR_DATA *ch, short type ) );
+void obj_from_room( OBJ_DATA *obj );
+OD * obj_to_room( OBJ_DATA *obj, ROOM_INDEX_DATA *pRoomIndex );
+OD * obj_to_obj( OBJ_DATA *obj, OBJ_DATA *obj_to );
+void obj_from_obj( OBJ_DATA *obj );
+void extract_obj( OBJ_DATA *obj );
+void extract_exit( ROOM_INDEX_DATA *room, EXIT_DATA *pexit );
+void extract_room( ROOM_INDEX_DATA *room );
+void clean_room( ROOM_INDEX_DATA *room );
+void clean_obj( OBJ_INDEX_DATA *obj );
+void clean_mob( MOB_INDEX_DATA *mob );
+void extract_char( CHAR_DATA *ch, bool fPull );
+CD *get_char_room( const CHAR_DATA *ch, const char *argument );
+CD *get_char_world( const CHAR_DATA *ch, const char *argument );
+OD *get_obj_type( const OBJ_INDEX_DATA *pObjIndexData );
+OD *get_obj_list( const CHAR_DATA *ch, const char *argument, OBJ_DATA *list );
+OD *get_obj_list_rev( const CHAR_DATA *ch, const char *argument,
+			    OBJ_DATA *list );
+OD *get_obj_carry( const CHAR_DATA *ch, const char *argument );
+OD *get_obj_wear( const CHAR_DATA *ch, const char *argument );
+OD *get_obj_here( const CHAR_DATA *ch, const char *argument );
+OD *get_obj_world( const CHAR_DATA *ch, const char *argument );
+int get_obj_number( const OBJ_DATA *obj );
+int get_obj_weight( const OBJ_DATA *obj );
+bool room_is_dark( const ROOM_INDEX_DATA *pRoomIndex );
+bool room_is_private( const CHAR_DATA *ch, const ROOM_INDEX_DATA *pRoomIndex );
+bool can_see( const CHAR_DATA *ch, const CHAR_DATA *victim );
+bool can_see_obj( const CHAR_DATA *ch, const OBJ_DATA *obj );
+bool can_drop_obj( const CHAR_DATA *ch, const OBJ_DATA *obj );
+const char *item_type_name( const OBJ_DATA *obj );
+const char *affect_loc_name( int location );
+char *affect_bit_name( int vector );
+char *extra_bit_name( int extra_flags );
+char *magic_bit_name( int magic_flags );
+ch_ret check_for_trap( CHAR_DATA *ch, OBJ_DATA *obj, int flag );
+ch_ret check_room_for_traps( CHAR_DATA *ch, int flag );
+bool is_trapped( OBJ_DATA *obj );
+OD *get_trap( OBJ_DATA *obj );
+ch_ret spring_trap( CHAR_DATA *ch, OBJ_DATA *obj );
+void fix_char( CHAR_DATA *ch );
+void showaffect( const CHAR_DATA *ch, const AFFECT_DATA *paf );
+void set_cur_obj( OBJ_DATA *obj );
+bool obj_extracted( const OBJ_DATA *obj );
+void queue_extracted_obj( OBJ_DATA *obj );
+void clean_obj_queue( void );
+void set_cur_char( CHAR_DATA *ch );
+bool char_died( const CHAR_DATA *ch );
+void queue_extracted_char( CHAR_DATA *ch, bool extract );
+void clean_char_queue( void );
+void add_timer( CHAR_DATA *ch, short type, short count,
+		DO_FUN *fun, int value );
+TIMER *get_timerptr( const CHAR_DATA *ch, short type );
+short get_timer( const CHAR_DATA *ch, short type );
+void extract_timer( CHAR_DATA *ch, TIMER *timer );
+void remove_timer( CHAR_DATA *ch, short type );
 bool luck_check( const CHAR_DATA *ch, short percent );
-OD *	clone_object	args( ( const OBJ_DATA *obj ) );
-void	split_obj	args( ( OBJ_DATA *obj, int num ) );
-void	separate_obj	args( ( OBJ_DATA *obj ) );
-bool	empty_obj	args( ( OBJ_DATA *obj, OBJ_DATA *destobj,
-				ROOM_INDEX_DATA *destroom ) );
-OD *	find_obj	args( ( CHAR_DATA *ch, char *argument,
-				bool carryonly ) );
-bool	ms_find_obj	args( ( const CHAR_DATA *ch ) );
-void	worsen_mental_state args( ( CHAR_DATA *ch, int mod ) );
-void	better_mental_state args( ( CHAR_DATA *ch, int mod ) );
-void	add_kill	args( ( CHAR_DATA *ch, CHAR_DATA *mob ) );
-int	times_killed	args( ( const CHAR_DATA *ch, const CHAR_DATA *mob ) );
-
+OD *clone_object( const OBJ_DATA *obj );
+void split_obj( OBJ_DATA *obj, int num );
+void separate_obj( OBJ_DATA *obj );
+bool empty_obj( OBJ_DATA *obj, OBJ_DATA *destobj, ROOM_INDEX_DATA *destroom );
+OD *find_obj( CHAR_DATA *ch, char *argument, bool carryonly );
+bool ms_find_obj( const CHAR_DATA *ch );
+void worsen_mental_state( CHAR_DATA *ch, int mod );
+void better_mental_state( CHAR_DATA *ch, int mod );
+void add_kill( CHAR_DATA *ch, CHAR_DATA *mob );
+int times_killed( const CHAR_DATA *ch, const CHAR_DATA *mob );
 
 /* interp.c */
 void update_userec(struct timeval *time_used, struct timerset *userec);
-bool	check_pos	args( ( const CHAR_DATA *ch, short position ) );
-void	interpret	args( ( CHAR_DATA *ch, char *argument ) );
-ST *	find_social	args( ( const char *command ) );
-CMDTYPE *find_command	args( ( const char *command ) );
-void	hash_commands	args( ( void ) );
+bool check_pos( const CHAR_DATA *ch, short position );
+void interpret( CHAR_DATA *ch, char *argument );
+ST * find_social( const char *command );
+CMDTYPE *find_command( const char *command );
+void hash_commands( void );
 void send_timer( struct timerset *vtime, const CHAR_DATA *ch );
 
 /* magic.c */
-bool	process_spell_components args( ( CHAR_DATA *ch, int sn ) );
-int	ch_slookup	args( ( const CHAR_DATA *ch, const char *name ) );
+bool process_spell_components( CHAR_DATA *ch, int sn );
+int ch_slookup( const CHAR_DATA *ch, const char *name );
 int find_spell( const CHAR_DATA *ch, const char *name, bool know );
 int find_skill( const CHAR_DATA *ch, const char *name, bool know );
 int find_weapon( const CHAR_DATA *ch, const char *name, bool know );
-int	skill_lookup	args( ( const char *name ) );
-int	slot_lookup	args( ( int slot ) );
-int	bsearch_skill	args( ( const char *name, int first, int top ) );
-int	bsearch_skill_exact args( ( const char *name, int first, int top ) );
-bool	saves_poison_death	args( ( int level, const CHAR_DATA *victim ) );
-bool	saves_wand		args( ( int level, const CHAR_DATA *victim ) );
-bool	saves_para_petri	args( ( int level, const CHAR_DATA *victim ) );
-bool	saves_breath		args( ( int level, const CHAR_DATA *victim ) );
-bool	saves_spell_staff	args( ( int level, const CHAR_DATA *victim ) );
-ch_ret	obj_cast_spell	args( ( int sn, int level, CHAR_DATA *ch, CHAR_DATA *victim, OBJ_DATA *obj ) );
-int	dice_parse	args( (const CHAR_DATA *ch, int level, char *exp) );
-SK *	get_skilltype	args( ( int sn ) );
+int skill_lookup( const char *name );
+int slot_lookup( int slot );
+int bsearch_skill( const char *name, int first, int top );
+int bsearch_skill_exact( const char *name, int first, int top );
+bool saves_poison_death( int level, const CHAR_DATA *victim );
+bool saves_wand( int level, const CHAR_DATA *victim );
+bool saves_para_petri( int level, const CHAR_DATA *victim );
+bool saves_breath( int level, const CHAR_DATA *victim );
+bool saves_spell_staff( int level, const CHAR_DATA *victim );
+ch_ret obj_cast_spell( int sn, int level, CHAR_DATA *ch,
+		       CHAR_DATA *victim, OBJ_DATA *obj );
+int dice_parse(const CHAR_DATA *ch, int level, char *exp);
+SK *get_skilltype( int sn );
 
 /* save.c */
 /* object saving defines for fread/write_obj. -- Altrag */
 #define OS_CARRY	0
 #define OS_CORPSE	1
-void	save_char_obj	args( ( CHAR_DATA *ch ) );
-void	save_clone	args( ( CHAR_DATA *ch ) );
-bool	load_char_obj	args( ( DESCRIPTOR_DATA *d, const char *name, bool preload ) );
-void	set_alarm	args( ( long seconds ) );
-void	requip_char	args( ( CHAR_DATA *ch ) );
-void    fwrite_obj      args( ( const CHAR_DATA *ch,  const OBJ_DATA  *obj, FILE *fp, 
-				int iNest, short os_type ) );
-void	fread_obj	args( ( CHAR_DATA *ch,  FILE *fp, short os_type ) );
-void	de_equip_char	args( ( CHAR_DATA *ch ) );
-void	re_equip_char	args( ( CHAR_DATA *ch ) );
-void	save_home	args( ( const CHAR_DATA *ch ) );
+void save_char_obj( CHAR_DATA *ch );
+void save_clone( CHAR_DATA *ch );
+bool load_char_obj( DESCRIPTOR_DATA *d, const char *name, bool preload );
+void set_alarm( long seconds );
+void requip_char( CHAR_DATA *ch );
+void fwrite_obj( const CHAR_DATA *ch,  const OBJ_DATA  *obj, FILE *fp, 
+		 int iNest, short os_type );
+void fread_obj( CHAR_DATA *ch,  FILE *fp, short os_type );
+void de_equip_char( CHAR_DATA *ch );
+void re_equip_char( CHAR_DATA *ch );
+void save_home( const CHAR_DATA *ch );
 void load_home( CHAR_DATA *ch );
 
 /* shops.c */
 
 /* special.c */
-SF *	spec_lookup	args( ( const char *name ) );
-const char *	lookup_spec	args( ( SPEC_FUN *special ) );
+SF *spec_lookup( const char *name );
+const char *lookup_spec( SPEC_FUN *special );
 
 /* tables.c */
-int	get_skill	args( ( const char *skilltype ) );
-const char *	spell_name	args( ( SPELL_FUN *spell ) );
-const char *	skill_name	args( ( DO_FUN *skill ) );
-void	load_skill_table args( ( void ) );
-void	save_skill_table args( ( void ) );
-void	sort_skill_table args( ( void ) );
-void	load_socials	args( ( void ) );
-void	save_socials	args( ( void ) );
-void	load_commands	args( ( void ) );
-void	save_commands	args( ( void ) );
-SPELL_FUN *spell_function args( ( const char *name ) );
-DO_FUN *skill_function  args( ( const char *name ) );
+int get_skill( const char *skilltype );
+const char *spell_name( SPELL_FUN *spell );
+const char *skill_name( DO_FUN *skill );
+void load_skill_table( void );
+void save_skill_table( void );
+void sort_skill_table( void );
+void load_socials( void );
+void save_socials( void );
+void load_commands( void );
+void save_commands( void );
+SPELL_FUN *spell_function( const char *name );
+DO_FUN *skill_function( const char *name );
 
 /* track.c */
-void	found_prey	args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
-void	hunt_victim	args( ( CHAR_DATA *ch) );
+void found_prey( CHAR_DATA *ch, CHAR_DATA *victim );
+void hunt_victim( CHAR_DATA *ch );
 
 /* update.c */
-void	gain_condition	args( ( CHAR_DATA *ch, int iCond, int value ) );
-void	update_handler	args( ( void ) );
-void	reboot_check	args( ( time_t reset ) );
-#if 0
-void    reboot_check    args( ( char *arg ) );
-#endif
-void    auction_update  args( ( void ) );
-void	remove_portal	args( ( OBJ_DATA *portal ) );
+void gain_condition( CHAR_DATA *ch, int iCond, int value );
+void update_handler( void );
+void reboot_check( time_t reset );
+void auction_update( void );
+void remove_portal( OBJ_DATA *portal );
 
 #undef	SK
 #undef	CO
