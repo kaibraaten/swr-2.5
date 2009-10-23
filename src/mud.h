@@ -3182,8 +3182,7 @@ void         echo_to_cockpit        args( ( int color , const SHIP_DATA *ship , 
 void         echo_to_system         args( ( int color , const SHIP_DATA *ship , const char *argument , const SHIP_DATA *ignore ) );
 bool         extract_ship           args( ( SHIP_DATA *ship ) );
 bool         ship_to_room           args( ( SHIP_DATA *ship , long vnum ) );
-void         damage_ship            args( ( SHIP_DATA *ship , int min , int max ) );
-void         damage_ship_ch         args( ( SHIP_DATA *ship , int min , int max , CHAR_DATA *ch ) );
+void damage_ship( SHIP_DATA *ship , int min , int max , CHAR_DATA *ch );
 void         destroy_ship           args( ( SHIP_DATA *ship , CHAR_DATA *ch ) );
 void         ship_to_starsystem     args( ( SHIP_DATA *ship , SPACE_DATA *starsystem ) );
 void         ship_from_starsystem   args( ( SHIP_DATA *ship , SPACE_DATA *starsystem ) );
