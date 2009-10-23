@@ -3117,6 +3117,7 @@ void log_printf( const char *fmt, ... );
 void copyover_recover( void );
 
 /* act_move.c */
+char *wordwrap( char *txt, short wrap );
 void	clear_vrooms	args( ( void ) );
 ED *	find_door	args( ( CHAR_DATA *ch, char *arg, bool quiet ) );
 ED *	get_exit	args( ( const ROOM_INDEX_DATA *room, short dir ) );
