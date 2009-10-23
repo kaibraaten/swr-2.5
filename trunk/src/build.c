@@ -2981,44 +2981,6 @@ void do_redit( CHAR_DATA *ch, char *argument )
     if ( !can_rmodify( ch, location ) )
       return;
 
-    if ( !str_cmp( arg, "substate" ) )
-    {
-	  argument = one_argument( argument, arg2);
-          if( !str_cmp( arg2, "north" )  )
-	  {
-               ch->inter_substate = SUB_NORTH; 
-	       return;
-	  }
-          if( !str_cmp( arg2, "east" )  )
-	  {
-               ch->inter_substate = SUB_EAST; 
-	       return;
-	  }
-          if( !str_cmp( arg2, "south" )  )
-	  {
-               ch->inter_substate = SUB_SOUTH; 
-	       return;
-	  }
-          if( !str_cmp( arg2, "west" )  )
-	  {
-               ch->inter_substate = SUB_WEST; 
-	       return;
-	  }
-          if( !str_cmp( arg2, "up" )  )
-	  {
-               ch->inter_substate = SUB_UP; 
-	       return;
-	  }
-          if( !str_cmp( arg2, "down" )  )
-	  {
-               ch->inter_substate = SUB_DOWN; 
-	       return;
-	  }
-          send_to_char( " unrecognized substate in redit\r\n", ch);
-	  return;
-    }
-
-
     if ( !str_cmp( arg, "name" ) )
     {
 	if ( argument[0] == '\0' )
@@ -3303,18 +3265,9 @@ void do_redit( CHAR_DATA *ch, char *argument )
     if ( !str_cmp( arg, "ex_flags" ) )
     {
 	argument = one_argument( argument, arg2 );
-        switch(ch->inter_substate)
-	{
-           case SUB_EAST : dir = 'e'; edir = 1; break;
-           case SUB_WEST : dir = 'w'; edir = 3; break;
-           case SUB_SOUTH: dir = 's'; edir = 2; break;
-           case SUB_UP   : dir = 'u'; edir = 4; break;
-           case SUB_DOWN : dir = 'd'; edir = 5; break;
-	   default:
-           case SUB_NORTH: dir = 'n'; edir = 0; break;
-	}
 
 	value = get_exflag(arg2);
+
         if ( value < 0 )
 	{
            send_to_char("Bad exit flag. \r\n", ch);
@@ -3334,16 +3287,6 @@ void do_redit( CHAR_DATA *ch, char *argument )
     if ( !str_cmp( arg, "ex_to_room" ) )
     {
 	argument = one_argument( argument, arg2 );
-        switch(ch->inter_substate)
-	{
-           case SUB_EAST : dir = 'e'; edir = 1; break;
-           case SUB_WEST : dir = 'w'; edir = 3; break;
-           case SUB_SOUTH: dir = 's'; edir = 2; break;
-           case SUB_UP   : dir = 'u'; edir = 4; break;
-           case SUB_DOWN : dir = 'd'; edir = 5; break;
-	   default:
-           case SUB_NORTH: dir = 'n'; edir = 0; break;
-	}
 	evnum = atoi(arg2);
 	if ( evnum < 1 || evnum > 32766 )
 	{
@@ -3368,16 +3311,7 @@ void do_redit( CHAR_DATA *ch, char *argument )
     if ( !str_cmp( arg, "ex_key" ) )
     {
 	argument = one_argument( argument, arg2 );
-        switch(ch->inter_substate)
-	{
-           case SUB_EAST : dir = 'e'; edir = 1; break;
-           case SUB_WEST : dir = 'w'; edir = 3; break;
-           case SUB_SOUTH: dir = 's'; edir = 2; break;
-           case SUB_UP   : dir = 'u'; edir = 4; break;
-           case SUB_DOWN : dir = 'd'; edir = 5; break;
-	   default:
-           case SUB_NORTH: dir = 'n'; edir = 0; break;
-	}
+
 	if ( (xit = get_exit(location,edir)) == NULL )
 	{ 
 	   sprintf(buf,"exit %c 1",dir);
@@ -3390,16 +3324,6 @@ void do_redit( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg, "ex_exdesc" ) )  
     {
-        switch(ch->inter_substate)
-	{
-           case SUB_EAST : dir = 'e'; edir = 1; break;
-           case SUB_WEST : dir = 'w'; edir = 3; break;
-           case SUB_SOUTH: dir = 's'; edir = 2; break;
-           case SUB_UP   : dir = 'u'; edir = 4; break;
-           case SUB_DOWN : dir = 'd'; edir = 5; break;
-	   default:
-           case SUB_NORTH: dir = 'n'; edir = 0; break;
-	}
 	if ( (xit = get_exit(location, edir)) == NULL )
 	{ 
 	   sprintf(buf,"exit %c 1",dir);
@@ -3412,16 +3336,6 @@ void do_redit( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg, "ex_keywords" ) )  /* not called yet */
     {
-        switch(ch->inter_substate)
-	{
-           case SUB_EAST : dir = 'e'; edir = 1; break;
-           case SUB_WEST : dir = 'w'; edir = 3; break;
-           case SUB_SOUTH: dir = 's'; edir = 2; break;
-           case SUB_UP   : dir = 'u'; edir = 4; break;
-           case SUB_DOWN : dir = 'd'; edir = 5; break;
-	   default:
-           case SUB_NORTH: dir = 'n'; edir = 0; break;
-	}
 	if ( (xit = get_exit(location, edir)) == NULL )
 	{ 
 	   sprintf(buf, "exit %c 1", dir);
@@ -4427,18 +4341,6 @@ void fold_area( const AREA_DATA *tarea, const char *filename, bool install )
       for ( ed = room->first_extradesc; ed; ed = ed->next )
 	fprintf( fpout, "E\n%s~\n%s~\n",
 		 ed->keyword, strip_cr( ed->description ));
-
-      if ( room->map )   /* maps */
-	{
-#ifdef OLDMAPS
-	  fprintf( fpout, "M\n" );
-	  fprintf( fpout, "%s~\n", strip_cr( room->map )	);
-#endif
-	  fprintf( fpout, "M %ld %d %d %c\n",	room->map->vnum
-		   , room->map->x
-		   , room->map->y
-		   , room->map->entry );
-	}
 
       if( room->mudprogs )
 	{

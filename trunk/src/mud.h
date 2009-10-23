@@ -54,8 +54,6 @@ typedef struct	board_data		BOARD_DATA;
 typedef struct	obj_data		OBJ_DATA;
 typedef struct	obj_index_data		OBJ_INDEX_DATA;
 typedef struct	pc_data			PC_DATA;
-typedef struct	map_index_data		MAP_INDEX_DATA;   /* maps */
-typedef struct	map_data		MAP_DATA;   /* maps */
 typedef struct	room_index_data		ROOM_INDEX_DATA;
 typedef struct	shop_data		SHOP_DATA;
 typedef struct	repairshop_data		REPAIR_DATA;
@@ -1822,12 +1820,6 @@ struct	char_data
     short		mod_frc;
     short		mental_state;		/* simplified */
     short		emotional_state;	/* simplified */
-    int			pagelen;                        /* BUILD INTERFACE */
-    short		inter_page;                     /* BUILD INTERFACE */
-    short		inter_type;                     /* BUILD INTERFACE */
-    char  		*inter_editing;                 /* BUILD INTERFACE */
-    long		inter_editing_vnum;             /* BUILD INTERFACE */
-    short		inter_substate;                 /* BUILD INTERFACE */
     int			retran;
     int			regoto;
     short		mobinvis;	/* Mobinvis level SB */
@@ -2079,7 +2071,6 @@ struct	room_index_data
     SHIP_DATA * 	first_ship;
     SHIP_DATA * 	last_ship;	
     char *		name;
-    MAP_DATA *		map;                 /* maps */
     char *		description;
     long		vnum;
     int			room_flags;
@@ -3585,172 +3576,6 @@ void	remove_portal	args( ( OBJ_DATA *portal ) );
 #undef	CL
 #undef	EDD
 #undef	ED
-
-/*
- *
- *  New Build Interface Stuff Follows
- *
- */
-
-
-/*
- *  Data for a menu page
- */
-struct	menu_data
-{
-    char		*sectionNum;
-    char		*charChoice;
-    int			x;
-    int			y;
-    char		*outFormat;
-    void		*data;
-    int			ptrType;
-    int			cmdArgs;
-    char		*cmdString;
-};
-
-DECLARE_DO_FUN( do_redraw_page  );
-DECLARE_DO_FUN( do_refresh_page );
-DECLARE_DO_FUN( do_pagelen	);
-DECLARE_DO_FUN( do_omenu  	);
-DECLARE_DO_FUN( do_rmenu  	);
-DECLARE_DO_FUN( do_mmenu  	);
-DECLARE_DO_FUN( do_clear  	);
-
-extern		MENU_DATA		room_page_a_data[];
-extern		MENU_DATA		room_page_b_data[];
-extern		MENU_DATA		room_page_c_data[];
-extern		MENU_DATA		room_help_page_data[];
-
-extern		MENU_DATA		mob_page_a_data[];
-extern		MENU_DATA		mob_page_b_data[];
-extern		MENU_DATA		mob_page_c_data[];
-extern		MENU_DATA		mob_page_d_data[];
-extern		MENU_DATA		mob_page_e_data[];
-extern		MENU_DATA		mob_page_f_data[];
-extern		MENU_DATA		mob_help_page_data[];
-
-extern		MENU_DATA		obj_page_a_data[];
-extern		MENU_DATA		obj_page_b_data[];
-extern		MENU_DATA		obj_page_c_data[];
-extern		MENU_DATA		obj_page_d_data[];
-extern		MENU_DATA		obj_page_e_data[];
-extern		MENU_DATA		obj_help_page_data[];
-
-extern		MENU_DATA		control_page_a_data[];
-extern		MENU_DATA		control_help_page_data[];
-
-extern	const   char    room_page_a[];
-extern	const   char    room_page_b[];
-extern	const   char    room_page_c[];
-extern	const   char    room_help_page[];
-
-extern	const   char    obj_page_a[];
-extern	const   char    obj_page_b[];
-extern	const   char    obj_page_c[];
-extern	const   char    obj_page_d[];
-extern	const   char    obj_page_e[];
-extern	const   char    obj_help_page[];
-
-extern	const   char    mob_page_a[];
-extern	const   char    mob_page_b[];
-extern	const   char    mob_page_c[];
-extern	const   char    mob_page_d[];
-extern	const   char    mob_page_e[];
-extern	const   char    mob_page_f[];
-extern	const   char    mob_help_page[];
-extern	const   char *  npc_sex[3];
-extern	const   char *  ris_strings[];
-
-extern	const   char    control_page_a[];
-extern	const   char    control_help_page[];
-
-#define NO_PAGE    0
-#define MOB_PAGE_A 1
-#define MOB_PAGE_B 2
-#define MOB_PAGE_C 3
-#define MOB_PAGE_D 4
-#define MOB_PAGE_E 5
-#define MOB_PAGE_F 17
-#define MOB_HELP_PAGE 14
-#define ROOM_PAGE_A 6
-#define ROOM_PAGE_B 7
-#define ROOM_PAGE_C 8
-#define ROOM_HELP_PAGE 15
-#define OBJ_PAGE_A 9
-#define OBJ_PAGE_B 10
-#define OBJ_PAGE_C 11
-#define OBJ_PAGE_D 12
-#define OBJ_PAGE_E 13
-#define OBJ_HELP_PAGE 16
-#define CONTROL_PAGE_A 18
-#define CONTROL_HELP_PAGE 19
-
-#define NO_TYPE   0
-#define MOB_TYPE  1
-#define OBJ_TYPE  2
-#define ROOM_TYPE 3
-#define CONTROL_TYPE 4
-
-#define SUB_NORTH DIR_NORTH
-#define SUB_EAST  DIR_EAST
-#define SUB_SOUTH DIR_SOUTH
-#define SUB_WEST  DIR_WEST
-#define SUB_UP    DIR_UP
-#define SUB_DOWN  DIR_DOWN
-#define SUB_NE    DIR_NORTHEAST
-#define SUB_NW    DIR_NORTHWEST
-#define SUB_SE    DIR_SOUTHEAST
-#define SUB_SW    DIR_SOUTHWEST
-
-/*
- * defines for use with this get_affect function
- */
-
-#define RIS_000		BV00
-#define RIS_R00		BV01
-#define RIS_0I0		BV02
-#define RIS_RI0		BV03
-#define RIS_00S		BV04
-#define RIS_R0S		BV05
-#define RIS_0IS		BV06
-#define RIS_RIS		BV07
-
-#define GA_AFFECTED	BV09
-#define GA_RESISTANT	BV10
-#define GA_IMMUNE	BV11
-#define GA_SUSCEPTIBLE	BV12
-#define GA_RIS          BV30
-
-
-
-/*
- *   Map Structures
- */
-
-DECLARE_DO_FUN( do_mapout 	);
-DECLARE_DO_FUN( do_lookmap	);
-
-struct  map_data	/* contains per-room data */
-{
-  long vnum;		/* which map this room belongs to */
-  int x;		/* horizontal coordinate */
-  int y;		/* vertical coordinate */
-  char entry;		/* code that shows up on map */ 
-};
-
-
-struct  map_index_data
-{
-  MAP_INDEX_DATA  *next;
-  long 		  vnum;  		  /* vnum of the map */
-  long             map_of_vnums[49][81];   /* room vnums aranged as a map */
-};
-
-
-MAP_INDEX_DATA *get_map_index(long vnum);
-void            init_maps( void );
-
 
 /*
  * mudprograms stuff
