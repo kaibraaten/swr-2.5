@@ -19,9 +19,9 @@ GUARD_DATA * first_guard = NULL;
 GUARD_DATA * last_guard = NULL;
 
 /* local routines */
-void	fread_planet	args( ( PLANET_DATA *planet, FILE *fp ) );
-bool	load_planet_file	args( ( const char *planetfile ) );
-void	write_planet_list	args( ( void ) );
+void fread_planet( PLANET_DATA *planet, FILE *fp );
+bool load_planet_file( const char *planetfile );
+void write_planet_list( void );
 static PLANET_DATA *planet_create( void );
 
 PLANET_DATA *get_planet( const char *name )

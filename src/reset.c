@@ -7,7 +7,7 @@
 
 extern ROOM_INDEX_DATA *       room_index_hash         [MAX_KEY_HASH];
 
-SHIP_DATA * make_mob_ship( PLANET_DATA *planet , int model );
+SHIP_DATA * make_mob_ship( PLANET_DATA *planet , int ship_model );
 void    resetship args( ( SHIP_DATA *ship ) );
 
 void do_reset( CHAR_DATA * ch , char * argument )
@@ -142,7 +142,7 @@ static void reset_respawn_planetary_fleet( ROOM_INDEX_DATA *pRoomIndex )
                && pRoomIndex->area->planet->starsystem
        && pRoomIndex->area->planet->governed_by )
     {
-      SPACE_DATA * system =  pRoomIndex->area->planet->starsystem;
+      SPACE_DATA * starsystem =  pRoomIndex->area->planet->starsystem;
       SHIP_DATA * ship = NULL;
       int numpatrols = 0;
       int numdestroyers = 0;
@@ -150,7 +150,7 @@ static void reset_respawn_planetary_fleet( ROOM_INDEX_DATA *pRoomIndex )
       int numcruisers = 0;
       int fleetsize = 0;
 
-      for ( ship = system->first_ship;
+      for ( ship = starsystem->first_ship;
 	    ship; ship = ship->next_in_starsystem )
 	if ( !str_cmp( ship->owner,
 		       pRoomIndex->area->planet->governed_by->name )
@@ -1097,7 +1097,7 @@ void reset_all( )
     }
 }
 
-SHIP_DATA * make_mob_ship( PLANET_DATA *planet , int model )
+SHIP_DATA * make_mob_ship( PLANET_DATA *planet , int ship_model )
 {
   SHIP_DATA *ship;
   int shipreg = 0;
@@ -1126,7 +1126,7 @@ SHIP_DATA * make_mob_ship( PLANET_DATA *planet , int model )
   ship->pilot = STRALLOC("");
   ship->copilot = STRALLOC("");
   ship->type = MOB_SHIP;
-  ship->model = model;
+  ship->model = ship_model;
   ship->tractorbeam = 2;
 
   switch( ship->model )

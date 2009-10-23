@@ -51,7 +51,6 @@ void skill_notfound( CHAR_DATA *ch, char *argument )
     return;
 }
 
-
 int get_ssave( const char *name )
 {
   size_t x;
@@ -1152,7 +1151,6 @@ void do_sset( CHAR_DATA *ch, char *argument )
     return;
 }
 
-
 void learn_from_success( CHAR_DATA *ch, int sn )
 {
     int adept, learn, percent, chance;
@@ -1450,10 +1448,7 @@ void do_steal( CHAR_DATA *ch, char *argument )
     separate_obj( obj );
     obj_from_char( obj );
     obj_to_char( obj, ch );
-     
-    return;
 }
-
 
 void do_backstab( CHAR_DATA *ch, char *argument )
 {
@@ -1538,7 +1533,6 @@ void do_backstab( CHAR_DATA *ch, char *argument )
     }
     return;
 }
-
 
 void do_rescue( CHAR_DATA *ch, char *argument )
 {
@@ -1631,8 +1625,6 @@ void do_rescue( CHAR_DATA *ch, char *argument )
     return;
 }
 
-
-
 void do_kick( CHAR_DATA *ch, char *argument )
 {
     CHAR_DATA *victim;
@@ -1663,7 +1655,6 @@ void do_kick( CHAR_DATA *ch, char *argument )
     return;
 }
 
-
 /*
  * Disarm a creature.
  * Caller must check for successful attack.
@@ -1671,46 +1662,44 @@ void do_kick( CHAR_DATA *ch, char *argument )
  */
 void disarm( CHAR_DATA *ch, CHAR_DATA *victim )
 {
-    OBJ_DATA *obj, *tmpobj;
+  OBJ_DATA *obj = NULL, *tmpobj = NULL;
 
-    if ( ( obj = get_eq_char( victim, WEAR_WIELD ) ) == NULL )
-	return;
+  if ( ( obj = get_eq_char( victim, WEAR_WIELD ) ) == NULL )
+    return;
 
-    if ( ( tmpobj = get_eq_char( victim, WEAR_DUAL_WIELD ) ) != NULL
-    &&     number_bits( 1 ) == 0 )
-	obj = tmpobj;
+  if ( ( tmpobj = get_eq_char( victim, WEAR_DUAL_WIELD ) ) != NULL
+       && number_bits( 1 ) == 0 )
+    obj = tmpobj;
 
-    if ( get_eq_char( ch, WEAR_WIELD ) == NULL && number_bits( 1 ) == 0 )
+  if ( get_eq_char( ch, WEAR_WIELD ) == NULL && number_bits( 1 ) == 0 )
     {
-	learn_from_failure( ch, gsn_disarm );
-	return;
+      learn_from_failure( ch, gsn_disarm );
+      return;
     }
 
-    if ( IS_NPC( ch ) && !can_see_obj( ch, obj ) && number_bits( 1 ) == 0)
+  if ( IS_NPC( ch ) && !can_see_obj( ch, obj ) && number_bits( 1 ) == 0)
     {
-	learn_from_failure( ch, gsn_disarm );
-	return;
+      learn_from_failure( ch, gsn_disarm );
+      return;
     }
  
-    if ( check_grip( ch, victim ) )
+  if ( check_grip( ch, victim ) )
     {
-	learn_from_failure( ch, gsn_disarm );
-	return;
+      learn_from_failure( ch, gsn_disarm );
+      return;
     }
 
-    act( AT_SKILL, "$n DISARMS you!", ch, NULL, victim, TO_VICT    );
-    act( AT_SKILL, "You disarm $N!",  ch, NULL, victim, TO_CHAR    );
-    act( AT_SKILL, "$n disarms $N!",  ch, NULL, victim, TO_NOTVICT );
-    learn_from_success( ch, gsn_disarm );
+  act( AT_SKILL, "$n DISARMS you!", ch, NULL, victim, TO_VICT    );
+  act( AT_SKILL, "You disarm $N!",  ch, NULL, victim, TO_CHAR    );
+  act( AT_SKILL, "$n disarms $N!",  ch, NULL, victim, TO_NOTVICT );
+  learn_from_success( ch, gsn_disarm );
 
-    if ( obj == get_eq_char( victim, WEAR_WIELD )
-    &&  (tmpobj = get_eq_char( victim, WEAR_DUAL_WIELD)) != NULL )
-       tmpobj->wear_loc = WEAR_WIELD;
+  if ( obj == get_eq_char( victim, WEAR_WIELD )
+       && (tmpobj = get_eq_char( victim, WEAR_DUAL_WIELD)) != NULL )
+    tmpobj->wear_loc = WEAR_WIELD;
 
-    obj_from_char( obj );
-    obj_to_room( obj, victim->in_room );
-
-    return;
+  obj_from_char( obj );
+  obj_to_room( obj, victim->in_room );
 }
 
 
@@ -2054,65 +2043,60 @@ void do_visible( CHAR_DATA *ch, char *argument )
     REMOVE_BIT   ( ch->affected_by, AFF_INVISIBLE	);
     REMOVE_BIT   ( ch->affected_by, AFF_SNEAK		);
     send_to_char( "Ok.\r\n", ch );
-    return;
 }
-
 
 void do_recall( CHAR_DATA *ch, char *argument )
 {
-    ROOM_INDEX_DATA *location;
-    CHAR_DATA *opponent;
+  ROOM_INDEX_DATA *location = get_room_index( wherehome(ch) );
+  CHAR_DATA *opponent;
 
-    location = NULL;
-
-    location = get_room_index( wherehome(ch) ); 
-    
-    if ( !IS_IMMORTAL( ch ) )
+  if ( !IS_IMMORTAL( ch ) )
     {
-	   return;
-    }
-    
-    if ( !location )
-    {
-	send_to_char( "You are completely lost.\r\n", ch );
-	return;
+      return;
     }
 
-    if ( ch->in_room == location )
-	return;
-
-    if ( IS_SET(ch->affected_by, AFF_CURSE) )
+  if ( !location )
     {
-        send_to_char("You are cursed and cannot recall!\r\n", ch );
-        return;
+      send_to_char( "You are completely lost.\r\n", ch );
+      return;
     }
 
-    if ( ( opponent = who_fighting( ch ) ) != NULL )
-    {
+  if ( ch->in_room == location )
+    return;
 
-	if ( number_bits( 1 ) == 0 || ( !IS_NPC( opponent ) && number_bits( 3 ) > 1 ) )
+  if ( IS_SET(ch->affected_by, AFF_CURSE) )
+    {
+      send_to_char("You are cursed and cannot recall!\r\n", ch );
+      return;
+    }
+
+  if ( ( opponent = who_fighting( ch ) ) != NULL )
+    {
+      if ( number_bits( 1 ) == 0
+	   || ( !IS_NPC( opponent ) && number_bits( 3 ) > 1 ) )
 	{
-	    WAIT_STATE( ch, 4 );
-	    ch_printf( ch, "You failed!\r\n" );
-	    return;
+	  WAIT_STATE( ch, 4 );
+	  ch_printf( ch, "You failed!\r\n" );
+	  return;
 	}
 
-	ch_printf( ch, "You recall from combat!\r\n" );
-	stop_fighting( ch, TRUE );
+      ch_printf( ch, "You recall from combat!\r\n" );
+      stop_fighting( ch, TRUE );
     }
 
-    act( AT_ACTION, "$n disappears in a swirl of the Force.", ch, NULL, NULL, TO_ROOM );
-    char_from_room( ch );
-    char_to_room( ch, location );
-    if ( ch->mount )
+  act( AT_ACTION, "$n disappears in a swirl of the Force.", ch, NULL, NULL, TO_ROOM );
+  char_from_room( ch );
+  char_to_room( ch, location );
+
+  if ( ch->mount )
     {
-	char_from_room( ch->mount );
-	char_to_room( ch->mount, location );
+      char_from_room( ch->mount );
+      char_to_room( ch->mount, location );
     }
-    act( AT_ACTION, "$n appears in a swirl of the Force.", ch, NULL, NULL, TO_ROOM );
-    do_look( ch, const_char_to_nonconst("auto") );
 
-    return;
+  act( AT_ACTION, "$n appears in a swirl of the Force.",
+       ch, NULL, NULL, TO_ROOM );
+  do_look( ch, const_char_to_nonconst("auto") );
 }
 
 
@@ -2513,32 +2497,34 @@ void do_poison_weapon( CHAR_DATA *ch, char *argument )
 
 bool check_grip( CHAR_DATA *ch, CHAR_DATA *victim )
 {
-    int chance;
+  int chance;
 
-    if ( !IS_AWAKE(victim) )
-	return FALSE;
+  if ( !IS_AWAKE(victim) )
+    return FALSE;
 
-    if ( IS_NPC(victim) && !IS_SET(victim->defenses, DFND_GRIP) )
-      return FALSE;
+  if ( IS_NPC(victim) && !IS_SET(victim->defenses, DFND_GRIP) )
+    return FALSE;
 
-    if ( IS_NPC(victim) )
-	chance  = UMIN( 60, 2 * victim->top_level );
-    else
-      chance  = character_skill_level( victim, gsn_grip ) / 2;
+  if ( IS_NPC(victim) )
+    chance  = UMIN( 60, 2 * victim->top_level );
+  else
+    chance  = character_skill_level( victim, gsn_grip ) / 2;
 
-    /* Consider luck as a factor */
-    chance += (2 * (get_curr_lck(victim) - 13 ) );
+  /* Consider luck as a factor */
+  chance += (2 * (get_curr_lck(victim) - 13 ) );
 
-    if ( number_percent( ) >= chance + victim->top_level - ch->top_level )
+  if ( number_percent( ) >= chance + victim->top_level - ch->top_level )
     {
-	learn_from_failure( victim, gsn_grip );
-        return FALSE;
+      learn_from_failure( victim, gsn_grip );
+      return FALSE;
     }
-    act( AT_SKILL, "You evade $n's attempt to disarm you.", ch, NULL, victim, TO_VICT    );
-    act( AT_SKILL, "$N holds $S weapon strongly, and is not disarmed.", 
-  	 ch, NULL, victim, TO_CHAR    );
-    learn_from_success( victim, gsn_grip );
-    return TRUE;
+
+  act( AT_SKILL, "You evade $n's attempt to disarm you.", ch, NULL,
+       victim, TO_VICT    );
+  act( AT_SKILL, "$N holds $S weapon strongly, and is not disarmed.", 
+       ch, NULL, victim, TO_CHAR    );
+  learn_from_success( victim, gsn_grip );
+  return TRUE;
 }
 
 void do_circle( CHAR_DATA *ch, char *argument )

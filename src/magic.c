@@ -73,24 +73,27 @@ int ch_slookup( const CHAR_DATA *ch, const char *name )
  */
 int skill_lookup( const char *name )
 {
-    int sn;
+  int sn = 0;
 
-    if ( (sn=bsearch_skill(name, gsn_first_spell, gsn_first_skill-1)) == -1 )
-      if ( (sn=bsearch_skill(name, gsn_first_skill, gsn_first_weapon-1)) == -1 )
-	if ( (sn=bsearch_skill(name, gsn_first_weapon, gsn_top_sn-1)) == -1
-	  &&    gsn_top_sn < top_sn )
-	  {
-	      for ( sn = gsn_top_sn; sn < top_sn; sn++ )
-	      {
-		  if ( !skill_table[sn] || !skill_table[sn]->name )
-		    return -1;
-		  if ( LOWER(name[0]) == LOWER(skill_table[sn]->name[0])
-		  &&  !str_prefix( name, skill_table[sn]->name ) )
-		    return sn;
-	      }
-	      return -1;
-	  }
-    return sn;
+  if ( (sn=bsearch_skill(name, gsn_first_spell, gsn_first_skill-1)) == -1 )
+    if ( (sn=bsearch_skill(name, gsn_first_skill, gsn_first_weapon-1)) == -1 )
+      if ( (sn=bsearch_skill(name, gsn_first_weapon, gsn_top_sn-1)) == -1
+	   && gsn_top_sn < top_sn )
+	{
+	  for ( sn = gsn_top_sn; sn < top_sn; sn++ )
+	    {
+	      if ( !skill_table[sn] || !skill_table[sn]->name )
+		return -1;
+
+	      if ( LOWER(name[0]) == LOWER(skill_table[sn]->name[0])
+		   &&  !str_prefix( name, skill_table[sn]->name ) )
+		return sn;
+	    }
+
+	  return -1;
+	}
+
+  return sn;
 }
 
 /*
@@ -99,11 +102,11 @@ int skill_lookup( const char *name )
  */
 SKILLTYPE *get_skilltype( int sn )
 {
-    if ( sn >= TYPE_PERSONAL )
-	return NULL;
-    if ( sn >= TYPE_HIT )
-	return NULL;
-    return IS_VALID_SN(sn) ? skill_table[sn] : NULL;
+  if ( sn >= TYPE_PERSONAL )
+    return NULL;
+  if ( sn >= TYPE_HIT )
+    return NULL;
+  return IS_VALID_SN(sn) ? skill_table[sn] : NULL;
 }
 
 /*
@@ -112,23 +115,22 @@ SKILLTYPE *get_skilltype( int sn )
  */
 int bsearch_skill( const char *name, int first, int top )
 {
-    int sn;
-
-    for (;;)
+  for (;;)
     {
-	sn = (first + top) >> 1;
+      int sn = (first + top) >> 1;
 
-	if ( LOWER(name[0]) == LOWER(skill_table[sn]->name[0])
-	&&  !str_prefix(name, skill_table[sn]->name) )
-	    return sn;
-	if (first >= top)
-	    return -1;
-    	if (strcmp(name, skill_table[sn]->name) < 1)
-	    top = sn - 1;
-    	else
-	    first = sn + 1;
+      if ( LOWER(name[0]) == LOWER(skill_table[sn]->name[0])
+	   &&  !str_prefix(name, skill_table[sn]->name) )
+	return sn;
+      if (first >= top)
+	return -1;
+      if (strcmp(name, skill_table[sn]->name) < 1)
+	top = sn - 1;
+      else
+	first = sn + 1;
     }
-    return -1;
+
+  return -1;
 }
 
 /*
@@ -160,7 +162,8 @@ int bsearch_skill_exact( const char *name, int first, int top )
  * Each different section of the skill table is sorted alphabetically
  * Only match skills player knows				-Thoric
  */
-int ch_bsearch_skill( const CHAR_DATA *ch, const char *name, int first, int top )
+int ch_bsearch_skill( const CHAR_DATA *ch, const char *name,
+		      int first, int top )
 {
   for (;;)
     {
@@ -428,7 +431,7 @@ int ris_save( CHAR_DATA *ch, int chance, int ris )
  * Used for spell dice parsing, ie: 3d8+L-6
  *
  */
-int rd_parse(const CHAR_DATA *ch, int level, char *exp)
+int rd_parse(const CHAR_DATA *ch, int level, char *expr)
 {
   int x = 0, lop = 0, gop = 0, eop = 0;
   char operation = 0;
@@ -436,20 +439,20 @@ int rd_parse(const CHAR_DATA *ch, int level, char *exp)
   int total = 0, len = 0;
 
   /* take care of nulls coming in */
-  if (!exp || !strlen(exp))
+  if (!expr || !strlen(expr))
     return 0;
 
   /* get rid of brackets if they surround the entire expresion */
-  if ((*exp == '(') && !strchr(exp+1,'(') && exp[strlen(exp)-1] == ')')
+  if ((*expr == '(') && !strchr(expr+1,'(') && expr[strlen(expr)-1] == ')')
   {
-    exp[strlen(exp)-1] = '\0';
-    exp++;
+    expr[strlen(expr)-1] = '\0';
+    expr++;
   }
 
   /* check if the expresion is just a number */
-  len = strlen(exp);
-  if ( len == 1 && isalpha((int) exp[0]) )
-    switch(exp[0]) {
+  len = strlen(expr);
+  if ( len == 1 && isalpha((int) expr[0]) )
+    switch(expr[0]) {
 	case 'L': case 'l':	return level;
 	case 'H': case 'h':	return ch->hit;
 	case 'M': case 'm':	return ch->mana;
@@ -465,15 +468,15 @@ int rd_parse(const CHAR_DATA *ch, int level, char *exp)
     }
 
   for (x = 0; x < len; ++x)
-    if (!isdigit((int) exp[x]) && !isspace((int) exp[x]))
+    if (!isdigit((int) expr[x]) && !isspace((int) expr[x]))
       break;
 
   if (x == len)
-    return(atoi(exp));
+    return(atoi(expr));
   
   /* break it into 2 parts */
-  for (x = 0; x < (int)strlen(exp); ++x)
-    switch(exp[x]) {
+  for (x = 0; x < (int)strlen(expr); ++x)
+    switch(expr[x]) {
     case '^':
       if (!total)
 	eop = x;
@@ -498,10 +501,10 @@ int rd_parse(const CHAR_DATA *ch, int level, char *exp)
   if (gop) x = gop;
   else
   x = eop;
-  operation = exp[x];
-  exp[x] = '\0';
-  sexp[0] = exp;
-  sexp[1] = (char *)(exp+x+1);
+  operation = expr[x];
+  expr[x] = '\0';
+  sexp[0] = expr;
+  sexp[1] = (char *)(expr+x+1);
 
   /* work it out */
   total = rd_parse(ch, level, sexp[0]);
@@ -525,11 +528,11 @@ int rd_parse(const CHAR_DATA *ch, int level, char *exp)
 }
 
 /* wrapper function so as not to destroy exp */
-int dice_parse(const CHAR_DATA *ch, int level, char *exp)
+int dice_parse(const CHAR_DATA *ch, int level, char *expr)
 {
     char buf[MAX_INPUT_LENGTH];
 
-    strcpy( buf, exp );
+    strcpy( buf, expr );
     return rd_parse(ch, level, buf);
 }
 

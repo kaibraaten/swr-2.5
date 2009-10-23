@@ -27,8 +27,6 @@ void	obj_act_update	args( ( void ) );
 void	char_check	args( ( void ) );
 void    drunk_randoms	args( ( CHAR_DATA *ch ) );
 void    halucinations	args( ( CHAR_DATA *ch ) );
-void	subtract_times	args( ( struct timeval *etime,
-				struct timeval *stime ) );
 
 /*
  * Global Variables
@@ -1680,14 +1678,14 @@ void update_handler( void )
     static  int     pulse_space;
     static  int     pulse_ship;
     static  int     pulse_recharge;
-    struct timeval stime;
+    struct timeval start_time;
     struct timeval etime;
 
     if ( timechar )
     {
       set_char_color(AT_PLAIN, timechar);
       send_to_char( "Starting update timer.\r\n", timechar );
-      gettimeofday(&stime, NULL);
+      gettimeofday(&start_time, NULL);
     }
     
     if ( --pulse_area     <= 0 )
@@ -1777,7 +1775,7 @@ void update_handler( void )
       gettimeofday(&etime, NULL);
       set_char_color(AT_PLAIN, timechar);
       send_to_char( "Update timing complete.\r\n", timechar );
-      subtract_times(&etime, &stime);
+      subtract_times(&etime, &start_time);
       ch_printf( timechar, "Timing took %d.%06d seconds.\r\n",
           etime.tv_sec, etime.tv_usec );
       timechar = NULL;
@@ -2218,15 +2216,3 @@ void auction_update (void)
 	    auction->item = NULL; /* clear auction */
     } /* switch */
 } /* func */
-
-void subtract_times(struct timeval *etime, struct timeval *stime)
-{
-  etime->tv_sec -= stime->tv_sec;
-  etime->tv_usec -= stime->tv_usec;
-  while ( etime->tv_usec < 0 )
-  {
-    etime->tv_usec += 1000000;
-    etime->tv_sec--;
-  }
-  return;
-}

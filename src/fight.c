@@ -750,7 +750,7 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
     /* check for RIS_PLUSx 					-Thoric */
     if ( dam )
     {
-	int x, res, imm, sus, mod;
+	int flag, res, imm, sus, mod;
 
 	if ( plusris )
 	   plusris = RIS_PLUS1 << UMIN(plusris, 7);
@@ -759,14 +759,14 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
 	imm = res = -1;  sus = 1;
 
 	/* find high ris */
-	for ( x = RIS_PLUS1; x <= RIS_PLUS6; x <<= 1 )
+	for ( flag = RIS_PLUS1; flag <= RIS_PLUS6; flag <<= 1 )
 	{
-	   if ( IS_SET( victim->immune, x ) )
-		imm = x;
-	   if ( IS_SET( victim->resistant, x ) )
-		res = x;
-	   if ( IS_SET( victim->susceptible, x ) )
-		sus = x;
+	   if ( IS_SET( victim->immune, flag ) )
+		imm = flag;
+	   if ( IS_SET( victim->resistant, flag ) )
+		res = flag;
+	   if ( IS_SET( victim->susceptible, flag ) )
+		sus = flag;
 	}
 	mod = 10;
 	if ( imm >= plusris )
@@ -1012,10 +1012,10 @@ ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt )
      */
      if ( IS_NPC(victim) )
      {
-         OBJ_DATA *wield;
+         OBJ_DATA *weapon;
          
-         wield = get_eq_char( victim, WEAR_WIELD );                 
-         if ( wield != NULL && wield->value[3] == WEAPON_BLASTER && get_cover( victim ) == TRUE ) 
+         weapon = get_eq_char( victim, WEAR_WIELD );                 
+         if ( weapon != NULL && weapon->value[3] == WEAPON_BLASTER && get_cover( victim ) == TRUE ) 
          {
                if ( IS_SET( victim->act , ACT_SENTINEL ) )
                {

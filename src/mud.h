@@ -3203,7 +3203,6 @@ SHIP_DATA  * ship_from_engine       args( ( const ROOM_INDEX_DATA * room ) );
 SHIP_DATA  * ship_from_pilot        args( ( const char *name ) );
 SHIP_DATA  * get_ship_here          args( ( const char *name,
 					    const SPACE_DATA *starsystem ) );
-void         showstarsystem         args( ( CHAR_DATA *ch , const SPACE_DATA *starsystem ) );
 void         update_space           args( ( void ) );
 void         recharge_ships         args( ( void ) );
 void move_missiles( void );
@@ -3500,16 +3499,13 @@ int	times_killed	args( ( const CHAR_DATA *ch, const CHAR_DATA *mob ) );
 
 
 /* interp.c */
+void update_userec(struct timeval *time_used, struct timerset *userec);
 bool	check_pos	args( ( const CHAR_DATA *ch, short position ) );
 void	interpret	args( ( CHAR_DATA *ch, char *argument ) );
 ST *	find_social	args( ( const char *command ) );
 CMDTYPE *find_command	args( ( const char *command ) );
 void	hash_commands	args( ( ) );
-void	start_timer	args( ( struct timeval *stime ) );
-time_t	end_timer	args( ( struct timeval *stime ) );
 void send_timer( struct timerset *vtime, const CHAR_DATA *ch );
-void	update_userec	args( ( struct timeval *time_used,
-				struct timerset *userec ) );
 
 /* magic.c */
 bool	process_spell_components args( ( CHAR_DATA *ch, int sn ) );

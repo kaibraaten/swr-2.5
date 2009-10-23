@@ -4241,14 +4241,14 @@ void do_cedit( CHAR_DATA *ch, char *argument )
 
     if ( !str_cmp( arg2, "log" ) )
     {
-	int log = atoi( argument );
+	int log_type = atoi( argument );
 
-	if ( log < 0 || log > LOG_COMM )
+	if ( log_type < 0 || log_type > LOG_COMM )
 	{
 	    send_to_char( "Log out of range.\r\n", ch );
 	    return;
 	}
-	command->log = log;
+	command->log = log_type;
 	send_to_char( "Done.\r\n", ch );
 	return;
     }

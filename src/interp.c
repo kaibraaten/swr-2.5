@@ -10,7 +10,6 @@
 /*
  * Externals
  */
-void subtract_times( struct timeval *etime, struct timeval *stime );
 bool	check_social	args( ( CHAR_DATA *ch, const char *command,
 			    char *argument ) );
 
@@ -451,7 +450,7 @@ bool check_social( CHAR_DATA *ch, const char *command, char *argument )
 
 void do_timecmd( CHAR_DATA *ch, char *argument )
 {
-  struct timeval stime;
+  struct timeval start_time;
   struct timeval etime;
   static bool timing;
   extern CHAR_DATA *timechar;
@@ -480,44 +479,16 @@ void do_timecmd( CHAR_DATA *ch, char *argument )
   set_char_color(AT_PLAIN, ch);
   send_to_char( "Starting timer.\r\n", ch );
   timing = TRUE;
-  gettimeofday(&stime, NULL);
+  gettimeofday(&start_time, NULL);
   interpret(ch, argument);
   gettimeofday(&etime, NULL);
   timing = FALSE;
   set_char_color(AT_PLAIN, ch);
   send_to_char( "Timing complete.\r\n", ch );
-  subtract_times(&etime, &stime);
+  subtract_times(&etime, &start_time);
   ch_printf( ch, "Timing took %d.%06d seconds.\r\n",
       etime.tv_sec, etime.tv_usec );
   return;
-}
-
-void start_timer(struct timeval *stime)
-{
-  if ( !stime )
-  {
-    bug( "Start_timer: NULL stime.", 0 );
-    return;
-  }
-  gettimeofday(stime, NULL);
-  return;
-}
-
-time_t end_timer(struct timeval *stime)
-{
-  struct timeval etime;
-  
-  /* Mark etime before checking stime, so that we get a better reading.. */
-  gettimeofday(&etime, NULL);
-  if ( !stime || (!stime->tv_sec && !stime->tv_usec) )
-  {
-    bug( "End_timer: bad stime.", 0 );
-    return 0;
-  }
-  subtract_times(&etime, stime);
-  /* stime becomes time used */
-  *stime = etime;
-  return (etime.tv_sec*1000000)+etime.tv_usec;
 }
 
 void send_timer(struct timerset *vtime, const CHAR_DATA *ch)
