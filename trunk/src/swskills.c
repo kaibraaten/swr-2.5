@@ -5,9 +5,9 @@
 #include <string.h>
 #include "mud.h"
 
-void    add_reinforcements  args( ( CHAR_DATA *ch ) );
-ch_ret  one_hit             args( ( CHAR_DATA *ch, CHAR_DATA *victim, int dt ) );
-int     xp_compute                ( CHAR_DATA *ch , CHAR_DATA *victim );
+void add_reinforcements( CHAR_DATA *ch );
+ch_ret one_hit( CHAR_DATA *ch, CHAR_DATA *victim, int dt );
+int xp_compute( CHAR_DATA *ch , CHAR_DATA *victim );
 int ris_save( CHAR_DATA *ch, int chance, int ris );
 CHAR_DATA *get_char_room_mp( CHAR_DATA *ch, char *argument );
 void  clear_roomtype( ROOM_INDEX_DATA * room );
@@ -1623,84 +1623,92 @@ void do_postguard( CHAR_DATA *ch, char *argument )
 
 void add_reinforcements( CHAR_DATA *ch )
 {
-     MOB_INDEX_DATA  * pMobIndex;
-     OBJ_DATA        * blaster;
-     OBJ_INDEX_DATA  * pObjIndex;
-       
-     
-     if ( !ch->in_room )
-        return;
-     
-     if ( ( pMobIndex = get_mob_index( ch->backup_mob ) ) == NULL )
-        return;         
+  MOB_INDEX_DATA  * pMobIndex = NULL;
+  OBJ_DATA        * blaster = NULL;
+  OBJ_INDEX_DATA  * pObjIndex = NULL;
 
-     if ( ch->backup_mob == MOB_VNUM_SOLDIER       )  
-     {
-        CHAR_DATA * mob[3];
-        int         mob_cnt;
-        
-        send_to_char( "Your reinforcements have arrived.\r\n", ch );
-        for ( mob_cnt = 0 ; mob_cnt < 3 ; mob_cnt++ )
+  if ( !ch->in_room )
+    return;
+
+  if ( ( pMobIndex = get_mob_index( ch->backup_mob ) ) == NULL )
+    return;         
+
+  if ( ch->backup_mob == MOB_VNUM_SOLDIER       )  
+    {
+      CHAR_DATA * mob[3];
+      int         mob_cnt = 0;
+
+      send_to_char( "Your reinforcements have arrived.\r\n", ch );
+
+      for ( mob_cnt = 0 ; mob_cnt < 3 ; mob_cnt++ )
         {
-            mob[mob_cnt] = create_mobile( pMobIndex );
-            if ( !mob[mob_cnt] )
-                return;
-            char_to_room( mob[mob_cnt], ch->in_room );
-            act( AT_IMMORT, "$N has arrived.", ch, NULL, mob[mob_cnt], TO_ROOM );
-            mob[mob_cnt]->top_level = 50;
-            mob[mob_cnt]->hit = 100;
-            mob[mob_cnt]->max_hit = 100;
-            mob[mob_cnt]->armor = 50;
-            mob[mob_cnt]->damroll = 0;
-            mob[mob_cnt]->hitroll = 10;
-            if ( ( pObjIndex = get_obj_index( OBJ_VNUM_BLASTER ) ) != NULL )
+	  mob[mob_cnt] = create_mobile( pMobIndex );
+
+	  if ( !mob[mob_cnt] )
+	    return;
+
+	  char_to_room( mob[mob_cnt], ch->in_room );
+	  act( AT_IMMORT, "$N has arrived.", ch, NULL, mob[mob_cnt], TO_ROOM );
+	  mob[mob_cnt]->top_level = 50;
+	  mob[mob_cnt]->hit = 100;
+	  mob[mob_cnt]->max_hit = 100;
+	  mob[mob_cnt]->armor = 50;
+	  mob[mob_cnt]->damroll = 0;
+	  mob[mob_cnt]->hitroll = 10;
+
+	  if ( ( pObjIndex = get_obj_index( OBJ_VNUM_BLASTER ) ) != NULL )
             {
 	      blaster = create_object( pObjIndex );
 	      obj_to_char( blaster, mob[mob_cnt] );
-	      equip_char( mob[mob_cnt], blaster, WEAR_WIELD );                        
-            } 
-            
-            if ( mob[mob_cnt]->master )
-	       stop_follower( mob[mob_cnt] );
-	    add_follower( mob[mob_cnt], ch );
-            SET_BIT( mob[mob_cnt]->affected_by, AFF_CHARM );
-            do_setblaster( mob[mob_cnt] , const_char_to_nonconst("full") );
-            if ( ch->pcdata && ch->pcdata->clan )   
-               mob[mob_cnt]->mob_clan = ch->pcdata->clan;
+	      equip_char( mob[mob_cnt], blaster, WEAR_WIELD );
+            }
+
+	  if ( mob[mob_cnt]->master )
+	    stop_follower( mob[mob_cnt] );
+
+	  add_follower( mob[mob_cnt], ch );
+	  SET_BIT( mob[mob_cnt]->affected_by, AFF_CHARM );
+	  do_setblaster( mob[mob_cnt] , const_char_to_nonconst("full") );
+
+	  if ( ch->pcdata && ch->pcdata->clan )   
+	    mob[mob_cnt]->mob_clan = ch->pcdata->clan;
         }
-     }
-     else
-     {
-        CHAR_DATA *mob;
-        
-        mob = create_mobile( pMobIndex );
-        char_to_room( mob, ch->in_room );
-        if ( ch->pcdata && ch->pcdata->clan )
+    }
+  else
+    {
+      CHAR_DATA *mob = create_mobile( pMobIndex );
+      char_to_room( mob, ch->in_room );
+
+      if ( ch->pcdata && ch->pcdata->clan )
         {
           char tmpbuf[MAX_STRING_LENGTH];
-        
-          sprintf( tmpbuf , "A guard stands at attention. (%s)\r\n" , ch->pcdata->clan->name );
+          sprintf( tmpbuf, "A guard stands at attention. (%s)\r\n",
+		   ch->pcdata->clan->name );
           STRFREE( mob->long_descr );
           mob->long_descr = STRALLOC( tmpbuf );
         }
-        act( AT_IMMORT, "$N has arrived.", ch, NULL, mob, TO_ROOM );
-        send_to_char( "Your guard has arrived.\r\n", ch );
-        mob->top_level = 75;
-        mob->hit = 200;
-        mob->max_hit = 200;
-        mob->armor = 0;
-        mob->damroll = 5;
-        mob->hitroll = 20;
-        if ( ( pObjIndex = get_obj_index( OBJ_VNUM_BLASTER ) ) != NULL )
+
+      act( AT_IMMORT, "$N has arrived.", ch, NULL, mob, TO_ROOM );
+      send_to_char( "Your guard has arrived.\r\n", ch );
+      mob->top_level = 75;
+      mob->hit = 200;
+      mob->max_hit = 200;
+      mob->armor = 0;
+      mob->damroll = 5;
+      mob->hitroll = 20;
+
+      if ( ( pObjIndex = get_obj_index( OBJ_VNUM_BLASTER ) ) != NULL )
         {
 	  blaster = create_object( pObjIndex );
 	  obj_to_char( blaster, mob );
 	  equip_char( mob, blaster, WEAR_WIELD );                        
         }
-        do_setblaster( mob , const_char_to_nonconst("full") );
-        if ( ch->pcdata && ch->pcdata->clan )   
-               mob->mob_clan = ch->pcdata->clan;
-     }                    
+
+      do_setblaster( mob , const_char_to_nonconst("full") );
+
+      if ( ch->pcdata && ch->pcdata->clan )   
+	mob->mob_clan = ch->pcdata->clan;
+    }
 }
 
 void do_torture( CHAR_DATA *ch, char *argument )
@@ -2049,26 +2057,26 @@ void do_snipe( CHAR_DATA *ch, char *argument )
     
     switch ( dir )
     {
-        case 0:
-        case 1:
+        case DIR_NORTH:
+        case DIR_EAST:
            dir += 2;
            break;
-        case 2:
-        case 3:
+        case DIR_SOUTH:
+        case DIR_WEST:
            dir -= 2;
            break;
-        case 4:
-        case 7:
+        case DIR_UP:
+        case DIR_NORTHWEST:
            dir += 1;
            break;
-        case 5:
-        case 8:
+        case DIR_DOWN:
+        case DIR_SOUTHEAST:
            dir -= 1;
            break;
-        case 6:
+        case DIR_NORTHEAST:
            dir += 3;
            break;
-        case 9:
+        case DIR_SOUTHWEST:
            dir -=3;
            break;
     }
@@ -2201,26 +2209,26 @@ void do_throw( CHAR_DATA *ch, char *argument )
       
       switch ( dir )
       {
-        case 0:
-        case 1:
+        case DIR_NORTH:
+        case DIR_EAST:
            dir += 2;
            break;
-        case 2:
-        case 3:
+        case DIR_SOUTH:
+        case DIR_WEST:
            dir -= 2;
            break;
-        case 4:
-        case 7:
+        case DIR_UP:
+        case DIR_NORTHWEST:
            dir += 1;
            break;
-        case 5:
-        case 8:
+        case DIR_DOWN:
+        case DIR_SOUTHEAST:
            dir -= 1;
            break;
-        case 6:
+        case DIR_NORTHEAST:
            dir += 3;
            break;
-        case 9:
+        case DIR_SOUTHWEST:
            dir -=3;
            break;
       }

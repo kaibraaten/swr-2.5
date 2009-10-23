@@ -8,25 +8,25 @@
 #include "mud.h"
 
 /* from swskills.c */
-void    add_reinforcements  args( ( CHAR_DATA *ch ) );
+void add_reinforcements( CHAR_DATA *ch );
 
 /*
  * Local functions.
  */
-int	hit_gain	args( ( CHAR_DATA *ch ) );
-int	mana_gain	args( ( CHAR_DATA *ch ) );
-int	move_gain	args( ( CHAR_DATA *ch ) );
-void	mobile_update	args( ( void ) );
-void	weather_update	args( ( void ) );
-void	update_taxes	args( ( void ) );
-void	char_update	args( ( void ) );
-void	obj_update	args( ( void ) );
-void	aggr_update	args( ( void ) );
-void	room_act_update	args( ( void ) );
-void	obj_act_update	args( ( void ) );
-void	char_check	args( ( void ) );
-void    drunk_randoms	args( ( CHAR_DATA *ch ) );
-void    halucinations	args( ( CHAR_DATA *ch ) );
+int hit_gain( CHAR_DATA *ch );
+int mana_gain( CHAR_DATA *ch );
+int move_gain( CHAR_DATA *ch );
+void mobile_update( void );
+void weather_update( void );
+void update_taxes( void );
+void char_update( void );
+void obj_update( void );
+void aggr_update( void );
+void room_act_update( void );
+void obj_act_update( void );
+void char_check( void );
+void drunk_randoms( CHAR_DATA *ch );
+void halucinations( CHAR_DATA *ch );
 
 /*
  * Global Variables
@@ -595,52 +595,54 @@ void mobile_update( void )
 
 void update_taxes( void )
 {
-     PLANET_DATA *planet;
-     CLAN_DATA *clan;
-     DESCRIPTOR_DATA *d;
-     CHAR_DATA *ch;
-     CHAR_DATA *och;
-     int pay;
-          
-    for ( planet = first_planet; planet; planet = planet->next )
+  PLANET_DATA *planet = NULL;
+  CLAN_DATA *clan = NULL;
+  DESCRIPTOR_DATA *d = NULL;
+  CHAR_DATA *ch = NULL;
+  CHAR_DATA *och = NULL;
+  int pay = 0;
+
+  for ( planet = first_planet; planet; planet = planet->next )
     {
-        clan = planet->governed_by;
-        if ( clan )
+      clan = planet->governed_by;
+
+      if ( clan )
         {
-            clan->funds += get_taxes(planet)/720;
-            if ( clan->funds < 0 )
+	  clan->funds += get_taxes(planet)/720;
+
+	  if ( clan->funds < 0 )
             {
-                 clan->funds = 0;
-                 planet->pop_support -= 1;
-                 if ( planet->pop_support < -100 )
-                      planet->pop_support = -100;
+	      clan->funds = 0;
+	      planet->pop_support -= 1;
+
+	      if ( planet->pop_support < -100 )
+		planet->pop_support = -100;
             }
-            save_clan( clan );
-            save_planet( planet );
+
+	  save_clan( clan );
+	  save_planet( planet );
         }
     }
 
-    for ( d = last_descriptor; d; d = d->prev )
+  for ( d = last_descriptor; d; d = d->prev )
     {
-	if ( (d->connected != CON_PLAYING && d->connected != CON_EDITING)
-	|| d->original)
-	    continue;
-	ch    = d->character;  
-	och   = d->original ? d->original : d->character;
+      if ( (d->connected != CON_PLAYING && d->connected != CON_EDITING)
+	   || d->original)
+	continue;
 
-        if ( !och->pcdata || !och->pcdata->clan )
-           continue;
+      ch    = d->character;  
+      och   = d->original ? d->original : d->character;
 
-        clan = och->pcdata->clan;
-        
-        pay = UMIN(  clan->salary , clan->funds );  
-        pay = UMAX(  pay , 0 );
-        clan->funds -= pay;
-        och->pcdata->bank += pay;
-        
-        ch_printf( ch, "%d credits are deposited into your bank account,\r\ncourtesy of %s.\r\n" ,
-        pay , clan->name );
+      if ( !och->pcdata || !och->pcdata->clan )
+	continue;
 
+      clan = och->pcdata->clan;
+      pay = UMIN(  clan->salary , clan->funds );  
+      pay = UMAX(  pay , 0 );
+      clan->funds -= pay;
+      och->pcdata->bank += pay;
+      ch_printf( ch, "%d credits are deposited into your bank account,\r\ncourtesy of %s.\r\n" ,
+		 pay , clan->name );
     }
 }
 
@@ -815,8 +817,6 @@ void weather_update( void )
 
     return;
 }
-
-
 
 /*
  * Update all chars, including mobs.
@@ -1091,8 +1091,6 @@ void char_update( void )
     return;
 }
 
-
-
 /*
  * Update all objs.
  * This function is performance sensitive.
@@ -1258,136 +1256,145 @@ void obj_update( void )
  */
 void char_check( void )
 {
-    CHAR_DATA *ch, *ch_next;
-    EXIT_DATA *pexit;
-    static int cnt = 0;
-    int door, retcode;
+  CHAR_DATA *ch = NULL, *ch_next = NULL;
+  EXIT_DATA *pexit = NULL;
+  static int cnt = 0;
+  int door = 0, retcode = rNONE;
 
-    cnt = (cnt+1) % 2;
+  cnt = (cnt+1) % 2;
 
-    for ( ch = first_char; ch; ch = ch_next )
+  for ( ch = first_char; ch; ch = ch_next )
     {
-	set_cur_char(ch);
-	ch_next = ch->next;
-	will_fall(ch, 0);
+      set_cur_char(ch);
+      ch_next = ch->next;
+      will_fall(ch, 0);
 
-	if ( char_died( ch ) )
-	  continue;
+      if ( char_died( ch ) )
+	continue;
 
-	if ( IS_NPC( ch ) )
+      if ( IS_NPC( ch ) )
 	{
-	    if ( cnt != 0 )
-		continue;
+	  if ( cnt != 0 )
+	    continue;
 
-	    /* running mobs	-Thoric */
-	    if ( IS_SET(ch->act, ACT_RUNNING) )
+	  /* running mobs	-Thoric */
+	  if ( IS_SET(ch->act, ACT_RUNNING) )
 	    {
-		if ( !IS_SET( ch->act, ACT_SENTINEL )
-		&&   !ch->fighting && ch->hunting )
+	      if ( !IS_SET( ch->act, ACT_SENTINEL )
+		   && !ch->fighting && ch->hunting )
 		{
-		    WAIT_STATE( ch, 2 * PULSE_VIOLENCE );
-		    hunt_victim( ch );
+		  WAIT_STATE( ch, 2 * PULSE_VIOLENCE );
+		  hunt_victim( ch );
+		  continue;
+		}
+
+	      if ( ch->spec_fun )
+		{
+		  if ( (*ch->spec_fun) ( ch ) )
+		    continue;
+		  if ( char_died(ch) )
 		    continue;
 		}
 
-		if ( ch->spec_fun )
+	      if ( ch->spec_2 )
 		{
-		    if ( (*ch->spec_fun) ( ch ) )
-			continue;
-		    if ( char_died(ch) )
-			continue;
-		}
-                if ( ch->spec_2 )
-		{
-		    if ( (*ch->spec_2) ( ch ) )
-			continue;
-		    if ( char_died(ch) )
-			continue;
+		  if ( (*ch->spec_2) ( ch ) )
+		    continue;
+		  if ( char_died(ch) )
+		    continue;
 		}
 
-		if ( !IS_SET(ch->act, ACT_SENTINEL)
-		&&   !IS_SET(ch->act, ACT_PROTOTYPE)
-		&& ( door = number_bits( 4 ) ) <= 9
-		&& ( pexit = get_exit(ch->in_room, door) ) != NULL
-		&&   pexit->to_room
-		&&   !IS_SET(pexit->exit_info, EX_CLOSED)
-		&&   !IS_SET(pexit->to_room->room_flags, ROOM_NO_MOB)
-	        && ( ch->guard_data || pexit->to_room->sector_type == ch->in_room->sector_type ) ) 
+	      if ( !IS_SET(ch->act, ACT_SENTINEL)
+		   && !IS_SET(ch->act, ACT_PROTOTYPE)
+		   && ( door = number_bits( 4 ) ) <= 9
+		   && ( pexit = get_exit(ch->in_room, door) ) != NULL
+		   && pexit->to_room
+		   && !IS_SET(pexit->exit_info, EX_CLOSED)
+		   && !IS_SET(pexit->to_room->room_flags, ROOM_NO_MOB)
+		   && ( ch->guard_data
+			|| pexit->to_room->sector_type == ch->in_room->sector_type ) ) 
 		{
-		    retcode = move_char( ch, pexit, 0 );
-		    if ( char_died(ch) )
-			continue;
-		    if ( retcode != rNONE || IS_SET(ch->act, ACT_SENTINEL)
-		    ||    ch->position < POS_STANDING )
-			continue;
+		  retcode = move_char( ch, pexit, 0 );
+
+		  if ( char_died(ch) )
+		    continue;
+
+		  if ( retcode != rNONE || IS_SET(ch->act, ACT_SENTINEL)
+		       ||    ch->position < POS_STANDING )
+		    continue;
 		}
 	    }
-	    continue;
+
+	  continue;
 	}
-	else
+      else
 	{
-	    if ( ch->mount
-	    &&   ch->in_room != ch->mount->in_room )
+	  if ( ch->mount
+	       && ch->in_room != ch->mount->in_room )
 	    {
-		REMOVE_BIT( ch->mount->act, ACT_MOUNTED );
-		ch->mount = NULL;
-		ch->position = POS_STANDING;
-		send_to_char( "No longer upon your mount, you fall to the ground...\r\nOUCH!\r\n", ch );
+	      REMOVE_BIT( ch->mount->act, ACT_MOUNTED );
+	      ch->mount = NULL;
+	      ch->position = POS_STANDING;
+	      send_to_char( "No longer upon your mount, you fall to the ground...\r\nOUCH!\r\n", ch );
 	    }
 
-	    if ( ( ch->in_room && ch->in_room->sector_type == SECT_UNDERWATER )
-	    || ( ch->in_room && ch->in_room->sector_type == SECT_OCEANFLOOR ) )
+	  if ( ( ch->in_room && ch->in_room->sector_type == SECT_UNDERWATER )
+	       || ( ch->in_room && ch->in_room->sector_type == SECT_OCEANFLOOR ) )
 	    {
-		if ( !IS_AFFECTED( ch, AFF_AQUA_BREATH ) )
+	      if ( !IS_AFFECTED( ch, AFF_AQUA_BREATH ) )
 		{
-		    if (  !IS_IMMORTAL(ch) )
+		  if (  !IS_IMMORTAL(ch) )
 		    {
-			int dam;
+		      int dam = number_range( ch->max_hit / 50,
+					      ch->max_hit / 30 );
+		      dam = UMAX( 1, dam );
 
-        		  	
-			dam = number_range( ch->max_hit / 50 , ch->max_hit / 30 );
-			dam = UMAX( 1, dam );
-			if(  ch->hit <= 0 )
-			    dam = UMIN( 10, dam );
-			if ( number_bits(3) == 0 )
-			  send_to_char( "You cough and choke as you try to breathe water!\r\n", ch );
-			damage( ch, ch, dam, TYPE_UNDEFINED );
+		      if(  ch->hit <= 0 )
+			dam = UMIN( 10, dam );
+		      if ( number_bits(3) == 0 )
+			send_to_char( "You cough and choke as you try to breathe water!\r\n", ch );
+
+		      damage( ch, ch, dam, TYPE_UNDEFINED );
 		    }
 		}
 	    }
-	
-	    if ( char_died( ch ) )
-		continue; 
 
-	    if ( ch->in_room
-	    && (( ch->in_room->sector_type == SECT_WATER_NOSWIM )
-	    ||  ( ch->in_room->sector_type == SECT_WATER_SWIM ) ) )
+	  if ( char_died( ch ) )
+	    continue; 
+
+	  if ( ch->in_room
+	       && (( ch->in_room->sector_type == SECT_WATER_NOSWIM )
+		   ||  ( ch->in_room->sector_type == SECT_WATER_SWIM ) ) )
 	    {
-		if ( !IS_AFFECTED( ch, AFF_FLYING )
-		&& !IS_AFFECTED( ch, AFF_FLOATING ) 
-		&& !IS_AFFECTED( ch, AFF_AQUA_BREATH )
-		&& !ch->mount )
+	      if ( !IS_AFFECTED( ch, AFF_FLYING )
+		   && !IS_AFFECTED( ch, AFF_FLOATING ) 
+		   && !IS_AFFECTED( ch, AFF_AQUA_BREATH )
+		   && !ch->mount )
 		{
-			if (  !IS_IMMORTAL(ch) )
-			{
-			    int dam;
+		  if (  !IS_IMMORTAL(ch) )
+		    {
+		      int dam = 0;
 
-			    if ( ch->move > 0 )
-				    ch->move--;
-			    else
-			    {
-				dam = number_range( ch->max_hit / 50, ch->max_hit / 30 );
-				dam = UMAX( 1, dam );
-				if(  ch->hit <= 0 )
-			           dam = UMIN( 10, dam );
-				if ( number_bits(3) == 0 )
-				   send_to_char( "Struggling with exhaustion, you choke on a mouthful of water.\r\n", ch );
-				damage( ch, ch, dam, TYPE_UNDEFINED );
-			    }
-          	      }
+		      if ( ch->move > 0 )
+			{
+			  ch->move--;
+			}
+		      else
+			{
+			  dam = number_range( ch->max_hit / 50, ch->max_hit / 30 );
+			  dam = UMAX( 1, dam );
+
+			  if(  ch->hit <= 0 )
+			    dam = UMIN( 10, dam );
+
+			  if ( number_bits(3) == 0 )
+			    send_to_char( "Struggling with exhaustion, you choke on a mouthful of water.\r\n", ch );
+
+			  damage( ch, ch, dam, TYPE_UNDEFINED );
+			}
+		    }
 		}
 	    }
-
 	}
     }
 }
@@ -1640,23 +1647,25 @@ void halucinations( CHAR_DATA *ch )
 
 void tele_update( void )
 {
-    TELEPORT_DATA *tele, *tele_next;
+  TELEPORT_DATA *tele, *tele_next;
 
-    if ( !first_teleport )
-      return;
-    
-    for ( tele = first_teleport; tele; tele = tele_next )
+  if ( !first_teleport )
+    return;
+
+  for ( tele = first_teleport; tele; tele = tele_next )
     {
-	tele_next = tele->next;
-	if ( --tele->timer <= 0 )
+      tele_next = tele->next;
+
+      if ( --tele->timer <= 0 )
 	{
-	    if ( tele->room->first_person )
+	  if ( tele->room->first_person )
 	    {
-		  teleport( tele->room->first_person, tele->room->tele_vnum,
+	      teleport( tele->room->first_person, tele->room->tele_vnum,
 			TELE_TRANSALL );
 	    }
-	    UNLINK( tele, first_teleport, last_teleport, next, prev );
-	    DISPOSE( tele );
+
+	  UNLINK( tele, first_teleport, last_teleport, next, prev );
+	  DISPOSE( tele );
 	}
     }
 }
@@ -1668,178 +1677,169 @@ void tele_update( void )
  */
 void update_handler( void )
 {
-    static  int     pulse_taxes;
-    static  int     pulse_area;
-    static  int     pulse_savearea;
-    static  int     pulse_mobile;
-    static  int     pulse_violence;
-    static  int     pulse_point;
-    static  int	    pulse_second;
-    static  int     pulse_space;
-    static  int     pulse_ship;
-    static  int     pulse_recharge;
-    struct timeval start_time;
-    struct timeval etime;
+  static  int     pulse_taxes;
+  static  int     pulse_area;
+  static  int     pulse_savearea;
+  static  int     pulse_mobile;
+  static  int     pulse_violence;
+  static  int     pulse_point;
+  static  int	    pulse_second;
+  static  int     pulse_space;
+  static  int     pulse_ship;
+  static  int     pulse_recharge;
+  struct timeval start_time;
+  struct timeval etime;
 
-    if ( timechar )
+  if ( timechar )
     {
       set_char_color(AT_PLAIN, timechar);
       send_to_char( "Starting update timer.\r\n", timechar );
       gettimeofday(&start_time, NULL);
     }
-    
-    if ( --pulse_area     <= 0 )
+
+  if ( --pulse_area <= 0 )
     {
-	pulse_area	= number_range( PULSE_AREA / 2, 3 * PULSE_AREA / 2 );
-	reset_all( );
+      pulse_area = number_range( PULSE_AREA / 2, 3 * PULSE_AREA / 2 );
+      reset_all();
     }
 
-    if ( --pulse_savearea     <= 0 )
+  if ( --pulse_savearea <= 0 )
     {
-	pulse_savearea	= 10 * PULSE_MINUTE ;
-	save_some_areas( );
-    }
-    
-    if ( --pulse_taxes     <= 0 )
-    {
-	pulse_taxes	= PULSE_TAXES ;
-	update_taxes	( );
+      pulse_savearea = 10 * PULSE_MINUTE ;
+      save_some_areas();
     }
 
-    if ( --pulse_mobile   <= 0 )
+  if ( --pulse_taxes <= 0 )
     {
-	pulse_mobile	= PULSE_MOBILE;
-	mobile_update  ( );
-    }
-    
-    if ( --pulse_space   <= 0 )
-    {
-       pulse_space    = PULSE_SPACE;
-       update_space  ( );
+      pulse_taxes = PULSE_TAXES ;
+      update_taxes();
     }
 
-    if ( --pulse_recharge <= 0 )
+  if ( --pulse_mobile <= 0 )
     {
-         pulse_recharge = PULSE_SPACE/3;
-         recharge_ships ( );
-    }
-    
-    if ( --pulse_ship   <= 0 )
-    {
-       pulse_ship  = PULSE_SPACE/10;
-       move_missiles();
-       move_ships();
-    }
-    
-    if ( --pulse_violence <= 0 )
-    {
-	pulse_violence	= PULSE_VIOLENCE;
-	violence_update	( );
+      pulse_mobile = PULSE_MOBILE;
+      mobile_update();
     }
 
-    if ( --pulse_point    <= 0 )
+  if ( --pulse_space <= 0 )
     {
-      pulse_point     = number_range( (int)(PULSE_TICK * 0.75), (int)(PULSE_TICK * 1.25 ));
-
-	weather_update	( );
-	char_update	( );
-	obj_update	( );
-	clear_vrooms	( );			/* remove virtual rooms */
+      pulse_space = PULSE_SPACE;
+      update_space();
     }
 
-    if ( --pulse_second   <= 0 )
+  if ( --pulse_recharge <= 0 )
     {
-	pulse_second	= PULSE_PER_SECOND;
-	char_check();
- 	/*reboot_check( "" ); Disabled to check if its lagging a lot - Scryn*/
- 	/* Much faster version enabled by Altrag..
- 	   although I dunno how it could lag too much, it was just a bunch
- 	   of comparisons.. */
- 	reboot_check(0);
+      pulse_recharge = PULSE_SPACE/3;
+      recharge_ships ( );
     }
 
-    if ( auction->item && --auction->pulse <= 0 )
+  if ( --pulse_ship <= 0 )
+    {
+      pulse_ship  = PULSE_SPACE/10;
+      move_missiles();
+      move_ships();
+    }
+
+  if ( --pulse_violence <= 0 )
+    {
+      pulse_violence	= PULSE_VIOLENCE;
+      violence_update	( );
+    }
+
+  if ( --pulse_point    <= 0 )
+    {
+      pulse_point = number_range( (int)(PULSE_TICK * 0.75),
+				  (int)(PULSE_TICK * 1.25 ));
+
+      weather_update();
+      char_update();
+      obj_update();
+      clear_vrooms();			/* remove virtual rooms */
+    }
+
+  if ( --pulse_second <= 0 )
+    {
+      pulse_second = PULSE_PER_SECOND;
+      char_check();
+      /*reboot_check( "" ); Disabled to check if its lagging a lot - Scryn*/
+      /* Much faster version enabled by Altrag..
+	 although I dunno how it could lag too much, it was just a bunch
+	 of comparisons.. */
+      reboot_check(0);
+    }
+
+  if ( auction->item && --auction->pulse <= 0 )
     {                                                  
-	auction->pulse = PULSE_AUCTION;                     
-	auction_update( );
+      auction->pulse = PULSE_AUCTION;                     
+      auction_update( );
     }
 
-    tele_update( );
-    aggr_update( );
-    obj_act_update ( );
-    room_act_update( );
-    clean_obj_queue();		/* dispose of extracted objects */
-    clean_char_queue();		/* dispose of dead mobs/quitting chars */
-    if ( timechar )
+  tele_update();
+  aggr_update();
+  obj_act_update();
+  room_act_update();
+  clean_obj_queue();		/* dispose of extracted objects */
+  clean_char_queue();		/* dispose of dead mobs/quitting chars */
+
+  if ( timechar )
     {
       gettimeofday(&etime, NULL);
       set_char_color(AT_PLAIN, timechar);
       send_to_char( "Update timing complete.\r\n", timechar );
       subtract_times(&etime, &start_time);
       ch_printf( timechar, "Timing took %d.%06d seconds.\r\n",
-          etime.tv_sec, etime.tv_usec );
+		 etime.tv_sec, etime.tv_usec );
       timechar = NULL;
     }
-
-    return;
 }
-
 
 void remove_portal( OBJ_DATA *portal )
 {
-    ROOM_INDEX_DATA *fromRoom, *toRoom;
-    CHAR_DATA *ch;
-    EXIT_DATA *pexit;
-    bool found;
+  ROOM_INDEX_DATA *fromRoom = NULL, *toRoom = NULL;
+  CHAR_DATA *ch = NULL;
+  EXIT_DATA *pexit = NULL;
+  bool found = FALSE;
 
-    if ( !portal )
+  if ( !portal )
     {
-	bug( "remove_portal: portal is NULL", 0 );
-	return;
+      bug( "remove_portal: portal is NULL", 0 );
+      return;
     }
 
-    fromRoom = portal->in_room;
-    found = FALSE;
-    if ( !fromRoom )
+  fromRoom = portal->in_room;
+
+  if ( !fromRoom )
     {
-	bug( "remove_portal: portal->in_room is NULL", 0 );
-	return;
+      bug( "remove_portal: portal->in_room is NULL", 0 );
+      return;
     }
 
-    for ( pexit = fromRoom->first_exit; pexit; pexit = pexit->next )
-	if ( IS_SET( pexit->exit_info, EX_PORTAL ) )
+  for ( pexit = fromRoom->first_exit; pexit; pexit = pexit->next )
+    {
+      if ( IS_SET( pexit->exit_info, EX_PORTAL ) )
 	{
-	    found = TRUE;
-	    break;
+	  found = TRUE;
+	  break;
 	}
-
-    if ( !found )
-    {
-	bug( "remove_portal: portal not found in room %d!", fromRoom->vnum );
-	return;
     }
 
-    if ( pexit->vdir != DIR_PORTAL )
-	bug( "remove_portal: exit in dir %d != DIR_PORTAL", pexit->vdir );
+  if ( !found )
+    {
+      bug( "remove_portal: portal not found in room %d!", fromRoom->vnum );
+      return;
+    }
 
-    if ( ( toRoom = pexit->to_room ) == NULL )
-      bug( "remove_portal: toRoom is NULL", 0 );
+  if ( pexit->vdir != DIR_PORTAL )
+    bug( "remove_portal: exit in dir %d != DIR_PORTAL", pexit->vdir );
+
+  if ( ( toRoom = pexit->to_room ) == NULL )
+    bug( "remove_portal: toRoom is NULL", 0 );
  
-    extract_exit( fromRoom, pexit );
-    /* rendunancy */
-    /* send a message to fromRoom */
-    /* ch = fromRoom->first_person; */
-    /* if(ch!=NULL) */
-    /* act( AT_PLAIN, "A magical portal below winks from existence.", ch, NULL, NULL, TO_ROOM ); */
+  extract_exit( fromRoom, pexit );
 
-    /* send a message to toRoom */
-    if ( toRoom && (ch = toRoom->first_person) != NULL )
-      act( AT_PLAIN, "A magical portal above winks from existence.", ch, NULL, NULL, TO_ROOM );
-
-    /* remove the portal obj: looks better to let update_obj do this */
-    /* extract_obj(portal);  */
-
-    return;
+  if ( toRoom && (ch = toRoom->first_person) != NULL )
+    act( AT_PLAIN, "A magical portal above winks from existence.",
+	 ch, NULL, NULL, TO_ROOM );
 }
 
 void reboot_check( time_t reset )
@@ -1920,299 +1920,115 @@ void reboot_check( time_t reset )
   return;
 }
   
-#if 0
-void reboot_check( char *arg )
-{
-    char buf[MAX_STRING_LENGTH];
-    extern bool mud_down;
-    /*struct tm *timestruct;
-    int timecheck;*/
-    CHAR_DATA *vch;
-
-    /*Bools to show which pre-boot echoes we've done. */
-    static bool thirty  = FALSE;
-    static bool fifteen = FALSE;
-    static bool ten     = FALSE;
-    static bool five    = FALSE;
-    static bool four    = FALSE;
-    static bool three   = FALSE;
-    static bool two     = FALSE;
-    static bool one     = FALSE;
-
-    /* This function can be called by do_setboot when the reboot time
-       is being manually set to reset all the bools. */
-    if ( !str_cmp( arg, "reset" ) )
-    {
-      thirty  = FALSE;
-      fifteen = FALSE;
-      ten     = FALSE;
-      five    = FALSE;
-      four    = FALSE;
-      three   = FALSE;
-      two     = FALSE;
-      one     = FALSE;
-      return;
-    }
-
-    /* If the mud has been up less than 18 hours and the boot time 
-       wasn't set manually, forget it. */ 
-/* Usage monitor */
-
-if ((current_time % 1800) == 0)
-{
-  sprintf(buf, "%s: %d players", ctime(&current_time), num_descriptors);  
-  append_to_file(USAGE_FILE, buf);
-}
-
-/* Change by Scryn - if mud has not been up 18 hours at boot time - still 
- * allow for warnings even if not up 18 hours 
- */
-    if ( new_boot_time_t - boot_time < 60*60*18 
-         && set_boot_time->manual == 0 )
-    {
-      return;
-    }
-/*
-    timestruct = localtime( &current_time);
-
-    if ( timestruct->tm_hour == set_boot_time->hour        
-         && timestruct->tm_min  == set_boot_time->min )*/
-    if ( new_boot_time_t <= current_time )
-    {
-       /* Return auction item to seller */
-       if (auction->item != NULL)
-       {
-        sprintf (buf,"Sale of %s has been stopped by mud.",
-                 auction->item->short_descr);
-        talk_auction (buf);
-        obj_to_char (auction->item, auction->seller);
-        auction->item = NULL;
-        if (auction->buyer != NULL && auction->seller != auction->buyer) /* return money to the buyer */
-        {
-            auction->buyer->gold += auction->bet;
-            send_to_char ("Your money has been returned.\r\n",auction->buyer);
-        }
-       }      
-
-       sprintf( buf, "You are forced from these realms by a strong magical presence" ); 
-       echo_to_all( AT_YELLOW, buf, ECHOTAR_ALL );
-       sprintf( buf, "as life here is reconstructed." );
-       echo_to_all( AT_YELLOW, buf, ECHOTAR_ALL );
-
-       /* Save all characters before booting. */
-       for ( vch = first_char; vch; vch = vch->next )
-       {
-         if ( !IS_NPC( vch ) )
-           save_char_obj( vch );
-       }
-       mud_down = TRUE;
-    }
-
-  /* How many minutes to the scheduled boot? */
-/*  timecheck = ( set_boot_time->hour * 60 + set_boot_time->min )
-              - ( timestruct->tm_hour * 60 + timestruct->tm_min );
-
-  if ( timecheck > 30  || timecheck < 0 ) return;
-
-  if ( timecheck <= 1 ) */
-  if ( new_boot_time_t - current_time <= 60 )
-  {
-    if ( one == FALSE )
-    {
-	sprintf( buf, "You feel the ground shake as the end comes near!" );
-	echo_to_all( AT_YELLOW, buf, ECHOTAR_ALL );
-	one = TRUE;
-	sysdata.DENY_NEW_PLAYERS = TRUE;
-    }
-    return;   
-  }
-
-/*  if ( timecheck == 2 )*/
-  if ( new_boot_time_t - current_time <= 120 )
-  {
-    if ( two == FALSE )
-    {
-	sprintf( buf, "Lightning crackles in the sky above!" );
-	echo_to_all( AT_YELLOW, buf, ECHOTAR_ALL );
-	two = TRUE;
-	sysdata.DENY_NEW_PLAYERS = TRUE;
-    }
-    return;   
-  }
-
-/*  if ( timecheck == 3 )*/ 
-  if (new_boot_time_t - current_time <= 180 )
-  {
-    if ( three == FALSE )
-    {
-	sprintf( buf, "Crashes of thunder sound across the land!" );
-	echo_to_all( AT_YELLOW, buf, ECHOTAR_ALL );
-	three = TRUE;
-	sysdata.DENY_NEW_PLAYERS = TRUE;
-    }
-    return;   
-  }
-
-/*  if ( timecheck == 4 )*/
-  if( new_boot_time_t - current_time <= 240 )
-  {
-    if ( four == FALSE )
-    {
-	sprintf( buf, "The sky has suddenly turned midnight black." );
-	echo_to_all( AT_YELLOW, buf, ECHOTAR_ALL );
-	four = TRUE;
-	sysdata.DENY_NEW_PLAYERS = TRUE;
-    }
-    return;   
-  }
-
-/*  if ( timecheck == 5 )*/
-  if( new_boot_time_t - current_time <= 300 )
-  {
-    if ( five == FALSE )
-    {
-	sprintf( buf, "You notice the life forms around you slowly dwindling away." );
-	echo_to_all( AT_YELLOW, buf, ECHOTAR_ALL );
-	five = TRUE;
-	sysdata.DENY_NEW_PLAYERS = TRUE;
-    }
-    return;   
-  }
-
-/*  if ( timecheck == 10 )*/
-  if( new_boot_time_t - current_time <= 600 )
-  {
-    if ( ten == FALSE )
-    {
-	sprintf( buf, "The seas across the realm have turned frigid." );
-	echo_to_all( AT_YELLOW, buf, ECHOTAR_ALL );
-	ten = TRUE;
-    }
-    return;   
-  }
-
-/*  if ( timecheck == 15 )*/
-  if( new_boot_time_t - current_time <= 900 )
-  {
-    if ( fifteen == FALSE )
-    {
-	sprintf( buf, "The aura of magic which once surrounded the realms seems slightly unstable." );
-	echo_to_all( AT_YELLOW, buf, ECHOTAR_ALL );
-	fifteen = TRUE;
-    }
-    return;   
-  }
-
-/*  if ( timecheck == 30 )*/
-  if( new_boot_time_t - current_time <= 1800 )
-  { 
-    if ( thirty == FALSE )
-    {
-	sprintf( buf, "You sense a change in the magical forces surrounding you." );
-	echo_to_all( AT_YELLOW, buf, ECHOTAR_ALL );
-	thirty = TRUE;
-    }
-    return;   
-  }
-
-  return;
-}
-#endif
-
 /* the auction update*/
 
 void auction_update (void)
 {
-    int tax, pay;
-    char buf[MAX_STRING_LENGTH];
+  int tax = 0, pay = 0;
+  char buf[MAX_STRING_LENGTH];
 
-    switch (++auction->going) /* increase the going state */
+  switch (++auction->going) /* increase the going state */
     {
-	case 1 : /* going once */
-	case 2 : /* going twice */
-	    if (auction->bet > auction->starting)
-		sprintf (buf, "%s: going %s for %d.", auction->item->short_descr,
-			((auction->going == 1) ? "once" : "twice"), auction->bet);
-	    else
-		sprintf (buf, "%s: going %s (bid not received yet).", auction->item->short_descr,
-			((auction->going == 1) ? "once" : "twice"));
+    case 1 : /* going once */
+    case 2 : /* going twice */
+      if (auction->bet > auction->starting)
+	sprintf (buf, "%s: going %s for %d.", auction->item->short_descr,
+		 ((auction->going == 1) ? "once" : "twice"), auction->bet);
+      else
+	sprintf (buf, "%s: going %s (bid not received yet).",
+		 auction->item->short_descr,
+		 ((auction->going == 1) ? "once" : "twice"));
 
-	    talk_auction (buf);
-	    break;
+      talk_auction (buf);
+      break;
 
-	case 3 : /* SOLD! */
-	    if (!auction->buyer && auction->bet)
+    case 3 : /* SOLD! */
+      if (!auction->buyer && auction->bet)
+	{
+	  bug( "Auction code reached SOLD, with NULL buyer, but %d gold bid",
+	       auction->bet );
+	  auction->bet = 0;
+	}
+
+      if (auction->bet > 0 && auction->buyer != auction->seller)
+	{
+	  sprintf (buf, "%s sold to %s for %d.",
+		   auction->item->short_descr,
+		   IS_NPC(auction->buyer) ? auction->buyer->short_descr : auction->buyer->name,
+		   auction->bet);
+	  talk_auction(buf);
+
+	  act(AT_ACTION, "The auctioneer materializes before you, and hands you $p.",
+	      auction->buyer, auction->item, NULL, TO_CHAR);
+	  act(AT_ACTION, "The auctioneer materializes before $n, and hands $m $p.",
+	      auction->buyer, auction->item, NULL, TO_ROOM);
+
+	  if ( (auction->buyer->carry_weight 
+		+     get_obj_weight( auction->item ))
+	       >     can_carry_w( auction->buyer ) )
 	    {
-		bug( "Auction code reached SOLD, with NULL buyer, but %d gold bid", auction->bet );
-		auction->bet = 0;
+	      act( AT_PLAIN, "$p is too heavy for you to carry with your current inventory.", auction->buyer, auction->item, NULL, TO_CHAR );
+	      act( AT_PLAIN, "$n is carrying too much to also carry $p, and $e drops it.", auction->buyer, auction->item, NULL, TO_ROOM );
+	      obj_to_room( auction->item, auction->buyer->in_room );
 	    }
-	    if (auction->bet > 0 && auction->buyer != auction->seller)
+	  else
 	    {
-		sprintf (buf, "%s sold to %s for %d.",
-			auction->item->short_descr,
-			IS_NPC(auction->buyer) ? auction->buyer->short_descr : auction->buyer->name,
-			auction->bet);
-		talk_auction(buf);
+	      obj_to_char( auction->item, auction->buyer );
+	    }
 
-		act(AT_ACTION, "The auctioneer materializes before you, and hands you $p.",
-			auction->buyer, auction->item, NULL, TO_CHAR);
-		act(AT_ACTION, "The auctioneer materializes before $n, and hands $m $p.",
-			auction->buyer, auction->item, NULL, TO_ROOM);
+	  pay = (int)(auction->bet * 0.9);
+	  tax = (int)(auction->bet * 0.1);
+	  auction->seller->gold += pay; /* give him the money, tax 10 % */
+	  sprintf(buf, "The auctioneer pays you %d gold, charging an auction fee of %d.\r\n", pay, tax);
+	  send_to_char(buf, auction->seller);
+	  auction->item = NULL; /* reset item */
 
-		if ( (auction->buyer->carry_weight 
+	  if ( IS_SET( sysdata.save_flags, SV_AUCTION ) )
+	    {
+	      save_char_obj( auction->buyer );
+	      save_char_obj( auction->seller );
+	    }
+	}
+      else /* not sold */
+	{
+	  sprintf (buf, "No bids received for %s - object has been removed from auction\r\n.",auction->item->short_descr);
+	  talk_auction(buf);
+	  act (AT_ACTION, "The auctioneer appears before you to return $p to you.",
+	       auction->seller,auction->item,NULL,TO_CHAR);
+	  act (AT_ACTION, "The auctioneer appears before $n to return $p to $m.",
+	       auction->seller,auction->item,NULL,TO_ROOM);
+
+	  if ( (auction->seller->carry_weight
 		+     get_obj_weight( auction->item ))
-		>     can_carry_w( auction->buyer ) )
-		{
-		    act( AT_PLAIN, "$p is too heavy for you to carry with your current inventory.", auction->buyer, auction->item, NULL, TO_CHAR );
-    		    act( AT_PLAIN, "$n is carrying too much to also carry $p, and $e drops it.", auction->buyer, auction->item, NULL, TO_ROOM );
-		    obj_to_room( auction->item, auction->buyer->in_room );
-		}
-		else
-		    obj_to_char( auction->item, auction->buyer );
-	        pay = (int)(auction->bet * 0.9);
-		tax = (int)(auction->bet * 0.1);
-                auction->seller->gold += pay; /* give him the money, tax 10 % */
-		sprintf(buf, "The auctioneer pays you %d gold, charging an auction fee of %d.\r\n", pay, tax);
-		send_to_char(buf, auction->seller);
-                auction->item = NULL; /* reset item */
-		if ( IS_SET( sysdata.save_flags, SV_AUCTION ) )
-		{
-		    save_char_obj( auction->buyer );
-		    save_char_obj( auction->seller );
-		}
-            }
-            else /* not sold */
-            {
-                sprintf (buf, "No bids received for %s - object has been removed from auction\r\n.",auction->item->short_descr);
-                talk_auction(buf);
-                act (AT_ACTION, "The auctioneer appears before you to return $p to you.",
-                      auction->seller,auction->item,NULL,TO_CHAR);
-                act (AT_ACTION, "The auctioneer appears before $n to return $p to $m.",
-                      auction->seller,auction->item,NULL,TO_ROOM);
-		if ( (auction->seller->carry_weight
-		+     get_obj_weight( auction->item ))
-		>     can_carry_w( auction->seller ) )
-		{
-		    act( AT_PLAIN, "You drop $p as it is just too much to carry"
-			" with everything else you're carrying.", auction->seller,
-			auction->item, NULL, TO_CHAR );
-		    act( AT_PLAIN, "$n drops $p as it is too much extra weight"
-			" for $m with everything else.", auction->seller,
-			auction->item, NULL, TO_ROOM );
-		    obj_to_room( auction->item, auction->seller->in_room );
-		}
-		else
-		    obj_to_char (auction->item,auction->seller);
-		tax = (int)(auction->item->cost * 0.05);
-		sprintf(buf, "The auctioneer charges you an auction fee of %d.\r\n", tax );
-		send_to_char(buf, auction->seller);
-		if ((auction->seller->gold - tax) < 0)
-		  auction->seller->gold = 0;
-		else
-		  auction->seller->gold -= tax;
-		if ( IS_SET( sysdata.save_flags, SV_AUCTION ) )
-		    save_char_obj( auction->seller );
-	    } /* else */
-	    auction->item = NULL; /* clear auction */
+	       >     can_carry_w( auction->seller ) )
+	    {
+	      act( AT_PLAIN, "You drop $p as it is just too much to carry"
+		   " with everything else you're carrying.", auction->seller,
+		   auction->item, NULL, TO_CHAR );
+	      act( AT_PLAIN, "$n drops $p as it is too much extra weight"
+		   " for $m with everything else.", auction->seller,
+		   auction->item, NULL, TO_ROOM );
+	      obj_to_room( auction->item, auction->seller->in_room );
+	    }
+	  else
+	    {
+	      obj_to_char (auction->item,auction->seller);
+	    }
+
+	  tax = (int)(auction->item->cost * 0.05);
+	  sprintf(buf, "The auctioneer charges you an auction fee of %d.\r\n",
+		  tax );
+	  send_to_char(buf, auction->seller);
+
+	  if ((auction->seller->gold - tax) < 0)
+	    auction->seller->gold = 0;
+	  else
+	    auction->seller->gold -= tax;
+
+	  if ( IS_SET( sysdata.save_flags, SV_AUCTION ) )
+	    save_char_obj( auction->seller );
+	} /* else */
+
+      auction->item = NULL; /* clear auction */
     } /* switch */
 } /* func */
