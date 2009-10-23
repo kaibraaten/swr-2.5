@@ -3,7 +3,7 @@ BINARY = swr
 WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wredundant-decls -Wwrite-strings
 
 CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support
-LFLAGS = -lm -Lswr_support -lswr_support
+LFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support
 DEPS = 
 ODIR = obj
 _OBJ = act_comm.o act_info.o act_move.o act_obj.o act_wiz.o boards.o \

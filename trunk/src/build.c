@@ -485,53 +485,6 @@ int get_defenseflag( const char *flag )
   return -1;
 }
 
-/*
- * Remove carriage returns from a line
- */
-char *strip_cr( const char *str )
-{
-    static char newstr[MAX_STRING_LENGTH];
-    int i, j;
-
-    for ( i=j=0; str[i] != '\0'; i++ )
-	if ( str[i] != '\r' )
-	{
-	  newstr[j++] = str[i];	
-	}
-    newstr[j] = '\0';
-    return newstr;
-}
-
-
-/*
- * Removes the tildes from a line, except if it's the last character.
- */
-void smush_tilde( char *str )
-{
-    int len;
-    char last;
-    char *strptr;
-    
-    strptr = str;
-    
-    len  = strlen( str );
-    if ( len )
-      last = strptr[len-1];
-    else
-      last = '\0';
-
-    for ( ; *str != '\0'; str++ )
-    {
-	if ( *str == '~' )
-	    *str = '-';
-    }
-    if ( len )
-      strptr[len-1] = last;
-
-    return;
-}
-
-
 void start_editing( CHAR_DATA *ch, char *data )
 {
 	EDITOR_DATA *edit;
