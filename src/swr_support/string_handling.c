@@ -7,6 +7,10 @@
 
 void bug( const char *str, ... );
 
+bool is_name2( const char*, char* );
+bool is_name2_prefix( const char*, char* );
+char *wordwrap( char*, short );
+
 /*
  * See if a string is one of the names of an object.
  */
@@ -324,7 +328,11 @@ char *strupper( const char *str )
 /*
  * Returns TRUE or FALSE if a letter is a vowel                 -Thoric
  */
-bool isavowel( char letter )
+#ifdef AMIGA
+static bool isavowel( unsigned letter )
+#else
+static bool isavowel( char letter )
+#endif
 {
   char c;
 

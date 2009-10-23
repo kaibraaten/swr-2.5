@@ -63,7 +63,7 @@ bool can_post( CHAR_DATA *ch, BOARD_DATA *board )
 /*
  * board commands.
  */
-void write_boards_txt( )
+void write_boards_txt( void )
 {
     BOARD_DATA *tboard;
     FILE *fpout;

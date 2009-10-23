@@ -25,6 +25,10 @@
 #ifndef _SWR2_OS_AMIGA_H_
 #define _SWR2_OS_AMIGA_H_
 
+#ifdef __STORMGCC__
+typedef long clock_t;
+#endif
+
 #include <utility/tagitem.h>
 #include <exec/exec.h>
 #include <proto/exec.h>
@@ -40,7 +44,7 @@
 #include <sys/time.h>
 #include <db.h>
 
-#if defined( __STORMGCC__ ) && defined( __cplusplus )
+#if defined( __STORMGCC__ )
 #define unlink(name) !DeleteFile((STRPTR)(name))
 #endif
 

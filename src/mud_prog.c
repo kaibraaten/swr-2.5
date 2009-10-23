@@ -87,7 +87,7 @@ char * strstr(s1,s2) const char *s1; const char *s2;
 
 #define RID ROOM_INDEX_DATA
 
-void init_supermob()
+void init_supermob( void )
 {
   RID *office = get_room_index ( ROOM_VNUM_SUPERMOB_OFFICE );
 

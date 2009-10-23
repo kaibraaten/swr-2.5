@@ -15,7 +15,7 @@ void do_reset( CHAR_DATA * ch , char * argument )
     reset_all();
 }
 
-static void reset_make_random_disaster()
+static void reset_make_random_disaster( void )
 {
   PLANET_DATA * dPlanet = NULL;
   int pCount = 0;

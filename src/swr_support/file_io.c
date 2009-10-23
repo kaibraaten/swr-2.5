@@ -120,7 +120,7 @@ float fread_float( FILE *fp )
            else
              {
                place++;
-               number += pow( 10, ( -1 * place ) ) * ( c - '0' );
+               number += pow( (double) 10, ( -1 * place ) ) * ( c - '0' );
              }
            c = getc( fp );
          }
@@ -212,8 +212,8 @@ int fread_number( FILE *fp )
  */
 char *str_dup( const char *str )
 {
-  static char *ret;
-  int len;
+  static char *ret = NULL;
+  size_t len = 0;
 
   if ( !str )
     return NULL;

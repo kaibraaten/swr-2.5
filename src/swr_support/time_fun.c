@@ -1,3 +1,4 @@
+#include "os.h"
 #include <time.h>
 
 #ifndef WIN32
@@ -6,7 +7,12 @@
 
 void bug( const char *str, ... );
 
-struct tm *update_time ( struct tm *old_time )
+struct tm *update_time( struct tm* );
+void subtract_times( struct timeval*, struct timeval* );
+void start_timer( struct timeval* );
+time_t end_timer( struct timeval* );
+
+struct tm *update_time( struct tm *old_time )
 {
   time_t t = mktime(old_time);
   return localtime(&t);

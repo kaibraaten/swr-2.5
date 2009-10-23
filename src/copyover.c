@@ -39,18 +39,6 @@
 #include "os.h"
 
 /*
- * Socket and TCP/IP stuff.
- */
-/*
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/in_systm.h>
-#include <netinet/ip.h>
-#include <arpa/inet.h>
-#include <arpa/telnet.h>
-#include <netdb.h>
-*/
-/*
  * OS-dependent local functions.
  */
 SOCKET init_socket( int port );

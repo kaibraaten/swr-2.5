@@ -1,6 +1,8 @@
+#include "swr_support.h"
 #include <time.h>
 #include <string.h>
-#include "swr_support.h"
+
+void init_mm( void );
 
 int umin( int check, int ncheck )
 {
@@ -87,7 +89,7 @@ char *scramble( const char *argument, int modifier )
  */
 static  int     rgiState[2+55];
 
-void init_mm( )
+void init_mm( void )
 {
   int *piState;
   int iState;

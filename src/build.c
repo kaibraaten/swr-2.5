@@ -4548,7 +4548,7 @@ void do_foldarea( CHAR_DATA *ch, char *argument )
 
 extern int top_area;
 
-void write_area_list( )
+void write_area_list( void )
 {
     AREA_DATA *tarea;
     FILE *fpout;
