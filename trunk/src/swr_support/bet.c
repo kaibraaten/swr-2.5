@@ -18,7 +18,8 @@
 *			Auction bid parsing routines			   *
 ****************************************************************************/
 #include <ctype.h>
-
+#include <stdlib.h>
+#include "swr_support.h"
 
 /*
  * The following code was written by Erwin Andreasen for the automated
@@ -59,7 +60,7 @@
   once.
 */
 
-static int advatoi (const char *s)
+int advatoi (const char *s)
 {
     int number = 0;	/* number to be returned */
     int multiplier = 0;	/* multiplier used to get the extra digits right */
@@ -118,7 +119,7 @@ static int advatoi (const char *s)
   gives 10,000 etc.
 
 */
-static int parsebet (const int currentbet, const char *s)
+int parsebet (const int currentbet, const char *s)
 {
     /* check to make sure it's not blank */
     if ( s[0] != '\0' )

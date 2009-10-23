@@ -3,7 +3,6 @@
 #include <string.h>
 #include <assert.h>
 #include "mud.h"
-#include "bet.h"
 
 /*
  * Local functions.
