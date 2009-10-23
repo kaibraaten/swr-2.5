@@ -24,11 +24,11 @@ int		 cur_obj_serial = 0;
 bool		 cur_obj_extracted = FALSE;
 obj_ret		 global_objcode = rNONE;
 
-bool is_wizvis( const CHAR_DATA *ch , const CHAR_DATA *victim );
+static bool is_wizvis( const CHAR_DATA *ch , const CHAR_DATA *victim );
 
-OBJ_DATA *group_object( OBJ_DATA *obj1, OBJ_DATA *obj2 );
+static OBJ_DATA *group_object( OBJ_DATA *obj1, OBJ_DATA *obj2 );
 
-bool is_wizvis( const CHAR_DATA *ch , const CHAR_DATA *victim )
+static bool is_wizvis( const CHAR_DATA *ch , const CHAR_DATA *victim )
 {
   if ( !IS_NPC(victim)
        &&   IS_SET(victim->act, PLR_WIZINVIS)
@@ -873,9 +873,9 @@ int count_obj_list( const OBJ_INDEX_DATA *pObjIndex, const OBJ_DATA *list )
 /*
  * Move an obj out of a room.
  */
-void	write_corpses	args( ( CHAR_DATA *ch, char *name ) );
+void write_corpses( const CHAR_DATA *ch, const char *name );
 
-int falling;
+int falling = 0;
 
 void obj_from_room( OBJ_DATA *obj )
 {
@@ -2688,7 +2688,7 @@ void remove_timer( CHAR_DATA *ch, short type )
 /*
  * Scryn, standard luck check 2/2/96
  */
-bool chance( const CHAR_DATA *ch, short percent ) 
+bool luck_check( const CHAR_DATA *ch, short percent ) 
 {
 /*  short clan_factor, ms;*/
     short deity_factor, ms;
@@ -2777,7 +2777,7 @@ OBJ_DATA *clone_object( const OBJ_DATA *obj )
  * as this will allow them to be grouped together both in memory, and in
  * the player files.
  */
-OBJ_DATA *group_object( OBJ_DATA *obj1, OBJ_DATA *obj2 )
+static OBJ_DATA *group_object( OBJ_DATA *obj1, OBJ_DATA *obj2 )
 {
     if ( !obj1 || !obj2 )
 	return NULL;
@@ -3086,4 +3086,228 @@ void character_extract_carried_objects( CHAR_DATA *ch )
       obj_next = obj->prev_content;
       extract_obj( obj );
     }
+}
+
+/*
+ * The primary output interface for formatted output.
+ */
+/* Major overhaul. -- Alty */
+#define NAME(ch)        (IS_NPC(ch) ? ch->short_descr : ch->name)
+char *act_string(const char *format, CHAR_DATA *to, CHAR_DATA *ch,
+                 const void *arg1, const void *arg2)
+{
+  static const char * const he_she  [] = { "it",  "he",  "she" };
+  static const char * const him_her [] = { "it",  "him", "her" };
+  static const char * const his_her [] = { "its", "his", "her" };
+  static char buf[MAX_STRING_LENGTH];
+  char fname[MAX_INPUT_LENGTH];
+  char *point = buf;
+  const char *str = format;
+  const char *i = NULL;
+  CHAR_DATA *vch = (CHAR_DATA *) arg2;
+  OBJ_DATA *obj1 = (OBJ_DATA  *) arg1;
+  OBJ_DATA *obj2 = (OBJ_DATA  *) arg2;
+
+  while ( *str != '\0' )
+    {
+      if ( *str != '$' )
+	{
+	  *point++ = *str++;
+	  continue;
+	}
+      ++str;
+      if ( !arg2 && *str >= 'A' && *str <= 'Z' )
+	{
+	  bug( "Act: missing arg2 for code %c:", *str );
+	  bug( format );
+	  i = " <@@@> ";
+	}
+      else
+	{
+	  switch ( *str )
+	    {
+	    default:  bug( "Act: bad code %c.", *str );
+	      i = " <@@@> ";                                          break;
+	    case 't': i = (char *) arg1;                                      break;
+	    case 'T': i = (char *) arg2;                                      break;
+	    case 'n': i = (to ? PERS( ch, to) : NAME( ch));                   break;
+	    case 'N': i = (to ? PERS(vch, to) : NAME(vch));                   break;
+	    case 'e': if (ch->sex > 2 || ch->sex < 0)
+                {
+                  bug("act_string: player %s has sex set at %d!", ch->name,
+                      ch->sex);
+                  i = "it";
+                }
+	      else
+		i = he_she [URANGE(0,  ch->sex, 2)];
+	      break;
+	    case 'E': if (vch->sex > 2 || vch->sex < 0)
+                {
+                  bug("act_string: player %s has sex set at %d!", vch->name,
+                      vch->sex);
+                  i = "it";
+                }
+	      else
+		i = he_she [URANGE(0, vch->sex, 2)];
+	      break;
+	    case 'm': if (ch->sex > 2 || ch->sex < 0)
+                {
+                  bug("act_string: player %s has sex set at %d!", ch->name,
+                      ch->sex);
+                  i = "it";
+                }
+	      else
+		i = him_her[URANGE(0,  ch->sex, 2)];
+	      break;
+	    case 'M': if (vch->sex > 2 || vch->sex < 0)
+                {
+                  bug("act_string: player %s has sex set at %d!", vch->name,
+                      vch->sex);
+                  i = "it";
+                }
+	      else
+		i = him_her[URANGE(0, vch->sex, 2)];
+	      break;
+	    case 's': if (ch->sex > 2 || ch->sex < 0)
+                {
+                  bug("act_string: player %s has sex set at %d!", ch->name,
+                      ch->sex);
+                  i = "its";
+                }
+	      else
+		i = his_her[URANGE(0,  ch->sex, 2)];
+	      break;
+	    case 'S': if (vch->sex > 2 || vch->sex < 0)
+                {
+                  bug("act_string: player %s has sex set at %d!", vch->name,
+                      vch->sex);
+                  i = "its";
+                }
+	      else
+		i = his_her[URANGE(0, vch->sex, 2)];
+	      break;
+	    case 'q': i = (to == ch) ? "" : "s";                              break;
+	    case 'Q': i = (to == ch) ? "your" :
+	      his_her[URANGE(0,  ch->sex, 2)];                    break;
+	    case 'p': i = (!to || can_see_obj(to, obj1)
+			   ? obj_short(obj1) : "something");                     break;
+	    case 'P': i = (!to || can_see_obj(to, obj2)
+			   ? obj_short(obj2) : "something");                     break;
+	    case 'd':
+	      if ( !arg2 || ((char *) arg2)[0] == '\0' )
+		i = "door";
+	      else
+		{
+		  one_argument((char *) arg2, fname);
+		  i = fname;
+		}
+	      break;
+	    }
+	}
+      ++str;
+      while ( (*point = *i) != '\0' )
+	++point, ++i;
+    }
+  strcpy(point, "\r\n");
+  buf[0] = UPPER(buf[0]);
+  return buf;
+}
+#undef NAME
+
+void act( short AType, const char *format, CHAR_DATA *ch, const void *arg1,
+          const void *arg2, int type )
+{
+  char *txt = NULL;
+  CHAR_DATA *to = NULL;
+  CHAR_DATA *vch = (CHAR_DATA *)arg2;
+
+  /*
+   * Discard null and zero-length messages.
+   */
+  if ( !format || format[0] == '\0' )
+    return;
+
+  if ( !ch )
+    {
+      bug( "Act: null ch. (%s)", format );
+      return;
+    }
+
+  if ( !ch->in_room )
+    to = NULL;
+  else if ( type == TO_CHAR )
+    to = ch;
+  else
+    to = ch->in_room->first_person;
+
+  /*
+   * ACT_SECRETIVE handling
+   */
+  if ( IS_NPC(ch) && IS_SET(ch->act, ACT_SECRETIVE) && type != TO_CHAR )
+    return;
+
+  if ( type == TO_VICT )
+    {
+      if ( !vch )
+        {
+	  bug( "Act: null vch with TO_VICT." );
+	  bug( "%s (%s)", ch->name, format );
+	  return;
+        }
+      if ( !vch->in_room )
+        {
+	  bug( "Act: vch in NULL room!" );
+	  bug( "%s -> %s (%s)", ch->name, vch->name, format );
+	  return;
+        }
+      to = vch;
+      /*      to = vch->in_room->first_person;*/
+    }
+
+  if ( MOBtrigger && type != TO_CHAR && type != TO_VICT && to )
+    {
+      OBJ_DATA *to_obj = NULL;
+
+      txt = act_string(format, NULL, ch, arg1, arg2);
+      if ( IS_SET(to->in_room->progtypes, ACT_PROG) )
+        rprog_act_trigger(txt, to->in_room, ch, (OBJ_DATA *)arg1, (void *)arg2);
+      for ( to_obj = to->in_room->first_content; to_obj;
+            to_obj = to_obj->next_content )
+        if ( IS_SET(to_obj->pIndexData->progtypes, ACT_PROG) )
+          oprog_act_trigger(txt, to_obj, ch, (OBJ_DATA *)arg1, (void *)arg2);
+    }
+
+  /* Anyone feel like telling me the point of looping through the whole
+     room when we're only sending to one char anyways..? -- Alty */
+  for ( ; to; to = (type == TO_CHAR || type == TO_VICT)
+	  ? NULL : to->next_in_room )
+    {
+      if ((!to->desc
+	   && (  IS_NPC(to) && !IS_SET(to->pIndexData->progtypes, ACT_PROG) ))
+	  ||   !IS_AWAKE(to) )
+	continue;
+
+      if ( type == TO_CHAR && to != ch )
+	continue;
+      if ( type == TO_VICT && ( to != vch || to == ch ) )
+	continue;
+      if ( type == TO_ROOM && to == ch )
+	continue;
+      if ( type == TO_NOTVICT && (to == ch || to == vch) )
+	continue;
+
+      txt = act_string(format, to, ch, arg1, arg2);
+      if (to->desc)
+        {
+          set_char_color(AType, to);
+          send_to_char_color( txt, to );
+        }
+      if (MOBtrigger)
+        {
+          /* Note: use original string, not string with ANSI. -- Alty */
+          mprog_act_trigger( txt, to, ch, (OBJ_DATA *)arg1, (void *)arg2 );
+        }
+    }
+  MOBtrigger = TRUE;
+  return;
 }

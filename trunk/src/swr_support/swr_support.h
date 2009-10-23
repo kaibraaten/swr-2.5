@@ -235,5 +235,7 @@ int interpolate( int level, int value_00, int value_32 );
 
 struct tm *update_time( struct tm *old_time );
 char *flag_string( int bitvector, const char * const flagarray[] );
+char *const_char_to_nonconst( const char *argument );
+void append_to_file( const char *file, const char *str );
 
 #endif /* include guard */

@@ -35,9 +35,9 @@ static	OBJ_DATA *	rgObjNest	[MAX_NEST];
 /*
  * Local functions.
  */
-void	fwrite_char	args( ( const CHAR_DATA *ch, FILE *fp ) );
-void	fread_char	args( ( CHAR_DATA *ch, FILE *fp, bool preload) );
-void	write_corpses	args( ( CHAR_DATA *ch, char *name ) );
+void fwrite_char( const CHAR_DATA *ch, FILE *fp );
+void fread_char( CHAR_DATA *ch, FILE *fp, bool preload );
+void write_corpses( const CHAR_DATA *ch, const char *name );
 
 extern int falling;
 
@@ -1818,7 +1818,7 @@ void do_last( CHAR_DATA *ch, char *argument )
    send_to_char( buf, ch );
 }
 
-void write_corpses( CHAR_DATA *ch, char *name )
+void write_corpses( const CHAR_DATA *ch, const char *name )
 {
   OBJ_DATA *corpse;
   FILE *fp = NULL;

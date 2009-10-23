@@ -2647,7 +2647,7 @@ void do_berserk( CHAR_DATA *ch, char *argument )
   
   percent = IS_NPC(ch) ? 80 : character_skill_level( ch, gsn_berserk );
   WAIT_STATE(ch, skill_table[gsn_berserk]->beats);
-  if ( !chance(ch, percent) )
+  if ( !luck_check(ch, percent) )
   {
     send_to_char( "You couldn't build up enough rage.\r\n", ch);
     learn_from_failure(ch, gsn_berserk);
@@ -2699,7 +2699,7 @@ void do_hitall( CHAR_DATA *ch, char *argument )
       continue;
     if ( ++nvict > character_skill_level( ch, gsn_hitall ) / 5 )
       break;
-    if ( chance(ch, percent) )
+    if ( luck_check(ch, percent) )
     {
       nhit++;
       global_retcode = one_hit(ch, vch, TYPE_UNDEFINED);

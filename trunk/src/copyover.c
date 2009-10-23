@@ -105,6 +105,7 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 	  if( cur_desc == SOCKET_ERROR )
 	    {
 	      fprintf( stderr, "ReleaseCopyOfSocket() failed.\n" );
+	      fclose( fp );
 	      exit( 1 );
 	    }
 #else

@@ -608,3 +608,13 @@ char *wordwrap( char *txt, short wrap )
     }
   return bufp;
 }
+
+/*
+ * Serious nasty kludge for passing string literals to do_funs.
+ */
+char *const_char_to_nonconst( const char *argument )
+{
+  static char buf[MAX_STRING_LENGTH];
+  sprintf( buf, "%s", argument );
+  return buf;
+}

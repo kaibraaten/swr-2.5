@@ -1363,7 +1363,7 @@ void do_bank( CHAR_DATA *ch, char *argument )
 
     if ( arg1[0] == '\0' )
     {
-       send_to_char( "Usage: BANK <deposit|withdraw|ballance> [amount]\r\n", ch );
+       send_to_char( "Usage: BANK <deposit|withdraw|balance> [amount]\r\n", ch );
        return;
     }
 
@@ -1391,7 +1391,7 @@ void do_bank( CHAR_DATA *ch, char *argument )
        ch_printf( ch , "You deposit %ld credits into your account.\r\n" ,amount );
        return;
     }
-    else if ( !str_prefix( arg1 , "withdrawl" ) )
+    else if ( !str_prefix( arg1 , "withdraw" ) )
     {
        if ( amount  <= 0 )
        {
@@ -1413,7 +1413,7 @@ void do_bank( CHAR_DATA *ch, char *argument )
        return;
 
     }
-    else if ( !str_prefix( arg1 , "ballance" ) )
+    else if ( !str_prefix( arg1 , "balance" ) )
     {
         ch_printf( ch , "You have %ld credits in your account.\r\n" , ch->pcdata->bank );
         return; 
