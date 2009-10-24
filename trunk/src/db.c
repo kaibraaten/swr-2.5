@@ -774,7 +774,7 @@ void load_mobiles( AREA_DATA *tarea, FILE *fp )
 	/* '+'		*/		  fread_letter( fp );
 	pMobIndex->damplus		= fread_number( fp );
 	pMobIndex->gold			= fread_number( fp );
-	pMobIndex->exp			= fread_number( fp );
+	/*pMobIndex->exp =*/		fread_number( fp );
 	pMobIndex->position		= fread_number( fp );
 	pMobIndex->defposition		= fread_number( fp );
 
@@ -2985,7 +2985,6 @@ MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
       pMobIndex->damsizedice	= 0;
       pMobIndex->damplus		= 0;
       pMobIndex->gold		= 0;
-      pMobIndex->exp		= 0;
       pMobIndex->position		= 8;
       pMobIndex->defposition	= 8;
       pMobIndex->sex		= 0;
@@ -3028,7 +3027,6 @@ MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
       pMobIndex->damsizedice	= cMobIndex->damsizedice;
       pMobIndex->damplus		= cMobIndex->damplus;
       pMobIndex->gold		= cMobIndex->gold;
-      pMobIndex->exp		= cMobIndex->exp;
       pMobIndex->position		= cMobIndex->position;
       pMobIndex->defposition	= cMobIndex->defposition;
       pMobIndex->sex		= cMobIndex->sex;
