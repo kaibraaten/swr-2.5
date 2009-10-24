@@ -1628,7 +1628,6 @@ struct	mob_index_data
     short		damplus;
     short		numattacks;
     int			gold;
-    int			exp;
     int			xflags;
     int			resistant;
     int			immune;
@@ -3487,7 +3486,7 @@ bool saves_breath( int level, const CHAR_DATA *victim );
 bool saves_spell_staff( int level, const CHAR_DATA *victim );
 ch_ret obj_cast_spell( int sn, int level, CHAR_DATA *ch,
 		       CHAR_DATA *victim, OBJ_DATA *obj );
-int dice_parse(const CHAR_DATA *ch, int level, char *exp);
+int dice_parse(const CHAR_DATA *ch, int level, char *expression);
 SK *get_skilltype( int sn );
 
 /* save.c */

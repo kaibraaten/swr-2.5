@@ -63,7 +63,7 @@ int 		    maxdesc = 0;
  * OS-dependent local functions.
  */
 void game_loop( void );
-SOCKET init_socket( int port );
+SOCKET init_socket( int listen_port );
 void new_descriptor( SOCKET new_desc );
 bool read_from_descriptor( DESCRIPTOR_DATA *d );
 bool write_to_descriptor( SOCKET desc, const char *txt, int length );

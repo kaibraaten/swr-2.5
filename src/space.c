@@ -33,7 +33,7 @@ static void launchship( SHIP_DATA *ship );
 static void echo_to_room_dnr( int ecolor, ROOM_INDEX_DATA *room,
 			      const char *argument );
 static ch_ret drive_ship( CHAR_DATA *ch, SHIP_DATA *ship,
-			  EXIT_DATA *exit, int fall );
+			  EXIT_DATA *xit, int fall );
 static bool autofly(SHIP_DATA *ship);
 
 /* from act_info.c */

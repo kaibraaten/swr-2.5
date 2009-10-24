@@ -882,16 +882,24 @@ bool load_char_obj( DESCRIPTOR_DATA *d, const char *name, bool preload )
 	    ch->pcdata->wizinvis = ch->top_level;
 	}
 	if ( file_ver > 1 )
-	  for ( i = 0; i < MAX_WEAR; i++ )
-	    for ( x = 0; x < MAX_LAYERS; x++ )
-		if ( save_equipment[i][x] )
-		{
-		    equip_char( ch, save_equipment[i][x], i );
-		    save_equipment[i][x] = NULL;
-		}
-		else
-		    break;
-        
+	  {
+	    for ( i = 0; i < MAX_WEAR; i++ )
+	      {
+		for ( x = 0; x < MAX_LAYERS; x++ )
+		  {
+		    if ( save_equipment[i][x] )
+		      {
+			equip_char( ch, save_equipment[i][x], i );
+			save_equipment[i][x] = NULL;
+		      }
+		    else
+		      {
+			break;
+		      }
+		  }
+	      }
+	  }
+
     	for ( sn = 0; sn < top_sn ; sn++ )
 	  if ( character_skill_level( ch, sn ) > 0 )
            {
