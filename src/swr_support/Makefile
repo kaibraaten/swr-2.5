@@ -7,7 +7,7 @@ WFLAGS =  -Wall -Wshadow -Wformat-security -Winline -Wpointer-arith -Wcast-align
 CFLAGS = -O2 -MMD -pedantic -ansi $(GCC_MARCH) $(WFLAGS) -I.
 
 ifndef CYGWIN
-CFLAGS := -fPIC
+CFLAGS += -fPIC
 
 #Comment out next line to link as static library
 LINK_SHARED_LIBRARY = 1

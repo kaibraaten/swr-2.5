@@ -2916,13 +2916,13 @@ void do_redit( CHAR_DATA *ch, char *argument )
     char arg2[MAX_INPUT_LENGTH];
     char arg3[MAX_INPUT_LENGTH];
     char buf [MAX_STRING_LENGTH];
-    ROOM_INDEX_DATA	*location, *tmp;
-    EXTRA_DESCR_DATA	*ed;
-    char		dir;
-    EXIT_DATA		*xit, *texit;
-    int			value;
-    int			edir, ekey;
-    long		 evnum;
+    ROOM_INDEX_DATA	*location = 0, *tmp = 0;
+    EXTRA_DESCR_DATA	*ed = 0;
+    char		dir = 0;
+    EXIT_DATA		*xit = 0, *texit = 0;
+    int			value = 0;
+    int			edir = 0, ekey = 0;
+    long		 evnum = 0;
 
     if ( !ch->desc )
     {
