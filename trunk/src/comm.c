@@ -100,7 +100,7 @@ int main( int argc, char **argv )
 {
   struct timeval now_time;
   bool fCopyOver = FALSE;
-
+  const char *filename = 0;
   network_startup();
   atexit( execute_on_exit );
 
@@ -109,6 +109,7 @@ int main( int argc, char **argv )
   last_descriptor		= NULL;
   sysdata.NO_NAME_RESOLVING	= TRUE;
   sysdata.WAIT_FOR_AUTH	= TRUE;
+  sysdata.exe_filename = NULL;
 
   /*
    * Init time.
@@ -155,6 +156,13 @@ int main( int argc, char **argv )
    */
   port = 4000;
 
+  filename = argv[0];
+
+  while( *filename == '.' || *filename == '/' )
+    ++filename;
+
+  sysdata.exe_filename = STRALLOC( filename );
+  
   if ( argc > 1 )
     {
       if ( !is_number( argv[1] ) )

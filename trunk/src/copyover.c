@@ -111,14 +111,14 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 
 #ifdef AMIGA
   sprintf( buf, "run %s %d copyover %d",
-	   EXE_FILE, port, control );
+	   sysdata.exe_filename, port, control );
 
   error_code = System( buf, TAG_DONE );
 
   if( error_code == -1 )
     {
       bug( "Copyover failure, executable could not be run." );
-      fprintf( stderr, "Failed to run %s\n", EXE_FILE );
+      fprintf( stderr, "Failed to run %s\n", sysdata.exe_filename );
       ch_printf( ch, "Copyover FAILED!\r\n" );
     }
   else
@@ -133,7 +133,8 @@ void do_copyover (CHAR_DATA *ch, char * argument)
   sprintf (buf, "%d", port);
   sprintf (buf2, "%d", control);
 
-  execl (EXE_FILE, "swr", buf, "copyover", buf2, (char*) NULL );
+  execl( sysdata.exe_filename, sysdata.exe_filename,
+	 buf, "copyover", buf2, (char*) NULL );
 
   /* Failed - sucessful exec will not return */
 

@@ -2007,16 +2007,17 @@ struct	area_data
  */
 struct	system_data
 {
-    int		maxplayers;		/* Maximum players this boot   */
-    int		alltimemax;		/* Maximum players ever	  */
-    char *	time_of_max;		/* Time of max ever */
-    char *	officials;		/* Elected Officials */
-    bool	NO_NAME_RESOLVING;	/* Hostnames are not resolved  */
-    bool    	DENY_NEW_PLAYERS;	/* New players cannot connect  */
-    bool	WAIT_FOR_AUTH;		/* New players must be auth'ed */
-    short	max_sn;			/* Max skills */
-    int		save_flags;		/* Toggles for saving conditions */
-    short	save_frequency;		/* How old to autosave someone */
+  int maxplayers;		/* Maximum players this boot   */
+  int alltimemax;		/* Maximum players ever	  */
+  char *time_of_max;		/* Time of max ever */
+  char *officials;		/* Elected Officials */
+  bool NO_NAME_RESOLVING;	/* Hostnames are not resolved  */
+  bool DENY_NEW_PLAYERS;	/* New players cannot connect  */
+  bool WAIT_FOR_AUTH;		/* New players must be auth'ed */
+  short max_sn;			/* Max skills */
+  int save_flags;		/* Toggles for saving conditions */
+  short	save_frequency;		/* How old to autosave someone */
+  char *exe_filename;
 };
 
 struct	vote_data
