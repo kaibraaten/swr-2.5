@@ -246,7 +246,7 @@ void ship_jump_to_lightspeed( SHIP_DATA *ship )
   ship->shipstate = SHIP_HYPERSPACE;
 
   echo_to_ship( AT_YELLOW , ship , "The ship lurches slightly as it makes the jump to lightspeed." );
-  echo_to_cockpit( AT_YELLOW , ship , "The stars become streaks of light as youenter hyperspace.");
+  echo_to_cockpit( AT_YELLOW , ship , "The stars become streaks of light as you enter hyperspace.");
 
   ship->energy -= (100+ship->hyperdistance);
   vector_copy( &ship->pos, &ship->jump );
@@ -2985,7 +2985,7 @@ void destroy_ship( SHIP_DATA *ship , CHAR_DATA *killer )
   sprintf( buf , "%s destroyed by %s", ship->name,
 	   killer ? killer->name : "(none)" );
   log_string( buf );
-  echo_to_ship( AT_WHITE, ship, "The ship is shaken by a FATAL explosion. You realize its escape or perish.");
+  echo_to_ship( AT_WHITE, ship, "The ship is shaken by a FATAL explosion. You realize it's escape or perish.");
   echo_to_ship( AT_WHITE, ship, "The last thing you remember is reaching for the escape pod release lever.");
   echo_to_ship( AT_WHITE + AT_BLINK, ship, "A blinding flash of light.");
   echo_to_ship( AT_WHITE, ship, "And then darkness....");
@@ -4377,7 +4377,7 @@ void do_status(CHAR_DATA *ch, char *argument )
     ch_printf( ch, "&W%s:\r\n",target->name);
     ch_printf( ch, "&OCurrent Coordinates:&Y %.0f %.0f %.0f\r\n",
                         target->pos.x, target->pos.y, target->pos.z );
-    ch_printf( ch, "&OCurrent Heading:&Y %.0f %.0f %.0f\r\n",
+    ch_printf( ch, "&OCurrent Heading:&Y %.2f %.2f %.2f\r\n",
                         target->head.x, target->head.y, target->head.z );
     ch_printf( ch, "&OCurrent Speed:&Y %d&O/%d\r\n",
                         target->currspeed , target->realspeed );
@@ -5274,98 +5274,109 @@ void do_rempilot(CHAR_DATA *ch, char *argument )
 
 void do_radar( CHAR_DATA *ch, char *argument )
 {
-    SHIP_DATA *target;
-    int chance;
-    SHIP_DATA *ship;
-    MISSILE_DATA *missile;  
-    PLANET_DATA *planet;  
+  SHIP_DATA *target = NULL;
+  int chance = 0;
+  SHIP_DATA *ship = NULL;
+  MISSILE_DATA *missile = NULL;  
+  PLANET_DATA *planet = NULL;
    
-        if (   (ship = ship_from_cockpit(ch->in_room))  == NULL )
-        {
-            send_to_char("&RYou must be in the cockpit or turret of a ship to do that!\r\n",ch);
-            return;
-        }
+  if (   (ship = ship_from_cockpit(ch->in_room))  == NULL )
+    {
+      send_to_char("&RYou must be in the cockpit or turret of a ship to do that!\r\n",ch);
+      return;
+    }
         
-        if ( ship->ship_class > SPACE_STATION )
-    	        {
-    	            send_to_char("&RThis isn't a spacecraft!\r\n",ch);
-    	            return;
-    	        }
+  if ( ship->ship_class > SPACE_STATION )
+    {
+      send_to_char("&RThis isn't a spacecraft!\r\n",ch);
+      return;
+    }
     	        
-        if (ship->shipstate == SHIP_DOCKED)
-        {
-            send_to_char("&RWait until after you launch!\r\n",ch);
-            return;
-        }
+  if (ship->shipstate == SHIP_DOCKED)
+    {
+      send_to_char("&RWait until after you launch!\r\n",ch);
+      return;
+    }
         
-        if (ship->shipstate == SHIP_HYPERSPACE)
-        {
-            send_to_char("&RYou can only do that in realspace!\r\n",ch);
-            return;
-        }
+  if (ship->shipstate == SHIP_HYPERSPACE)
+    {
+      send_to_char("&RYou can only do that in realspace!\r\n",ch);
+      return;
+    }
         
-    	if (ship->starsystem == NULL)
-    	{
-    	       send_to_char("&RYou can't do that unless the ship is flying in realspace!\r\n",ch);
-    	       return;
-    	}        
+  if (ship->starsystem == NULL)
+    {
+      send_to_char("&RYou can't do that unless the ship is flying in realspace!\r\n",ch);
+      return;
+    }        
     	        
-        chance = character_skill_level( ch, gsn_spacecraft );
+  chance = character_skill_level( ch, gsn_spacecraft );
 
-        if ( number_percent( ) > chance )
-        {
-           send_to_char("&RYou fail to work the controls properly.\r\n",ch);
-    	   return;	
-        }
-        
-    
-    act( AT_PLAIN, "$n checks the radar.", ch,
-         NULL, argument , TO_ROOM );
+  if ( number_percent( ) > chance )
+    {
+      send_to_char("&RYou fail to work the controls properly.\r\n",ch);
+      return;	
+    }
+
+  act( AT_PLAIN, "$n checks the radar.", ch,
+       NULL, argument , TO_ROOM );
      
-    	           set_char_color(  AT_WHITE, ch );
-    	           ch_printf(ch, "%s\r\n\r\n" , ship->starsystem->name );
-    	           if ( ship->starsystem->star1 && str_cmp(ship->starsystem->star1,"") ) 
-    	                 ch_printf(ch, "&Y%s   %.0f %.0f %.0f\r\n" , 
-    	                        ship->starsystem->star1,
-    	                        ship->starsystem->star1_pos.x,
-    	                        ship->starsystem->star1_pos.y,
-    	                        ship->starsystem->star1_pos.z );
-    	           if ( ship->starsystem->star2 && str_cmp(ship->starsystem->star2,"")  ) 
-    	                 ch_printf(ch, "&Y%s   %.0f %.0f %.0f\r\n" , 
-    	                        ship->starsystem->star2,
-    	                        ship->starsystem->star2_pos.x,
-    	                        ship->starsystem->star2_pos.y,
-    	                        ship->starsystem->star2_pos.z );
-    	           for ( planet= ship->starsystem->first_planet ; planet ; planet = planet->next_in_system ) 
-    	                 ch_printf(ch, "&G%s   %.0f %.0f %.0f\r\n" , 
-    	                        planet->name,
-    	                        planet->pos.x,
-    	                        planet->pos.y,
-    	                        planet->pos.z );
-    	           ch_printf(ch,"\r\n");
-    	           for ( target = ship->starsystem->first_ship; target; target = target->next_in_starsystem )
-                   {       
-                        if ( target != ship ) 
-                           ch_printf(ch, "&C%s    %.0f %.0f %.0f\r\n", 
-                           	target->name,
-                           	target->pos.x,
-                           	target->pos.y,
-                           	target->pos.z);
-                   }
-                   ch_printf(ch,"\r\n");
-    	           for ( missile = ship->starsystem->first_missile; missile; missile = missile->next_in_starsystem )
-                   {        
-                           ch_printf(ch, "&RA Missile    %.0f %.0f %.0f\r\n", 
-                           	missile->pos.x,
-                           	missile->pos.y,
-                                missile->pos.z );
-                   }
+  set_char_color(  AT_WHITE, ch );
+  ch_printf(ch, "%s\r\n\r\n" , ship->starsystem->name );
+
+  if ( ship->starsystem->star1 && str_cmp(ship->starsystem->star1,"") ) 
+    ch_printf(ch, "&Y%s   %.0f %.0f %.0f [Distance %.0f]\r\n" , 
+	      ship->starsystem->star1,
+	      ship->starsystem->star1_pos.x,
+	      ship->starsystem->star1_pos.y,
+	      ship->starsystem->star1_pos.z,
+	      vector_distance( &ship->pos, &ship->starsystem->star1_pos ) );
+
+  if ( ship->starsystem->star2 && str_cmp(ship->starsystem->star2,"")  ) 
+    ch_printf(ch, "&Y%s   %.0f %.0f %.0f [Distance %.0f]\r\n" , 
+	      ship->starsystem->star2,
+	      ship->starsystem->star2_pos.x,
+	      ship->starsystem->star2_pos.y,
+	      ship->starsystem->star2_pos.z,
+	      vector_distance( &ship->pos, &ship->starsystem->star2_pos ) );
+
+  for( planet = ship->starsystem->first_planet; planet;
+       planet = planet->next_in_system ) 
+    ch_printf(ch, "&G%s   %.0f %.0f %.0f [Distance %.0f]\r\n" , 
+	      planet->name,
+	      planet->pos.x,
+	      planet->pos.y,
+	      planet->pos.z,
+	      ship_distance_to_planet( ship, planet ) );
+  ch_printf(ch,"\r\n");
+
+  for( target = ship->starsystem->first_ship;
+       target; target = target->next_in_starsystem )
+    {       
+      if ( target != ship ) 
+	ch_printf(ch, "&C%s    %.0f %.0f %.0f [Distance %.0f]\r\n", 
+		  target->name,
+		  target->pos.x,
+		  target->pos.y,
+		  target->pos.z,
+		  ship_distance_to_ship( ship, target ) );
+    }
+
+  ch_printf(ch,"\r\n");
+
+  for ( missile = ship->starsystem->first_missile; missile; missile = missile->next_in_starsystem )
+    {        
+      ch_printf(ch, "&RA Missile    %.0f %.0f %.0f [Distance %.0f]\r\n", 
+		missile->pos.x,
+		missile->pos.y,
+		missile->pos.z,
+		missile_distance_to_ship( missile, ship ) );
+    }
                      
-                   ch_printf(ch, "\r\n&WYour Coordinates: %.0f %.0f %.0f\r\n", 
-                             ship->pos.x, ship->pos.y, ship->pos.z);   
+  ch_printf(ch, "\r\n&WYour Coordinates: %.0f %.0f %.0f\r\n", 
+	    ship->pos.x, ship->pos.y, ship->pos.z);   
         
-    	        
-        learn_from_success( ch, gsn_spacecraft );
+  learn_from_success( ch, gsn_spacecraft );
 }
 
 void do_autotrack( CHAR_DATA *ch, char *argument )
