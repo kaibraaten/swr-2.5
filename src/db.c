@@ -2082,6 +2082,7 @@ void do_memory( CHAR_DATA *ch, char *argument )
     int hash;
 
     argument = one_argument( argument, arg );
+    ch_printf( ch, "Exe     %s\r\n", sysdata.exe_filename );
     ch_printf( ch, "Affects %5d    Areas   %5d\r\n",  top_affect, top_area   );
     ch_printf( ch, "ExtDes  %5d    Exits   %5d\r\n", top_ed,	 top_exit   );
     ch_printf( ch, "Helps   %5d\r\n", top_help  );
@@ -3682,6 +3683,11 @@ static void free_sysdata( void )
   if( sysdata.officials )
     {
       STRFREE( sysdata.officials );
+    }
+
+  if( sysdata.exe_filename )
+    {
+      STRFREE( sysdata.exe_filename );
     }
 }
 

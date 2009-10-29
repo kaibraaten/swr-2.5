@@ -2,7 +2,7 @@ CC = gcc
 BINARY = swr
 WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wwrite-strings -Wshadow
 
-CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support -DEXE_FILE=\"$(BINARY)\"
+CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support
 LFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support
 DEPS = 
 ODIR = obj
