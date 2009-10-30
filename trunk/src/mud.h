@@ -2436,45 +2436,58 @@ extern  HOUR_MIN_SEC * set_boot_time;
 extern  struct  tm *new_boot_time;
 extern  time_t new_boot_time_t;
 
-extern	const	struct	model_type	model		[MAX_SHIP_MODEL+1];
+extern const struct model_type model[MAX_SHIP_MODEL+1];
 
-extern	const	struct	str_app_type	str_app		[26];
-extern	const	struct	int_app_type	int_app		[26];
-extern	const	struct	wis_app_type	wis_app		[26];
-extern	const	struct	dex_app_type	dex_app		[26];
-extern	const	struct	con_app_type	con_app		[26];
-extern	const	struct	cha_app_type	cha_app		[26];
-extern  const	struct	lck_app_type	lck_app		[26];
-extern  const	struct	frc_app_type	frc_app		[26];
+extern const struct str_app_type str_app[26];
+extern const struct int_app_type int_app[26];
+extern const struct wis_app_type wis_app[26];
+extern const struct dex_app_type dex_app[26];
+extern const struct con_app_type con_app[26];
+extern const struct cha_app_type cha_app[26];
+extern const struct lck_app_type lck_app[26];
+extern const struct frc_app_type frc_app[26];
 
-extern	const	struct	liq_type	liq_table	[LIQ_MAX];
-extern	const char *	const			attack_table	[13];
+extern const struct liq_type liq_table[LIQ_MAX];
+extern const char * const attack_table[13];
 
-extern	const char *	const	skill_tname	[];
-extern	short	const	movement_loss	[SECT_MAX];
-extern	const char *	const	dir_name	[];
-extern	const char *	const	where_name	[];
-extern	const	short	rev_dir		[];
-extern	const	int	trap_door	[];
-extern	const char *	const	r_flags		[];
-extern	const char *	const	w_flags		[];
-extern	const char *	const	o_flags		[];
-extern	const char *	const	a_flags		[];
-extern	const char *	const	o_types		[];
-extern	const char *	const	a_types		[];
-extern	const char *	const	act_flags	[];
-extern  const char *  const   planet_flags    [];
-extern  const char *  const   weapon_table    [13];
-extern  const char *  const   spice_table     [];
-extern	const char *	const	plr_flags	[];
-extern	const char *	const	pc_flags	[];
-extern	const char *	const	trap_flags	[];
-extern	const char *	const	ris_flags	[];
-extern	const char *	const	trig_flags	[];
-extern	const char *	const	part_flags	[];
-extern	const char *	const	defense_flags	[];
-extern	const char *	const	attack_flags	[];
-extern	const char *	const	area_flags	[];
+extern const char * const skill_tname[];
+extern short const movement_loss[SECT_MAX];
+extern const char * const dir_name[];
+extern const char * const where_name[];
+extern const short rev_dir[];
+extern const int trap_door[];
+extern const char * const r_flags[];
+extern const char * const w_flags[];
+extern const char * const o_flags[];
+extern const char * const a_flags[];
+extern const char * const o_types[];
+extern const char * const a_types[];
+extern const char * const act_flags[];
+extern const char * const planet_flags[];
+extern const char * const weapon_table[13];
+extern const char * const spice_table[];
+extern const char * const plr_flags[];
+extern const char * const pc_flags[];
+extern const char * const trap_flags[];
+extern const char * const ris_flags[];
+extern const char * const trig_flags[];
+extern const char * const part_flags[];
+extern const char * const defense_flags[];
+extern const char * const attack_flags[];
+extern const char * const area_flags[];
+extern const char * const halucinated_object_short[];
+extern const char * const halucinated_object_long[];
+extern const char * const day_name[];
+extern const char * const month_name[];
+extern const char * const sect_names[SECT_MAX][2];
+extern const char *  const   ex_flags [];
+extern const char * const spell_flag[];
+extern const char * const spell_saves[];
+extern const char * const spell_damage[];
+extern const char * const spell_action[];
+extern const char * const spell_power[];
+extern const char * const spell_class[];
+extern const char * const target_type[];
 
 /*
  * Global variables.
@@ -3216,6 +3229,36 @@ void	act		args( ( short AType, const char *format, CHAR_DATA *ch,
 /* reset.c */
 void	reset_all	args( ( void ) );
 
+/* const.c */
+size_t halucinated_object_short_size( void );
+size_t halucinated_object_long_size( void );
+int get_otype( const char *type );
+int get_aflag( const char *flag );
+int get_trapflag( const char *flag );
+int get_atype( const char *type );
+int get_wearloc( const char *type );
+int get_exflag( const char *flag );
+int get_rflag( const char *flag );
+int get_mpflag( const char *flag );
+int get_oflag( const char *flag );
+int get_areaflag( const char *flag );
+int get_wflag( const char *flag );
+int get_actflag( const char *flag );
+int get_pcflag( const char *flag );
+int get_plrflag( const char *flag );
+int get_risflag( const char *flag );
+int get_trigflag( const char *flag );
+int get_partflag( const char *flag );
+int get_attackflag( const char *flag );
+int get_defenseflag( const char *flag );
+int get_ssave( const char *name );
+int get_starget( const char *name );
+int get_sflag( const char *name );
+int get_sdamage( const char *name );
+int get_saction( const char *name );
+int get_spower( const char *name );
+int get_sclass( const char *name );
+
 /* db.c */
 void free_extra_descr( EXTRA_DESCR_DATA *ed );
 void free_shop( SHOP_DATA* );
@@ -3318,35 +3361,35 @@ const char *mprog_type_to_name( int type );
 
 /* mud_prog.c */
 #ifdef DUNNO_STRSTR
-char *  strstr                  args ( (const char *s1, const char *s2 ) );
+char *strstr(const char *s1, const char *s2 );
 #endif
 
-void	mprog_wordlist_check    args ( ( char * arg, CHAR_DATA *mob,
+void mprog_wordlist_check    args ( ( char * arg, CHAR_DATA *mob,
                 			CHAR_DATA* actor, OBJ_DATA* object,
 					void* vo, int type ) );
-void	mprog_percent_check     args ( ( CHAR_DATA *mob, CHAR_DATA* actor,
+void mprog_percent_check     args ( ( CHAR_DATA *mob, CHAR_DATA* actor,
 					OBJ_DATA* object, void* vo,
 					int type ) );
-void	mprog_act_trigger       args ( ( char* buf, CHAR_DATA* mob,
+void mprog_act_trigger       args ( ( char* buf, CHAR_DATA* mob,
 		                        CHAR_DATA* ch, OBJ_DATA* obj,
 					void* vo ) );
-void	mprog_bribe_trigger     args ( ( CHAR_DATA* mob, CHAR_DATA* ch,
+void mprog_bribe_trigger     args ( ( CHAR_DATA* mob, CHAR_DATA* ch,
 		                        int amount ) );
-void	mprog_entry_trigger     args ( ( CHAR_DATA* mob ) );
-void	mprog_give_trigger      args ( ( CHAR_DATA* mob, CHAR_DATA* ch,
+void mprog_entry_trigger     args ( ( CHAR_DATA* mob ) );
+void mprog_give_trigger      args ( ( CHAR_DATA* mob, CHAR_DATA* ch,
                 		        OBJ_DATA* obj ) );
-void	mprog_greet_trigger     args ( ( CHAR_DATA* mob ) );
-void    mprog_fight_trigger     args ( ( CHAR_DATA* mob, CHAR_DATA* ch ) );
-void    mprog_hitprcnt_trigger  args ( ( CHAR_DATA* mob, CHAR_DATA* ch ) );
-void    mprog_death_trigger     args ( ( CHAR_DATA *killer, CHAR_DATA* mob ) );
-void    mprog_random_trigger    args ( ( CHAR_DATA* mob ) );
-void    mprog_speech_trigger    args ( ( char* txt, CHAR_DATA* mob ) );
-void    mprog_script_trigger    args ( ( CHAR_DATA *mob ) );
-void    mprog_hour_trigger      args ( ( CHAR_DATA *mob ) );
-void    mprog_time_trigger      args ( ( CHAR_DATA *mob ) );
-void    progbug                 args( ( const char *str, CHAR_DATA *mob ) );
-void	rset_supermob		args( ( ROOM_INDEX_DATA *room) );
-void	release_supermob	args( ( void ) );
+void mprog_greet_trigger     args ( ( CHAR_DATA* mob ) );
+void mprog_fight_trigger     args ( ( CHAR_DATA* mob, CHAR_DATA* ch ) );
+void mprog_hitprcnt_trigger  args ( ( CHAR_DATA* mob, CHAR_DATA* ch ) );
+void mprog_death_trigger     args ( ( CHAR_DATA *killer, CHAR_DATA* mob ) );
+void mprog_random_trigger    args ( ( CHAR_DATA* mob ) );
+void mprog_speech_trigger    args ( ( char* txt, CHAR_DATA* mob ) );
+void mprog_script_trigger( CHAR_DATA *mob ) );
+void mprog_hour_trigger( CHAR_DATA *mob ) );
+void mprog_time_trigger( CHAR_DATA *mob ) );
+void progbug( const char *str, CHAR_DATA *mob ) );
+void rset_supermob( ROOM_INDEX_DATA *room) );
+void release_supermob( void ) );
 
 /* player.c */
 void set_title( CHAR_DATA *ch, const char *title );

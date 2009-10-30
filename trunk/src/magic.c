@@ -405,9 +405,8 @@ void say_spell( CHAR_DATA *ch, int sn )
  */
 int ris_save( CHAR_DATA *ch, int chance, int ris )
 {
-   short modifier;
+   short modifier = 10;
 
-   modifier = 10;
    if ( IS_SET(ch->immune, ris ) )
      modifier -= 10;
    if ( IS_SET(ch->resistant, ris ) )
@@ -542,9 +541,7 @@ int dice_parse(const CHAR_DATA *ch, int level, char *expr)
  */
 bool saves_poison_death( int level, const CHAR_DATA *victim )
 {
-    int save;
-
-    save = 50 + ( victim->top_level - level - victim->saving_poison_death ) * 2;
+    int save = 50 + ( victim->top_level - level - victim->saving_poison_death ) * 2;
     save = URANGE( 5, save, 95 );
     return luck_check( victim, save );
 }

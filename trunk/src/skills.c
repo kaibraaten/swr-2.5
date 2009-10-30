@@ -4,31 +4,6 @@
 #include <ctype.h>
 #include "mud.h"
 
-const char * const spell_flag[] =
-{ "water", "earth", "air", "astral", "area", "distant", "reverse",
-"save_half_dam", "save_negates", "accumulative", "recastable", "noscribe",
-"nobrew", "group", "object", "character", "secretskill", "pksensitive" };
-
-const char * const spell_saves[] =
-{ "none", "poison_death", "wands", "para_petri", "breath", "spell_staff" };
-
-const char * const spell_damage[] =
-{ "none", "fire", "cold", "electricity", "energy", "acid", "poison", "drain" };
-
-const char * const spell_action[] =
-{ "none", "create", "destroy", "resist", "suscept", "divinate", "obscure",
-"change" };
-
-const char * const spell_power[] =
-{ "none", "minor", "greater", "major" };
-
-const char * const spell_class[] =
-{ "none", "lunar", "solar", "travel", "summon", "life", "death", "illusion" };
-
-const char * const target_type[] =
-{ "ignore", "offensive", "defensive", "self", "objinv" };
-
-
 void show_char_to_char( CHAR_DATA *list, CHAR_DATA *ch );
 int ris_save( CHAR_DATA *ch, int chance, int ris );
 bool check_illegal_psteal( CHAR_DATA *ch, CHAR_DATA *victim );
@@ -49,76 +24,6 @@ void skill_notfound( CHAR_DATA *ch, char *argument )
 {
     send_to_char( "Huh?\r\n", ch );
     return;
-}
-
-int get_ssave( const char *name )
-{
-  size_t x;
-
-    for ( x = 0; x < sizeof(spell_saves) / sizeof(spell_saves[0]); x++ )
-      if ( !str_cmp( name, spell_saves[x] ) )
-        return x;
-    return -1;
-}
-
-int get_starget( const char *name )
-{
-  size_t x;
-
-    for ( x = 0; x < sizeof(target_type) / sizeof(target_type[0]); x++ )
-      if ( !str_cmp( name, target_type[x] ) )
-        return x;
-    return -1;
-}
-
-int get_sflag( const char *name )
-{
-  size_t x;
-
-    for ( x = 0; x < sizeof(spell_flag) / sizeof(spell_flag[0]); x++ )
-      if ( !str_cmp( name, spell_flag[x] ) )
-        return x;
-    return -1;
-}
-
-int get_sdamage( const char *name )
-{
-  size_t x;
-
-    for ( x = 0; x < sizeof(spell_damage) / sizeof(spell_damage[0]); x++ )
-      if ( !str_cmp( name, spell_damage[x] ) )
-        return x;
-    return -1;
-}
-
-int get_saction( const char *name )
-{
-  size_t x;
-
-    for ( x = 0; x < sizeof(spell_action) / sizeof(spell_action[0]); x++ )
-      if ( !str_cmp( name, spell_action[x] ) )
-        return x;
-    return -1;
-}
-
-int get_spower( const char *name )
-{
-  size_t x;
-
-    for ( x = 0; x < sizeof(spell_power) / sizeof(spell_power[0]); x++ )
-      if ( !str_cmp( name, spell_power[x] ) )
-        return x;
-    return -1;
-}
-
-int get_sclass( const char *name )
-{
-  size_t x;
-
-    for ( x = 0; x < sizeof(spell_class) / sizeof(spell_class[0]); x++ )
-      if ( !str_cmp( name, spell_class[x] ) )
-        return x;
-    return -1;
 }
 
 bool is_legal_kill(CHAR_DATA *ch, CHAR_DATA *vch)
