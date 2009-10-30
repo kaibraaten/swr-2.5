@@ -2176,23 +2176,6 @@ bool oprog_percent_check( CHAR_DATA *mob, CHAR_DATA *actor, OBJ_DATA *obj,
  * Triggers follow
  */
 
-
-/*
- *  Hold on this
- *
-void oprog_act_trigger( CHAR_DATA *ch, OBJ_DATA *obj )
-{
-   set_supermob( obj );
-   if ( obj->pIndexData->progtypes & ACT_PROG ) 
-     oprog_percent_check( supermob, ch, obj, NULL, ACT_PROG );
-
- release_supermob();
- return;
-}
- *
- *
- */
-
 void oprog_greet_trigger( CHAR_DATA *ch )
 {
   OBJ_DATA *vobj;

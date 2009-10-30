@@ -78,20 +78,17 @@ void interpret( CHAR_DATA *ch, char *argument )
     char logname[MAX_INPUT_LENGTH];
     TIMER *timer = NULL;
     CMDTYPE *cmd = NULL;
-    int trust;
-    int loglvl;
-    bool found;
+    int trust = 0;
+    int loglvl = 0;
+    bool found = FALSE;
     struct timeval time_used;
-    long tmptime;
-
+    long tmptime = 0;
 
     if ( !ch )
     {
 	bug( "interpret: null ch!", 0 );
 	return;
     }
-
-    found = FALSE;
 
     if ( !cmd )
     {
@@ -214,9 +211,7 @@ void interpret( CHAR_DATA *ch, char *argument )
 
     if ( timer )
     {
-	int tempsub;
-
-	tempsub = ch->substate;
+	int tempsub = ch->substate;
 	ch->substate = SUB_TIMER_DO_ABORT;
 	(timer->do_fun)(ch,const_char_to_nonconst(""));
 	if ( char_died(ch) )
@@ -241,7 +236,7 @@ void interpret( CHAR_DATA *ch, char *argument )
 	if ( !check_skill( ch, command, argument )
 	&&   !check_social( ch, command, argument ) )
 	{
-	    EXIT_DATA *pexit;
+	    EXIT_DATA *pexit = NULL;
 
 	    /* check for an auto-matic exit command */
 	    if ( (pexit = find_door( ch, command, TRUE )) != NULL
@@ -307,10 +302,8 @@ void interpret( CHAR_DATA *ch, char *argument )
 
 CMDTYPE *find_command( const char *command )
 {
-    CMDTYPE *cmd;
-    int hash;
-
-    hash = LOWER(command[0]) % 126;
+    CMDTYPE *cmd = NULL;
+    int hash = LOWER(command[0]) % 126;
 
     for ( cmd = command_hash[hash]; cmd; cmd = cmd->next )
 	if ( !str_prefix( command, cmd->name ) )
@@ -321,8 +314,8 @@ CMDTYPE *find_command( const char *command )
 
 SOCIALTYPE *find_social( const char *command )
 {
-    SOCIALTYPE *social;
-    int hash;
+    SOCIALTYPE *social = NULL;
+    int hash = 0;
 
     if ( command[0] < 'a' || command[0] > 'z' )
 	hash = 0;
@@ -339,8 +332,8 @@ SOCIALTYPE *find_social( const char *command )
 bool check_social( CHAR_DATA *ch, const char *command, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];
-    CHAR_DATA *victim;
-    SOCIALTYPE *social;
+    CHAR_DATA *victim = NULL;
+    SOCIALTYPE *social = NULL;
 
     if ( (social=find_social(command)) == NULL )
 	return FALSE;

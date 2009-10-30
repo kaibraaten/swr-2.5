@@ -4,193 +4,157 @@
 #include <ctype.h>
 #include "mud.h"
 
-const	short	movement_loss	[SECT_MAX]	=
-{
-    1, 2, 2, 3, 4, 6, 4, 1, 6, 10, 6, 5, 7, 4, 6, 4, 2, 3, 6, 3, 3, 5, 4, 3, 2, 3, 7
-};
-
-const char *	const	dir_name	[]		=
-{
-    "north", "east", "south", "west", "up", "down",
-    "northeast", "northwest", "southeast", "southwest", "somewhere"
-};
-
-const	short	rev_dir		[]		=
-{
-    2, 3, 0, 1, 5, 4, 9, 8, 7, 6, 10
-};
-
-const char *	const		sect_names[SECT_MAX][2] =
-{
-    { "In a room","inside"	},	{ "A City Street","cities"      },
-    { "In a field","fields"	},	{ "In a forest","forests"	},
-    { "hill",	"hills"		},	{ "On a mountain","mountains"	},
-    { "In the water","waters"	},	{ "In rough water","waters"	},
-    { "Underwater", "underwaters" },	{ "In the air",	"air"		},
-    { "In a desert","deserts"	},	{ "Somewhere",	"unknown"	},
-    { "ocean floor", "ocean floor" },	{ "underground", "underground"	},
-    { "Scrub", "scrub" },		{ "Rocky Terrain", "rocky"	},
-    { "Savanna", "savanna" },		{ "Tundra", "tundra"	},
-    { "Glacier", "glacial" },		{ "Rainforest", "rainforest"	},
-    { "Jungle", "jungle" },		{ "Swamp", "swamp"	},
-    { "Wetlands", "wetlands" },		{ "Brush", "brush"	},
-    { "Steppe", "steppe" },		{ "Farmland", "farmland"	},    
-    { "Volcano", "volcanic" }    
-};
-
 const	int		sent_total[SECT_MAX]		=
 {
-    4, 24, 4, 4, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 
+  4, 24, 4, 4, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 
 };
 
 const char *	const		room_sents[SECT_MAX][25]	=
-{
+  {
     {
-	"The rough hewn walls are made of granite.",
-	"You see an occasional spider crawling around.",
-	"You notice signs of a recent battle from the bloodstains on the floor.",
-	"This place hasa damp musty odour not unlike rotting vegetation."
+      "The rough hewn walls are made of granite.",
+      "You see an occasional spider crawling around.",
+      "You notice signs of a recent battle from the bloodstains on the floor.",
+      "This place hasa damp musty odour not unlike rotting vegetation."
     },
 
     {
-	"You notice the occasional stray looking for food.",
-	"Tall buildings loom on either side of you stretching to the sky.",
-	"Some street people are putting on an interesting display of talent trying to earn some credits.",
-	"Two people nearby shout heated words of argument at one another.",
-	"You think you can make out several shady figures talking down a dark alleyway."
-        "A slight breeze blows through the tall buildings.",
-        "A small crowd of people have gathered at one side of the street.",
-        "Clouds far above you obscure the tops of the highest skyscrapers.",
-        "A speeder moves slowly through the street avoiding pedestrians.",
-        "A cloudcar flys by overhead.",
-        "The air is thick and hard to breath.",
-        "The many smells of the city assault your senses.",
-        "You hear a scream far of in the distance.",
-        "The buildings around you seem endless in number.",
-        "The city stretches seemingly endless in all directions.",
-        "The street is wide and long.",
-        "A swoop rider passes quickly by weaving in and out of pedestrians and other vehicles.",
-        "The surface of the road is worn from many travellers.",
-        "You feel it would be very easy to get lost in such an enormous city.",
-        "You can see other streets above and bellow this one running in many directions.",
-        "There are entrances to several buildings at this level.",
-        "Along the edge of the street railings prevent pedestrians from falling to their death.",
-        "In between the many towers you can see down into depths of the lower city.",
-        "A grate in the street prevents rainwater from building up.",
-        "You can see you reflection in several of the transparisteel windows as you pass by."
-        "You hear a scream far of in the distance.",
+      "You notice the occasional stray looking for food.",
+      "Tall buildings loom on either side of you stretching to the sky.",
+      "Some street people are putting on an interesting display of talent trying to earn some credits.",
+      "Two people nearby shout heated words of argument at one another.",
+      "You think you can make out several shady figures talking down a dark alleyway."
+      "A slight breeze blows through the tall buildings.",
+      "A small crowd of people have gathered at one side of the street.",
+      "Clouds far above you obscure the tops of the highest skyscrapers.",
+      "A speeder moves slowly through the street avoiding pedestrians.",
+      "A cloudcar flys by overhead.",
+      "The air is thick and hard to breath.",
+      "The many smells of the city assault your senses.",
+      "You hear a scream far of in the distance.",
+      "The buildings around you seem endless in number.",
+      "The city stretches seemingly endless in all directions.",
+      "The street is wide and long.",
+      "A swoop rider passes quickly by weaving in and out of pedestrians and other vehicles.",
+      "The surface of the road is worn from many travellers.",
+      "You feel it would be very easy to get lost in such an enormous city.",
+      "You can see other streets above and bellow this one running in many directions.",
+      "There are entrances to several buildings at this level.",
+      "Along the edge of the street railings prevent pedestrians from falling to their death.",
+      "In between the many towers you can see down into depths of the lower city.",
+      "A grate in the street prevents rainwater from building up.",
+      "You can see you reflection in several of the transparisteel windows as you pass by."
+      "You hear a scream far of in the distance.",
     },
 
     {
-	"You notice sparce patches of brush and shrubs.",
-	"There is a small cluster of trees far off in the distance.",
-	"Around you are grassy fields as far as the eye can see.",
-	"Throughout the plains a wide variety of weeds and wildflowers are scattered."
+      "You notice sparce patches of brush and shrubs.",
+      "There is a small cluster of trees far off in the distance.",
+      "Around you are grassy fields as far as the eye can see.",
+      "Throughout the plains a wide variety of weeds and wildflowers are scattered."
     },
 
     {
-	"Tall, dark evergreens prevent you from seeing very far.",
-	"Many huge oak trees that look several hundred years old are here.",
-	"You notice a solitary lonely weeping willow.",
-	"To your left is a patch of bright white birch trees, slender and tall."
+      "Tall, dark evergreens prevent you from seeing very far.",
+      "Many huge oak trees that look several hundred years old are here.",
+      "You notice a solitary lonely weeping willow.",
+      "To your left is a patch of bright white birch trees, slender and tall."
     },
 
     {
-	"The rolling hills are lightly speckled with violet wildflowers."
+      "The rolling hills are lightly speckled with violet wildflowers."
     },
 
     {
-	"The rocky mountain pass offers many hiding places."
+      "The rocky mountain pass offers many hiding places."
     },
 
     {
-	"The water is smooth as glass."
+      "The water is smooth as glass."
     },
 
     {
-	"Rough waves splash about angrily."
+      "Rough waves splash about angrily."
     },
 
     {
-	"A small school of fish swims by."
+      "A small school of fish swims by."
     },
 
     {
-	"The land is far far below.",
-	"A misty haze of clouds drifts by."
+      "The land is far far below.",
+      "A misty haze of clouds drifts by."
     },
 
     {
-	"Around you is sand as far as the eye can see.",
-	"You think you see an oasis far in the distance."
+      "Around you is sand as far as the eye can see.",
+      "You think you see an oasis far in the distance."
     },
 
     {
-	"You notice nothing unusual."
+      "You notice nothing unusual."
     },
 
     { 
-        "There are many rocks and coral which litter the ocean floor."
+      "There are many rocks and coral which litter the ocean floor."
     },
 
     {
-	"You stand in a lengthy tunnel of rock."
+      "You stand in a lengthy tunnel of rock."
     },
 
     {
-	"Hmm..."
-    },
-
-
-    {
-	"Hmm..."
+      "Hmm..."
     },
 
     {
-	"Hmm..."
+      "Hmm..."
     },
 
     {
-	"Hmm..."
+      "Hmm..."
     },
 
     {
-	"Hmm..."
+      "Hmm..."
     },
 
     {
-	"Hmm..."
+      "Hmm..."
     },
 
     {
-	"Hmm..."
+      "Hmm..."
     },
 
     {
-	"Hmm..."
+      "Hmm..."
     },
 
     {
-	"Hmm..."
+      "Hmm..."
     },
 
     {
-	"Hmm..."
+      "Hmm..."
     },
 
     {
-	"Hmm..."
+      "Hmm..."
     },
 
     {
-	"Hmm..."
+      "Hmm..."
     },
 
     {
-	"Hmm..."
+      "Hmm..."
+    },
+
+    {
+      "Hmm..."
     }
-
-};
+  };
 
 int wherehome( const CHAR_DATA *ch)
 {

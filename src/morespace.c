@@ -27,7 +27,7 @@ static void create_default_rooms( SHIP_DATA *ship, ROOM_INDEX_DATA *room[] );
    create_ship_rooms. Very bad things will happen if they don't. 
 */
 
-const	struct	model_type	model	[MAX_SHIP_MODEL+1] =
+const struct model_type model[MAX_SHIP_MODEL+1] =
 {
 /* name, hyperspeed, realspeed, missiles, lasers, tractorbeam, manuever, energy, shield, hull, rooms, builder function */
   { "Short Range Fighter", 0, 255, 10, 4, 0, 255, 2500, 50, 250, 1,

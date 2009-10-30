@@ -8,32 +8,6 @@
 #include "mud.h"
 #include "sha256.h"
 
-const char *	const	where_name	[] =
-  {
-    "<used as light>     ",
-    "<worn on finger>    ",
-    "<worn on finger>    ",
-    "<worn around neck>  ",
-    "<worn around neck>  ",
-    "<worn on body>      ",
-    "<worn on head>      ",
-    "<worn on legs>      ",
-    "<worn on feet>      ",
-    "<worn on hands>     ",
-    "<worn on arms>      ",
-    "<energy shield>     ",
-    "<worn about body>   ",
-    "<worn about waist>  ",
-    "<worn around wrist> ",
-    "<worn around wrist> ",
-    "<wielded>           ",
-    "<held>              ",
-    "<dual wielded>      ",
-    "<worn on ears>      ",
-    "<worn on eyes>      ",
-    "<missile wielded>   "
-  };
-
 /*
  * Local functions.
  */
@@ -92,60 +66,14 @@ char *format_obj_to_char( const OBJ_DATA *obj, CHAR_DATA *ch, bool fShort )
  */
 const char *halucinated_object( int ms, bool fShort )
 {
-  int sms = URANGE( 1, (ms+10)/5, 20 );
+  int sms = URANGE( 1, (ms+10)/5, halucinated_object_short_size() );
 
   if ( fShort )
     {
-      switch( number_range( 6-URANGE(1,sms/2,5), sms ) )
-	{
-	case  1: return "a sword";
-	case  2: return "a stick";
-	case  3: return "something shiny";
-	case  4: return "something";
-	case  5: return "something interesting";
-	case  6: return "something colorful";
-	case  7: return "something that looks cool";
-	case  8: return "a nifty thing";
-	case  9: return "a cloak of flowing colors";
-	case 10: return "a mystical flaming sword";
-	case 11: return "a swarm of insects";
-	case 12: return "a deathbane";
-	case 13: return "a figment of your imagination";
-	case 14: return "your gravestone";
-	case 15: return "the long lost boots of Ranger Thoric";
-	case 16: return "a glowing tome of arcane knowledge";
-	case 17: return "a long sought secret";
-	case 18: return "the meaning of it all";
-	case 19: return "the answer";
-	case 20: return "the key to life, the universe and everything";
-	}
+      return halucinated_object_short[number_range(6-URANGE(1,sms/2,5), sms)];
     }
 
-  switch( number_range( 6-URANGE(1,sms/2,5), sms ) )
-    {
-    case  1: return "A nice looking sword catches your eye.";
-    case  2: return "The ground is covered in small sticks.";
-    case  3: return "Something shiny catches your eye.";
-    case  4: return "Something catches your attention.";
-    case  5: return "Something interesting catches your eye.";
-    case  6: return "Something colorful flows by.";
-    case  7: return "Something that looks cool calls out to you.";
-    case  8: return "A nifty thing of great importance stands here.";
-    case  9: return "A cloak of flowing colors asks you to wear it.";
-    case 10: return "A mystical flaming sword awaits your grasp.";
-    case 11: return "A swarm of insects buzzes in your face!";
-    case 12: return "The extremely rare Deathbane lies at your feet.";
-    case 13: return "A figment of your imagination is at your command.";
-    case 14: return "You notice a gravestone here... upon closer examination, it reads your name.";
-    case 15: return "The long lost boots of Ranger Thoric lie off to the side.";
-    case 16: return "A glowing tome of arcane knowledge hovers in the air before you.";
-    case 17: return "A long sought secret of all mankind is now clear to you.";
-    case 18: return "The meaning of it all, so simple, so clear... of course!";
-    case 19: return "The answer.  One.  It's always been One.";
-    case 20: return "The key to life, the universe and everything awaits your hand.";
-    }
-
-  return "Whoa!!!";
+  return halucinated_object_long[number_range( 6-URANGE(1,sms/2,5), sms )];
 }
 
 /*
@@ -1706,20 +1634,6 @@ void do_exits( CHAR_DATA *ch, char *argument )
     return;
 }
 
-const char *	const	day_name	[] =
-{
-    "the Moon", "the Bull", "Deception", "Thunder", "Freedom",
-    "the Great Gods", "the Sun"
-};
-
-const char *	const	month_name	[] =
-{
-    "Winter", "the Winter Wolf", "the Frost Giant", "the Old Forces",
-    "the Grand Struggle", "the Spring", "Nature", "Futility", "the Dragon",
-    "the Sun", "the Heat", "the Battle", "the Dark Shades", "the Shadows",
-    "the Long Shadows", "the Ancient Darkness", "the Great Evil"
-};
-
 void do_time( CHAR_DATA *ch, char *argument )
 {
     extern char str_boot_time[];
@@ -1751,8 +1665,6 @@ void do_time( CHAR_DATA *ch, char *argument )
 	(char *) ctime( &current_time ),
 	reboot_time
 	);
-
-    return;
 }
 
 
