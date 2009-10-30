@@ -917,3 +917,29 @@ int get_sclass( const char *name )
       return x;
   return -1;
 }
+
+const char * const sector_name[SECT_MAX] =
+  {
+    "inside", "city", "field", "forest", "hills", "mountain", "water swim", "water noswim",
+    "underwater", "air", "desert", "unknown", "ocean floor", "underground",
+    "scrub", "rocky", "savanna", "tundra", "glacial", "rainforest", "jungle",
+    "swamp", "wetlands", "brush", "steppe", "farmland", "volcanic"
+  };
+
+const char * const corpse_descs[] =
+  {
+    "The corpse of %s will soon be gone.",
+    "The corpse of %s lies here.",
+    "The corpse of %s lies here.",
+    "The corpse of %s lies here.",
+    "The corpse of %s lies here."
+  };
+
+const char * const d_corpse_descs[] =
+  {
+    "The shattered remains %s will soon be gone.",
+    "The shattered remains %s are here.",
+    "The shattered remains %s are here.",
+    "The shattered remains %s are here.",
+    "The shattered remains %s are here."
+  };

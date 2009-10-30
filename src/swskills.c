@@ -15,14 +15,6 @@ void  clear_roomtype( ROOM_INDEX_DATA * room );
 extern int      top_affect;
 extern int top_r_vnum;
 
-const	char *	sector_name	[SECT_MAX]	=
-{
-    "inside", "city", "field", "forest", "hills", "mountain", "water swim", "water noswim", 
-    "underwater", "air", "desert", "unknown", "ocean floor", "underground",
-    "scrub", "rocky", "savanna", "tundra", "glacial", "rainforest", "jungle", 
-    "swamp", "wetlands", "brush", "steppe", "farmland", "volcanic"
-};
-
 void do_makeblade( CHAR_DATA *ch, char *argument )
 {
     char arg[MAX_INPUT_LENGTH];

@@ -2488,6 +2488,9 @@ extern const char * const spell_action[];
 extern const char * const spell_power[];
 extern const char * const spell_class[];
 extern const char * const target_type[];
+extern const char * const sector_name[SECT_MAX];
+extern const char * const corpse_descs[];
+extern const char * const d_corpse_descs[];
 
 /*
  * Global variables.
@@ -3364,32 +3367,29 @@ const char *mprog_type_to_name( int type );
 char *strstr(const char *s1, const char *s2 );
 #endif
 
-void mprog_wordlist_check    args ( ( char * arg, CHAR_DATA *mob,
-                			CHAR_DATA* actor, OBJ_DATA* object,
-					void* vo, int type ) );
-void mprog_percent_check     args ( ( CHAR_DATA *mob, CHAR_DATA* actor,
-					OBJ_DATA* object, void* vo,
-					int type ) );
-void mprog_act_trigger       args ( ( char* buf, CHAR_DATA* mob,
-		                        CHAR_DATA* ch, OBJ_DATA* obj,
-					void* vo ) );
-void mprog_bribe_trigger     args ( ( CHAR_DATA* mob, CHAR_DATA* ch,
-		                        int amount ) );
-void mprog_entry_trigger     args ( ( CHAR_DATA* mob ) );
-void mprog_give_trigger      args ( ( CHAR_DATA* mob, CHAR_DATA* ch,
-                		        OBJ_DATA* obj ) );
-void mprog_greet_trigger     args ( ( CHAR_DATA* mob ) );
-void mprog_fight_trigger     args ( ( CHAR_DATA* mob, CHAR_DATA* ch ) );
-void mprog_hitprcnt_trigger  args ( ( CHAR_DATA* mob, CHAR_DATA* ch ) );
-void mprog_death_trigger     args ( ( CHAR_DATA *killer, CHAR_DATA* mob ) );
-void mprog_random_trigger    args ( ( CHAR_DATA* mob ) );
-void mprog_speech_trigger    args ( ( char* txt, CHAR_DATA* mob ) );
-void mprog_script_trigger( CHAR_DATA *mob ) );
-void mprog_hour_trigger( CHAR_DATA *mob ) );
-void mprog_time_trigger( CHAR_DATA *mob ) );
-void progbug( const char *str, CHAR_DATA *mob ) );
-void rset_supermob( ROOM_INDEX_DATA *room) );
-void release_supermob( void ) );
+void mprog_wordlist_check( char * arg, CHAR_DATA *mob,
+			   CHAR_DATA* actor, OBJ_DATA* object,
+			   void* vo, int type );
+void mprog_percent_check( CHAR_DATA *mob, CHAR_DATA* actor,
+			  OBJ_DATA* object, void* vo,
+			  int type );
+void mprog_act_trigger( char* buf, CHAR_DATA* mob,
+			CHAR_DATA* ch, OBJ_DATA* obj, void* vo );
+void mprog_bribe_trigger( CHAR_DATA* mob, CHAR_DATA* ch, int amount );
+void mprog_entry_trigger( CHAR_DATA* mob );
+void mprog_give_trigger( CHAR_DATA* mob, CHAR_DATA* ch, OBJ_DATA* obj );
+void mprog_greet_trigger( CHAR_DATA* mob );
+void mprog_fight_trigger( CHAR_DATA* mob, CHAR_DATA* ch );
+void mprog_hitprcnt_trigger( CHAR_DATA* mob, CHAR_DATA* ch );
+void mprog_death_trigger( CHAR_DATA *killer, CHAR_DATA* mob );
+void mprog_random_trigger( CHAR_DATA* mob );
+void mprog_speech_trigger( char* txt, CHAR_DATA* mob );
+void mprog_script_trigger( CHAR_DATA *mob );
+void mprog_hour_trigger( CHAR_DATA *mob );
+void mprog_time_trigger( CHAR_DATA *mob );
+void progbug( const char *str, CHAR_DATA *mob );
+void rset_supermob( ROOM_INDEX_DATA *room);
+void release_supermob( void );
 
 /* player.c */
 void set_title( CHAR_DATA *ch, const char *title );
