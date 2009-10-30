@@ -37,24 +37,6 @@ OBJ_DATA *	gobj_prev = NULL;
 
 CHAR_DATA *	timechar = NULL;
 
-const char * corpse_descs[] =
-   { 
-     "The corpse of %s will soon be gone.", 
-     "The corpse of %s lies here.",
-     "The corpse of %s lies here.",
-     "The corpse of %s lies here.",
-     "The corpse of %s lies here."
-   };
-
-const char * d_corpse_descs[] =
-   { 
-     "The shattered remains %s will soon be gone.", 
-     "The shattered remains %s are here.",
-     "The shattered remains %s are here.",
-     "The shattered remains %s are here.",
-     "The shattered remains %s are here."
-   };
-
 extern int      top_exit;
 
 

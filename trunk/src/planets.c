@@ -10,7 +10,6 @@ extern int top_area;
 extern int top_r_vnum;
 void write_area_list( void );
 void write_starsystem_list( void );
-extern const   char *  sector_name     [SECT_MAX];
 
 PLANET_DATA * first_planet = NULL;
 PLANET_DATA * last_planet = NULL;
