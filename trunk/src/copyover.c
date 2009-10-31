@@ -38,6 +38,10 @@
 #include "mud.h"
 #include "os.h"
 
+#ifdef AMIGA
+#include <dos/dostags.h>
+#endif
+
 /*
  * OS-dependent local functions.
  */
@@ -92,7 +96,7 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 
 	  if( cur_desc == SOCKET_ERROR )
 	    {
-	      fprintf( stderr, "ReleaseCopyOfSocket() failed.\n" );
+	      fprintf( out_stream, "ReleaseCopyOfSocket() failed.\n" );
 	      fclose( fp );
 	      exit( 1 );
 	    }
@@ -110,15 +114,15 @@ void do_copyover (CHAR_DATA *ch, char * argument)
   fclose (fp);
 
 #ifdef AMIGA
-  sprintf( buf, "run %s %d copyover %d",
+  sprintf( buf, "%s %d copyover %d",
 	   sysdata.exe_filename, port, control );
 
-  error_code = System( buf, TAG_DONE );
+  error_code = SystemTags( buf, SYS_Asynch, TRUE, TAG_END );
 
   if( error_code == -1 )
     {
       bug( "Copyover failure, executable could not be run." );
-      fprintf( stderr, "Failed to run %s\n", sysdata.exe_filename );
+      fprintf( out_stream, "Failed to run %s\n", sysdata.exe_filename );
       ch_printf( ch, "Copyover FAILED!\r\n" );
     }
   else

@@ -19,6 +19,8 @@
 #include <string.h>
 #include <sys/types.h>
 
+extern FILE *out_stream;
+
 #define STR_HASH_SIZE	1024
 
 struct hashstr_data
@@ -89,7 +91,7 @@ char *quick_link( const char *str )
 
   if ( ptr->links == 0 )
     {
-      fprintf(stderr, "quick_link: bad pointer\n" );
+      fprintf(out_stream, "quick_link: bad pointer\n" );
       return NULL;
     }
 
@@ -117,7 +119,7 @@ int str_free( char *str )
 	return ptr->links;
     if ( ptr->links == 0 )
     {
-	fprintf(stderr, "str_free: bad pointer\n" );
+	fprintf(out_stream, "str_free: bad pointer\n" );
 	return -1;
     }
     if ( --ptr->links == 0 )
@@ -138,7 +140,7 @@ int str_free( char *str )
 		return 0;
 	    }
 	}
-	fprintf( stderr, "str_free: pointer not found for string: %s\n", str );
+	fprintf( out_stream, "str_free: pointer not found for string: %s\n", str );
 	return -1;
     }
     return ptr->links;
@@ -152,9 +154,9 @@ void show_hash( int count )
     for ( x = 0; x < count; x++ )
     {
 	for ( c = 0, ptr = string_hash[x]; ptr; ptr = ptr->next, c++ );
-	fprintf( stderr, " %d", c );
+	fprintf( out_stream, " %d", c );
     }
-    fprintf( stderr, "\n" );
+    fprintf( out_stream, "\n" );
 }
 
 void hash_dump( int hash )
@@ -165,7 +167,7 @@ void hash_dump( int hash )
 
     if ( hash > STR_HASH_SIZE || hash < 0 )
     {
-	fprintf( stderr, "hash_dump: invalid hash size\r\n" );
+	fprintf( out_stream, "hash_dump: invalid hash size\r\n" );
 	return;
     }
 
@@ -174,11 +176,11 @@ void hash_dump( int hash )
     for( c = 0, ptr = string_hash[hash]; ptr; ptr = ptr->next, c++ )
       {
 	str = ( char * )( ( ( long )ptr ) + psize );
-	fprintf( stderr, "Len:%4d Lnks:%5d Str: %s\n\r",
+	fprintf( out_stream, "Len:%4d Lnks:%5d Str: %s\n\r",
 		 ptr->length, ptr->links, str );
       }
 
-    fprintf( stderr, "Total strings in hash %d: %d\r\n", hash, c );
+    fprintf( out_stream, "Total strings in hash %d: %d\r\n", hash, c );
 }
 
 char *check_hash( char *str )
@@ -244,7 +246,7 @@ void show_high_hash( int top )
 	  if( ptr->links >= top )
 	    {
 	      str = ( char * )( ( ( long )ptr ) + psize );
-	      fprintf( stderr, "Links: %5d  String: >%s<\n\r",
+	      fprintf( out_stream, "Links: %5d  String: >%s<\n\r",
 		       ptr->links, str );
 	    }
 	}

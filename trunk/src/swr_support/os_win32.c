@@ -27,13 +27,16 @@
 #include <time.h>
 #include "os.h"
 
+extern FILE *out_stream;
+
 void network_startup( void )
 {
   WSADATA wsaData;
+  out_stream = stdout;
 
   if( WSAStartup( MAKEWORD( 2, 2 ), &wsaData ) != 0 )
     {
-      fprintf( stderr, "%s (%s:%d) - WSAStartup failed.\n",
+      fprintf( out_stream, "%s (%s:%d) - WSAStartup failed.\n",
 	       __FUNCTION__, __FILE__, __LINE__ );
       exit( 1 );
     }

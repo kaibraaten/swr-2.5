@@ -29,26 +29,29 @@
 struct Library *SocketBase = NULL;
 struct Library *UserGroupBase = NULL;
 struct UtilityBase *UtilityBase = NULL;
+extern FILE *out_stream;
 
 void network_startup( void )
 {
+  out_stream = fopen( "CON:800/800/640/480/SWR Factor 2.0/AUTO/CLOSE/WAIT/INACTIVE", "a" );
+
   if( !( SocketBase = OpenLibrary( "bsdsocket.library", 2 ) ) )
     {
-      fprintf( stderr, "%s (%s:%d) - Failed to open bsdsocket.library v2+\n",
+      fprintf( out_stream, "%s (%s:%d) - Failed to open bsdsocket.library v2+\n",
 	       __FUNCTION__, __FILE__, __LINE__ );
       exit( 1 );
     }
 
   if( !( UserGroupBase = OpenLibrary( "usergroup.library", 0 ) ) )
     {
-      fprintf( stderr, "%s (%s:%d) - Failed to open usergroup.library\n",
+      fprintf( out_stream, "%s (%s:%d) - Failed to open usergroup.library\n",
 	       __FUNCTION__, __FILE__, __LINE__ );
       exit( 1 );
     }
 
   if( !( UtilityBase = (struct UtilityBase*) OpenLibrary( "utility.library", 0 ) ) )
     {
-      fprintf( stderr, "%s (%s:%d) - Failed to open utility.library\n",
+      fprintf( out_stream, "%s (%s:%d) - Failed to open utility.library\n",
 	       __FUNCTION__, __FILE__, __LINE__ );
       exit( 1 );
     }
@@ -72,5 +75,11 @@ void network_teardown( void )
     {
       CloseLibrary( SocketBase );
       SocketBase = NULL;
+    }
+
+  if( out_stream )
+    {
+      fclose( out_stream );
+      out_stream = 0;
     }
 }

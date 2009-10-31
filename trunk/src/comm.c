@@ -18,15 +18,7 @@
 /*
  * Socket and TCP/IP stuff.
  */
-/*
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <netinet/in_systm.h>
-#include <netinet/ip.h>
-#include <arpa/inet.h>
-#include <arpa/telnet.h>
-#include <netdb.h>
-*/
+
 #ifndef WIN32
 const   char    go_ahead_str    [] = { IAC, GA, '\0' };
 #endif
@@ -37,6 +29,7 @@ void        write_ship_list args( ( void ) );
 /*
  * Global variables.
  */
+FILE *out_stream = NULL;
 DESCRIPTOR_DATA *   first_descriptor = NULL; /* First descriptor	*/
 DESCRIPTOR_DATA *   last_descriptor = NULL;	/* Last descriptor	*/
 DESCRIPTOR_DATA *   d_next = NULL;		/* Next descriptor in loop*/
@@ -167,12 +160,12 @@ int main( int argc, char **argv )
     {
       if ( !is_number( argv[1] ) )
 	{
-	  fprintf( stderr, "Usage: %s [port #]\n", argv[0] );
+	  fprintf( out_stream, "Usage: %s [port #]\n", argv[0] );
 	  exit( 1 );
 	}
       else if ( ( port = atoi( argv[1] ) ) <= 1024 )
 	{
-	  fprintf( stderr, "Port number must be above 1024.\n" );
+	  fprintf( out_stream, "Port number must be above 1024.\n" );
 	  exit( 1 );
 	}
 
