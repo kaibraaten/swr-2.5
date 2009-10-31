@@ -1914,7 +1914,7 @@ void load_corpses( void )
 #else
 		  de->d_name );
 #endif
-	  fprintf(stderr, "Corpse -> %s\n", strArea);
+	  fprintf(out_stream, "Corpse -> %s\n", strArea);
       if ( !(fpArea = fopen(strArea, "r")) )
       {
         perror(strArea);

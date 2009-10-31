@@ -2,7 +2,7 @@
 #define _MUD_H_
 
 #include <swr_support.h>
-
+#include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
 #ifndef WIN32
@@ -11,6 +11,8 @@
 #endif
 #include <math.h>
 #include <time.h>
+
+extern FILE *out_stream;
 
 typedef	int				ch_ret;
 typedef	int				obj_ret;
@@ -2274,7 +2276,7 @@ extern  short  gsn_grip;
 do								\
 {								\
     if ( ((gsn) = skill_lookup((skill))) == -1 )		\
-	fprintf( stderr, "ASSIGN_GSN: Skill %s not found.\n",	\
+	fprintf( out_stream, "ASSIGN_GSN: Skill %s not found.\n",	\
 		(skill) );					\
 } while(0)
 

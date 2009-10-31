@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "swr_support.h"
 
+extern FILE *out_stream;
+
 #define HIDDEN_TILDE    '*'
 
 void bug( const char *str, ... );
@@ -166,7 +168,7 @@ bool str_cmp( const char *astr, const char *bstr )
     {
       bug( "Str_cmp: null astr." );
       if ( bstr )
-	fprintf( stderr, "str_cmp: astr: (null)  bstr: %s\n", bstr );
+	fprintf( out_stream, "str_cmp: astr: (null)  bstr: %s\n", bstr );
       return TRUE;
     }
 
@@ -174,7 +176,7 @@ bool str_cmp( const char *astr, const char *bstr )
     {
       bug( "Str_cmp: null bstr." );
       if ( astr )
-	fprintf( stderr, "str_cmp: astr: %s  bstr: (null)\n", astr );
+	fprintf( out_stream, "str_cmp: astr: %s  bstr: (null)\n", astr );
       return TRUE;
     }
 

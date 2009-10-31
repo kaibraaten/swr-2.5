@@ -87,7 +87,7 @@ do                                                              \
  if (!(point))                                                 \
    {                                                             \
  bug( "Freeing null pointer" ); \
- fprintf( stderr, "DISPOSEing NULL in %s, line %d\n", __FILE__, __LINE__\
+ fprintf( out_stream, "DISPOSEing NULL in %s, line %d\n", __FILE__, __LINE__\
 	  ); \
    }                                                             \
  else free(point);                                             \
@@ -103,11 +103,11 @@ do                                                              \
  if (!(point))                                                 \
    {                                                             \
  bug( "Freeing null pointer" );                          \
- fprintf( stderr, "STRFREEing NULL in %s, line %d\n", __FILE__, __LINE__\
+ fprintf( out_stream, "STRFREEing NULL in %s, line %d\n", __FILE__, __LINE__\
 	  ); \
    }                                                             \
  else if (str_free((point))==-1)                               \
-   fprintf( stderr, "STRFREEing bad pointer in %s, line %d\n", __FILE__, __LINE__ ); \
+   fprintf( out_stream, "STRFREEing bad pointer in %s, line %d\n", __FILE__, __LINE__ ); \
  } while(0)
 #else
 #define STRALLOC(point)         str_dup((point))
@@ -118,7 +118,7 @@ do                                                              \
  if (!(point))                                                 \
    {                                                             \
  bug( "Freeing null pointer" );                          \
- fprintf( stderr, "STRFREEing NULL in %s, line %d\n", __FILE__, __LINE__ ); \
+ fprintf( out_stream, "STRFREEing NULL in %s, line %d\n", __FILE__, __LINE__ ); \
    }                                                             \
  else free((point));                                           \
  } while(0)

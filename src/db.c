@@ -2165,7 +2165,7 @@ void bug( const char *str, ... )
       int iLine;
       int iChar;
 
-      if ( fpArea == stdin )
+      if ( fpArea == out_stream )
 	{
 	  iLine = 0;
 	}
@@ -2294,7 +2294,7 @@ void log_string_plus( const char *str, short log_type )
 
     strtime                    = ctime( &current_time );
     strtime[strlen(strtime)-1] = '\0';
-    fprintf( stderr, "%s :: %s\n", strtime, str );
+    fprintf( out_stream, "%s :: %s\n", strtime, str );
     if ( strncmp( str, "Log ", 4 ) == 0 )
       offset = 4;
     else
@@ -3246,11 +3246,11 @@ void load_area_file( AREA_DATA *tarea, const char *filename )
 
   if ( tarea )
     {
-      fprintf( stderr, "%s\n",
+      fprintf( out_stream, "%s\n",
 	       filename);
     }
   else
-    fprintf( stderr, "(%s)\n", filename );
+    fprintf( out_stream, "(%s)\n", filename );
 }
 
 /*
