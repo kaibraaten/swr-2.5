@@ -32,7 +32,7 @@ extern FILE *out_stream;
 void network_startup( void )
 {
   WSADATA wsaData;
-  out_stream = stdout;
+  out_stream = stderr;
 
   if( WSAStartup( MAKEWORD( 2, 2 ), &wsaData ) != 0 )
     {
