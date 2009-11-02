@@ -3077,6 +3077,10 @@ DECLARE_SPELL_FUN(	spell_smaug		);
 #define SK	SKILLTYPE
 #define SH      SHIP_DATA
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* act_comm.c */
 bool character_has_comlink( const CHAR_DATA *ch );
 void    sound_to_room( const ROOM_INDEX_DATA *room , const char *argument );
@@ -3170,6 +3174,8 @@ int     max_population          args( ( const PLANET_DATA *planet ) );
 long    get_taxes               args( ( const PLANET_DATA *planet ) );
 
 /* space.c */
+void write_area_list( void );
+void write_starsystem_list( void );
 SHIP_DATA *ship_create( void );
 SPACE_DATA *starsystem_create(  void );
 SH        *  get_ship          	    args( ( const char *name ) );
@@ -3694,5 +3700,9 @@ void rprog_act_trigger( char *buf, ROOM_INDEX_DATA *room, CHAR_DATA *ch,
 
 #define send_to_char  send_to_char_color
 #define send_to_pager send_to_pager_color
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* include guard */

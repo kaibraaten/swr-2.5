@@ -30,6 +30,10 @@ struct hashstr_data
     unsigned short int	 length;	/* length of string */
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 char *str_alloc( const char *str );
 char *quick_link( const char *str );
 int str_free( char *str );
@@ -38,6 +42,10 @@ char *hash_stats( void );
 void hash_dump( int );
 char *check_hash( char* );
 void show_high_hash( int );
+
+#ifdef __cplusplus
+}
+#endif
 
 struct hashstr_data *string_hash[STR_HASH_SIZE];
 

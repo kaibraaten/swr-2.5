@@ -6,6 +6,10 @@
 #include "vector3.h"
 #include "os.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * String and memory management parameters.
  */
@@ -242,5 +246,9 @@ time_t end_timer(struct timeval *start_time);
 char *flag_string( int bitvector, const char * const flagarray[] );
 char *const_char_to_nonconst( const char *argument );
 void append_to_file( const char *file, const char *str );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* include guard */

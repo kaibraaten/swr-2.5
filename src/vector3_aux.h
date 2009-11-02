@@ -28,6 +28,10 @@
 
 #include "mud.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * To check if a ship is facing a specific position, which can be another
  * ship, a planet, an asteroid, etc.
@@ -90,5 +94,9 @@ double ship_distance_to_planet( const SHIP_DATA * const ship,
 double missile_distance_to_ship( const MISSILE_DATA * const m,
 				 const SHIP_DATA * const s );
 void vector_randomize( Vector3 * const vec, int from, int to );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* include guard */

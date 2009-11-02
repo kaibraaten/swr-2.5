@@ -3,13 +3,10 @@
 #include <stdio.h>
 #include <string.h>
 #include "mud.h"
-
-void vector_randomize( Vector3 * const vec, int from, int to );
+#include "vector3_aux.h"
 
 extern int top_area;
 extern int top_r_vnum;
-void write_area_list( void );
-void write_starsystem_list( void );
 
 PLANET_DATA * first_planet = NULL;
 PLANET_DATA * last_planet = NULL;
@@ -17,10 +14,10 @@ PLANET_DATA * last_planet = NULL;
 GUARD_DATA * first_guard = NULL;
 GUARD_DATA * last_guard = NULL;
 
-/* local routines */
 void fread_planet( PLANET_DATA *planet, FILE *fp );
 bool load_planet_file( const char *planetfile );
 void write_planet_list( void );
+
 static PLANET_DATA *planet_create( void );
 
 PLANET_DATA *get_planet( const char *name )
