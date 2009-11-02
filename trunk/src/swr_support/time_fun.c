@@ -5,12 +5,20 @@
 #include <sys/time.h>
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void bug( const char *str, ... );
 
 struct tm *update_time( struct tm* );
 void subtract_times( struct timeval*, struct timeval* );
 void start_timer( struct timeval* );
 time_t end_timer( struct timeval* );
+
+#ifdef __cplusplus
+}
+#endif
 
 struct tm *update_time( struct tm *old_time )
 {

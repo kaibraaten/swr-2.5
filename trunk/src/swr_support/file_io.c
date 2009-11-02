@@ -9,9 +9,14 @@
 /*
  * Uni-directional dependencies. Fix that.
  */
+#ifdef __cplusplus
+extern "C" {
+#endif
 void bug( const char *str, ... );
 void shutdown_mud( const char *reason );
-
+#ifdef __cplusplus
+}
+#endif
 /*
  * Added lots of EOF checks, as most of the file crashes are based on them.
  * If an area file encounters EOF, the fread_* functions will shutdown the

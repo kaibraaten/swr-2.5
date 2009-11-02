@@ -197,6 +197,9 @@ bool MOBtrigger = TRUE;
 /*
  * Local booting procedures.
  */
+#ifdef __cplusplus
+extern "C"
+#endif
 void init_mm( void );
 
 static void boot_log( const char *str, ... );
@@ -228,6 +231,9 @@ static void oprog_read_programs( FILE* fp, OBJ_INDEX_DATA *pObjIndex);
 static void rprog_read_programs( FILE* fp, ROOM_INDEX_DATA *pRoomIndex);
 void unlink_social( SOCIALTYPE *social );
 
+#ifdef __cplusplus
+extern "C"
+#endif
 void shutdown_mud( const char *reason )
 {
   FILE *fp;

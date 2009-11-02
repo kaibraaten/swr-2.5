@@ -34,9 +34,16 @@
 #include "os_unix.h"
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void network_startup( void );
 void network_teardown( void );
 
+#ifdef __cplusplus
+}
+#endif 
 #endif /* include guard */
 
 

@@ -2,6 +2,9 @@
 #include <time.h>
 #include <string.h>
 
+#ifdef __cplusplus
+extern "C"
+#endif
 void init_mm( void );
 
 int umin( int check, int ncheck )

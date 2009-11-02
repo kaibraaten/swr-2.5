@@ -7,12 +7,17 @@ extern FILE *out_stream;
 
 #define HIDDEN_TILDE    '*'
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void bug( const char *str, ... );
 
 bool is_name2( const char*, char* );
 bool is_name2_prefix( const char*, char* );
 char *wordwrap( char*, short );
-
+#ifdef __cplusplus
+}
+#endif
 /*
  * See if a string is one of the names of an object.
  */

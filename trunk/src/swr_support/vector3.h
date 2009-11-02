@@ -36,6 +36,10 @@ struct vector3
   double x, y, z;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*
  * Return the length of a vector
  * Not to be confused with the distance between two vectors!
@@ -72,5 +76,9 @@ void vector_init( Vector3 * const v );
  */
 
 void vector_set( Vector3 * const vec, double x, double y, double z );
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
