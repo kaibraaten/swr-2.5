@@ -114,7 +114,7 @@ void do_copyover (CHAR_DATA *ch, char * argument)
   fclose (fp);
 
 #ifdef AMIGA
-  sprintf( buf, "run %s %d copyover %d",
+  sprintf( buf, "run >NIL: %s %d copyover %d",
 	   sysdata.exe_filename, port, control );
 
   error_code = System( buf, NULL );
