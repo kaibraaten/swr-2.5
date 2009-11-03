@@ -31,9 +31,13 @@ struct Library *UserGroupBase = NULL;
 struct UtilityBase *UtilityBase = NULL;
 extern FILE *out_stream;
 
+#define MUD_NAME "SWR Factor 2.0"
+#define VERSTAG "\0$VER: " MUD_NAME " (" __DATE2__ ")"
+const char *VersTag = VERSTAG;
+
 void network_startup( void )
 {
-  out_stream = fopen( "CON:800/800/640/480/SWR Factor 2.0/AUTO/CLOSE/INACTIVE", "a" );
+  out_stream = fopen( "CON:800/800/640/480/" MUD_NAME "/AUTO/CLOSE/INACTIVE", "a" );
 
   if( !( SocketBase = OpenLibrary( "bsdsocket.library", 2 ) ) )
     {
