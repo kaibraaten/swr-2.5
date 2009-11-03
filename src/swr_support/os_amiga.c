@@ -33,7 +33,7 @@ extern FILE *out_stream;
 
 void network_startup( void )
 {
-  out_stream = fopen( "CON:800/800/640/480/SWR Factor 2.0/AUTO/CLOSE/WAIT/INACTIVE", "a" );
+  out_stream = fopen( "CON:800/800/640/480/SWR Factor 2.0/AUTO/CLOSE/INACTIVE", "a" );
 
   if( !( SocketBase = OpenLibrary( "bsdsocket.library", 2 ) ) )
     {

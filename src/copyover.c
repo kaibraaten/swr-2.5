@@ -114,10 +114,10 @@ void do_copyover (CHAR_DATA *ch, char * argument)
   fclose (fp);
 
 #ifdef AMIGA
-  sprintf( buf, "%s %d copyover %d",
+  sprintf( buf, "run %s %d copyover %d",
 	   sysdata.exe_filename, port, control );
 
-  error_code = SystemTags( buf, SYS_Asynch, TRUE, TAG_END );
+  error_code = System( buf, NULL );
 
   if( error_code == -1 )
     {
@@ -132,8 +132,6 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 
 #else
   /* exec - descriptors are inherited */
-
-
   sprintf (buf, "%d", port);
   sprintf (buf2, "%d", control);
 
