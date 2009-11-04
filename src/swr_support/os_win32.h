@@ -28,6 +28,7 @@
 
 #include <io.h>
 #include <winsock2.h>
+#include <windows.h>
 
 typedef int ssize_t;
 typedef int socklen_t;

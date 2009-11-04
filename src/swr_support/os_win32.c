@@ -29,10 +29,37 @@
 
 extern FILE *out_stream;
 
+static const char *get_next_filename( const char *directory )
+{
+  static char filename[256];
+  int high_num = 1000;
+  WIN32_FIND_DATA info;
+  HANDLE h = FindFirstFile( "*.*", &info );
+
+  if( h != INVALID_HANDLE_VALUE )
+    {
+      do
+	{
+	  if( info.cFileName[0] != '.' )
+            {
+              int curr = strtol( info.cFileName, 0, 10 );
+              high_num = curr > high_num ? curr : high_num;
+            }
+	}
+      while( FindNextFile( h, &info ) );
+
+      FindClose( h );
+    }
+
+  ++high_num;
+  sprintf( filename, "%s%d.log", directory, high_num );
+  return filename;
+}
+
 void os_setup( void )
 {
   WSADATA wsaData;
-  out_stream = stderr;
+  out_stream = fopen( get_next_filename( "log/" ), "w" );
 
   if( WSAStartup( MAKEWORD( 2, 2 ), &wsaData ) != 0 )
     {
@@ -45,6 +72,12 @@ void os_setup( void )
 void os_cleanup( void )
 {
   WSACleanup();
+
+  if( out_stream )
+    {
+      fclose( out_stream );
+      out_stream = 0;
+    }
 }
 
 // gettimeofday for Windows
