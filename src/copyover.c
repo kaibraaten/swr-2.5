@@ -23,7 +23,7 @@
 /* Origional Copyover Code by Erwin S. Andreasen http://www.andreasen.org/ */
 
 #include <sys/types.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/time.h>
 #include <unistd.h>
 #endif

@@ -6,8 +6,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef WIN32
-#include <arpa/telnet.h> /* Telnet opt codes */
+#ifndef _WIN32
 #include <unistd.h>
 #endif
 #include "mud.h"
@@ -31,7 +30,7 @@ static void nanny_done_motd( DESCRIPTOR_DATA *d, char *argument );
 
 static  OBJ_DATA *      rgObjNest       [MAX_NEST];
 extern bool wizlock;
-#ifndef WIN32
+#ifndef _WIN32
 const   char    echo_off_str    [] = { IAC, WILL, TELOPT_ECHO, '\0' };
 const   char    echo_on_str     [] = { IAC, WONT, TELOPT_ECHO, '\0' };
 #endif
@@ -288,7 +287,7 @@ arts of this game...\r\n"
 
       /* Old player */
       write_to_buffer( d, "Password: ", 0 );
-#ifndef WIN32
+#ifndef _WIN32
 	  write_to_buffer( d, echo_off_str, 0 );
 #endif
 	  d->connected = CON_GET_OLD_PASSWORD;
@@ -320,7 +319,7 @@ static void nanny_get_old_password( DESCRIPTOR_DATA *d, char *argument )
       return;
     }
 
-#ifndef WIN32
+#ifndef _WIN32
   write_to_buffer( d, echo_on_str, 0 );
 #endif
 
@@ -371,7 +370,7 @@ static void nanny_confirm_new_name( DESCRIPTOR_DATA *d, char *argument )
       sprintf( buf, "\r\nMake sure to use a password that won't be easily guessed by someone else."
 	       "\r\nPick a good password for %s: %s",
 	       ch->name,
-#ifdef WIN32
+#ifdef _WIN32
 			"" );
 #else
 		   echo_off_str );
@@ -438,7 +437,7 @@ static void nanny_confirm_new_password( DESCRIPTOR_DATA *d, char *argument )
       return;
     }
 
-#ifndef WIN32
+#ifndef _WIN32
   write_to_buffer( d, echo_on_str, 0 );
 #endif
   write_to_buffer( d, "\r\nWhat is your sex (M/F/N)? ", 0 );

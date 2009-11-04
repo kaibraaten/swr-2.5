@@ -4,14 +4,12 @@
 #include <stdarg.h>
 #include <string.h>
 #include "mud.h"
-#ifndef WIN32
-#include <unistd.h>
-#include <dirent.h>
-#endif
 #include <sys/stat.h>
 
-#ifndef WIN32
-extern	int _filbuf( FILE* );
+#ifndef _WIN32
+#include <unistd.h>
+#include <dirent.h>
+extern  int _filbuf( FILE* );
 #endif
 
 void init_supermob( void );

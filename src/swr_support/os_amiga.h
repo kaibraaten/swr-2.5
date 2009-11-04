@@ -43,6 +43,7 @@ typedef long clock_t;
 #include <netdb.h>
 #include <sys/time.h>
 #include <db.h>
+#include <arpa/telnet.h>
 
 #if defined( __STORMGCC__ )
 #define unlink(name) !DeleteFile((STRPTR)(name))
