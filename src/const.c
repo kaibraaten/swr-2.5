@@ -1,4 +1,3 @@
-#include <sys/types.h>
 #include <stdio.h>
 #include "mud.h"
 

@@ -1,15 +1,7 @@
-#include <sys/types.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include "mud.h"
-#ifdef _WIN32
-#include <io.h>
-#else
-#include <unistd.h>
-#include <dirent.h>
-#endif
-#include <sys/stat.h>
 
 /*
  * Increment with every major format change.
@@ -1876,8 +1868,6 @@ void write_corpses( const CHAR_DATA *ch, const char *name )
 
 /* Directory scanning with AmigaOS */
 #if defined(AMIGA)
-#include <dos/dos.h>
-#include <proto/dos.h>
 
 void load_corpses( void )
 {
@@ -1920,7 +1910,6 @@ void load_corpses( void )
 
 /* Directory scanning with Windows */
 #elif defined(_WIN32)
-#include <windows.h>
 
 void load_corpses( void )
 {

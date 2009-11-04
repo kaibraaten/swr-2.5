@@ -5,10 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#ifndef _WIN32
-#include <sys/cdefs.h>
-#include <sys/time.h>
-#endif
 #include <math.h>
 #include <time.h>
 

@@ -1,11 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#ifndef _WIN32
-#include <unistd.h>
-#endif
 #include <ctype.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <errno.h>
 #include "mud.h"
 #include "sha256.h"

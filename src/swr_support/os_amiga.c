@@ -145,3 +145,9 @@ void os_cleanup( void )
       out_stream = 0;
     }
 }
+
+int set_nonblocking( SOCKET sock )
+{
+  char optval = 1;
+  return IoctlSocket( sock, FIONBIO, &optval );
+}

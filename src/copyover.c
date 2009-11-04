@@ -22,25 +22,13 @@
 ****************************************************************************/
 /* Origional Copyover Code by Erwin S. Andreasen http://www.andreasen.org/ */
 
-#include <sys/types.h>
-#ifndef _WIN32
-#include <sys/time.h>
-#include <unistd.h>
-#endif
-#include <sys/stat.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <fcntl.h>
-#include <signal.h>
 #include <stdarg.h>
 #include "mud.h"
 #include "os.h"
-
-#ifdef AMIGA
-#include <dos/dostags.h>
-#endif
 
 /*
  * OS-dependent local functions.

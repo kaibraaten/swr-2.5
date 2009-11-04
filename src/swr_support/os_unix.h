@@ -27,15 +27,18 @@
 #define _SWR2_OS_UNIX_H_
 
 #include <netinet/in.h>
+#include <sys/cdefs.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>
+#include <sys/stat.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <unistd.h>
 #include <arpa/telnet.h>
+#include <dirent.h>
 
 static const int INVALID_SOCKET = -1;
 static const int SOCKET_ERROR = -1;
