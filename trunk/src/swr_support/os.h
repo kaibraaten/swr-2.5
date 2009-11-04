@@ -40,6 +40,7 @@ extern "C" {
 
 void os_setup( void );
 void os_cleanup( void );
+int set_nonblocking( SOCKET sock );
 
 #ifdef __cplusplus
 }

@@ -32,6 +32,7 @@ typedef long clock_t;
 #include <utility/tagitem.h>
 #include <exec/exec.h>
 #include <proto/exec.h>
+#include <dos/dos.h>
 #include <proto/dos.h>
 #include <lineread.h>
 #include <unistd.h>
@@ -44,6 +45,7 @@ typedef long clock_t;
 #include <sys/time.h>
 #include <db.h>
 #include <arpa/telnet.h>
+#include <sys/cdefs.h>
 
 #if defined( __STORMGCC__ )
 #define unlink(name) !DeleteFile((STRPTR)(name))

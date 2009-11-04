@@ -6,9 +6,6 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#ifndef _WIN32
-#include <unistd.h>
-#endif
 #include "mud.h"
 #include "sha256.h"
 

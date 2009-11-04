@@ -1,7 +1,3 @@
-#include <sys/types.h>
-#ifndef _WIN32
-#include <sys/time.h>
-#endif
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>

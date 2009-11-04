@@ -1,15 +1,11 @@
-#include <sys/types.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
 #include "mud.h"
-#include <sys/stat.h>
 
 #ifndef _WIN32
-#include <unistd.h>
-#include <dirent.h>
-extern  int _filbuf( FILE* );
+extern int _filbuf( FILE* );
 #endif
 
 void init_supermob( void );

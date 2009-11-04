@@ -1,7 +1,5 @@
-#include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #include "mud.h"
 
 /*
@@ -1164,8 +1162,6 @@ static void generic_wear_obj( CHAR_DATA *ch, OBJ_DATA *obj, short wear_loc,
 
 static void wear_obj_light( CHAR_DATA *ch, OBJ_DATA *obj, bool fReplace )
 {
-  assert( obj->item_type == ITEM_LIGHT );
-
   if ( !remove_obj( ch, WEAR_LIGHT, fReplace ) )
     return;
 

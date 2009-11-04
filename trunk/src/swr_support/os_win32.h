@@ -29,6 +29,7 @@
 #include <io.h>
 #include <winsock2.h>
 #include <windows.h>
+#include <sys/types.h>
 
 #ifdef _MSC_VER
 typedef int ssize_t;

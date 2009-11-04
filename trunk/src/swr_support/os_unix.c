@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#include <sys/types.h>
-#include <dirent.h>
 #include "os.h"
 
 extern FILE *out_stream;
@@ -55,4 +53,9 @@ void os_cleanup( void )
     {
       fclose( out_stream );
     }
+}
+
+int set_nonblocking( SOCKET sock )
+{
+  return fcntl( sock, F_SETFL, O_NONBLOCK );
 }

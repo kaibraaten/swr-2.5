@@ -1,11 +1,7 @@
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <fcntl.h>
-#include <signal.h>
 #include <stdarg.h>
 #include "mud.h"
 #include "os.h"
@@ -623,11 +619,6 @@ void new_descriptor( SOCKET new_desc )
     struct sockaddr_in sock;
     SOCKET desc = 0;
     socklen_t size = 0;
-#if defined(AMIGA)
-    char optval = 1;
-#elif defined(_WIN32)
-	unsigned long optval = 1;
-#endif
 
     set_alarm( 20 );
     size = sizeof(sock);
@@ -654,13 +645,7 @@ void new_descriptor( SOCKET new_desc )
 
     set_alarm( 20 );
 
-#ifdef AMIGA
-    if( IoctlSocket( desc, FIONBIO, &optval ) == SOCKET_ERROR )
-#elif defined(_WIN32)
-	if( ioctlsocket( desc, FIONBIO, &optval ) == SOCKET_ERROR )
-#else
-    if ( fcntl( desc, F_SETFL, FNDELAY ) == SOCKET_ERROR )
-#endif
+    if( set_nonblocking( desc ) == SOCKET_ERROR )
     {
 	perror( "New_descriptor: fcntl: FNDELAY" );
 	set_alarm( 0 );
