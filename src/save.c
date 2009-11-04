@@ -1920,9 +1920,28 @@ void load_corpses( void )
 
 /* Directory scanning with Windows */
 #elif defined(_WIN32)
+#include <windows.h>
+
 void load_corpses( void )
 {
+  char buf[256];
+  WIN32_FIND_DATA info;
+  HANDLE h;
 
+  sprintf( buf, "%s*.*", CORPSE_DIR );
+  h = FindFirstFile( buf, &info );
+
+  if( h != INVALID_HANDLE_VALUE )
+    {
+      do
+	{
+	  if( info.cFileName[0] != '.' )
+	    {
+	      fread_corpse( info.cFileName );
+	    }
+	}
+      while( FindNextFile( h, &info ) );
+    }
 }
 
 /* Directory scanning with POSIX */
@@ -1939,8 +1958,6 @@ void load_corpses( void )
       return;
     }
 
-  falling = 1; /* Arbitrary, must be >0 though. */
-
   while ( (de = readdir(dp)) != NULL )
     {
       if ( de->d_name[0] != '.' )
@@ -1948,15 +1965,12 @@ void load_corpses( void )
 	  fread_corpse( de->d_name );
 	}
     }
-
-  fpArea = NULL;
-  strcpy( strArea, "$" );
-  falling = 0;
 }
 #endif
 
 void fread_corpse( const char *name )
 {
+  falling = 1;
   sprintf( strArea, "%s%s", CORPSE_DIR, name );
   fprintf( out_stream, "Corpse -> %s\n", strArea );
 
@@ -2005,4 +2019,7 @@ void fread_corpse( const char *name )
     }
 
   fclose(fpArea);
+  fpArea = NULL;
+  sprintf( strArea, "$" );
+  falling = 0;
 }
