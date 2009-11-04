@@ -489,8 +489,6 @@ void load_prototypes( )
   first_ship_prototype	= NULL;
   last_ship_prototype	= NULL;
 
-  log_string( "Loading ship prototypes..." );
-
   sprintf( prototypelist, "%s%s", PROTOTYPE_DIR, PROTOTYPE_LIST );
 
   if ( ( fpList = fopen( prototypelist, "r" ) ) == NULL )
@@ -515,7 +513,6 @@ void load_prototypes( )
     }
 
   fclose( fpList );
-  log_string(" Done ship prototypes " );
 }
 
 void do_setprototype( CHAR_DATA *ch, char *argument )
