@@ -24,7 +24,10 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "os.h"
+#include <dos/dos.h>
+#include <proto/dos.h>
 
 struct Library *SocketBase = NULL;
 struct Library *UserGroupBase = NULL;
@@ -35,9 +38,64 @@ extern FILE *out_stream;
 #define VERSTAG "\0$VER: " MUD_NAME " (" __DATE2__ ")"
 const char *VersTag = VERSTAG;
 
+static const char *get_next_filename( const char *directory )
+{
+  static char filename[256];
+  int high_num = 1000;
+  BPTR sourcelock = NULL;
+  struct ExAllControl *excontrol = NULL;
+  struct ExAllData buffer, *ead = NULL;
+  BOOL exmore = TRUE;
+
+  *filename = '\0';
+  memcpy( &buffer, 0, sizeof( buffer ) );
+  sourcelock = Lock( directory, SHARED_LOCK );
+  excontrol = AllocDosObject( DOS_EXALLCONTROL, NULL );
+  excontrol->eac_LastKey = 0;
+
+  do
+    {
+      exmore = ExAll( sourcelock, &buffer, sizeof( buffer ),
+		      ED_NAME, excontrol );
+
+      if( !exmore && IoErr() != ERROR_NO_MORE_ENTRIES )
+	{
+	  /* Abnormal abort */
+	  break;
+	}
+
+      if( excontrol->eac_Entries == 0 )
+	{
+	  continue;
+	}
+
+      ead = &buffer;
+
+      do
+	{
+	  if( ead->ed_Name[0] != '.' )
+	    {
+	      int curr = strtol( ead->ed_Name, 0, 10 );
+	      high_num = curr > high_num ? curr : high_num;
+	    }
+
+	  ead = ead->ed_Next;
+	}
+      while( ead );
+
+    }
+  while( exmore );
+
+  FreeDosObject( DOS_EXALLCONTROL, excontrol );
+  UnLock( sourcelock );
+  ++high_num;
+  sprintf( filename, "%s%d.log", directory, high_num );
+  return filename;
+}
+
 void os_setup( void )
 {
-  out_stream = fopen( "CON:800/800/640/480/" MUD_NAME "/AUTO/CLOSE/INACTIVE", "a" );
+  out_stream = fopen( get_next_filename( "PROGDIR:log/" ), "w+" );
 
   if( !( SocketBase = OpenLibrary( "bsdsocket.library", 2 ) ) )
     {
