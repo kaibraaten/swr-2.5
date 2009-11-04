@@ -26,8 +26,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "os.h"
-#include <dos/dos.h>
-#include <proto/dos.h>
 
 struct Library *SocketBase = NULL;
 struct Library *UserGroupBase = NULL;
