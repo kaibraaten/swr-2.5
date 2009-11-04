@@ -86,7 +86,7 @@ void free_memory( void );
 static void execute_on_exit( void )
 {
   free_memory();
-  network_teardown();
+  os_cleanup();
 }
 
 int main( int argc, char **argv )
@@ -94,7 +94,7 @@ int main( int argc, char **argv )
   struct timeval now_time;
   bool fCopyOver = FALSE;
   const char *filename = 0;
-  network_startup();
+  os_setup();
   atexit( execute_on_exit );
 
   num_descriptors		= 0;
@@ -357,6 +357,16 @@ void accept_new( SOCKET ctrl )
     }
 }
 
+static void flush_logfile( void )
+{
+  static int num = 0;
+
+  if( ( num % 20 ) == 0 )
+    fflush( out_stream );
+
+  ++num;
+}
+
 void game_loop( )
 {
   struct timeval last_time;
@@ -375,7 +385,7 @@ void game_loop( )
   /* Main loop */
   while ( !mud_down )
     {
-      accept_new( control  );
+      accept_new( control );
       /*
        * Kick out descriptors with raised exceptions
        * or have been idle, then check for input.
@@ -591,14 +601,7 @@ void game_loop( )
       gettimeofday( &last_time, NULL );
       current_time = (time_t) last_time.tv_sec;
 
-      /* Check every 5 seconds...  (don't need it right now)
-	 if ( last_check+5 < current_time )
-	 {
-	 CHECK_LINKS(first_descriptor, last_descriptor, next, prev,
-	 DESCRIPTOR_DATA);
-	 last_check = current_time;
-	 }
-      */
+      flush_logfile();
     }
 }
 

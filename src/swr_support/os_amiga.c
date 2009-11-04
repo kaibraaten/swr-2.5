@@ -35,7 +35,7 @@ extern FILE *out_stream;
 #define VERSTAG "\0$VER: " MUD_NAME " (" __DATE2__ ")"
 const char *VersTag = VERSTAG;
 
-void network_startup( void )
+void os_setup( void )
 {
   out_stream = fopen( "CON:800/800/640/480/" MUD_NAME "/AUTO/CLOSE/INACTIVE", "a" );
 
@@ -61,7 +61,7 @@ void network_startup( void )
     }
 }
 
-void network_teardown( void )
+void os_cleanup( void )
 {
   if( UtilityBase )
     {
