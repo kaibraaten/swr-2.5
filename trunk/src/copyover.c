@@ -135,6 +135,9 @@ void do_copyover (CHAR_DATA *ch, char * argument)
   sprintf (buf, "%d", port);
   sprintf (buf2, "%d", control);
 
+  fclose( out_stream );
+  out_stream = NULL;
+
   execl( sysdata.exe_filename, sysdata.exe_filename,
 	 buf, "copyover", buf2, (char*) NULL );
 

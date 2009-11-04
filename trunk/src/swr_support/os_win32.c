@@ -29,7 +29,7 @@
 
 extern FILE *out_stream;
 
-void network_startup( void )
+void os_setup( void )
 {
   WSADATA wsaData;
   out_stream = stderr;
@@ -42,7 +42,7 @@ void network_startup( void )
     }
 }
 
-void network_teardown( void )
+void os_cleanup( void )
 {
   WSACleanup();
 }

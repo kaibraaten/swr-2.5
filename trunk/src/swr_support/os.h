@@ -38,8 +38,8 @@
 extern "C" {
 #endif
 
-void network_startup( void );
-void network_teardown( void );
+void os_setup( void );
+void os_cleanup( void );
 
 #ifdef __cplusplus
 }
