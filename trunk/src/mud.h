@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#ifndef WIN32
+#ifndef _WIN32
 #include <sys/cdefs.h>
 #include <sys/time.h>
 #endif

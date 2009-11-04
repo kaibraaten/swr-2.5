@@ -26,9 +26,9 @@
 #ifndef _SWR2_OS_H_
 #define _SWR2_OS_H_
 
-#ifdef WIN32
+#if defined(_WIN32)
 #include "os_win32.h"
-#elif defined AMIGA
+#elif defined(AMIGA)
 #include "os_amiga.h"
 #else
 #include "os_unix.h"

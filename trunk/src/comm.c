@@ -10,7 +10,7 @@
 #include "mud.h"
 #include "os.h"
 
-#ifndef WIN32
+#ifndef _WIN32
 const   char    go_ahead_str    [] = { IAC, GA, '\0' };
 #endif
 
@@ -200,7 +200,7 @@ int main( int argc, char **argv )
 SOCKET init_socket( int listen_port )
 {
   struct sockaddr_in	 sa;
-#ifdef WIN32
+#ifdef _WIN32
 	const char optval = 1;
 #else
   int optval = 1;
@@ -263,7 +263,7 @@ SOCKET init_socket( int listen_port )
 /*
  * LAG alarm!							-Thoric
  */
-#if !defined(AMIGA) && !defined(WIN32)
+#if !defined(AMIGA) && !defined(_WIN32)
 static void caught_alarm( int foo )
 {
     char buf[MAX_STRING_LENGTH];
@@ -365,7 +365,7 @@ void game_loop( )
   char cmdline[MAX_INPUT_LENGTH];
   DESCRIPTOR_DATA *d = NULL;
 
-#if !defined(AMIGA) && !defined(WIN32)
+#if !defined(AMIGA) && !defined(_WIN32)
   signal( SIGPIPE, SIG_IGN );
   signal( SIGALRM, caught_alarm );
   /* signal( SIGSEGV, SegVio ); */
@@ -568,7 +568,7 @@ void game_loop( )
 	if ( secDelta > 0 || ( secDelta == 0 && usecDelta > 0 ) )
 	  {
 		struct timeval stall_time;
-#ifdef WIN32
+#ifdef _WIN32
     fd_set dummy_set;
     FD_ZERO (&dummy_set);
     FD_SET (control, &dummy_set);
@@ -578,7 +578,7 @@ void game_loop( )
 
 #ifdef AMIGA
 	    if( WaitSelect( 0, 0, 0, 0, &stall_time, 0 ) == SOCKET_ERROR )
-#elif defined(WIN32)
+#elif defined(_WIN32)
 		if (select (0, NULL, NULL, &dummy_set, &stall_time) == SOCKET_ERROR)
 #else
 	    if ( select( 0, NULL, NULL, NULL, &stall_time ) == SOCKET_ERROR )
@@ -625,7 +625,7 @@ void new_descriptor( SOCKET new_desc )
     socklen_t size = 0;
 #if defined(AMIGA)
     char optval = 1;
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	unsigned long optval = 1;
 #endif
 
@@ -656,7 +656,7 @@ void new_descriptor( SOCKET new_desc )
 
 #ifdef AMIGA
     if( IoctlSocket( desc, FIONBIO, &optval ) == SOCKET_ERROR )
-#elif defined(WIN32)
+#elif defined(_WIN32)
 	if( ioctlsocket( desc, FIONBIO, &optval ) == SOCKET_ERROR )
 #else
     if ( fcntl( desc, F_SETFL, FNDELAY ) == SOCKET_ERROR )
@@ -1092,7 +1092,7 @@ bool flush_buffer( DESCRIPTOR_DATA *d, bool fPrompt )
 
 	if ( IS_SET(ch->act, PLR_PROMPT) )
 	    display_prompt(d);
-#ifndef WIN32
+#ifndef _WIN32
 	if ( IS_SET(ch->act, PLR_TELNET_GA) )
 	    write_to_buffer( d, go_ahead_str, 0 );
 #endif

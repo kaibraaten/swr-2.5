@@ -35,6 +35,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <unistd.h>
+#include <arpa/telnet.h>
 
 static const int INVALID_SOCKET = -1;
 static const int SOCKET_ERROR = -1;

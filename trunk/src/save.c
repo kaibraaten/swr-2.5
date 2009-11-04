@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "mud.h"
-#ifdef WIN32
+#ifdef _WIN32
 #include <io.h>
 #else
 #include <unistd.h>
@@ -1795,7 +1795,7 @@ void fread_obj( CHAR_DATA *ch, FILE *fp, short os_type )
 
 void set_alarm( long seconds )
 {
-#if !defined( AMIGA ) && !defined( WIN32 )
+#if !defined( AMIGA ) && !defined( _WIN32 )
     alarm( seconds );
 #endif
 }
@@ -1919,7 +1919,7 @@ void load_corpses( void )
 }
 
 /* Directory scanning with Windows */
-#elif defined(WIN32)
+#elif defined(_WIN32)
 void load_corpses( void )
 {
 

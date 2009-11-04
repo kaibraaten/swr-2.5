@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#if !defined(WIN32)
+#if !defined(_WIN32)
 #include <sys/param.h>
 #include <sys/cdefs.h>
 #if defined(__FreeBSD__)

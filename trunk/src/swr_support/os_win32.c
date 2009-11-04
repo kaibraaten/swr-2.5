@@ -31,10 +31,13 @@ extern FILE *out_stream;
 
 static const char *get_next_filename( const char *directory )
 {
-  static char filename[256];
+  static char buf[256];
   int high_num = 1000;
   WIN32_FIND_DATA info;
-  HANDLE h = FindFirstFile( "*.*", &info );
+  HANDLE h;
+
+  sprintf( buf, "%s*.*", directory );
+  h = FindFirstFile( buf, &info );
 
   if( h != INVALID_HANDLE_VALUE )
     {

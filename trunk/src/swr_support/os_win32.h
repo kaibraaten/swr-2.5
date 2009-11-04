@@ -30,7 +30,10 @@
 #include <winsock2.h>
 #include <windows.h>
 
+#ifdef _MSC_VER
 typedef int ssize_t;
+#endif
+
 typedef int socklen_t;
 #define GETERROR WSAGetLastError()
 #define EWOULDBLOCK WSAEWOULDBLOCK
