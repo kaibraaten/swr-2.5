@@ -37,6 +37,7 @@ static	OBJ_DATA *	rgObjNest	[MAX_NEST];
 void fwrite_char( const CHAR_DATA *ch, FILE *fp );
 void fread_char( CHAR_DATA *ch, FILE *fp, bool preload );
 void write_corpses( const CHAR_DATA *ch, const char *name );
+static void fread_corpse( const char *name );
 
 extern int falling;
 
@@ -1873,92 +1874,135 @@ void write_corpses( const CHAR_DATA *ch, const char *name )
   return;
 }
 
+/* Directory scanning with AmigaOS */
+#if defined(AMIGA)
+#include <dos/dos.h>
+#include <proto/dos.h>
+
 void load_corpses( void )
 {
-#ifndef WIN32
-#ifdef WIN32
-	struct _finddata_t c_file;
-	long hFile = 0;
+  BPTR sourcelock = NULL;
+  struct ExAllControl *excontrol = NULL;
+  struct ExAllData buffer, *ead = NULL;
+  BOOL exmore = TRUE;
+
+  memcpy( &buffer, 0, sizeof( buffer ) );
+  sourcelock = Lock( CORPSE_DIR, SHARED_LOCK );
+  excontrol = AllocDosObject( DOS_EXALLCONTROL, NULL );
+  excontrol->eac_LastKey = 0;
+
+  do
+    {
+      exmore = ExAll( sourcelock, &buffer, sizeof( buffer ),
+		      ED_NAME, excontrol );
+
+      if( !exmore && IoErr() != ERROR_NO_MORE_ENTRIES )
+	continue;
+
+      ead = &buffer;
+
+      do
+	{
+	  if( ead->ed_Name[0] != '.' )
+	    {
+	      fread_corpse( ead->ed_Name );
+	    }
+
+	  ead = ead->ed_Next;
+	}
+      while( ead );
+    }
+  while( exmore );
+
+  FreeDosObject( DOS_EXALLCONTROL, excontrol );
+  UnLock( sourcelock );
+}
+
+/* Directory scanning with Windows */
+#elif defined(WIN32)
+void load_corpses( void )
+{
+
+}
+
+/* Directory scanning with POSIX */
 #else
-	DIR *dp;
-  struct dirent *de;
-#endif
-  
-#ifdef WIN32
-  if( ( hFile = _findfirst( "corpses\*", &c_file ) ) )
-#else
-  if ( !(dp = opendir(CORPSE_DIR)) )
-#endif
-  {
-    bug( "Load_corpses: can't open CORPSE_DIR", 0);
-    perror(CORPSE_DIR);
-    return;
-  }
+void load_corpses( void )
+{
+  DIR *dp = NULL;
+  struct dirent *de = NULL;
+
+  if( !( dp = opendir( CORPSE_DIR ) ) )
+    {
+      bug( "Load_corpses: can't open CORPSE_DIR", 0);
+      perror(CORPSE_DIR);
+      return;
+    }
 
   falling = 1; /* Arbitrary, must be >0 though. */
-#ifdef WIN32
-	while( _findnext( hFile, &c_file ) )
-#else
+
   while ( (de = readdir(dp)) != NULL )
-#endif
-  {
-#ifdef WIN32
-	if( c_file.name[0] != '.' )
-#else
-	if ( de->d_name[0] != '.' )
-#endif
-	  {
-      sprintf(strArea, "%s%s", CORPSE_DIR,
-#ifdef WIN32
-			c_file.name );
-#else
-		  de->d_name );
-#endif
-	  fprintf(out_stream, "Corpse -> %s\n", strArea);
-      if ( !(fpArea = fopen(strArea, "r")) )
-      {
-        perror(strArea);
-        continue;
-      }
-      for ( ; ; )
-      {
-        char letter;
-        char *word;
-        
-        letter = fread_letter( fpArea );
-        if ( letter == '*' )
-        {
-          fread_to_eol(fpArea);
-          continue;
-        }
-        if ( letter != '#' )
-        {
-          bug( "Load_corpses: # not found.", 0 );
-          break;
-        }
-        word = fread_word( fpArea );
-        if ( !str_cmp(word, "CORPSE" ) )
-          fread_obj( NULL, fpArea, OS_CORPSE );
-        else if ( !str_cmp(word, "OBJECT" ) )
-          fread_obj( NULL, fpArea, OS_CARRY );
-        else if ( !str_cmp( word, "END" ) )
-          break;
-        else
-        {
-          bug( "Load_corpses: bad section.", 0 );
-          break;
-        }
-      }
-      fclose(fpArea);
+    {
+      if ( de->d_name[0] != '.' )
+	{
+	  fread_corpse( de->d_name );
+	}
     }
-  }
+
   fpArea = NULL;
-  strcpy(strArea, "$");
-#ifdef WIN32
-	_findclose( hFile );
-#else
-  closedir(dp);
-#endif
-#endif
+  strcpy( strArea, "$" );
   falling = 0;
+}
+#endif
+
+void fread_corpse( const char *name )
+{
+  sprintf( strArea, "%s%s", CORPSE_DIR, name );
+  fprintf( out_stream, "Corpse -> %s\n", strArea );
+
+  if( !( fpArea = fopen( strArea, "r" ) ) )
+    {
+      perror( strArea );
+      return;
+    }
+
+  for ( ; ; )
+    {
+      const char *word;
+      char letter = fread_letter( fpArea );
+
+      if( letter == '*' )
+	{
+	  fread_to_eol( fpArea );
+	  continue;
+	}
+
+      if( letter != '#' )
+	{
+	  bug( "Load_corpses: # not found." );
+	  break;
+	}
+
+      word = fread_word( fpArea );
+
+      if( !str_cmp( word, "CORPSE" ) )
+	{
+	  fread_obj( NULL, fpArea, OS_CORPSE );
+	}
+      else if( !str_cmp( word, "OBJECT" ) )
+	{
+	  fread_obj( NULL, fpArea, OS_CARRY );
+	}
+      else if( !str_cmp( word, "END" ) )
+	{
+	  break;
+	}
+      else
+	{
+	  bug( "Load_corpses: bad section." );
+	  break;
+	}
+    }
+
+  fclose(fpArea);
 }
