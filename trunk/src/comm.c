@@ -1,8 +1,4 @@
 #include <sys/types.h>
-#ifndef WIN32
-#include <sys/time.h>
-#include <unistd.h>
-#endif
 #include <sys/stat.h>
 #include <ctype.h>
 #include <errno.h>
@@ -11,17 +7,13 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <stdarg.h>
-#include <arpa/telnet.h>
 #include "mud.h"
 #include "os.h"
-
-/*
- * Socket and TCP/IP stuff.
- */
 
 #ifndef WIN32
 const   char    go_ahead_str    [] = { IAC, GA, '\0' };
 #endif
+
 /*  from act_info?  */
 void    show_condition( CHAR_DATA *ch, CHAR_DATA *victim );
 void        write_ship_list args( ( void ) );
