@@ -1941,6 +1941,8 @@ void load_corpses( void )
 	    }
 	}
       while( FindNextFile( h, &info ) );
+
+      FindClose( h );
     }
 }
 
