@@ -264,8 +264,6 @@ void load_clans( )
     first_clan	= NULL;
     last_clan	= NULL;
 
-    log_string( "Loading clans..." );
-
     sprintf( clanlist, "%s%s", CLAN_DIR, CLAN_LIST );
 
     if ( ( fpList = fopen( clanlist, "r" ) ) == NULL )
@@ -277,7 +275,7 @@ void load_clans( )
     for ( ; ; )
     {
 	filename = feof( fpList ) ? "$" : fread_word( fpList );
-	log_string( filename );
+
 	if ( filename[0] == '$' )
 	  break;
 
@@ -287,8 +285,8 @@ void load_clans( )
 	  bug( buf, 0 );
 	}
     }
+
     fclose( fpList );
-    log_string(" Done clans\r\n" );
 }
 
 void do_make( CHAR_DATA *ch, char *argument )

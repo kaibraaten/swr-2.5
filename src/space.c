@@ -1295,7 +1295,6 @@ void load_space( void )
   FILE *fpList = NULL;
   char starsystemlist[256];
 
-  log_string( "Loading space..." );
   sprintf( starsystemlist, "%s%s", SPACE_DIR, SPACE_LIST );
 
   if ( ( fpList = fopen( starsystemlist, "r" ) ) == NULL )
@@ -1318,7 +1317,6 @@ void load_space( void )
     }
 
   fclose( fpList );
-  log_string(" Done starsystems " );
 }
 
 void do_setstarsystem( CHAR_DATA *ch, char *argument )
@@ -2111,7 +2109,6 @@ void load_ships( )
   FILE *fpList = NULL;
   char shiplist[256];
     
-  log_string( "Loading ships..." );
   sprintf( shiplist, "%s%s", SHIP_DIR, SHIP_LIST );
 
   if ( ( fpList = fopen( shiplist, "r" ) ) == NULL )
@@ -2134,7 +2131,6 @@ void load_ships( )
     }
 
   fclose( fpList );
-  log_string(" Done ships " );
 }
 
 void resetship( SHIP_DATA *ship )

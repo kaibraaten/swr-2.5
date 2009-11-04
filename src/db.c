@@ -3249,7 +3249,7 @@ void load_area_file( AREA_DATA *tarea, const char *filename )
     }
 
   fclose( fpArea );
-
+  /*
   if ( tarea )
     {
       fprintf( out_stream, "%s\n",
@@ -3257,6 +3257,7 @@ void load_area_file( AREA_DATA *tarea, const char *filename )
     }
   else
     fprintf( out_stream, "(%s)\n", filename );
+  */
 }
 
 /*

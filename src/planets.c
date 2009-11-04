@@ -314,8 +314,6 @@ void load_planets( )
     first_planet	= NULL;
     last_planet	= NULL;
 
-    log_string( "Loading planets..." );
-
     sprintf( planetlist, "%s%s", PLANET_DIR, PLANET_LIST );
 
     if ( ( fpList = fopen( planetlist, "r" ) ) == NULL )
@@ -327,7 +325,7 @@ void load_planets( )
     for ( ; ; )
     {
 	filename = feof( fpList ) ? "$" : fread_word( fpList );
-	log_string( filename );
+
 	if ( filename[0] == '$' )
 	  break;
 
@@ -338,7 +336,6 @@ void load_planets( )
 	}
     }
     fclose( fpList );
-    log_string(" Done planets " );  
 }
 
 void do_setplanet( CHAR_DATA *ch, char *argument )
