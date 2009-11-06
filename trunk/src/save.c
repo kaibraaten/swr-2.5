@@ -1876,7 +1876,7 @@ void load_corpses( void )
   struct ExAllData buffer, *ead = NULL;
   BOOL exmore = TRUE;
 
-  memcpy( &buffer, 0, sizeof( buffer ) );
+  memset( &buffer, 0, sizeof( buffer ) );
   sourcelock = Lock( CORPSE_DIR, SHARED_LOCK );
   excontrol = AllocDosObject( DOS_EXALLCONTROL, NULL );
   excontrol->eac_LastKey = 0;
