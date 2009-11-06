@@ -46,7 +46,7 @@ static const char *get_next_filename( const char *directory )
   BOOL exmore = TRUE;
 
   *filename = '\0';
-  memcpy( &buffer, 0, sizeof( buffer ) );
+  memset( &buffer, 0, sizeof( buffer ) );
   sourcelock = Lock( directory, SHARED_LOCK );
   excontrol = AllocDosObject( DOS_EXALLCONTROL, NULL );
   excontrol->eac_LastKey = 0;
