@@ -87,7 +87,8 @@ static bool ship_is_facing( const SHIP_DATA * const ship,
   d.y = target->y - ship->pos.y;
   d.z = target->z - ship->pos.z;
 
-  cosofa = vector_dot( &h, &d ) / ( vector_length( &h ) + vector_length( &d ) );
+  cosofa =
+    vector_dot( &h, &d ) / ( vector_length( &h ) + vector_length( &d ) );
 
   if( cosofa > 0.75 )
     facing = TRUE;
@@ -96,7 +97,7 @@ static bool ship_is_facing( const SHIP_DATA * const ship,
 }
 
 bool ship_is_facing_ship( const SHIP_DATA * const ship,
-                          const SHIP_DATA * const target )
+			  const SHIP_DATA * const target )
 {
   return ship_is_facing( ship, &target->pos );
 }
@@ -138,7 +139,7 @@ void ship_set_course( SHIP_DATA * const ship,
 }
 
 void ship_set_course_to_ship( SHIP_DATA * const ship,
-                              const SHIP_DATA * const target )
+			      const SHIP_DATA * const target )
 {
   ship_set_course( ship, &target->pos );
 }
@@ -173,23 +174,22 @@ void ship_align_heading( SHIP_DATA * const ship,
  */
 
 static void move_space_object( Vector3 * const pos,
-			       const Vector3 * const head,
-			       const int speed )
+			       const Vector3 * const head, const int speed )
 {
   if( speed > 0 )
     {
       const double change = vector_length( head );
 
       if( change > 0 )
-        {
-          Vector3 tmpv;
-          tmpv.x = head->x / change;
-          tmpv.y = head->y / change;
-          tmpv.z = head->z / change;
-          pos->x += ( tmpv.x * speed ) / 5;
-          pos->y += ( tmpv.y * speed ) / 5;
-          pos->z += ( tmpv.z * speed ) / 5;
-        }
+	{
+	  Vector3 tmpv;
+	  tmpv.x = head->x / change;
+	  tmpv.y = head->y / change;
+	  tmpv.z = head->z / change;
+	  pos->x += ( tmpv.x * speed ) / 5;
+	  pos->y += ( tmpv.y * speed ) / 5;
+	  pos->z += ( tmpv.z * speed ) / 5;
+	}
     }
 }
 
@@ -204,19 +204,19 @@ void missile_move( MISSILE_DATA * const missile )
 }
 
 double ship_distance_to_ship( const SHIP_DATA * const ship,
-                              const SHIP_DATA * const target )
+			      const SHIP_DATA * const target )
 {
   return vector_distance( &ship->pos, &target->pos );
 }
 
 double ship_distance_to_planet( const SHIP_DATA * const ship,
-                                const PLANET_DATA * const planet )
+				const PLANET_DATA * const planet )
 {
   return vector_distance( &ship->pos, &planet->pos );
 }
 
 double missile_distance_to_ship( const MISSILE_DATA * const missile,
-                                 const SHIP_DATA * const target )
+				 const SHIP_DATA * const target )
 {
   return vector_distance( &missile->pos, &target->pos );
 }
