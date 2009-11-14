@@ -35,19 +35,19 @@
  */
 SOCKET init_socket( int port );
 void new_descriptor( SOCKET new_desc );
-bool read_from_descriptor( DESCRIPTOR_DATA *d );
+bool read_from_descriptor( DESCRIPTOR_DATA * d );
 bool write_to_descriptor( SOCKET desc, const char *txt, int length );
-void init_descriptor( DESCRIPTOR_DATA *dnew, SOCKET desc );
+void init_descriptor( DESCRIPTOR_DATA * dnew, SOCKET desc );
 
 /*  Warm reboot stuff, gotta make sure to thank Erwin for this :) */
-extern int port;               /* Port number to be used       */
-extern SOCKET control;		/* Controlling descriptor	*/
+extern int port;		/* Port number to be used       */
+extern SOCKET control;		/* Controlling descriptor       */
 
-void do_copyover (CHAR_DATA *ch, char * argument)
+void do_copyover( CHAR_DATA * ch, char *argument )
 {
   DESCRIPTOR_DATA *d, *d_next;
-  char buf [100];
-  FILE *fp = fopen (COPYOVER_FILE, "w");
+  char buf[100];
+  FILE *fp = fopen( COPYOVER_FILE, "w" );
 
 #ifdef AMIGA
   long error_code = 0;
@@ -55,27 +55,28 @@ void do_copyover (CHAR_DATA *ch, char * argument)
   char buf2[100];
 #endif
 
-  if (!fp)
+  if( !fp )
     {
-      send_to_char ("Copyover file not writeable, aborted.\r\n",ch);
-      log_printf ("Could not write to copyover file: %s", COPYOVER_FILE);
-      perror ("do_copyover:fopen");
+      send_to_char( "Copyover file not writeable, aborted.\r\n", ch );
+      log_printf( "Could not write to copyover file: %s", COPYOVER_FILE );
+      perror( "do_copyover:fopen" );
       return;
     }
 
-  strcpy(buf, "\r\nA Blinding Flash of light starts heading towards you, before you can think it engulfs you!\r\n" );
+  strcpy( buf,
+	  "\r\nA Blinding Flash of light starts heading towards you, before you can think it engulfs you!\r\n" );
 
   /* For each playing descriptor, save its state */
-  for (d = first_descriptor; d ; d = d_next)
+  for( d = first_descriptor; d; d = d_next )
     {
-      CHAR_DATA * och = d->original ? d->original : d->character;
-      d_next = d->next; /* We delete from the list , so need to save this */
+      CHAR_DATA *och = d->original ? d->original : d->character;
+      d_next = d->next;		/* We delete from the list , so need to save this */
 
-      if (!d->character || d->connected != CON_PLAYING) /* drop those logging on */
+      if( !d->character || d->connected != CON_PLAYING )	/* drop those logging on */
 	{
-	  write_to_descriptor (d->descriptor, "\r\nSorry, we are rebooting."
-			       " Come back in a few minutes.\r\n", 0);
-	  close_socket (d, FALSE); /* throw'em out */
+	  write_to_descriptor( d->descriptor, "\r\nSorry, we are rebooting."
+			       " Come back in a few minutes.\r\n", 0 );
+	  close_socket( d, FALSE );	/* throw'em out */
 	}
       else
 	{
@@ -92,14 +93,14 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 	  SOCKET cur_desc = d->descriptor;
 #endif
 
-	  fprintf (fp, "%d %s %s\n", cur_desc, och->name, d->host);
-	  save_char_obj (och);
-	  write_to_descriptor (d->descriptor, buf, 0);
+	  fprintf( fp, "%d %s %s\n", cur_desc, och->name, d->host );
+	  save_char_obj( och );
+	  write_to_descriptor( d->descriptor, buf, 0 );
 	}
     }
 
-  fprintf (fp, "-1\n");
-  fclose (fp);
+  fprintf( fp, "-1\n" );
+  fclose( fp );
 
 #ifdef AMIGA
   sprintf( buf, "run >NIL: %s %d copyover %d",
@@ -120,19 +121,19 @@ void do_copyover (CHAR_DATA *ch, char * argument)
 
 #else
   /* exec - descriptors are inherited */
-  sprintf (buf, "%d", port);
-  sprintf (buf2, "%d", control);
+  sprintf( buf, "%d", port );
+  sprintf( buf2, "%d", control );
 
   fclose( out_stream );
   out_stream = NULL;
 
   execl( sysdata.exe_filename, sysdata.exe_filename,
-	 buf, "copyover", buf2, (char*) NULL );
+	 buf, "copyover", buf2, ( char * ) NULL );
 
   /* Failed - sucessful exec will not return */
 
-  perror ("do_copyover: execl");
-  send_to_char ("Copyover FAILED!\r\n",ch);
+  perror( "do_copyover: execl" );
+  send_to_char( "Copyover FAILED!\r\n", ch );
 #endif
 }
 
@@ -141,29 +142,29 @@ void copyover_recover( void )
 {
   DESCRIPTOR_DATA *d = NULL;
   FILE *fp = NULL;
-  char name [100];
+  char name[100];
   char host[MAX_STRING_LENGTH];
   SOCKET desc = 0;
   bool fOld = FALSE;
 
-  log_string ("Copyover recovery initiated");
+  log_string( "Copyover recovery initiated" );
 
-  fp = fopen (COPYOVER_FILE, "r");
+  fp = fopen( COPYOVER_FILE, "r" );
 
-  if (!fp) /* there are some descriptors open which will hang forever then ? */
+  if( !fp )			/* there are some descriptors open which will hang forever then ? */
     {
-      perror ("copyover_recover:fopen");
-      log_string("Copyover file not found. Exitting.\r\n");
-      exit (1);
+      perror( "copyover_recover:fopen" );
+      log_string( "Copyover file not found. Exitting.\r\n" );
+      exit( 1 );
     }
 
-  unlink (COPYOVER_FILE); /* In case something crashes
-			     - doesn't prevent reading */
-  for (;;)
+  unlink( COPYOVER_FILE );	/* In case something crashes
+				   - doesn't prevent reading */
+  for( ;; )
     {
-      fscanf (fp, "%d %s %s\n", &desc, name, host);
+      fscanf( fp, "%d %s %s\n", &desc, name, host );
 
-      if (desc == -1)
+      if( desc == -1 )
 	break;
 
 #ifdef AMIGA
@@ -177,48 +178,55 @@ void copyover_recover( void )
 #endif
 
       /* Write something, and check if it goes error-free */
-      if (!write_to_descriptor (desc, "\r\nThe surge of Light passes leaving you unscathed and your world reshaped anew\r\n", 0))
+      if( !write_to_descriptor
+	  ( desc,
+	    "\r\nThe surge of Light passes leaving you unscathed and your world reshaped anew\r\n",
+	    0 ) )
 	{
-	  closesocket(desc); /* nope */
+	  closesocket( desc );	/* nope */
 	  continue;
-        }
+	}
 
-      CREATE(d, DESCRIPTOR_DATA, 1);
-      init_descriptor (d, desc); /* set up various stuff */
+      CREATE( d, DESCRIPTOR_DATA, 1 );
+      init_descriptor( d, desc );	/* set up various stuff */
 
       d->host = STRALLOC( host );
 
       LINK( d, first_descriptor, last_descriptor, next, prev );
-      d->connected = CON_COPYOVER_RECOVER; /* negative so close_socket
-                                              will cut them off */
+      d->connected = CON_COPYOVER_RECOVER;	/* negative so close_socket
+						   will cut them off */
 
       /* Now, find the pfile */
-      fOld = load_char_obj (d, name, FALSE);
+      fOld = load_char_obj( d, name, FALSE );
 
-      if (!fOld) /* Player file not found?! */
+      if( !fOld )		/* Player file not found?! */
 	{
-          write_to_descriptor (desc, "\r\nSomehow, your character was lost in the copyover sorry.\r\n", 0);
-          close_socket (d, FALSE);
+	  write_to_descriptor( desc,
+			       "\r\nSomehow, your character was lost in the copyover sorry.\r\n",
+			       0 );
+	  close_socket( d, FALSE );
 	}
-      else /* ok! */
+      else			/* ok! */
 	{
-          write_to_descriptor (desc, "\r\nCopyover recovery complete.\r\n",0);
+	  write_to_descriptor( desc, "\r\nCopyover recovery complete.\r\n",
+			       0 );
 
 	  /* Just In Case,  Someone said this isn't necassary, but _why_
 	     do we want to dump someone in limbo? */
-	  if (!d->character->in_room)
-	    d->character->in_room = get_room_index (ROOM_VNUM_SCHOOL);
+	  if( !d->character->in_room )
+	    d->character->in_room = get_room_index( ROOM_VNUM_SCHOOL );
 
 	  /* Insert in the char_list */
 	  LINK( d->character, first_char, last_char, next, prev );
 
-	  char_to_room (d->character, d->character->in_room);
-	  do_look (d->character, const_char_to_nonconst("auto noprog"));
-	  load_home(d->character);	
-	  act (AT_ACTION, "$n materializes!", d->character, NULL, NULL, TO_ROOM);
+	  char_to_room( d->character, d->character->in_room );
+	  do_look( d->character, const_char_to_nonconst( "auto noprog" ) );
+	  load_home( d->character );
+	  act( AT_ACTION, "$n materializes!", d->character, NULL, NULL,
+	       TO_ROOM );
 	  d->connected = CON_PLAYING;
 	}
     }
 
-   fclose (fp);
+  fclose( fp );
 }
