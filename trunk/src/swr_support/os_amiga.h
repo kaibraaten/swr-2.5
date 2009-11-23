@@ -29,19 +29,25 @@
 typedef long clock_t;
 #endif
 
+#ifdef __MORPHOS__
+#include <proto/socket.h>
+#include <sys/filio.h>
+#else
+#include <sys/ioctl.h>
+#include <lineread.h>
+#endif
+
 #include <utility/tagitem.h>
 #include <exec/exec.h>
 #include <proto/exec.h>
 #include <dos/dos.h>
 #include <proto/dos.h>
-#include <lineread.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <sys/ioctl.h>
 #include <netdb.h>
 #include <sys/time.h>
 #include <db.h>
@@ -50,9 +56,9 @@ typedef long clock_t;
 
 #if defined( __STORMGCC__ )
 #define unlink(name) !DeleteFile((STRPTR)(name))
+typedef int ssize_t;
 #endif
 
-typedef int ssize_t;
 typedef LONG socklen_t;
 static const int INVALID_SOCKET = -1;
 static const int SOCKET_ERROR = -1;
@@ -62,4 +68,5 @@ typedef int SOCKET;
 static const int MSG_NOSIGNAL = 0;
 typedef unsigned char sockbuf_t;
 
-#endif // include guard
+#endif /* include guard */
+

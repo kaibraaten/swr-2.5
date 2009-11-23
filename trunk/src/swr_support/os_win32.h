@@ -65,4 +65,5 @@ struct timezone
 
 int gettimeofday( struct timeval*, struct timezone* );
 
-#endif //include guards
+#endif /* include guard */
+

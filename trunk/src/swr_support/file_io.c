@@ -48,7 +48,7 @@ char fread_letter( FILE *fp )
           return '\0';
         }
 
-      c = getc( fp );
+      c = fgetc( fp );
     }
   while ( isspace((int) c) );
 
@@ -77,7 +77,7 @@ float fread_float( FILE *fp )
              }
            return 0;
          }
-       c = getc( fp );
+       c = fgetc( fp );
      }
    while( isspace( (int) c ) );
 
@@ -87,11 +87,11 @@ float fread_float( FILE *fp )
    decimal = FALSE;
 
    if( c == '+' )
-     c = getc( fp );
+     c = fgetc( fp );
    else if( c == '-' )
      {
        sign = TRUE;
-       c = getc( fp );
+       c = fgetc( fp );
      }
 
    if( !isdigit( (int) c ) )
@@ -110,7 +110,7 @@ float fread_float( FILE *fp )
            if( c == '.' )
              {
                decimal = TRUE;
-               c = getc( fp );
+               c = fgetc( fp );
              }
 
            if( feof( fp ) )
@@ -127,7 +127,7 @@ float fread_float( FILE *fp )
                place++;
                number += pow( (double) 10, ( -1 * place ) ) * ( c - '0' );
              }
-           c = getc( fp );
+           c = fgetc( fp );
          }
        else
          break;
@@ -162,7 +162,7 @@ int fread_number( FILE *fp )
 	      exit(1);
 	    return 0;
 	  }
-        c = getc( fp );
+        c = fgetc( fp );
       }
     while ( isspace( (int) c ) );
 
@@ -171,12 +171,12 @@ int fread_number( FILE *fp )
     sign   = FALSE;
     if ( c == '+' )
       {
-        c = getc( fp );
+        c = fgetc( fp );
       }
     else if ( c == '-' )
       {
         sign = TRUE;
-        c = getc( fp );
+        c = fgetc( fp );
       }
 
     if ( !isdigit((int) c) )
@@ -197,7 +197,7 @@ int fread_number( FILE *fp )
 	    return number;
 	  }
         number = number * 10 + c - '0';
-        c      = getc( fp );
+        c      = fgetc( fp );
       }
 
     if ( sign )
@@ -257,7 +257,7 @@ char *fread_string( FILE *fp )
 	      exit(1);
             return STRALLOC("");
 	  }
-        c = getc( fp );
+        c = fgetc( fp );
       }
     while ( isspace((int)c) );
 
@@ -272,7 +272,7 @@ char *fread_string( FILE *fp )
 	    *plast = '\0';
 	    return STRALLOC( buf );
 	  }
-        switch ( *plast = getc( fp ) )
+        switch ( (int)( *plast = fgetc( fp ) ) )
 	  {
 	  default:
             plast++; ln++;
@@ -328,7 +328,7 @@ char *fread_string_nohash( FILE *fp )
 	      exit(1);
             return str_dup("");
 	  }
-        c = getc( fp );
+        c = fgetc( fp );
       }
     while ( isspace((int)c) );
 
@@ -343,7 +343,7 @@ char *fread_string_nohash( FILE *fp )
 	    *plast = '\0';
 	    return str_dup( buf );
 	  }
-        switch ( *plast = getc( fp ) )
+        switch ( (int)( *plast = fgetc( fp ) ) )
 	  {
 	  default:
             plast++; ln++;
@@ -388,13 +388,13 @@ void fread_to_eol( FILE *fp )
 	      exit(1);
             return;
 	  }
-        c = getc( fp );
+        c = fgetc( fp );
       }
     while ( c != '\n' && c != '\r' );
 
     do
       {
-        c = getc( fp );
+        c = fgetc( fp );
       }
     while ( c == '\n' || c == '\r' );
 
@@ -430,7 +430,7 @@ char *fread_line( FILE *fp )
             strcpy(line, "");
             return line;
 	  }
-        c = getc( fp );
+        c = fgetc( fp );
       }
     while ( isspace((int)c) );
 
@@ -445,7 +445,7 @@ char *fread_line( FILE *fp )
             *pline = '\0';
 	    return line;
 	  }
-        c = getc( fp );
+        c = fgetc( fp );
         *pline++ = c; ln++;
         if ( ln >= (MAX_STRING_LENGTH - 1) )
 	  {
@@ -457,7 +457,7 @@ char *fread_line( FILE *fp )
 
     do
       {
-        c = getc( fp );
+        c = fgetc( fp );
       }
     while ( c == '\n' || c == '\r' );
 
@@ -485,7 +485,7 @@ char *fread_word( FILE *fp )
             word[0] = '\0';
             return word;
 	  }
-        cEnd = getc( fp );
+        cEnd = fgetc( fp );
       }
     while ( isspace( (int) cEnd ) );
 
@@ -510,7 +510,7 @@ char *fread_word( FILE *fp )
             *pword = '\0';
             return word;
 	  }
-        *pword = getc( fp );
+        *pword = fgetc( fp );
         if ( cEnd == ' ' ? isspace((int) *pword) : *pword == cEnd )
 	  {
             if ( cEnd == ' ' )

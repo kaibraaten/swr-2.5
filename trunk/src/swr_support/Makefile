@@ -2,7 +2,7 @@ ODIR = obj
 _OBJ = bet.o file_io.o hashstr.o misc.o os_unix.o sha256.o string_handling.o time_fun.o vector3.o
 OBJ  = $(patsubst %,$(ODIR)/%,$(_OBJ))
 DEPS =
-CC = gcc
+#CC = gcc
 WFLAGS =  -Wall -Wshadow -Wformat-security -Winline -Wpointer-arith -Wcast-align -Wredundant-decls -Werror -Wwrite-strings
 CFLAGS = -O2 -MMD -pedantic -ansi $(GCC_MARCH) $(WFLAGS) -I.
 
@@ -35,6 +35,10 @@ else
 endif
 
 clean:
-		rm -f *.so *.a *~ core* $(ODIR)/*.o
+		rm -f *.so *.a *~ core* $(ODIR)/*.o $(ODIR)/*.d
 
 -include $(ODIR)/*.d
+
+mos:
+		$(MAKE) -f Makefile.MOS
+

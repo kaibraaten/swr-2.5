@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "os.h"
 
 struct Library *SocketBase = NULL;
@@ -32,11 +33,15 @@ struct Library *UserGroupBase = NULL;
 struct UtilityBase *UtilityBase = NULL;
 extern FILE *out_stream;
 
+#ifndef __DATE2__
+#define __DATE2__ __DATE__
+#endif
+
 #define MUD_NAME "SWR Factor 2.0"
 #define VERSTAG "\0$VER: " MUD_NAME " (" __DATE2__ ")"
 const char *VersTag = VERSTAG;
 
-static const char *get_next_filename( const char *directory )
+static const char *get_next_filename( CONST_STRPTR directory )
 {
   static char filename[256];
   int high_num = 1000;
@@ -73,7 +78,7 @@ static const char *get_next_filename( const char *directory )
 	{
 	  if( ead->ed_Name[0] != '.' )
 	    {
-	      int curr = strtol( ead->ed_Name, 0, 10 );
+	      int curr = strtol( (const char*) ead->ed_Name, 0, 10 );
 	      high_num = curr > high_num ? curr : high_num;
 	    }
 
@@ -93,23 +98,23 @@ static const char *get_next_filename( const char *directory )
 
 void os_setup( void )
 {
-  out_stream = fopen( get_next_filename( "PROGDIR:log/" ), "w+" );
+  out_stream = fopen( get_next_filename( (CONST_STRPTR) "PROGDIR:log/" ), "w+" );
 
-  if( !( SocketBase = OpenLibrary( "bsdsocket.library", 2 ) ) )
+  if( !( SocketBase = OpenLibrary( (CONST_STRPTR) "bsdsocket.library", 2 ) ) )
     {
       fprintf( out_stream, "%s (%s:%d) - Failed to open bsdsocket.library v2+\n",
 	       __FUNCTION__, __FILE__, __LINE__ );
       exit( 1 );
     }
 
-  if( !( UserGroupBase = OpenLibrary( "usergroup.library", 0 ) ) )
+  if( !( UserGroupBase = OpenLibrary( (CONST_STRPTR) "usergroup.library", 0 ) ) )
     {
       fprintf( out_stream, "%s (%s:%d) - Failed to open usergroup.library\n",
 	       __FUNCTION__, __FILE__, __LINE__ );
       exit( 1 );
     }
 
-  if( !( UtilityBase = (struct UtilityBase*) OpenLibrary( "utility.library", 0 ) ) )
+  if( !( UtilityBase = (struct UtilityBase*) OpenLibrary( (CONST_STRPTR) "utility.library", 0 ) ) )
     {
       fprintf( out_stream, "%s (%s:%d) - Failed to open utility.library\n",
 	       __FUNCTION__, __FILE__, __LINE__ );
