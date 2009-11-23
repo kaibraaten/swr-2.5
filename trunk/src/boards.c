@@ -1070,7 +1070,7 @@ BOARD_DATA *read_board( char *boardfile, FILE * fp )
 
   do
     {
-      letter = getc( fp );
+      letter = fgetc( fp );
       if( feof( fp ) )
 	{
 	  fclose( fp );
@@ -1155,7 +1155,7 @@ NOTE_DATA *read_note( char *notefile, FILE * fp )
 
       do
 	{
-	  letter = getc( fp );
+	  letter = fgetc( fp );
 	  if( feof( fp ) )
 	    {
 	      fclose( fp );

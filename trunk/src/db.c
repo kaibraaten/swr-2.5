@@ -2195,7 +2195,7 @@ void bug( const char *str, ... )
 	    {
 	      int letter;
 
-	      while( ( letter = getc( fpArea ) )
+	      while( ( letter = fgetc( fpArea ) )
 		     && letter != EOF && letter != '\n' )
 		;
 	    }
@@ -2262,7 +2262,7 @@ void boot_log( const char *str, ... )
 void show_file( const CHAR_DATA * ch, const char *filename )
 {
   FILE *fp = NULL;
-#ifdef AMIGA
+#if defined(AMIGA) || defined(__MORPHOS__)
   signed
 #endif
   char buf[MAX_STRING_LENGTH];

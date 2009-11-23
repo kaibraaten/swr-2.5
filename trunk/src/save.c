@@ -729,7 +729,7 @@ bool load_char_obj( DESCRIPTOR_DATA * d, const char *name, bool preload )
   sprintf( strsave, "%s%c/%s", PLAYER_DIR, tolower( ( int ) name[0] ),
 	   capitalize( name ) );
 
-#ifndef AMIGA
+#if !defined(AMIGA) && !defined(__MORPHOS__)
   if( stat( strsave, &fst ) != -1 )
     {
       if( fst.st_size == 0 )
@@ -1776,7 +1776,7 @@ void fread_obj( CHAR_DATA * ch, FILE * fp, short os_type )
 
 void set_alarm( long seconds )
 {
-#if !defined( AMIGA ) && !defined( _WIN32 )
+#if !defined( AMIGA ) && !defined(__MORPHOS__) && !defined( _WIN32 )
   alarm( seconds );
 #endif
 }
@@ -1855,8 +1855,8 @@ void write_corpses( const CHAR_DATA * ch, const char *name )
   return;
 }
 
-/* Directory scanning with AmigaOS */
-#if defined(AMIGA)
+/* Directory scanning with AmigaOS and MorphOS */
+#if defined(AMIGA) || defined(__MORPHOS__)
 
 void load_corpses( void )
 {
@@ -1866,7 +1866,7 @@ void load_corpses( void )
   BOOL exmore = TRUE;
 
   memset( &buffer, 0, sizeof( buffer ) );
-  sourcelock = Lock( CORPSE_DIR, SHARED_LOCK );
+  sourcelock = Lock( (CONST_STRPTR) CORPSE_DIR, SHARED_LOCK );
   excontrol = AllocDosObject( DOS_EXALLCONTROL, NULL );
   excontrol->eac_LastKey = 0;
 
@@ -1884,7 +1884,7 @@ void load_corpses( void )
 	{
 	  if( ead->ed_Name[0] != '.' )
 	    {
-	      fread_corpse( ead->ed_Name );
+	      fread_corpse( (const char*) ead->ed_Name );
 	    }
 
 	  ead = ead->ed_Next;

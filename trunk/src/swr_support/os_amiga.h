@@ -52,7 +52,10 @@ typedef long clock_t;
 #include <sys/time.h>
 #include <db.h>
 #include <arpa/telnet.h>
+
+#ifndef __MORPHOS__
 #include <sys/cdefs.h>
+#endif
 
 #if defined( __STORMGCC__ )
 #define unlink(name) !DeleteFile((STRPTR)(name))

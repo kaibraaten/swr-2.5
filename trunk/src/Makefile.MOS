@@ -1,9 +1,8 @@
-#CC = gcc
 BINARY = swr
-WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wwrite-strings -Wshadow
+WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wwrite-strings -Wshadow -Wno-long-long -Wno-unused-variable
 
-CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support
-LFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support
+CCFLAGS = -MMD $(WFLAGS) -Iswr_support -I/gg/new-include -noixemul
+LFLAGS = -lm -Lswr_support -lswr_support -noixemul
 DEPS = 
 ODIR = obj
 _OBJ = act_comm.o act_info.o act_move.o act_obj.o act_wiz.o boards.o \
@@ -19,7 +18,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 all:		 libs $(BINARY)
 
 libs:
-		$(MAKE) -C swr_support
+		$(MAKE) -C swr_support mos
 
 $(BINARY):	$(OBJ)
 		@echo "Linking" $(BINARY)
@@ -33,9 +32,6 @@ $(ODIR)/%.o:	 %.c $(DEPS)
 
 -include $(ODIR)/*.d
 
-clean :
+clean:
 		-rm -f $(BINARY) *~ $(ODIR)/*.o core* $(ODIR)/*.d
-
-mos:
-		$(MAKE) -f Makefile.MOS
 

@@ -34,7 +34,7 @@
 #elif defined(AMIGA)
 #include <machine/endian.h>
 #elif defined(__MORPHOS__)
-/* do nothing; just to prevent endian.h to be included */
+/* do nothing; just to prevent endian.h from being included */
 #else
 #include <endian.h>
 #endif
