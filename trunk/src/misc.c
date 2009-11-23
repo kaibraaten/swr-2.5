@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "mud.h"
-#include "sha256.h"
 
 extern int top_exit;
 
@@ -1392,7 +1391,7 @@ void do_suicide( CHAR_DATA * ch, char *argument )
       return;
     }
 
-  if( strcmp( sha256_crypt( argument ), ch->pcdata->pwd ) )
+  if( strcmp( encode_string( argument ), ch->pcdata->pwd ) )
     {
       send_to_char( "Sorry wrong password.\r\n", ch );
       sprintf( logbuf, "%s attempting to commit suicide... WRONG PASSWORD!",
