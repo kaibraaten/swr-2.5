@@ -33,6 +33,8 @@
 #include <sys/endian.h>
 #elif defined(AMIGA)
 #include <machine/endian.h>
+#elif defined(__MORPHOS__)
+/* do nothing; just to prevent endian.h to be included */
 #else
 #include <endian.h>
 #endif
