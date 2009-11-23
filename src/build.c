@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "mud.h"
-#include "sha256.h"
 
 #define MAX_BUF_LINES 48
 
@@ -765,7 +764,7 @@ void do_mset( CHAR_DATA * ch, char *argument )
       /*
        * No tilde allowed because of player file format.
        */
-      pwdnew = sha256_crypt( arg3 );
+      pwdnew = encode_string( arg3 );
       for( p = pwdnew; *p != '\0'; p++ )
 	{
 	  if( *p == '~' )

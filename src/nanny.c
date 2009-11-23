@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "mud.h"
-#include "sha256.h"
 
 /*
  * Local function prototypes.
@@ -314,7 +313,7 @@ static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
   bool fOld, chk;
   write_to_buffer( d, "\r\n", 2 );
 
-  if( strcmp( sha256_crypt( argument ), ch->pcdata->pwd ) )
+  if( strcmp( ( argument ), ch->pcdata->pwd ) )
     {
       write_to_buffer( d, "Wrong password.\r\n", 0 );
       /* clear descriptor pointer to get rid of bug message in log */
@@ -415,7 +414,7 @@ static void nanny_get_new_password( DESCRIPTOR_DATA * d, char *argument )
       return;
     }
 
-  pwdnew = sha256_crypt( argument );
+  pwdnew = encode_string( argument );
 
   for( p = pwdnew; *p != '\0'; p++ )
     {
@@ -440,7 +439,7 @@ static void nanny_confirm_new_password( DESCRIPTOR_DATA * d, char *argument )
 
   write_to_buffer( d, "\r\n", 2 );
 
-  if( strcmp( sha256_crypt( argument ), ch->pcdata->pwd ) )
+  if( strcmp( encode_string( argument ), ch->pcdata->pwd ) )
     {
       write_to_buffer( d, "Passwords don't match.\r\nRetype password: ", 0 );
       d->connected = CON_GET_NEW_PASSWORD;

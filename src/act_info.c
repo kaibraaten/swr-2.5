@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "mud.h"
-#include "sha256.h"
 
 /*
  * Local functions.
@@ -2791,7 +2790,7 @@ void do_password( CHAR_DATA * ch, char *argument )
       return;
     }
 
-  if( strcmp( sha256_crypt( arg1 ), ch->pcdata->pwd ) )
+  if( strcmp( encode_string( arg1 ), ch->pcdata->pwd ) )
     {
       WAIT_STATE( ch, 40 );
       send_to_char( "Wrong password. Wait 10 seconds.\r\n", ch );
@@ -2808,7 +2807,7 @@ void do_password( CHAR_DATA * ch, char *argument )
   /*
    * No tilde allowed because of player file format.
    */
-  pwdnew = sha256_crypt( arg2 );
+  pwdnew = encode_string( arg2 );
 
   for( p = pwdnew; *p != '\0'; p++ )
     {

@@ -2,7 +2,6 @@
 #define _SWR_SUPPORT_H_
 
 #include <stdio.h>
-#include "sha256.h"
 #include "vector3.h"
 #include "os.h"
 
@@ -215,6 +214,7 @@ void hide_tilde( char *str );
 char *show_tilde( char *str );
 void replace_char( char*, char, char );
 void smush_tilde( char* );
+char *encode_string( const char* );
 
 /* hashstr.c */
 char *str_alloc( const char *str );

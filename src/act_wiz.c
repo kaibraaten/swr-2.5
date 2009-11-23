@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <errno.h>
 #include "mud.h"
-#include "sha256.h"
 
 #define RESTORE_INTERVAL 21600
 
@@ -3318,7 +3317,7 @@ void do_form_password( CHAR_DATA * ch, char *argument )
     }
 
   ch_printf( ch, "That would result in the following password: %s",
-	     sha256_crypt( argument ) );
+	     encode_string( argument ) );
 }
 
 /*
