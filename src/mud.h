@@ -5,7 +5,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <math.h>
+
+#ifndef __MORPHOS__
+#include <math.h> /* built-in */
+#endif
+
 #include <time.h>
 
 extern FILE *out_stream;
@@ -299,7 +303,7 @@ struct	descriptor_data
   unsigned long	pagesize;
   int pagetop;
   char *pagepoint;
-#ifdef AMIGA
+#if defined(AMIGA) || defined(__MORPHOS__)
   signed
 #endif
   char pagecmd;
