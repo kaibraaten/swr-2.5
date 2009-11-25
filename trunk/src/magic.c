@@ -2269,13 +2269,13 @@ ch_ret spell_affectchar( int sn, int level, CHAR_DATA * ch, void *vo )
  */
 ch_ret spell_affect( int sn, int level, CHAR_DATA * ch, void *vo )
 {
-  SMAUG_AFF *saf;
+  SMAUG_AFF *saf = NULL;
   SKILLTYPE *skill = get_skilltype( sn );
   CHAR_DATA *victim = ( CHAR_DATA * ) vo;
-  bool groupsp;
-  bool areasp;
-  bool hitchar, hitroom, hitvict = FALSE;
-  ch_ret retcode;
+  bool groupsp = FALSE;
+  bool areasp = FALSE;
+  bool hitchar = FALSE, hitroom = FALSE, hitvict = FALSE;
+  ch_ret retcode = rNONE;
 
   if( !skill->affects )
     {
