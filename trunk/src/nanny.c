@@ -46,12 +46,11 @@ void mail_count( CHAR_DATA * ch );
  */
 void nanny( DESCRIPTOR_DATA * d, char *argument )
 {
-  while( isspace( ( int ) *argument ) )
+  while( isspace( ( int ) *argument ) || !isascii( (int) *argument ) )
     argument++;
 
-  switch ( d->connected )
+  switch( d->connected )
     {
-
     default:
       bug( "Nanny: bad d->connected %d.", d->connected );
       close_socket( d, TRUE );
@@ -313,7 +312,7 @@ static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
   bool fOld, chk;
   write_to_buffer( d, "\r\n", 2 );
 
-  if( strcmp( ( argument ), ch->pcdata->pwd ) )
+  if( strcmp( encode_string( argument ), ch->pcdata->pwd ) )
     {
       write_to_buffer( d, "Wrong password.\r\n", 0 );
       /* clear descriptor pointer to get rid of bug message in log */
