@@ -152,6 +152,10 @@ do                                                              \
  (last)                      = (link);                       \
   } while(0)
 
+#ifdef INSERT
+#undef INSERT
+#endif
+
 #define INSERT(link, insert, first, next, prev)                 \
 do                                                              \
   {                                                               \
