@@ -11,11 +11,11 @@ extern FILE *out_stream;
 #ifdef __cplusplus
 extern "C" {
 #endif
-void bug( const char *str, ... );
+  void bug( const char *str, ... );
 
-bool is_name2( const char*, char* );
-bool is_name2_prefix( const char*, char* );
-char *wordwrap( char*, short );
+  bool is_name2( const char*, char* );
+  bool is_name2_prefix( const char*, char* );
+  char *wordwrap( char*, short );
 #ifdef __cplusplus
 }
 #endif
@@ -27,13 +27,13 @@ bool is_name( const char *str, char *namelist )
   char name[MAX_INPUT_LENGTH];
 
   for ( ; ; )
-    {
-      namelist = one_argument( namelist, name );
-      if ( name[0] == '\0' )
-	return FALSE;
-      if ( !str_cmp( str, name ) )
-	return TRUE;
-    }
+  {
+    namelist = one_argument( namelist, name );
+    if ( name[0] == '\0' )
+      return FALSE;
+    if ( !str_cmp( str, name ) )
+      return TRUE;
+  }
 }
 
 bool is_name_prefix( const char *str, char *namelist )
@@ -41,13 +41,13 @@ bool is_name_prefix( const char *str, char *namelist )
   char name[MAX_INPUT_LENGTH];
 
   for ( ; ; )
-    {
-      namelist = one_argument( namelist, name );
-      if ( name[0] == '\0' )
-	return FALSE;
-      if ( !str_prefix( str, name ) )
-	return TRUE;
-    }
+  {
+    namelist = one_argument( namelist, name );
+    if ( name[0] == '\0' )
+      return FALSE;
+    if ( !str_prefix( str, name ) )
+      return TRUE;
+  }
 }
 
 /*
@@ -59,13 +59,13 @@ bool is_name2( const char *str, char *namelist )
   char name[MAX_INPUT_LENGTH];
 
   for ( ; ; )
-    {
-      namelist = one_argument2( namelist, name );
-      if ( name[0] == '\0' )
-	return FALSE;
-      if ( !str_cmp( str, name ) )
-	return TRUE;
-    }
+  {
+    namelist = one_argument2( namelist, name );
+    if ( name[0] == '\0' )
+      return FALSE;
+    if ( !str_cmp( str, name ) )
+      return TRUE;
+  }
 }
 
 bool is_name2_prefix( const char *str, char *namelist )
@@ -73,13 +73,13 @@ bool is_name2_prefix( const char *str, char *namelist )
   char name[MAX_INPUT_LENGTH];
 
   for ( ; ; )
-    {
-      namelist = one_argument2( namelist, name );
-      if ( name[0] == '\0' )
-	return FALSE;
-      if ( !str_prefix( str, name ) )
-	return TRUE;
-    }
+  {
+    namelist = one_argument2( namelist, name );
+    if ( name[0] == '\0' )
+      return FALSE;
+    if ( !str_prefix( str, name ) )
+      return TRUE;
+  }
 }
 
 /*                                                              -Thoric
@@ -93,13 +93,13 @@ bool nifty_is_name( char *str, char *namelist )
     return FALSE;
 
   for ( ; ; )
-    {
-      str = one_argument2( str, name );
-      if ( name[0] == '\0' )
-	return TRUE;
-      if ( !is_name2( name, namelist ) )
-	return FALSE;
-    }
+  {
+    str = one_argument2( str, name );
+    if ( name[0] == '\0' )
+      return TRUE;
+    if ( !is_name2( name, namelist ) )
+      return FALSE;
+  }
 }
 
 bool nifty_is_name_prefix( char *str, char *namelist )
@@ -110,13 +110,13 @@ bool nifty_is_name_prefix( char *str, char *namelist )
     return FALSE;
 
   for ( ; ; )
-    {
-      str = one_argument2( str, name );
-      if ( name[0] == '\0' )
-	return TRUE;
-      if ( !is_name2_prefix( name, namelist ) )
-	return FALSE;
-    }
+  {
+    str = one_argument2( str, name );
+    if ( name[0] == '\0' )
+      return TRUE;
+    if ( !is_name2_prefix( name, namelist ) )
+      return FALSE;
+  }
 }
 
 /*
@@ -152,12 +152,12 @@ char *show_tilde( char *str )
 
   bufptr = buf;
   for ( ; *str != '\0'; str++, bufptr++ )
-    {
-      if ( *str == HIDDEN_TILDE )
-        *bufptr = '~';
-      else
-        *bufptr = *str;
-    }
+  {
+    if ( *str == HIDDEN_TILDE )
+      *bufptr = '~';
+    else
+      *bufptr = *str;
+  }
   *bufptr = '\0';
 
   return buf;
@@ -171,26 +171,26 @@ char *show_tilde( char *str )
 bool str_cmp( const char *astr, const char *bstr )
 {
   if ( !astr )
-    {
-      bug( "Str_cmp: null astr." );
-      if ( bstr )
-	fprintf( out_stream, "str_cmp: astr: (null)  bstr: %s\n", bstr );
-      return TRUE;
-    }
+  {
+    bug( "Str_cmp: null astr." );
+    if ( bstr )
+      fprintf( out_stream, "str_cmp: astr: (null)  bstr: %s\n", bstr );
+    return TRUE;
+  }
 
   if ( !bstr )
-    {
-      bug( "Str_cmp: null bstr." );
-      if ( astr )
-	fprintf( out_stream, "str_cmp: astr: %s  bstr: (null)\n", astr );
-      return TRUE;
-    }
+  {
+    bug( "Str_cmp: null bstr." );
+    if ( astr )
+      fprintf( out_stream, "str_cmp: astr: %s  bstr: (null)\n", astr );
+    return TRUE;
+  }
 
   for ( ; *astr || *bstr; astr++, bstr++ )
-    {
-      if ( LOWER(*astr) != LOWER(*bstr) )
-	return TRUE;
-    }
+  {
+    if ( LOWER(*astr) != LOWER(*bstr) )
+      return TRUE;
+  }
 
   return FALSE;
 }
@@ -203,22 +203,22 @@ bool str_cmp( const char *astr, const char *bstr )
 bool str_prefix( const char *astr, const char *bstr )
 {
   if ( !astr )
-    {
-      bug( "Strn_cmp: null astr." );
-      return TRUE;
-    }
+  {
+    bug( "Strn_cmp: null astr." );
+    return TRUE;
+  }
 
   if ( !bstr )
-    {
-      bug( "Strn_cmp: null bstr." );
-      return TRUE;
-    }
+  {
+    bug( "Strn_cmp: null bstr." );
+    return TRUE;
+  }
 
   for ( ; *astr; astr++, bstr++ )
-    {
-      if ( LOWER(*astr) != LOWER(*bstr) )
-	return TRUE;
-    }
+  {
+    if ( LOWER(*astr) != LOWER(*bstr) )
+      return TRUE;
+  }
 
   return FALSE;
 }
@@ -279,26 +279,26 @@ char *capitalize( const char *str )
   char c;
 
   while( (c = *str++) )
+  {
+    if( state == Normal )
     {
-      if( state == Normal )
-        {
-          if( c == '&' || c == '^' || c == '}' )
-            {
-              state = Color;
-            }
-          else if( isalpha( (int) c ) )
-            {
-              c = bFirst ? toupper( (int) c )  : tolower( (int) c );
-              bFirst = FALSE;
-            }
-        }
-      else
-        {
-          state = Normal;
-        }
-
-      *dest++ = c;
+      if( c == '&' || c == '^' || c == '}' )
+      {
+	state = Color;
+      }
+      else if( isalpha( (int) c ) )
+      {
+	c = bFirst ? toupper( (int) c )  : tolower( (int) c );
+	bFirst = FALSE;
+      }
     }
+    else
+    {
+      state = Normal;
+    }
+
+    *dest++ = c;
+  }
 
   *dest = c;
 
@@ -359,14 +359,14 @@ const char *aoran( const char *str )
   static char temp[MAX_STRING_LENGTH];
 
   if ( !str )
-    {
-      bug( "Aoran(): NULL str" );
-      return "";
-    }
+  {
+    bug( "Aoran(): NULL str" );
+    return "";
+  }
 
   if ( isavowel(str[0])
-       || ( strlen(str) > 1 && tolower((int)str[0]) == 'y'
-	    && !isavowel(str[1])) )
+      || ( strlen(str) > 1 && tolower((int)str[0]) == 'y'
+	&& !isavowel(str[1])) )
     strcpy( temp, "an " );
   else
     strcpy( temp, "a " );
@@ -379,12 +379,12 @@ void replace_char( char *buf, char replace, char with )
   size_t i = 0;
 
   for( i = 0; i < strlen( buf ); ++i )
+  {
+    if( buf[i] == replace )
     {
-      if( buf[i] == replace )
-        {
-          buf[i] = with;
-        }
+      buf[i] = with;
     }
+  }
 }
 
 /*
@@ -396,10 +396,10 @@ bool is_number( const char *arg )
     return FALSE;
 
   for ( ; *arg != '\0'; arg++ )
-    {
-      if ( !isdigit((int) *arg) )
-	return FALSE;
-    }
+  {
+    if ( !isdigit((int) *arg) )
+      return FALSE;
+  }
 
   return TRUE;
 }
@@ -415,16 +415,16 @@ int number_argument( const char *orig_argument, char *arg )
   sprintf( argument, "%s", orig_argument );
 
   for ( pdot = argument; *pdot != '\0'; pdot++ )
+  {
+    if ( *pdot == '.' )
     {
-      if ( *pdot == '.' )
-        {
-          *pdot = '\0';
-          number = atoi( argument );
-          *pdot = '.';
-          strcpy( arg, pdot+1 );
-          return number;
-        }
+      *pdot = '\0';
+      number = atoi( argument );
+      *pdot = '.';
+      strcpy( arg, pdot+1 );
+      return number;
     }
+  }
 
   strcpy( arg, argument );
   return 1;
@@ -446,17 +446,17 @@ char *one_argument( char *argument, char *arg_first )
     cEnd = *argument++;
 
   while ( *argument != '\0' || ++count >= 255 )
+  {
+    if ( *argument == cEnd )
     {
-      if ( *argument == cEnd )
-        {
-          argument++;
-          break;
-        }
-
-      *arg_first = *argument;
-      arg_first++;
       argument++;
+      break;
     }
+
+    *arg_first = *argument;
+    arg_first++;
+    argument++;
+  }
 
   *arg_first = '\0';
 
@@ -482,17 +482,17 @@ char *one_argument2( char *argument, char *arg_first )
     cEnd = *argument++;
 
   while ( *argument != '\0' || ++count >= 255 )
+  {
+    if ( *argument == cEnd || *argument == '-' )
     {
-      if ( *argument == cEnd || *argument == '-' )
-        {
-          argument++;
-          break;
-        }
-
-      *arg_first = *argument;
-      arg_first++;
       argument++;
+      break;
     }
+
+    *arg_first = *argument;
+    arg_first++;
+    argument++;
+  }
 
   *arg_first = '\0';
 
@@ -512,9 +512,9 @@ char *strip_cr( const char *str )
 
   for ( i=j=0; str[i] != '\0'; i++ )
     if ( str[i] != '\r' )
-      {
-	newstr[j++] = str[i];
-      }
+    {
+      newstr[j++] = str[i];
+    }
   newstr[j] = '\0';
   return newstr;
 }
@@ -537,10 +537,10 @@ void smush_tilde( char *str )
     last = '\0';
 
   for ( ; *str != '\0'; str++ )
-    {
-      if ( *str == '~' )
-	*str = '-';
-    }
+  {
+    if ( *str == '~' )
+      *str = '-';
+  }
   if ( len )
     strptr[len-1] = last;
 }
@@ -557,15 +557,15 @@ static char *grab_word( char *argument, char *arg_first )
     cEnd = *argument++;
 
   while ( *argument != '\0' || ++count >= 255 )
+  {
+    if ( *argument == cEnd )
     {
-      if ( *argument == cEnd )
-        {
-          argument++;
-          break;
-        }
-
-      *arg_first++ = *argument++;
+      argument++;
+      break;
     }
+
+    *arg_first++ = *argument++;
+  }
 
   *arg_first = '\0';
 
@@ -583,45 +583,45 @@ char *wordwrap( char *txt, short wrap )
   buf[0] = '\0';
   bufp = buf;
   if ( txt != NULL )
-    {
-      char line[MAX_STRING_LENGTH];
-      char temp[MAX_STRING_LENGTH];
-      char *ptr, *p;
-      int ln, x;
+  {
+    char line[MAX_STRING_LENGTH];
+    char temp[MAX_STRING_LENGTH];
+    char *ptr, *p;
+    int ln, x;
 
-      ++bufp;
-      line[0] = '\0';
-      ptr = txt;
-      while ( *ptr )
-        {
-          ptr = grab_word( ptr, temp );
-          ln = strlen( line );  x = strlen( temp );
-          if ( (ln + x + 1) < wrap )
-	    {
-	      if ( line[ln-1] == '.' )
-		strcat( line, "  " );
-	      else
-		strcat( line, " " );
-	      strcat( line, temp );
-	      p = strchr( line, '\n' );
-	      if ( !p )
-		p = strchr( line, '\r' );
-	      if ( p )
-		{
-		  strcat( buf, line );
-		  line[0] = '\0';
-		}
-	    }
-          else
-	    {
-	      strcat( line, "\r\n" );
-	      strcat( buf, line );
-	      strcpy( line, temp );
-	    }
-        }
-      if ( line[0] != '\0' )
+    ++bufp;
+    line[0] = '\0';
+    ptr = txt;
+    while ( *ptr )
+    {
+      ptr = grab_word( ptr, temp );
+      ln = strlen( line );  x = strlen( temp );
+      if ( (ln + x + 1) < wrap )
+      {
+	if ( line[ln-1] == '.' )
+	  strcat( line, "  " );
+	else
+	  strcat( line, " " );
+	strcat( line, temp );
+	p = strchr( line, '\n' );
+	if ( !p )
+	  p = strchr( line, '\r' );
+	if ( p )
+	{
+	  strcat( buf, line );
+	  line[0] = '\0';
+	}
+      }
+      else
+      {
+	strcat( line, "\r\n" );
 	strcat( buf, line );
+	strcpy( line, temp );
+      }
     }
+    if ( line[0] != '\0' )
+      strcat( buf, line );
+  }
   return bufp;
 }
 

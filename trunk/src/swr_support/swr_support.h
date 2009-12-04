@@ -40,7 +40,7 @@ typedef int                             bool;
 typedef unsigned char                   bool;
 #endif
 #else
-#ifndef __STORMGCC__
+#if !defined(__STORMGCC__) && !defined(__MORPHOS__)
 #define TRUE true
 #define FALSE false
 #endif /* StormC4 */

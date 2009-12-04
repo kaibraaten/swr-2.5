@@ -1,5 +1,5 @@
 BINARY = swr
-WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wwrite-strings -Wshadow -Wno-long-long -Wno-unused-variable
+WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wwrite-strings -Wno-long-long -Wno-unused-variable
 
 CCFLAGS = -MMD $(WFLAGS) -Iswr_support -I/gg/new-include -noixemul
 LFLAGS = -lm -Lswr_support -lswr_support -noixemul

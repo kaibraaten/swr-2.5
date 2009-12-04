@@ -7,7 +7,7 @@
  * Externals
  */
 bool check_social args( ( CHAR_DATA * ch, const char *command,
-			  char *argument ) );
+      char *argument ) );
 
 /*
  * Log-all switch.
@@ -22,42 +22,42 @@ SOCIALTYPE *social_index[27];	/* hash table for socials   */
 bool check_pos( const CHAR_DATA * ch, short position )
 {
   if( ch->position < position )
+  {
+    switch ( ch->position )
     {
-      switch ( ch->position )
-	{
-	case POS_DEAD:
-	  send_to_char( "A little difficult to do when you are DEAD...\r\n",
-			ch );
-	  break;
+      case POS_DEAD:
+	send_to_char( "A little difficult to do when you are DEAD...\r\n",
+	    ch );
+	break;
 
-	case POS_MORTAL:
-	case POS_INCAP:
-	  send_to_char( "You are hurt far too bad for that.\r\n", ch );
-	  break;
+      case POS_MORTAL:
+      case POS_INCAP:
+	send_to_char( "You are hurt far too bad for that.\r\n", ch );
+	break;
 
-	case POS_STUNNED:
-	  send_to_char( "You are too stunned to do that.\r\n", ch );
-	  break;
+      case POS_STUNNED:
+	send_to_char( "You are too stunned to do that.\r\n", ch );
+	break;
 
-	case POS_SLEEPING:
-	  send_to_char( "In your dreams, or what?\r\n", ch );
-	  break;
+      case POS_SLEEPING:
+	send_to_char( "In your dreams, or what?\r\n", ch );
+	break;
 
-	case POS_RESTING:
-	  send_to_char( "Nah... You feel too relaxed...\r\n", ch );
-	  break;
+      case POS_RESTING:
+	send_to_char( "Nah... You feel too relaxed...\r\n", ch );
+	break;
 
-	case POS_SITTING:
-	  send_to_char( "You can't do that sitting down.\r\n", ch );
-	  break;
+      case POS_SITTING:
+	send_to_char( "You can't do that sitting down.\r\n", ch );
+	break;
 
-	case POS_FIGHTING:
-	  send_to_char( "No way!  You are still fighting!\r\n", ch );
-	  break;
-	}
-
-      return FALSE;
+      case POS_FIGHTING:
+	send_to_char( "No way!  You are still fighting!\r\n", ch );
+	break;
     }
+
+    return FALSE;
+  }
 
   return TRUE;
 }
@@ -82,85 +82,85 @@ void interpret( CHAR_DATA * ch, char *argument )
   long tmptime = 0;
 
   if( !ch )
+  {
+    bug( "interpret: null ch!", 0 );
+    return;
+  }
+
+  if( !cmd )
+  {
+    /* Changed the order of these ifchecks to prevent crashing. */
+    if( !argument || !strcmp( argument, "" ) )
     {
-      bug( "interpret: null ch!", 0 );
+      bug( "interpret: null argument!", 0 );
       return;
     }
 
-  if( !cmd )
-    {
-      /* Changed the order of these ifchecks to prevent crashing. */
-      if( !argument || !strcmp( argument, "" ) )
-	{
-	  bug( "interpret: null argument!", 0 );
-	  return;
-	}
+    /*
+     * Strip leading spaces.
+     */
+    while( isspace( ( int ) *argument ) )
+      argument++;
+    if( argument[0] == '\0' )
+      return;
 
-      /*
-       * Strip leading spaces.
-       */
+    timer = get_timerptr( ch, TIMER_DO_FUN );
+
+    /* REMOVE_BIT( ch->affected_by, AFF_HIDE ); */
+
+    /*
+     * Implement freeze command.
+     */
+    if( !IS_NPC( ch ) && IS_SET( ch->act, PLR_FREEZE ) )
+    {
+      send_to_char( "You're totally frozen!\r\n", ch );
+      return;
+    }
+
+    /*
+     * Grab the command word.
+     * Special parsing so ' can be a command,
+     *   also no spaces needed after punctuation.
+     */
+    strcpy( logline, argument );
+    if( !isalpha( ( int ) argument[0] ) && !isdigit( ( int ) argument[0] ) )
+    {
+      command[0] = argument[0];
+      command[1] = '\0';
+      argument++;
       while( isspace( ( int ) *argument ) )
 	argument++;
-      if( argument[0] == '\0' )
-	return;
-
-      timer = get_timerptr( ch, TIMER_DO_FUN );
-
-      /* REMOVE_BIT( ch->affected_by, AFF_HIDE ); */
-
-      /*
-       * Implement freeze command.
-       */
-      if( !IS_NPC( ch ) && IS_SET( ch->act, PLR_FREEZE ) )
-	{
-	  send_to_char( "You're totally frozen!\r\n", ch );
-	  return;
-	}
-
-      /*
-       * Grab the command word.
-       * Special parsing so ' can be a command,
-       *   also no spaces needed after punctuation.
-       */
-      strcpy( logline, argument );
-      if( !isalpha( ( int ) argument[0] ) && !isdigit( ( int ) argument[0] ) )
-	{
-	  command[0] = argument[0];
-	  command[1] = '\0';
-	  argument++;
-	  while( isspace( ( int ) *argument ) )
-	    argument++;
-	}
-      else
-	argument = one_argument( argument, command );
-
-      /*
-       * Look for command in command table.
-       * Check for council powers and/or bestowments
-       */
-      trust = get_trust( ch );
-      for( cmd = command_hash[LOWER( command[0] ) % 126]; cmd;
-	   cmd = cmd->next )
-	if( !str_prefix( command, cmd->name )
-	    && ( cmd->level <= trust
-		 || ( !IS_NPC( ch ) && ch->pcdata->bestowments
-		      && ch->pcdata->bestowments[0] != '\0'
-		      && is_name( cmd->name, ch->pcdata->bestowments )
-		      && cmd->level <= ( trust + 5 ) ) ) )
-	  {
-	    found = TRUE;
-	    break;
-	  }
-
-      /*
-       * Turn off afk bit when any command performed.
-       */
-      if( IS_SET( ch->act, PLR_AFK ) && ( str_cmp( command, "AFK" ) ) )
-	{
-	  REMOVE_BIT( ch->act, PLR_AFK );
-	  act( AT_GREY, "$n is no longer afk.", ch, NULL, NULL, TO_ROOM );
-	}
     }
+    else
+      argument = one_argument( argument, command );
+
+    /*
+     * Look for command in command table.
+     * Check for council powers and/or bestowments
+     */
+    trust = get_trust( ch );
+    for( cmd = command_hash[LOWER( command[0] ) % 126]; cmd;
+	cmd = cmd->next )
+      if( !str_prefix( command, cmd->name )
+	  && ( cmd->level <= trust
+	    || ( !IS_NPC( ch ) && ch->pcdata->bestowments
+	      && ch->pcdata->bestowments[0] != '\0'
+	      && is_name( cmd->name, ch->pcdata->bestowments )
+	      && cmd->level <= ( trust + 5 ) ) ) )
+      {
+	found = TRUE;
+	break;
+      }
+
+    /*
+     * Turn off afk bit when any command performed.
+     */
+    if( IS_SET( ch->act, PLR_AFK ) && ( str_cmp( command, "AFK" ) ) )
+    {
+      REMOVE_BIT( ch->act, PLR_AFK );
+      act( AT_GREY, "$n is no longer afk.", ch, NULL, NULL, TO_ROOM );
+    }
+  }
 
   /*
    * Log and snoop.
@@ -175,88 +175,88 @@ void interpret( CHAR_DATA * ch, char *argument )
   if( ( !IS_NPC( ch ) && IS_SET( ch->act, PLR_LOG ) )
       || fLogAll
       || loglvl == LOG_BUILD || loglvl == LOG_HIGH || loglvl == LOG_ALWAYS )
-    {
-      /* Added by Narn to show who is switched into a mob that executes
-         a logged command.  Check for descriptor in case force is used. */
-      if( ch->desc && ch->desc->original )
-	sprintf( log_buf, "Log %s (%s): %s", ch->name,
-		 ch->desc->original->name, logline );
-      else
-	sprintf( log_buf, "Log %s: %s", ch->name, logline );
+  {
+    /* Added by Narn to show who is switched into a mob that executes
+       a logged command.  Check for descriptor in case force is used. */
+    if( ch->desc && ch->desc->original )
+      sprintf( log_buf, "Log %s (%s): %s", ch->name,
+	  ch->desc->original->name, logline );
+    else
+      sprintf( log_buf, "Log %s: %s", ch->name, logline );
 
-      /*
-       * Make it so a 'log all' will send most output to the log
-       * file only, and not spam the log channel to death     -Thoric
-       */
-      if( fLogAll && loglvl == LOG_NORMAL
-	  && ( IS_NPC( ch ) || !IS_SET( ch->act, PLR_LOG ) ) )
-	loglvl = LOG_ALL;
+    /*
+     * Make it so a 'log all' will send most output to the log
+     * file only, and not spam the log channel to death     -Thoric
+     */
+    if( fLogAll && loglvl == LOG_NORMAL
+	&& ( IS_NPC( ch ) || !IS_SET( ch->act, PLR_LOG ) ) )
+      loglvl = LOG_ALL;
 
-      log_string_plus( log_buf, loglvl );
-    }
+    log_string_plus( log_buf, loglvl );
+  }
 
   if( ch->desc && ch->desc->snoop_by )
-    {
-      sprintf( logname, "%s", ch->name );
-      write_to_buffer( ch->desc->snoop_by, logname, 0 );
-      write_to_buffer( ch->desc->snoop_by, "% ", 2 );
-      write_to_buffer( ch->desc->snoop_by, logline, 0 );
-      write_to_buffer( ch->desc->snoop_by, "\r\n", 2 );
-    }
+  {
+    sprintf( logname, "%s", ch->name );
+    write_to_buffer( ch->desc->snoop_by, logname, 0 );
+    write_to_buffer( ch->desc->snoop_by, "% ", 2 );
+    write_to_buffer( ch->desc->snoop_by, logline, 0 );
+    write_to_buffer( ch->desc->snoop_by, "\r\n", 2 );
+  }
 
 
 
   if( timer )
+  {
+    int tempsub = ch->substate;
+    ch->substate = SUB_TIMER_DO_ABORT;
+    ( timer->do_fun ) ( ch, const_char_to_nonconst( "" ) );
+    if( char_died( ch ) )
+      return;
+    if( ch->substate != SUB_TIMER_CANT_ABORT )
     {
-      int tempsub = ch->substate;
-      ch->substate = SUB_TIMER_DO_ABORT;
-      ( timer->do_fun ) ( ch, const_char_to_nonconst( "" ) );
-      if( char_died( ch ) )
-	return;
-      if( ch->substate != SUB_TIMER_CANT_ABORT )
-	{
-	  ch->substate = tempsub;
-	  extract_timer( ch, timer );
-	}
-      else
-	{
-	  ch->substate = tempsub;
-	  return;
-	}
+      ch->substate = tempsub;
+      extract_timer( ch, timer );
     }
+    else
+    {
+      ch->substate = tempsub;
+      return;
+    }
+  }
 
   /*
    * Look for command in skill and socials table.
    */
   if( !found )
+  {
+    if( !check_skill( ch, command, argument )
+	&& !check_social( ch, command, argument ) )
     {
-      if( !check_skill( ch, command, argument )
-	  && !check_social( ch, command, argument ) )
-	{
-	  EXIT_DATA *pexit = NULL;
+      EXIT_DATA *pexit = NULL;
 
-	  /* check for an auto-matic exit command */
-	  if( ( pexit = find_door( ch, command, TRUE ) ) != NULL
-	      && IS_SET( pexit->exit_info, EX_xAUTO ) )
-	    {
-	      if( IS_SET( pexit->exit_info, EX_CLOSED )
-		  && ( !IS_AFFECTED( ch, AFF_PASS_DOOR )
-		       || IS_SET( pexit->exit_info, EX_NOPASSDOOR ) ) )
-		{
-		  if( !IS_SET( pexit->exit_info, EX_SECRET ) )
-		    act( AT_PLAIN, "The $d is closed.", ch, NULL,
-			 pexit->keyword, TO_CHAR );
-		  else
-		    send_to_char( "You cannot do that here.\r\n", ch );
-		  return;
-		}
-	      move_char( ch, pexit, 0 );
-	      return;
-	    }
-	  send_to_char( "Huh?\r\n", ch );
+      /* check for an auto-matic exit command */
+      if( ( pexit = find_door( ch, command, TRUE ) ) != NULL
+	  && IS_SET( pexit->exit_info, EX_xAUTO ) )
+      {
+	if( IS_SET( pexit->exit_info, EX_CLOSED )
+	    && ( !IS_AFFECTED( ch, AFF_PASS_DOOR )
+	      || IS_SET( pexit->exit_info, EX_NOPASSDOOR ) ) )
+	{
+	  if( !IS_SET( pexit->exit_info, EX_SECRET ) )
+	    act( AT_PLAIN, "The $d is closed.", ch, NULL,
+		pexit->keyword, TO_CHAR );
+	  else
+	    send_to_char( "You cannot do that here.\r\n", ch );
+	  return;
 	}
-      return;
+	move_char( ch, pexit, 0 );
+	return;
+      }
+      send_to_char( "Huh?\r\n", ch );
     }
+    return;
+  }
 
   /*
    * Character not in position for command?
@@ -267,10 +267,10 @@ void interpret( CHAR_DATA * ch, char *argument )
   /* Berserk check for flee.. maybe add drunk to this?.. but too much
      hardcoding is annoying.. -- Altrag */
   if( !str_cmp( cmd->name, "flee" ) && IS_AFFECTED( ch, AFF_BERSERK ) )
-    {
-      send_to_char( "You aren't thinking very clearly..\r\n", ch );
-      return;
-    }
+  {
+    send_to_char( "You aren't thinking very clearly..\r\n", ch );
+    return;
+  }
 
   /*
    * Dispatch the command.
@@ -288,13 +288,13 @@ void interpret( CHAR_DATA * ch, char *argument )
 
   /* laggy command notice: command took longer than 1.5 seconds */
   if( tmptime > 1500000 )
-    {
-      sprintf( log_buf, "[*****] LAG: %s: %s %s (R:%ld S:%d.%06d)", ch->name,
-	       cmd->name, ( cmd->log == LOG_NEVER ? "XXX" : argument ),
-	       ch->in_room ? ch->in_room->vnum : 0,
-	       ( int ) ( time_used.tv_sec ), ( int ) ( time_used.tv_usec ) );
-      log_string_plus( log_buf, LOG_NORMAL );
-    }
+  {
+    sprintf( log_buf, "[*****] LAG: %s: %s %s (R:%ld S:%d.%06d)", ch->name,
+	cmd->name, ( cmd->log == LOG_NEVER ? "XXX" : argument ),
+	ch->in_room ? ch->in_room->vnum : 0,
+	( int ) ( time_used.tv_sec ), ( int ) ( time_used.tv_usec ) );
+    log_string_plus( log_buf, LOG_NORMAL );
+  }
 }
 
 CMDTYPE *find_command( const char *command )
@@ -336,13 +336,13 @@ bool check_social( CHAR_DATA * ch, const char *command, char *argument )
     return FALSE;
 
   if( !IS_NPC( ch ) && IS_SET( ch->act, PLR_NO_EMOTE ) )
-    {
-      send_to_char( "You are anti-social!\r\n", ch );
-      return TRUE;
-    }
+  {
+    send_to_char( "You are anti-social!\r\n", ch );
+    return TRUE;
+  }
 
   switch ( ch->position )
-    {
+  {
     case POS_DEAD:
       send_to_char( "Lie still; you are DEAD.\r\n", ch );
       return TRUE;
@@ -366,85 +366,85 @@ bool check_social( CHAR_DATA * ch, const char *command, char *argument )
       send_to_char( "In your dreams, or what?\r\n", ch );
       return TRUE;
 
-    }
+  }
 
   one_argument( argument, arg );
   victim = NULL;
   if( arg[0] == '\0' )
-    {
-      act( AT_SOCIAL, social->others_no_arg, ch, NULL, victim, TO_ROOM );
-      act( AT_SOCIAL, social->char_no_arg, ch, NULL, victim, TO_CHAR );
-    }
+  {
+    act( AT_SOCIAL, social->others_no_arg, ch, NULL, victim, TO_ROOM );
+    act( AT_SOCIAL, social->char_no_arg, ch, NULL, victim, TO_CHAR );
+  }
   else if( ( victim = get_char_room( ch, arg ) ) == NULL )
-    {
-      send_to_char( "They aren't here.\r\n", ch );
-    }
+  {
+    send_to_char( "They aren't here.\r\n", ch );
+  }
   else if( victim == ch )
-    {
-      act( AT_SOCIAL, social->others_auto, ch, NULL, victim, TO_ROOM );
-      act( AT_SOCIAL, social->char_auto, ch, NULL, victim, TO_CHAR );
-    }
+  {
+    act( AT_SOCIAL, social->others_auto, ch, NULL, victim, TO_ROOM );
+    act( AT_SOCIAL, social->char_auto, ch, NULL, victim, TO_CHAR );
+  }
   else
+  {
+    act( AT_SOCIAL, social->others_found, ch, NULL, victim, TO_NOTVICT );
+    act( AT_SOCIAL, social->char_found, ch, NULL, victim, TO_CHAR );
+    act( AT_SOCIAL, social->vict_found, ch, NULL, victim, TO_VICT );
+
+    if( !IS_NPC( ch ) && IS_NPC( victim )
+	&& !IS_AFFECTED( victim, AFF_CHARM )
+	&& IS_AWAKE( victim )
+	&& !IS_SET( victim->pIndexData->progtypes, ACT_PROG ) )
     {
-      act( AT_SOCIAL, social->others_found, ch, NULL, victim, TO_NOTVICT );
-      act( AT_SOCIAL, social->char_found, ch, NULL, victim, TO_CHAR );
-      act( AT_SOCIAL, social->vict_found, ch, NULL, victim, TO_VICT );
+      switch ( number_bits( 4 ) )
+      {
+	case 0:
+	  if( !IS_SET( ch->in_room->room_flags, ROOM_SAFE )
+	      || IS_EVIL( ch ) )
+	    multi_hit( victim, ch, TYPE_UNDEFINED );
+	  else if( IS_NEUTRAL( ch ) )
+	  {
+	    act( AT_ACTION, "$n slaps $N.", victim, NULL, ch,
+		TO_NOTVICT );
+	    act( AT_ACTION, "You slap $N.", victim, NULL, ch, TO_CHAR );
+	    act( AT_ACTION, "$n slaps you.", victim, NULL, ch,
+		TO_VICT );
+	  }
+	  else
+	  {
+	    act( AT_ACTION, "$n acts like $N doesn't even exist.",
+		victim, NULL, ch, TO_NOTVICT );
+	    act( AT_ACTION, "You just ignore $N.", victim, NULL, ch,
+		TO_CHAR );
+	    act( AT_ACTION, "$n appears to be ignoring you.", victim,
+		NULL, ch, TO_VICT );
+	  }
+	  break;
 
-      if( !IS_NPC( ch ) && IS_NPC( victim )
-	  && !IS_AFFECTED( victim, AFF_CHARM )
-	  && IS_AWAKE( victim )
-	  && !IS_SET( victim->pIndexData->progtypes, ACT_PROG ) )
-	{
-	  switch ( number_bits( 4 ) )
-	    {
-	    case 0:
-	      if( !IS_SET( ch->in_room->room_flags, ROOM_SAFE )
-		  || IS_EVIL( ch ) )
-		multi_hit( victim, ch, TYPE_UNDEFINED );
-	      else if( IS_NEUTRAL( ch ) )
-		{
-		  act( AT_ACTION, "$n slaps $N.", victim, NULL, ch,
-		       TO_NOTVICT );
-		  act( AT_ACTION, "You slap $N.", victim, NULL, ch, TO_CHAR );
-		  act( AT_ACTION, "$n slaps you.", victim, NULL, ch,
-		       TO_VICT );
-		}
-	      else
-		{
-		  act( AT_ACTION, "$n acts like $N doesn't even exist.",
-		       victim, NULL, ch, TO_NOTVICT );
-		  act( AT_ACTION, "You just ignore $N.", victim, NULL, ch,
-		       TO_CHAR );
-		  act( AT_ACTION, "$n appears to be ignoring you.", victim,
-		       NULL, ch, TO_VICT );
-		}
-	      break;
+	case 1:
+	case 2:
+	case 3:
+	case 4:
+	case 5:
+	case 6:
+	case 7:
+	case 8:
+	  act( AT_SOCIAL, social->others_found,
+	      victim, NULL, ch, TO_NOTVICT );
+	  act( AT_SOCIAL, social->char_found, victim, NULL, ch, TO_CHAR );
+	  act( AT_SOCIAL, social->vict_found, victim, NULL, ch, TO_VICT );
+	  break;
 
-	    case 1:
-	    case 2:
-	    case 3:
-	    case 4:
-	    case 5:
-	    case 6:
-	    case 7:
-	    case 8:
-	      act( AT_SOCIAL, social->others_found,
-		   victim, NULL, ch, TO_NOTVICT );
-	      act( AT_SOCIAL, social->char_found, victim, NULL, ch, TO_CHAR );
-	      act( AT_SOCIAL, social->vict_found, victim, NULL, ch, TO_VICT );
-	      break;
-
-	    case 9:
-	    case 10:
-	    case 11:
-	    case 12:
-	      act( AT_ACTION, "$n slaps $N.", victim, NULL, ch, TO_NOTVICT );
-	      act( AT_ACTION, "You slap $N.", victim, NULL, ch, TO_CHAR );
-	      act( AT_ACTION, "$n slaps you.", victim, NULL, ch, TO_VICT );
-	      break;
-	    }
-	}
+	case 9:
+	case 10:
+	case 11:
+	case 12:
+	  act( AT_ACTION, "$n slaps $N.", victim, NULL, ch, TO_NOTVICT );
+	  act( AT_ACTION, "You slap $N.", victim, NULL, ch, TO_CHAR );
+	  act( AT_ACTION, "$n slaps you.", victim, NULL, ch, TO_VICT );
+	  break;
+      }
     }
+  }
 
   return TRUE;
 }
@@ -462,21 +462,21 @@ void do_timecmd( CHAR_DATA * ch, char *argument )
     return;
   one_argument( argument, arg );
   if( !*arg )
-    {
-      send_to_char( "No command to time.\r\n", ch );
-      return;
-    }
+  {
+    send_to_char( "No command to time.\r\n", ch );
+    return;
+  }
   if( !str_cmp( arg, "update" ) )
+  {
+    if( timechar )
+      send_to_char( "Another person is already timing updates.\r\n", ch );
+    else
     {
-      if( timechar )
-	send_to_char( "Another person is already timing updates.\r\n", ch );
-      else
-	{
-	  timechar = ch;
-	  send_to_char( "Setting up to record next update loop.\r\n", ch );
-	}
-      return;
+      timechar = ch;
+      send_to_char( "Setting up to record next update loop.\r\n", ch );
     }
+    return;
+  }
   set_char_color( AT_PLAIN, ch );
   send_to_char( "Starting timer.\r\n", ch );
   timing = TRUE;
@@ -488,7 +488,7 @@ void do_timecmd( CHAR_DATA * ch, char *argument )
   send_to_char( "Timing complete.\r\n", ch );
   subtract_times( &etime, &start_time );
   ch_printf( ch, "Timing took %d.%06d seconds.\r\n",
-	     etime.tv_sec, etime.tv_usec );
+      etime.tv_sec, etime.tv_usec );
   return;
 }
 
@@ -506,9 +506,9 @@ void send_timer( struct timerset *vtime, const CHAR_DATA * ch )
 
   ch_printf( ch, "Has been used %d times this boot.\r\n", vtime->num_uses );
   ch_printf( ch, "Time (in secs): min %d.%0.6d; avg: %d.%0.6d; max %d.%0.6d"
-	     "\r\n", vtime->min_time.tv_sec, vtime->min_time.tv_usec,
-	     ntime.tv_sec,
-	     ntime.tv_usec, vtime->max_time.tv_sec, vtime->max_time.tv_usec );
+      "\r\n", vtime->min_time.tv_sec, vtime->min_time.tv_usec,
+      ntime.tv_sec,
+      ntime.tv_usec, vtime->max_time.tv_sec, vtime->max_time.tv_usec );
 }
 
 void update_userec( struct timeval *time_used, struct timerset *userec )
@@ -517,24 +517,24 @@ void update_userec( struct timeval *time_used, struct timerset *userec )
 
   if( !timerisset( &userec->min_time )
       || timercmp( time_used, &userec->min_time, < ) )
-    {
-      userec->min_time.tv_sec = time_used->tv_sec;
-      userec->min_time.tv_usec = time_used->tv_usec;
-    }
+  {
+    userec->min_time.tv_sec = time_used->tv_sec;
+    userec->min_time.tv_usec = time_used->tv_usec;
+  }
 
   if( !timerisset( &userec->max_time )
       || timercmp( time_used, &userec->max_time, > ) )
-    {
-      userec->max_time.tv_sec = time_used->tv_sec;
-      userec->max_time.tv_usec = time_used->tv_usec;
-    }
+  {
+    userec->max_time.tv_sec = time_used->tv_sec;
+    userec->max_time.tv_usec = time_used->tv_usec;
+  }
 
   userec->total_time.tv_sec += time_used->tv_sec;
   userec->total_time.tv_usec += time_used->tv_usec;
 
   while( userec->total_time.tv_usec >= 1000000 )
-    {
-      userec->total_time.tv_sec++;
-      userec->total_time.tv_usec -= 1000000;
-    }
+  {
+    userec->total_time.tv_sec++;
+    userec->total_time.tv_usec -= 1000000;
+  }
 }

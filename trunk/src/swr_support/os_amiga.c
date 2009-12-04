@@ -53,40 +53,40 @@ static const char *get_next_filename( CONST_STRPTR directory )
   *filename = '\0';
   memset( &buffer, 0, sizeof( buffer ) );
   sourcelock = Lock( directory, SHARED_LOCK );
-  excontrol = AllocDosObject( DOS_EXALLCONTROL, NULL );
+  excontrol = (struct ExAllControl*) AllocDosObject( DOS_EXALLCONTROL, NULL );
   excontrol->eac_LastKey = 0;
 
   do
+  {
+    exmore = ExAll( sourcelock, &buffer, sizeof( buffer ),
+	ED_NAME, excontrol );
+
+    if( !exmore && IoErr() != ERROR_NO_MORE_ENTRIES )
     {
-      exmore = ExAll( sourcelock, &buffer, sizeof( buffer ),
-		      ED_NAME, excontrol );
-
-      if( !exmore && IoErr() != ERROR_NO_MORE_ENTRIES )
-	{
-	  /* Abnormal abort */
-	  break;
-	}
-
-      if( excontrol->eac_Entries == 0 )
-	{
-	  continue;
-	}
-
-      ead = &buffer;
-
-      do
-	{
-	  if( ead->ed_Name[0] != '.' )
-	    {
-	      int curr = strtol( (const char*) ead->ed_Name, 0, 10 );
-	      high_num = curr > high_num ? curr : high_num;
-	    }
-
-	  ead = ead->ed_Next;
-	}
-      while( ead );
-
+      /* Abnormal abort */
+      break;
     }
+
+    if( excontrol->eac_Entries == 0 )
+    {
+      continue;
+    }
+
+    ead = &buffer;
+
+    do
+    {
+      if( ead->ed_Name[0] != '.' )
+      {
+	int curr = strtol( (const char*) ead->ed_Name, 0, 10 );
+	high_num = curr > high_num ? curr : high_num;
+      }
+
+      ead = ead->ed_Next;
+    }
+    while( ead );
+
+  }
   while( exmore );
 
   FreeDosObject( DOS_EXALLCONTROL, excontrol );
@@ -101,52 +101,52 @@ void os_setup( void )
   out_stream = fopen( get_next_filename( (CONST_STRPTR) "PROGDIR:log/" ), "w+" );
 
   if( !( SocketBase = OpenLibrary( (CONST_STRPTR) "bsdsocket.library", 2 ) ) )
-    {
-      fprintf( out_stream, "%s (%s:%d) - Failed to open bsdsocket.library v2+\n",
-	       __FUNCTION__, __FILE__, __LINE__ );
-      exit( 1 );
-    }
+  {
+    fprintf( out_stream, "%s (%s:%d) - Failed to open bsdsocket.library v2+\n",
+	__FUNCTION__, __FILE__, __LINE__ );
+    exit( 1 );
+  }
 
   if( !( UserGroupBase = OpenLibrary( (CONST_STRPTR) "usergroup.library", 0 ) ) )
-    {
-      fprintf( out_stream, "%s (%s:%d) - Failed to open usergroup.library\n",
-	       __FUNCTION__, __FILE__, __LINE__ );
-      exit( 1 );
-    }
+  {
+    fprintf( out_stream, "%s (%s:%d) - Failed to open usergroup.library\n",
+	__FUNCTION__, __FILE__, __LINE__ );
+    exit( 1 );
+  }
 
   if( !( UtilityBase = (struct UtilityBase*) OpenLibrary( (CONST_STRPTR) "utility.library", 0 ) ) )
-    {
-      fprintf( out_stream, "%s (%s:%d) - Failed to open utility.library\n",
-	       __FUNCTION__, __FILE__, __LINE__ );
-      exit( 1 );
-    }
+  {
+    fprintf( out_stream, "%s (%s:%d) - Failed to open utility.library\n",
+	__FUNCTION__, __FILE__, __LINE__ );
+    exit( 1 );
+  }
 }
 
 void os_cleanup( void )
 {
   if( UtilityBase )
-    {
-      CloseLibrary( (struct Library*) UtilityBase );
-      UtilityBase = NULL;
-    }
+  {
+    CloseLibrary( (struct Library*) UtilityBase );
+    UtilityBase = NULL;
+  }
 
   if( UserGroupBase )
-    {
-      CloseLibrary( UserGroupBase );
-      UserGroupBase = NULL;
-    }
+  {
+    CloseLibrary( UserGroupBase );
+    UserGroupBase = NULL;
+  }
 
   if( SocketBase )
-    {
-      CloseLibrary( SocketBase );
-      SocketBase = NULL;
-    }
+  {
+    CloseLibrary( SocketBase );
+    SocketBase = NULL;
+  }
 
   if( out_stream )
-    {
-      fclose( out_stream );
-      out_stream = 0;
-    }
+  {
+    fclose( out_stream );
+    out_stream = 0;
+  }
 }
 
 int set_nonblocking( SOCKET sock )
