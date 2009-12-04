@@ -16,19 +16,19 @@ static const char *get_next_filename( const char *directory )
   *filename = '\0';
 
   if( !( dp = opendir( directory ) ) )
-    {
-      perror( directory );
-      return filename;
-    }
+  {
+    perror( directory );
+    return filename;
+  }
 
   while( ( de = readdir( dp ) ) != NULL )
+  {
+    if( de->d_name[0] != '.' )
     {
-      if( de->d_name[0] != '.' )
-        {
-          int current_number = strtol( de->d_name, 0, 10 );
-          high_num = current_number > high_num ? current_number : high_num;
-        }
+      int current_number = strtol( de->d_name, 0, 10 );
+      high_num = current_number > high_num ? current_number : high_num;
     }
+  }
 
   ++high_num;
   sprintf( filename, "%s%d.log", directory, high_num );
@@ -40,19 +40,19 @@ void os_setup( void )
   out_stream = fopen( get_next_filename( "log/" ), "w" );
 
   if( !out_stream )
-    {
-      fprintf( stderr, "Failed to open new log file.\n" );
-      perror( strerror( errno ) );
-      exit( 1 );
-    }
+  {
+    fprintf( stderr, "Failed to open new log file.\n" );
+    perror( strerror( errno ) );
+    exit( 1 );
+  }
 }
 
 void os_cleanup( void )
 {
   if( out_stream )
-    {
-      fclose( out_stream );
-    }
+  {
+    fclose( out_stream );
+  }
 }
 
 int set_nonblocking( SOCKET sock )

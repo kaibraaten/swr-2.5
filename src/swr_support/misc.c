@@ -37,48 +37,48 @@ char *scramble( const char *argument, int modifier )
   modifier %= number_range( 80, 300 ); /* Bitvectors get way too large #s */
 
   for ( position = 0; position < MAX_INPUT_LENGTH; position++ )
+  {
+    if ( argument[position] == '\0' )
     {
-      if ( argument[position] == '\0' )
-        {
-          arg[position] = '\0';
-          return arg;
-        }
-      else if ( argument[position] >= 'A' && argument[position] <= 'Z' )
-        {
-          conversion = -conversion + position
-            - modifier + argument[position] - 'A';
-          conversion = number_range( conversion - 5, conversion + 5 );
-          while ( conversion > 25 )
-            conversion -= 26;
-          while ( conversion < 0 )
-            conversion += 26;
-          arg[position] = (char)(conversion + 'A');
-        }
-      else if ( argument[position] >= 'a' && argument[position] <= 'z' )
-        {
-          conversion = -conversion + position
-            - modifier + argument[position] - 'a';
-          conversion = number_range( conversion - 5, conversion + 5 );
-          while ( conversion > 25 )
-            conversion -= 26;
-          while ( conversion < 0 )
-            conversion += 26;
-          arg[position] = (char)(conversion + 'a');
-        }
-      else if ( argument[position] >= '0' && argument[position] <= '9' )
-        {
-          conversion = -conversion + position
-            - modifier + argument[position] - '0';
-          conversion = number_range( conversion - 2, conversion + 2 );
-          while ( conversion > 9 )
-            conversion -= 10;
-          while ( conversion < 0 )
-	    conversion += 10;
-          arg[position] = (char)(conversion + '0');
-        }
-      else
-        arg[position] = argument[position];
+      arg[position] = '\0';
+      return arg;
     }
+    else if ( argument[position] >= 'A' && argument[position] <= 'Z' )
+    {
+      conversion = -conversion + position
+	- modifier + argument[position] - 'A';
+      conversion = number_range( conversion - 5, conversion + 5 );
+      while ( conversion > 25 )
+	conversion -= 26;
+      while ( conversion < 0 )
+	conversion += 26;
+      arg[position] = (char)(conversion + 'A');
+    }
+    else if ( argument[position] >= 'a' && argument[position] <= 'z' )
+    {
+      conversion = -conversion + position
+	- modifier + argument[position] - 'a';
+      conversion = number_range( conversion - 5, conversion + 5 );
+      while ( conversion > 25 )
+	conversion -= 26;
+      while ( conversion < 0 )
+	conversion += 26;
+      arg[position] = (char)(conversion + 'a');
+    }
+    else if ( argument[position] >= '0' && argument[position] <= '9' )
+    {
+      conversion = -conversion + position
+	- modifier + argument[position] - '0';
+      conversion = number_range( conversion - 2, conversion + 2 );
+      while ( conversion > 9 )
+	conversion -= 10;
+      while ( conversion < 0 )
+	conversion += 10;
+      arg[position] = (char)(conversion + '0');
+    }
+    else
+      arg[position] = argument[position];
+  }
 
   arg[position-1] = '\0';
   return arg;
@@ -105,10 +105,10 @@ void init_mm( void )
   piState[0]  = ((int) time(0) ) & ((1 << 30) - 1);
   piState[1]  = 1;
   for ( iState = 2; iState < 55; iState++ )
-    {
-      piState[iState] = (piState[iState-1] + piState[iState-2])
-	& ((1 << 30) - 1);
-    }
+  {
+    piState[iState] = (piState[iState-1] + piState[iState-2])
+      & ((1 << 30) - 1);
+  }
   return;
 }
 
@@ -148,10 +148,10 @@ int dice( int number, int size )
   int sum;
 
   switch ( size )
-    {
+  {
     case 0: return 0;
     case 1: return number;
-    }
+  }
 
   for ( idice = 0, sum = 0; idice < number; idice++ )
     sum += number_range( 1, size );
@@ -165,10 +165,10 @@ int dice( int number, int size )
 int number_fuzzy( int number )
 {
   switch ( number_bits( 2 ) )
-    {
+  {
     case 0:  number -= 1; break;
     case 3:  number += 1; break;
-    }
+  }
 
   return UMAX( 1, number );
 }
@@ -221,10 +221,10 @@ char *flag_string( int bitvector, const char * const flagarray[] )
   buf[0] = '\0';
   for ( x = 0; x < 32 ; x++ )
     if ( IS_SET( bitvector, 1 << x ) )
-      {
-        strcat( buf, flagarray[x] );
-        strcat( buf, " " );
-      }
+    {
+      strcat( buf, flagarray[x] );
+      strcat( buf, " " );
+    }
   if ( (x=strlen( buf )) > 0 )
     buf[--x] = '\0';
 

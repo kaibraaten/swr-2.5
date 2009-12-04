@@ -42,7 +42,7 @@ SPELL_FUN *spell_function( const char *name )
 DO_FUN *skill_function( const char *name )
 {
   switch ( name[3] )
-    {
+  {
     case 'a':
       if( !str_cmp( name, "do_aassign" ) )
 	return do_aassign;
@@ -872,7 +872,7 @@ DO_FUN *skill_function( const char *name )
     case 'z':
       if( !str_cmp( name, "do_zones" ) )
 	return do_zones;
-    }
+  }
   return skill_notfound;
 }
 
@@ -1195,9 +1195,9 @@ const char *skill_name( DO_FUN * skill )
     return "do_drink";
   if( skill == do_drop )
     return "do_drop";
-/*    if ( skill == do_diagnose )		return "do_diagnose";
-*/ if( skill == do_east )
-    return "do_east";
+  /*    if ( skill == do_diagnose )		return "do_diagnose";
+  */ if( skill == do_east )
+  return "do_east";
   if( skill == do_eat )
     return "do_eat";
   if( skill == do_echo )
@@ -1718,7 +1718,7 @@ void sort_skill_table(  )
 {
   log_string( "Sorting skill table..." );
   qsort( &skill_table[1], top_sn - 1, sizeof( SKILLTYPE * ),
-	 ( int ( * )( const void *, const void * ) ) skill_comp );
+      ( int ( * )( const void *, const void * ) ) skill_comp );
 }
 
 
@@ -1792,7 +1792,7 @@ void fwrite_skill( FILE * fpout, SKILLTYPE * skill )
     fprintf( fpout, "Components   %s~\n", skill->components );
   for( aff = skill->affects; aff; aff = aff->next )
     fprintf( fpout, "Affect       '%s' %d '%s' %d\n",
-	     aff->duration, aff->location, aff->modifier, aff->bitvector );
+	aff->duration, aff->location, aff->modifier, aff->bitvector );
   if( skill->alignment )
     fprintf( fpout, "Alignment   %d\n", skill->alignment );
 
@@ -1808,19 +1808,19 @@ void save_skill_table(  )
   FILE *fpout;
 
   if( ( fpout = fopen( SKILL_FILE, "w" ) ) == NULL )
-    {
-      bug( "Cannot open skills.dat for writting", 0 );
-      perror( SKILL_FILE );
-      return;
-    }
+  {
+    bug( "Cannot open skills.dat for writting", 0 );
+    perror( SKILL_FILE );
+    return;
+  }
 
   for( x = 0; x < top_sn; x++ )
-    {
-      if( !skill_table[x]->name || skill_table[x]->name[0] == '\0' )
-	break;
-      fprintf( fpout, "#SKILL\n" );
-      fwrite_skill( fpout, skill_table[x] );
-    }
+  {
+    if( !skill_table[x]->name || skill_table[x]->name[0] == '\0' )
+      break;
+    fprintf( fpout, "#SKILL\n" );
+    fwrite_skill( fpout, skill_table[x] );
+  }
   fprintf( fpout, "#END\n" );
   fclose( fpout );
 }
@@ -1836,42 +1836,42 @@ void save_socials(  )
   int x;
 
   if( ( fpout = fopen( SOCIAL_FILE, "w" ) ) == NULL )
-    {
-      bug( "Cannot open socials.dat for writting", 0 );
-      perror( SOCIAL_FILE );
-      return;
-    }
+  {
+    bug( "Cannot open socials.dat for writting", 0 );
+    perror( SOCIAL_FILE );
+    return;
+  }
 
   for( x = 0; x < 27; x++ )
+  {
+    for( social = social_index[x]; social; social = social->next )
     {
-      for( social = social_index[x]; social; social = social->next )
-	{
-	  if( !social->name || social->name[0] == '\0' )
-	    {
-	      bug( "Save_socials: blank social in hash bucket %d", x );
-	      continue;
-	    }
-	  fprintf( fpout, "#SOCIAL\n" );
-	  fprintf( fpout, "Name        %s~\n", social->name );
-	  if( social->char_no_arg )
-	    fprintf( fpout, "CharNoArg   %s~\n", social->char_no_arg );
-	  else
-	    bug( "Save_socials: NULL char_no_arg in hash bucket %d", x );
-	  if( social->others_no_arg )
-	    fprintf( fpout, "OthersNoArg %s~\n", social->others_no_arg );
-	  if( social->char_found )
-	    fprintf( fpout, "CharFound   %s~\n", social->char_found );
-	  if( social->others_found )
-	    fprintf( fpout, "OthersFound %s~\n", social->others_found );
-	  if( social->vict_found )
-	    fprintf( fpout, "VictFound   %s~\n", social->vict_found );
-	  if( social->char_auto )
-	    fprintf( fpout, "CharAuto    %s~\n", social->char_auto );
-	  if( social->others_auto )
-	    fprintf( fpout, "OthersAuto  %s~\n", social->others_auto );
-	  fprintf( fpout, "End\n\n" );
-	}
+      if( !social->name || social->name[0] == '\0' )
+      {
+	bug( "Save_socials: blank social in hash bucket %d", x );
+	continue;
+      }
+      fprintf( fpout, "#SOCIAL\n" );
+      fprintf( fpout, "Name        %s~\n", social->name );
+      if( social->char_no_arg )
+	fprintf( fpout, "CharNoArg   %s~\n", social->char_no_arg );
+      else
+	bug( "Save_socials: NULL char_no_arg in hash bucket %d", x );
+      if( social->others_no_arg )
+	fprintf( fpout, "OthersNoArg %s~\n", social->others_no_arg );
+      if( social->char_found )
+	fprintf( fpout, "CharFound   %s~\n", social->char_found );
+      if( social->others_found )
+	fprintf( fpout, "OthersFound %s~\n", social->others_found );
+      if( social->vict_found )
+	fprintf( fpout, "VictFound   %s~\n", social->vict_found );
+      if( social->char_auto )
+	fprintf( fpout, "CharAuto    %s~\n", social->char_auto );
+      if( social->others_auto )
+	fprintf( fpout, "OthersAuto  %s~\n", social->others_auto );
+      fprintf( fpout, "End\n\n" );
     }
+  }
   fprintf( fpout, "#END\n" );
   fclose( fpout );
 }
@@ -1897,30 +1897,30 @@ void save_commands(  )
   int x;
 
   if( ( fpout = fopen( COMMAND_FILE, "w" ) ) == NULL )
-    {
-      bug( "Cannot open commands.dat for writing", 0 );
-      perror( COMMAND_FILE );
-      return;
-    }
+  {
+    bug( "Cannot open commands.dat for writing", 0 );
+    perror( COMMAND_FILE );
+    return;
+  }
 
   for( x = 0; x < 126; x++ )
+  {
+    for( command = command_hash[x]; command; command = command->next )
     {
-      for( command = command_hash[x]; command; command = command->next )
-	{
-	  if( !command->name || command->name[0] == '\0' )
-	    {
-	      bug( "Save_commands: blank command in hash bucket %d", x );
-	      continue;
-	    }
-	  fprintf( fpout, "#COMMAND\n" );
-	  fprintf( fpout, "Name        %s~\n", command->name );
-	  fprintf( fpout, "Code        %s\n", skill_name( command->do_fun ) );
-	  fprintf( fpout, "Position    %d\n", command->position );
-	  fprintf( fpout, "Level       %d\n", command->level );
-	  fprintf( fpout, "Log         %d\n", command->log );
-	  fprintf( fpout, "End\n\n" );
-	}
+      if( !command->name || command->name[0] == '\0' )
+      {
+	bug( "Save_commands: blank command in hash bucket %d", x );
+	continue;
+      }
+      fprintf( fpout, "#COMMAND\n" );
+      fprintf( fpout, "Name        %s~\n", command->name );
+      fprintf( fpout, "Code        %s\n", skill_name( command->do_fun ) );
+      fprintf( fpout, "Position    %d\n", command->position );
+      fprintf( fpout, "Level       %d\n", command->level );
+      fprintf( fpout, "Log         %d\n", command->log );
+      fprintf( fpout, "End\n\n" );
     }
+  }
   fprintf( fpout, "#END\n" );
   fclose( fpout );
 }
@@ -1936,134 +1936,134 @@ SKILLTYPE *fread_skill( FILE * fp )
   skill->affects = NULL;
 
   for( ;; )
+  {
+    word = feof( fp ) ? "End" : fread_word( fp );
+    fMatch = FALSE;
+
+    switch ( UPPER( word[0] ) )
     {
-      word = feof( fp ) ? "End" : fread_word( fp );
-      fMatch = FALSE;
+      case '*':
+	fMatch = TRUE;
+	fread_to_eol( fp );
+	break;
 
-      switch ( UPPER( word[0] ) )
+      case 'A':
+	KEY( "Alignment", skill->alignment, fread_number( fp ) );
+	if( !str_cmp( word, "Affect" ) )
 	{
-	case '*':
+	  SMAUG_AFF *aff;
+
+	  CREATE( aff, SMAUG_AFF, 1 );
+	  aff->duration = str_dup( fread_word( fp ) );
+	  aff->location = fread_number( fp );
+	  aff->modifier = str_dup( fread_word( fp ) );
+	  aff->bitvector = fread_number( fp );
+	  aff->next = skill->affects;
+	  skill->affects = aff;
 	  fMatch = TRUE;
-	  fread_to_eol( fp );
-	  break;
-
-	case 'A':
-	  KEY( "Alignment", skill->alignment, fread_number( fp ) );
-	  if( !str_cmp( word, "Affect" ) )
-	    {
-	      SMAUG_AFF *aff;
-
-	      CREATE( aff, SMAUG_AFF, 1 );
-	      aff->duration = str_dup( fread_word( fp ) );
-	      aff->location = fread_number( fp );
-	      aff->modifier = str_dup( fread_word( fp ) );
-	      aff->bitvector = fread_number( fp );
-	      aff->next = skill->affects;
-	      skill->affects = aff;
-	      fMatch = TRUE;
-	      break;
-	    }
-	  break;
-
-	case 'C':
-	  if( !str_cmp( word, "Code" ) )
-	    {
-	      SPELL_FUN *spellfun;
-	      DO_FUN *dofun;
-	      char *w = fread_word( fp );
-
-	      fMatch = TRUE;
-	      if( ( spellfun = spell_function( w ) ) != spell_notfound )
-		skill->spell_fun = spellfun;
-	      else if( ( dofun = skill_function( w ) ) != skill_notfound )
-		skill->skill_fun = dofun;
-	      else
-		{
-		  sprintf( buf, "fread_skill: unknown skill/spell %s", w );
-		  bug( buf, 0 );
-		  skill->spell_fun = spell_null;
-		}
-	      break;
-	    }
-	  KEY( "Code", skill->spell_fun, spell_function( fread_word( fp ) ) );
-	  KEY( "Components", skill->components, fread_string_nohash( fp ) );
-	  break;
-
-	case 'D':
-	  KEY( "Dammsg", skill->noun_damage, fread_string_nohash( fp ) );
-	  KEY( "Dice", skill->dice, fread_string_nohash( fp ) );
-	  KEY( "Diechar", skill->die_char, fread_string_nohash( fp ) );
-	  KEY( "Dieroom", skill->die_room, fread_string_nohash( fp ) );
-	  KEY( "Dievict", skill->die_vict, fread_string_nohash( fp ) );
-	  KEY( "Difficulty", skill->difficulty, fread_number( fp ) );
-	  break;
-
-	case 'E':
-	  if( !str_cmp( word, "End" ) )
-	    return skill;
-	  break;
-
-	case 'F':
-	  KEY( "Flags", skill->flags, fread_number( fp ) );
-	  break;
-
-	case 'H':
-	  KEY( "Hitchar", skill->hit_char, fread_string_nohash( fp ) );
-	  KEY( "Hitroom", skill->hit_room, fread_string_nohash( fp ) );
-	  KEY( "Hitvict", skill->hit_vict, fread_string_nohash( fp ) );
-	  break;
-
-	case 'I':
-	  KEY( "Immchar", skill->imm_char, fread_string_nohash( fp ) );
-	  KEY( "Immroom", skill->imm_room, fread_string_nohash( fp ) );
-	  KEY( "Immvict", skill->imm_vict, fread_string_nohash( fp ) );
-	  break;
-
-	case 'M':
-	  KEY( "Mana", skill->min_mana, fread_number( fp ) );
-	  KEY( "Minpos", skill->minimum_position, fread_number( fp ) );
-	  KEY( "Misschar", skill->miss_char, fread_string_nohash( fp ) );
-	  KEY( "Missroom", skill->miss_room, fread_string_nohash( fp ) );
-	  KEY( "Missvict", skill->miss_vict, fread_string_nohash( fp ) );
-	  break;
-
-	case 'N':
-	  KEY( "Name", skill->name, fread_string_nohash( fp ) );
-	  break;
-
-	case 'P':
-	  KEY( "Participants", skill->participants, fread_number( fp ) );
-	  break;
-
-	case 'R':
-	  KEY( "Rounds", skill->beats, fread_number( fp ) );
-	  break;
-
-	case 'S':
-	  KEY( "Slot", skill->slot, fread_number( fp ) );
-	  KEY( "Saves", skill->saves, fread_number( fp ) );
-	  break;
-
-	case 'T':
-	  KEY( "Target", skill->target, fread_number( fp ) );
-	  KEY( "Type", skill->type, get_skill( fread_word( fp ) ) );
-	  break;
-
-	case 'V':
-	  KEY( "Value", skill->value, fread_number( fp ) );
-	  break;
-
-	case 'W':
-	  KEY( "Wearoff", skill->msg_off, fread_string_nohash( fp ) );
 	  break;
 	}
+	break;
 
-      if( !fMatch )
+      case 'C':
+	if( !str_cmp( word, "Code" ) )
 	{
-	  sprintf( buf, "Fread_skill: no match: %s", word );
-	  bug( buf, 0 );
+	  SPELL_FUN *spellfun;
+	  DO_FUN *dofun;
+	  char *w = fread_word( fp );
+
+	  fMatch = TRUE;
+	  if( ( spellfun = spell_function( w ) ) != spell_notfound )
+	    skill->spell_fun = spellfun;
+	  else if( ( dofun = skill_function( w ) ) != skill_notfound )
+	    skill->skill_fun = dofun;
+	  else
+	  {
+	    sprintf( buf, "fread_skill: unknown skill/spell %s", w );
+	    bug( buf, 0 );
+	    skill->spell_fun = spell_null;
+	  }
+	  break;
 	}
+	KEY( "Code", skill->spell_fun, spell_function( fread_word( fp ) ) );
+	KEY( "Components", skill->components, fread_string_nohash( fp ) );
+	break;
+
+      case 'D':
+	KEY( "Dammsg", skill->noun_damage, fread_string_nohash( fp ) );
+	KEY( "Dice", skill->dice, fread_string_nohash( fp ) );
+	KEY( "Diechar", skill->die_char, fread_string_nohash( fp ) );
+	KEY( "Dieroom", skill->die_room, fread_string_nohash( fp ) );
+	KEY( "Dievict", skill->die_vict, fread_string_nohash( fp ) );
+	KEY( "Difficulty", skill->difficulty, fread_number( fp ) );
+	break;
+
+      case 'E':
+	if( !str_cmp( word, "End" ) )
+	  return skill;
+	break;
+
+      case 'F':
+	KEY( "Flags", skill->flags, fread_number( fp ) );
+	break;
+
+      case 'H':
+	KEY( "Hitchar", skill->hit_char, fread_string_nohash( fp ) );
+	KEY( "Hitroom", skill->hit_room, fread_string_nohash( fp ) );
+	KEY( "Hitvict", skill->hit_vict, fread_string_nohash( fp ) );
+	break;
+
+      case 'I':
+	KEY( "Immchar", skill->imm_char, fread_string_nohash( fp ) );
+	KEY( "Immroom", skill->imm_room, fread_string_nohash( fp ) );
+	KEY( "Immvict", skill->imm_vict, fread_string_nohash( fp ) );
+	break;
+
+      case 'M':
+	KEY( "Mana", skill->min_mana, fread_number( fp ) );
+	KEY( "Minpos", skill->minimum_position, fread_number( fp ) );
+	KEY( "Misschar", skill->miss_char, fread_string_nohash( fp ) );
+	KEY( "Missroom", skill->miss_room, fread_string_nohash( fp ) );
+	KEY( "Missvict", skill->miss_vict, fread_string_nohash( fp ) );
+	break;
+
+      case 'N':
+	KEY( "Name", skill->name, fread_string_nohash( fp ) );
+	break;
+
+      case 'P':
+	KEY( "Participants", skill->participants, fread_number( fp ) );
+	break;
+
+      case 'R':
+	KEY( "Rounds", skill->beats, fread_number( fp ) );
+	break;
+
+      case 'S':
+	KEY( "Slot", skill->slot, fread_number( fp ) );
+	KEY( "Saves", skill->saves, fread_number( fp ) );
+	break;
+
+      case 'T':
+	KEY( "Target", skill->target, fread_number( fp ) );
+	KEY( "Type", skill->type, get_skill( fread_word( fp ) ) );
+	break;
+
+      case 'V':
+	KEY( "Value", skill->value, fread_number( fp ) );
+	break;
+
+      case 'W':
+	KEY( "Wearoff", skill->msg_off, fread_string_nohash( fp ) );
+	break;
     }
+
+    if( !fMatch )
+    {
+      sprintf( buf, "Fread_skill: no match: %s", word );
+      bug( buf, 0 );
+    }
+  }
 }
 
 void load_skill_table(  )
@@ -2071,54 +2071,54 @@ void load_skill_table(  )
   FILE *fp;
 
   if( ( fp = fopen( SKILL_FILE, "r" ) ) != NULL )
+  {
+    top_sn = 0;
+    for( ;; )
     {
-      top_sn = 0;
-      for( ;; )
+      char letter;
+      char *word;
+
+      letter = fread_letter( fp );
+      if( letter == '*' )
+      {
+	fread_to_eol( fp );
+	continue;
+      }
+
+      if( letter != '#' )
+      {
+	bug( "Load_skill_table: # not found.", 0 );
+	break;
+      }
+
+      word = fread_word( fp );
+      if( !str_cmp( word, "SKILL" ) )
+      {
+	if( top_sn >= MAX_SKILL )
 	{
-	  char letter;
-	  char *word;
-
-	  letter = fread_letter( fp );
-	  if( letter == '*' )
-	    {
-	      fread_to_eol( fp );
-	      continue;
-	    }
-
-	  if( letter != '#' )
-	    {
-	      bug( "Load_skill_table: # not found.", 0 );
-	      break;
-	    }
-
-	  word = fread_word( fp );
-	  if( !str_cmp( word, "SKILL" ) )
-	    {
-	      if( top_sn >= MAX_SKILL )
-		{
-		  bug( "load_skill_table: more skills than MAX_SKILL %d",
-		       MAX_SKILL );
-		  fclose( fp );
-		  return;
-		}
-	      skill_table[top_sn++] = fread_skill( fp );
-	      continue;
-	    }
-	  else if( !str_cmp( word, "END" ) )
-	    break;
-	  else
-	    {
-	      bug( "Load_skill_table: bad section.", 0 );
-	      continue;
-	    }
+	  bug( "load_skill_table: more skills than MAX_SKILL %d",
+	      MAX_SKILL );
+	  fclose( fp );
+	  return;
 	}
-      fclose( fp );
+	skill_table[top_sn++] = fread_skill( fp );
+	continue;
+      }
+      else if( !str_cmp( word, "END" ) )
+	break;
+      else
+      {
+	bug( "Load_skill_table: bad section.", 0 );
+	continue;
+      }
     }
+    fclose( fp );
+  }
   else
-    {
-      bug( "Cannot open skills.dat", 0 );
-      exit( 0 );
-    }
+  {
+    bug( "Cannot open skills.dat", 0 );
+    exit( 0 );
+  }
 }
 
 
@@ -2132,66 +2132,66 @@ void fread_social( FILE * fp )
   CREATE( social, SOCIALTYPE, 1 );
 
   for( ;; )
+  {
+    word = feof( fp ) ? "End" : fread_word( fp );
+    fMatch = FALSE;
+
+    switch ( UPPER( word[0] ) )
     {
-      word = feof( fp ) ? "End" : fread_word( fp );
-      fMatch = FALSE;
+      case '*':
+	fMatch = TRUE;
+	fread_to_eol( fp );
+	break;
 
-      switch ( UPPER( word[0] ) )
+      case 'C':
+	KEY( "CharNoArg", social->char_no_arg, fread_string_nohash( fp ) );
+	KEY( "CharFound", social->char_found, fread_string_nohash( fp ) );
+	KEY( "CharAuto", social->char_auto, fread_string_nohash( fp ) );
+	break;
+
+      case 'E':
+	if( !str_cmp( word, "End" ) )
 	{
-	case '*':
-	  fMatch = TRUE;
-	  fread_to_eol( fp );
-	  break;
-
-	case 'C':
-	  KEY( "CharNoArg", social->char_no_arg, fread_string_nohash( fp ) );
-	  KEY( "CharFound", social->char_found, fread_string_nohash( fp ) );
-	  KEY( "CharAuto", social->char_auto, fread_string_nohash( fp ) );
-	  break;
-
-	case 'E':
-	  if( !str_cmp( word, "End" ) )
-	    {
-	      if( !social->name )
-		{
-		  bug( "Fread_social: Name not found", 0 );
-		  free_social( social );
-		  return;
-		}
-	      if( !social->char_no_arg )
-		{
-		  bug( "Fread_social: CharNoArg not found", 0 );
-		  free_social( social );
-		  return;
-		}
-	      add_social( social );
-	      return;
-	    }
-	  break;
-
-	case 'N':
-	  KEY( "Name", social->name, fread_string_nohash( fp ) );
-	  break;
-
-	case 'O':
-	  KEY( "OthersNoArg", social->others_no_arg,
-	       fread_string_nohash( fp ) );
-	  KEY( "OthersFound", social->others_found,
-	       fread_string_nohash( fp ) );
-	  KEY( "OthersAuto", social->others_auto, fread_string_nohash( fp ) );
-	  break;
-
-	case 'V':
-	  KEY( "VictFound", social->vict_found, fread_string_nohash( fp ) );
-	  break;
+	  if( !social->name )
+	  {
+	    bug( "Fread_social: Name not found", 0 );
+	    free_social( social );
+	    return;
+	  }
+	  if( !social->char_no_arg )
+	  {
+	    bug( "Fread_social: CharNoArg not found", 0 );
+	    free_social( social );
+	    return;
+	  }
+	  add_social( social );
+	  return;
 	}
+	break;
 
-      if( !fMatch )
-	{
-	  sprintf( buf, "Fread_social: no match: %s", word );
-	  bug( buf, 0 );
-	}
+      case 'N':
+	KEY( "Name", social->name, fread_string_nohash( fp ) );
+	break;
+
+      case 'O':
+	KEY( "OthersNoArg", social->others_no_arg,
+	    fread_string_nohash( fp ) );
+	KEY( "OthersFound", social->others_found,
+	    fread_string_nohash( fp ) );
+	KEY( "OthersAuto", social->others_auto, fread_string_nohash( fp ) );
+	break;
+
+      case 'V':
+	KEY( "VictFound", social->vict_found, fread_string_nohash( fp ) );
+	break;
     }
+
+    if( !fMatch )
+    {
+      sprintf( buf, "Fread_social: no match: %s", word );
+      bug( buf, 0 );
+    }
+  }
 }
 
 void load_socials(  )
@@ -2199,47 +2199,47 @@ void load_socials(  )
   FILE *fp;
 
   if( ( fp = fopen( SOCIAL_FILE, "r" ) ) != NULL )
+  {
+    top_sn = 0;
+    for( ;; )
     {
-      top_sn = 0;
-      for( ;; )
-	{
-	  char letter;
-	  char *word;
+      char letter;
+      char *word;
 
-	  letter = fread_letter( fp );
-	  if( letter == '*' )
-	    {
-	      fread_to_eol( fp );
-	      continue;
-	    }
+      letter = fread_letter( fp );
+      if( letter == '*' )
+      {
+	fread_to_eol( fp );
+	continue;
+      }
 
-	  if( letter != '#' )
-	    {
-	      bug( "Load_socials: # not found.", 0 );
-	      break;
-	    }
+      if( letter != '#' )
+      {
+	bug( "Load_socials: # not found.", 0 );
+	break;
+      }
 
-	  word = fread_word( fp );
-	  if( !str_cmp( word, "SOCIAL" ) )
-	    {
-	      fread_social( fp );
-	      continue;
-	    }
-	  else if( !str_cmp( word, "END" ) )
-	    break;
-	  else
-	    {
-	      bug( "Load_socials: bad section.", 0 );
-	      continue;
-	    }
-	}
-      fclose( fp );
+      word = fread_word( fp );
+      if( !str_cmp( word, "SOCIAL" ) )
+      {
+	fread_social( fp );
+	continue;
+      }
+      else if( !str_cmp( word, "END" ) )
+	break;
+      else
+      {
+	bug( "Load_socials: bad section.", 0 );
+	continue;
+      }
     }
+    fclose( fp );
+  }
   else
-    {
-      bug( "Cannot open socials.dat", 0 );
-      exit( 0 );
-    }
+  {
+    bug( "Cannot open socials.dat", 0 );
+    exit( 0 );
+  }
 }
 
 void fread_command( FILE * fp )
@@ -2252,61 +2252,61 @@ void fread_command( FILE * fp )
   CREATE( command, CMDTYPE, 1 );
 
   for( ;; )
+  {
+    word = feof( fp ) ? "End" : fread_word( fp );
+    fMatch = FALSE;
+
+    switch ( UPPER( word[0] ) )
     {
-      word = feof( fp ) ? "End" : fread_word( fp );
-      fMatch = FALSE;
+      case '*':
+	fMatch = TRUE;
+	fread_to_eol( fp );
+	break;
 
-      switch ( UPPER( word[0] ) )
+      case 'C':
+	KEY( "Code", command->do_fun, skill_function( fread_word( fp ) ) );
+	break;
+
+      case 'E':
+	if( !str_cmp( word, "End" ) )
 	{
-	case '*':
-	  fMatch = TRUE;
-	  fread_to_eol( fp );
-	  break;
-
-	case 'C':
-	  KEY( "Code", command->do_fun, skill_function( fread_word( fp ) ) );
-	  break;
-
-	case 'E':
-	  if( !str_cmp( word, "End" ) )
-	    {
-	      if( !command->name )
-		{
-		  bug( "Fread_command: Name not found", 0 );
-		  free_command( command );
-		  return;
-		}
-	      if( !command->do_fun )
-		{
-		  bug( "Fread_command: Function not found", 0 );
-		  free_command( command );
-		  return;
-		}
-	      add_command( command );
-	      return;
-	    }
-	  break;
-
-	case 'L':
-	  KEY( "Level", command->level, fread_number( fp ) );
-	  KEY( "Log", command->log, fread_number( fp ) );
-	  break;
-
-	case 'N':
-	  KEY( "Name", command->name, fread_string_nohash( fp ) );
-	  break;
-
-	case 'P':
-	  KEY( "Position", command->position, fread_number( fp ) );
-	  break;
+	  if( !command->name )
+	  {
+	    bug( "Fread_command: Name not found", 0 );
+	    free_command( command );
+	    return;
+	  }
+	  if( !command->do_fun )
+	  {
+	    bug( "Fread_command: Function not found", 0 );
+	    free_command( command );
+	    return;
+	  }
+	  add_command( command );
+	  return;
 	}
+	break;
 
-      if( !fMatch )
-	{
-	  sprintf( buf, "Fread_command: no match: %s", word );
-	  bug( buf, 0 );
-	}
+      case 'L':
+	KEY( "Level", command->level, fread_number( fp ) );
+	KEY( "Log", command->log, fread_number( fp ) );
+	break;
+
+      case 'N':
+	KEY( "Name", command->name, fread_string_nohash( fp ) );
+	break;
+
+      case 'P':
+	KEY( "Position", command->position, fread_number( fp ) );
+	break;
     }
+
+    if( !fMatch )
+    {
+      sprintf( buf, "Fread_command: no match: %s", word );
+      bug( buf, 0 );
+    }
+  }
 }
 
 void load_commands(  )
@@ -2314,46 +2314,46 @@ void load_commands(  )
   FILE *fp;
 
   if( ( fp = fopen( COMMAND_FILE, "r" ) ) != NULL )
+  {
+    top_sn = 0;
+    for( ;; )
     {
-      top_sn = 0;
-      for( ;; )
-	{
-	  char letter;
-	  char *word;
+      char letter;
+      char *word;
 
-	  letter = fread_letter( fp );
-	  if( letter == '*' )
-	    {
-	      fread_to_eol( fp );
-	      continue;
-	    }
+      letter = fread_letter( fp );
+      if( letter == '*' )
+      {
+	fread_to_eol( fp );
+	continue;
+      }
 
-	  if( letter != '#' )
-	    {
-	      bug( "Load_commands: # not found.", 0 );
-	      break;
-	    }
+      if( letter != '#' )
+      {
+	bug( "Load_commands: # not found.", 0 );
+	break;
+      }
 
-	  word = fread_word( fp );
-	  if( !str_cmp( word, "COMMAND" ) )
-	    {
-	      fread_command( fp );
-	      continue;
-	    }
-	  else if( !str_cmp( word, "END" ) )
-	    break;
-	  else
-	    {
-	      bug( "Load_commands: bad section.", 0 );
-	      continue;
-	    }
-	}
-      fclose( fp );
+      word = fread_word( fp );
+      if( !str_cmp( word, "COMMAND" ) )
+      {
+	fread_command( fp );
+	continue;
+      }
+      else if( !str_cmp( word, "END" ) )
+	break;
+      else
+      {
+	bug( "Load_commands: bad section.", 0 );
+	continue;
+      }
     }
+    fclose( fp );
+  }
   else
-    {
-      bug( "Cannot open commands.dat", 0 );
-      exit( 0 );
-    }
+  {
+    bug( "Cannot open commands.dat", 0 );
+    exit( 0 );
+  }
 
 }

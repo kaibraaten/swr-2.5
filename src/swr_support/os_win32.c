@@ -40,19 +40,19 @@ static const char *get_next_filename( const char *directory )
   h = FindFirstFile( buf, &info );
 
   if( h != INVALID_HANDLE_VALUE )
+  {
+    do
     {
-      do
-	{
-	  if( info.cFileName[0] != '.' )
-            {
-              int curr = strtol( info.cFileName, 0, 10 );
-              high_num = curr > high_num ? curr : high_num;
-            }
-	}
-      while( FindNextFile( h, &info ) );
-
-      FindClose( h );
+      if( info.cFileName[0] != '.' )
+      {
+	int curr = strtol( info.cFileName, 0, 10 );
+	high_num = curr > high_num ? curr : high_num;
+      }
     }
+    while( FindNextFile( h, &info ) );
+
+    FindClose( h );
+  }
 
   ++high_num;
   sprintf( buf, "%s%d.log", directory, high_num );
@@ -65,11 +65,11 @@ void os_setup( void )
   out_stream = fopen( get_next_filename( "log/" ), "w" );
 
   if( WSAStartup( MAKEWORD( 2, 2 ), &wsaData ) != 0 )
-    {
-      fprintf( out_stream, "%s (%s:%d) - WSAStartup failed.\n",
-	       __FUNCTION__, __FILE__, __LINE__ );
-      exit( 1 );
-    }
+  {
+    fprintf( out_stream, "%s (%s:%d) - WSAStartup failed.\n",
+	__FUNCTION__, __FILE__, __LINE__ );
+    exit( 1 );
+  }
 }
 
 void os_cleanup( void )
@@ -77,18 +77,18 @@ void os_cleanup( void )
   WSACleanup();
 
   if( out_stream )
-    {
-      fclose( out_stream );
-      out_stream = 0;
-    }
+  {
+    fclose( out_stream );
+    out_stream = 0;
+  }
 }
 
 // gettimeofday for Windows
 // http://www.openasthra.com/c-tidbits/gettimeofday-function-for-windows/
 #if defined(_MSC_VER) || defined(_MSC_EXTENSIONS)
-  #define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000Ui64
 #else
-  #define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
+#define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
 #endif
 
 int gettimeofday( struct timeval *tv, struct timezone *tz )
@@ -96,34 +96,34 @@ int gettimeofday( struct timeval *tv, struct timezone *tz )
   FILETIME ft;
   unsigned __int64 tmpres = 0;
   static int tzflag = 0;
- 
-  if( NULL != tv )
-    {
-      GetSystemTimeAsFileTime( &ft );
- 
-      tmpres |= ft.dwHighDateTime;
-      tmpres <<= 32;
-      tmpres |= ft.dwLowDateTime;
- 
-      /*converting file time to unix epoch*/
-      tmpres /= 10;  /*convert into microseconds*/
-      tmpres -= DELTA_EPOCH_IN_MICROSECS; 
-      tv->tv_sec = (long)(tmpres / 1000000UL);
-      tv->tv_usec = (long)(tmpres % 1000000UL);
-    }
- 
-  if( NULL != tz )
-    {
-      if( !tzflag )
-	{
-	  _tzset();
-	  tzflag++;
-	}
 
-      tz->tz_minuteswest = _timezone / 60;
-      tz->tz_dsttime = _daylight;
+  if( NULL != tv )
+  {
+    GetSystemTimeAsFileTime( &ft );
+
+    tmpres |= ft.dwHighDateTime;
+    tmpres <<= 32;
+    tmpres |= ft.dwLowDateTime;
+
+    /*converting file time to unix epoch*/
+    tmpres /= 10;  /*convert into microseconds*/
+    tmpres -= DELTA_EPOCH_IN_MICROSECS; 
+    tv->tv_sec = (long)(tmpres / 1000000UL);
+    tv->tv_usec = (long)(tmpres % 1000000UL);
+  }
+
+  if( NULL != tz )
+  {
+    if( !tzflag )
+    {
+      _tzset();
+      tzflag++;
     }
- 
+
+    tz->tz_minuteswest = _timezone / 60;
+    tz->tz_dsttime = _daylight;
+  }
+
   return 0;
 }
 

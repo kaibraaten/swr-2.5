@@ -50,7 +50,7 @@ void nanny( DESCRIPTOR_DATA * d, char *argument )
     argument++;
 
   switch( d->connected )
-    {
+  {
     default:
       bug( "Nanny: bad d->connected %d.", d->connected );
       close_socket( d, TRUE );
@@ -103,7 +103,7 @@ void nanny( DESCRIPTOR_DATA * d, char *argument )
     case CON_DONE_MOTD:
       nanny_done_motd( d, argument );
       break;
-    }
+  }
 }
 
 static void nanny_get_name( DESCRIPTOR_DATA * d, char *argument )
@@ -114,143 +114,143 @@ static void nanny_get_name( DESCRIPTOR_DATA * d, char *argument )
   CHAR_DATA *ch = NULL;
 
   if( argument[0] == '\0' )
-    {
-      close_socket( d, FALSE );
-      return;
-    }
+  {
+    close_socket( d, FALSE );
+    return;
+  }
 
   argument[0] = UPPER( argument[0] );
 
   if( !check_parse_name( argument ) )
+  {
+    write_to_buffer( d, "Illegal name, try another.\r\nName: ", 0 );
+    return;
+  }
+
+  if( !str_cmp( argument, "New" ) )
+  {
+    if( d->newstate == 0 )
+    {
+      /* New player */
+      /* Don't allow new players if DENY_NEW_PLAYERS is true */
+      if( sysdata.DENY_NEW_PLAYERS == TRUE )
+      {
+	sprintf( buf,
+	    "The mud is currently preparing for a reboot.\r\n" );
+	write_to_buffer( d, buf, 0 );
+	sprintf( buf,
+	    "New players are not accepted during this time.\r\n" );
+	write_to_buffer( d, buf, 0 );
+	sprintf( buf, "Please try again in a few minutes.\r\n" );
+	write_to_buffer( d, buf, 0 );
+	close_socket( d, FALSE );
+      }
+
+      for( pban = first_ban; pban; pban = pban->next )
+      {
+	if( ( !str_prefix( pban->name, d->host )
+	      || !str_suffix( pban->name, d->host ) ) )
+	{
+	  write_to_buffer( d,
+	      "Your site has been banned from this Mud.\r\n",
+	      0 );
+	  close_socket( d, FALSE );
+	  return;
+	}
+      }
+
+      for( pban = first_tban; pban; pban = pban->next )
+      {
+	if( ( !str_prefix( pban->name, d->host )
+	      || !str_suffix( pban->name, d->host ) ) )
+	{
+	  write_to_buffer( d,
+	      "New players have been temporarily banned from your IP.\r\n",
+	      0 );
+	  close_socket( d, FALSE );
+	  return;
+	}
+      }
+
+      sprintf( buf, "\r\nChoosing a name is one of the most important p\
+	  arts of this game...\r\n" "Make sure to pick a name appropriate to the character you are going\r\n" "to role play, and be sure that it suits our theme.\r\n" "If the name you select is not acceptable, you will be asked to choose\r\n" "another one.\r\n\r\nPlease choose a name for your character: " );
+      write_to_buffer( d, buf, 0 );
+      d->newstate++;
+      d->connected = CON_GET_NAME;
+      return;
+    }
+    else
     {
       write_to_buffer( d, "Illegal name, try another.\r\nName: ", 0 );
       return;
     }
-
-  if( !str_cmp( argument, "New" ) )
-    {
-      if( d->newstate == 0 )
-	{
-	  /* New player */
-	  /* Don't allow new players if DENY_NEW_PLAYERS is true */
-	  if( sysdata.DENY_NEW_PLAYERS == TRUE )
-	    {
-	      sprintf( buf,
-		       "The mud is currently preparing for a reboot.\r\n" );
-	      write_to_buffer( d, buf, 0 );
-	      sprintf( buf,
-		       "New players are not accepted during this time.\r\n" );
-	      write_to_buffer( d, buf, 0 );
-	      sprintf( buf, "Please try again in a few minutes.\r\n" );
-	      write_to_buffer( d, buf, 0 );
-	      close_socket( d, FALSE );
-	    }
-
-	  for( pban = first_ban; pban; pban = pban->next )
-	    {
-	      if( ( !str_prefix( pban->name, d->host )
-		    || !str_suffix( pban->name, d->host ) ) )
-		{
-		  write_to_buffer( d,
-				   "Your site has been banned from this Mud.\r\n",
-				   0 );
-		  close_socket( d, FALSE );
-		  return;
-		}
-	    }
-
-	  for( pban = first_tban; pban; pban = pban->next )
-	    {
-	      if( ( !str_prefix( pban->name, d->host )
-		    || !str_suffix( pban->name, d->host ) ) )
-		{
-		  write_to_buffer( d,
-				   "New players have been temporarily banned from your IP.\r\n",
-				   0 );
-		  close_socket( d, FALSE );
-		  return;
-		}
-	    }
-
-	  sprintf( buf, "\r\nChoosing a name is one of the most important p\
-arts of this game...\r\n" "Make sure to pick a name appropriate to the character you are going\r\n" "to role play, and be sure that it suits our theme.\r\n" "If the name you select is not acceptable, you will be asked to choose\r\n" "another one.\r\n\r\nPlease choose a name for your character: " );
-	  write_to_buffer( d, buf, 0 );
-	  d->newstate++;
-	  d->connected = CON_GET_NAME;
-	  return;
-	}
-      else
-	{
-	  write_to_buffer( d, "Illegal name, try another.\r\nName: ", 0 );
-	  return;
-	}
-    }
+  }
 
   if( check_playing( d, argument, FALSE ) == BERR )
-    {
-      write_to_buffer( d, "Name: ", 0 );
-      return;
-    }
+  {
+    write_to_buffer( d, "Name: ", 0 );
+    return;
+  }
 
   fOld = load_char_obj( d, argument, TRUE );
 
   if( !d->character )
-    {
-      sprintf( log_buf, "Bad player file %s@%s.", argument, d->host );
-      log_string( log_buf );
-      write_to_buffer( d,
-		       "Your playerfile is corrupt...Please notify Thoric@mud.compulink.com.\r\n",
-		       0 );
-      close_socket( d, FALSE );
-      return;
-    }
+  {
+    sprintf( log_buf, "Bad player file %s@%s.", argument, d->host );
+    log_string( log_buf );
+    write_to_buffer( d,
+	"Your playerfile is corrupt...Please notify Thoric@mud.compulink.com.\r\n",
+	0 );
+    close_socket( d, FALSE );
+    return;
+  }
 
   ch = d->character;
 
   for( pban = first_ban; pban; pban = pban->next )
+  {
+    if( ( !str_prefix( pban->name, d->host )
+	  || !str_suffix( pban->name, d->host ) )
+	&& pban->level >= ch->top_level )
     {
-      if( ( !str_prefix( pban->name, d->host )
-	    || !str_suffix( pban->name, d->host ) )
-	  && pban->level >= ch->top_level )
-	{
-	  write_to_buffer( d,
-			   "Your site has been banned from this Mud.\r\n",
-			   0 );
-	  close_socket( d, FALSE );
-	  return;
-	}
-    }
-
-  if( IS_SET( ch->act, PLR_DENY ) )
-    {
-      sprintf( log_buf, "Denying access to %s@%s.", argument, d->host );
-      log_string_plus( log_buf, LOG_COMM );
-      if( d->newstate != 0 )
-	{
-	  write_to_buffer( d,
-			   "That name is already taken.  Please choose another: ",
-			   0 );
-	  d->connected = CON_GET_NAME;
-	  return;
-	}
-
-      write_to_buffer( d, "You are denied access.\r\n", 0 );
+      write_to_buffer( d,
+	  "Your site has been banned from this Mud.\r\n",
+	  0 );
       close_socket( d, FALSE );
       return;
     }
+  }
+
+  if( IS_SET( ch->act, PLR_DENY ) )
+  {
+    sprintf( log_buf, "Denying access to %s@%s.", argument, d->host );
+    log_string_plus( log_buf, LOG_COMM );
+    if( d->newstate != 0 )
+    {
+      write_to_buffer( d,
+	  "That name is already taken.  Please choose another: ",
+	  0 );
+      d->connected = CON_GET_NAME;
+      return;
+    }
+
+    write_to_buffer( d, "You are denied access.\r\n", 0 );
+    close_socket( d, FALSE );
+    return;
+  }
 
   for( pban = first_tban; pban; pban = pban->next )
+  {
+    if( ( !str_prefix( pban->name, d->host )
+	  || !str_suffix( pban->name, d->host ) ) && ch->top_level == 0 )
     {
-      if( ( !str_prefix( pban->name, d->host )
-	    || !str_suffix( pban->name, d->host ) ) && ch->top_level == 0 )
-	{
-	  write_to_buffer( d,
-			   "You have been temporarily banned from creating new characters.\r\n",
-			   0 );
-	  close_socket( d, FALSE );
-	  return;
-	}
+      write_to_buffer( d,
+	  "You have been temporarily banned from creating new characters.\r\n",
+	  0 );
+      close_socket( d, FALSE );
+      return;
     }
+  }
 
   chk = check_reconnect( d, argument, FALSE );
 
@@ -258,51 +258,51 @@ arts of this game...\r\n" "Make sure to pick a name appropriate to the character
     return;
 
   if( chk )
-    {
-      fOld = TRUE;
-    }
+  {
+    fOld = TRUE;
+  }
   else
-    {
-      if( wizlock && !IS_IMMORTAL( ch ) )
-	{
-	  write_to_buffer( d,
-			   "The game is wizlocked.  Only immortals can connect now.\r\n",
-			   0 );
-	  write_to_buffer( d, "Please try back later.\r\n", 0 );
-	  close_socket( d, FALSE );
-	  return;
-	}
-    }
-
-  if( fOld )
-    {
-      if( d->newstate != 0 )
-	{
-	  write_to_buffer( d,
-			   "That name is already taken.  Please choose another: ",
-			   0 );
-	  d->connected = CON_GET_NAME;
-	  return;
-	}
-
-      /* Old player */
-      write_to_buffer( d, "Password: ", 0 );
-#ifndef _WIN32
-      write_to_buffer( d, echo_off_str, 0 );
-#endif
-      d->connected = CON_GET_OLD_PASSWORD;
-      return;
-    }
-  else
+  {
+    if( wizlock && !IS_IMMORTAL( ch ) )
     {
       write_to_buffer( d,
-		       "\r\nI don't recognize your name, you must be new here.\r\n\r\n",
-		       0 );
-      sprintf( buf, "Did I get that right, %s (Y/N)? ", argument );
-      write_to_buffer( d, buf, 0 );
-      d->connected = CON_CONFIRM_NEW_NAME;
+	  "The game is wizlocked.  Only immortals can connect now.\r\n",
+	  0 );
+      write_to_buffer( d, "Please try back later.\r\n", 0 );
+      close_socket( d, FALSE );
       return;
     }
+  }
+
+  if( fOld )
+  {
+    if( d->newstate != 0 )
+    {
+      write_to_buffer( d,
+	  "That name is already taken.  Please choose another: ",
+	  0 );
+      d->connected = CON_GET_NAME;
+      return;
+    }
+
+    /* Old player */
+    write_to_buffer( d, "Password: ", 0 );
+#ifndef _WIN32
+    write_to_buffer( d, echo_off_str, 0 );
+#endif
+    d->connected = CON_GET_OLD_PASSWORD;
+    return;
+  }
+  else
+  {
+    write_to_buffer( d,
+	"\r\nI don't recognize your name, you must be new here.\r\n\r\n",
+	0 );
+    sprintf( buf, "Did I get that right, %s (Y/N)? ", argument );
+    write_to_buffer( d, buf, 0 );
+    d->connected = CON_CONFIRM_NEW_NAME;
+    return;
+  }
 }
 
 static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
@@ -313,13 +313,13 @@ static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
   write_to_buffer( d, "\r\n", 2 );
 
   if( strcmp( encode_string( argument ), ch->pcdata->pwd ) )
-    {
-      write_to_buffer( d, "Wrong password.\r\n", 0 );
-      /* clear descriptor pointer to get rid of bug message in log */
-      d->character->desc = NULL;
-      close_socket( d, FALSE );
-      return;
-    }
+  {
+    write_to_buffer( d, "Wrong password.\r\n", 0 );
+    /* clear descriptor pointer to get rid of bug message in log */
+    d->character->desc = NULL;
+    close_socket( d, FALSE );
+    return;
+  }
 
 #ifndef _WIN32
   write_to_buffer( d, echo_on_str, 0 );
@@ -331,22 +331,22 @@ static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
   chk = check_reconnect( d, ch->name, TRUE );
 
   if( chk == BERR )
-    {
-      if( d->character && d->character->desc )
-	d->character->desc = NULL;
+  {
+    if( d->character && d->character->desc )
+      d->character->desc = NULL;
 
-      close_socket( d, FALSE );
-      return;
-    }
+    close_socket( d, FALSE );
+    return;
+  }
 
   if( chk == TRUE )
     return;
 
   if( check_multi( d, ch->name ) )
-    {
-      close_socket( d, FALSE );
-      return;
-    }
+  {
+    close_socket( d, FALSE );
+    return;
+  }
 
   sprintf( buf, "%s", ch->name );
   d->character->desc = NULL;
@@ -367,16 +367,16 @@ static void nanny_confirm_new_name( DESCRIPTOR_DATA * d, char *argument )
   char buf[MAX_STRING_LENGTH];
 
   switch ( *argument )
-    {
+  {
     case 'y':
     case 'Y':
       sprintf( buf,
-	       "\r\nMake sure to use a password that won't be easily guessed by someone else."
-	       "\r\nPick a good password for %s: %s", ch->name,
+	  "\r\nMake sure to use a password that won't be easily guessed by someone else."
+	  "\r\nPick a good password for %s: %s", ch->name,
 #ifdef _WIN32
-	       "" );
+	  "" );
 #else
-	       echo_off_str );
+      echo_off_str );
 #endif
       write_to_buffer( d, buf, 0 );
       d->connected = CON_GET_NEW_PASSWORD;
@@ -395,7 +395,7 @@ static void nanny_confirm_new_name( DESCRIPTOR_DATA * d, char *argument )
     default:
       write_to_buffer( d, "Please type Yes or No. ", 0 );
       break;
-    }
+  }
 }
 
 static void nanny_get_new_password( DESCRIPTOR_DATA * d, char *argument )
@@ -406,25 +406,25 @@ static void nanny_get_new_password( DESCRIPTOR_DATA * d, char *argument )
   write_to_buffer( d, "\r\n", 2 );
 
   if( strlen( argument ) < 5 )
-    {
-      write_to_buffer( d,
-		       "Password must be at least five characters long.\r\nPassword: ",
-		       0 );
-      return;
-    }
+  {
+    write_to_buffer( d,
+	"Password must be at least five characters long.\r\nPassword: ",
+	0 );
+    return;
+  }
 
   pwdnew = encode_string( argument );
 
   for( p = pwdnew; *p != '\0'; p++ )
+  {
+    if( *p == '~' )
     {
-      if( *p == '~' )
-	{
-	  write_to_buffer( d,
-			   "New password not acceptable, try again.\r\nPassword: ",
-			   0 );
-	  return;
-	}
+      write_to_buffer( d,
+	  "New password not acceptable, try again.\r\nPassword: ",
+	  0 );
+      return;
     }
+  }
 
   DISPOSE( ch->pcdata->pwd );
   ch->pcdata->pwd = str_dup( pwdnew );
@@ -439,11 +439,11 @@ static void nanny_confirm_new_password( DESCRIPTOR_DATA * d, char *argument )
   write_to_buffer( d, "\r\n", 2 );
 
   if( strcmp( encode_string( argument ), ch->pcdata->pwd ) )
-    {
-      write_to_buffer( d, "Passwords don't match.\r\nRetype password: ", 0 );
-      d->connected = CON_GET_NEW_PASSWORD;
-      return;
-    }
+  {
+    write_to_buffer( d, "Passwords don't match.\r\nRetype password: ", 0 );
+    d->connected = CON_GET_NEW_PASSWORD;
+    return;
+  }
 
 #ifndef _WIN32
   write_to_buffer( d, echo_on_str, 0 );
@@ -457,7 +457,7 @@ static void nanny_get_new_sex( DESCRIPTOR_DATA * d, char *argument )
   CHAR_DATA *ch = d->character;
 
   switch ( argument[0] )
-    {
+  {
     case 'm':
     case 'M':
       ch->sex = SEX_MALE;
@@ -473,20 +473,20 @@ static void nanny_get_new_sex( DESCRIPTOR_DATA * d, char *argument )
     default:
       write_to_buffer( d, "That's not a sex.\r\nWhat IS your sex? ", 0 );
       return;
-    }
+  }
 
   write_to_buffer( d,
-		   "\r\nYou may choose one of the following skill packages to start with.\r\n",
-		   0 );
+      "\r\nYou may choose one of the following skill packages to start with.\r\n",
+      0 );
   write_to_buffer( d,
-		   "You may learn a limited number of skills from other professions later.\r\n\r\n",
-		   0 );
+      "You may learn a limited number of skills from other professions later.\r\n\r\n",
+      0 );
 
   write_to_buffer( d,
-		   "Architect            Tailor              Weaponsmith\r\n",
-		   0 );
+      "Architect            Tailor              Weaponsmith\r\n",
+      0 );
   write_to_buffer( d, "Soldier              Medic               Assassin\r\n",
-		   0 );
+      0 );
   write_to_buffer( d, "Pilot                Senator             Spy\r\n", 0 );
   write_to_buffer( d, "Thief                Pirate\r\n\r\n", 0 );
 
@@ -502,143 +502,143 @@ static void nanny_add_skills( DESCRIPTOR_DATA * d, char *argument )
   char buf[MAX_STRING_LENGTH];
 
   if( argument[0] == '\0' )
-    {
-      write_to_buffer( d, "Please pick a skill package: ", 0 );
-      return;
-    }
+  {
+    write_to_buffer( d, "Please pick a skill package: ", 0 );
+    return;
+  }
 
   if( !str_cmp( argument, "help" ) )
-    {
-      do_help( ch, const_char_to_nonconst( argument ) );
-      return;
-    }
+  {
+    do_help( ch, const_char_to_nonconst( argument ) );
+    return;
+  }
   else if( !str_prefix( argument, "architect" ) )
-    {
-      ch->pcdata->learned[gsn_survey] = 50;
-      ch->pcdata->learned[gsn_landscape] = 50;
-      ch->pcdata->learned[gsn_construction] = 50;
-      ch->pcdata->learned[gsn_bridge] = 50;
-      ch->pcdata->learned[gsn_spacecraft] = 50;
-      ch->pcdata->num_skills = 5;
-      sprintf( buf, "%s the architect", ch->name );
-      set_title( ch, buf );
-    }
+  {
+    ch->pcdata->learned[gsn_survey] = 50;
+    ch->pcdata->learned[gsn_landscape] = 50;
+    ch->pcdata->learned[gsn_construction] = 50;
+    ch->pcdata->learned[gsn_bridge] = 50;
+    ch->pcdata->learned[gsn_spacecraft] = 50;
+    ch->pcdata->num_skills = 5;
+    sprintf( buf, "%s the architect", ch->name );
+    set_title( ch, buf );
+  }
   else if( !str_prefix( argument, "soldier" ) )
-    {
-      ch->pcdata->learned[gsn_spacecraft] = 50;
-      ch->pcdata->learned[gsn_blasters] = 50;
-      ch->pcdata->learned[gsn_enhanced_damage] = 50;
-      ch->pcdata->learned[gsn_kick] = 50;
-      ch->pcdata->learned[gsn_second_attack] = 50;
-      ch->pcdata->num_skills = 5;
-      sprintf( buf, "%s the soldier", ch->name );
-      set_title( ch, buf );
-    }
+  {
+    ch->pcdata->learned[gsn_spacecraft] = 50;
+    ch->pcdata->learned[gsn_blasters] = 50;
+    ch->pcdata->learned[gsn_enhanced_damage] = 50;
+    ch->pcdata->learned[gsn_kick] = 50;
+    ch->pcdata->learned[gsn_second_attack] = 50;
+    ch->pcdata->num_skills = 5;
+    sprintf( buf, "%s the soldier", ch->name );
+    set_title( ch, buf );
+  }
   else if( !str_prefix( argument, "medic" ) )
-    {
-      ch->pcdata->learned[gsn_spacecraft] = 50;
-      ch->pcdata->learned[gsn_aid] = 50;
-      ch->pcdata->learned[gsn_first_aid] = 50;
-      ch->pcdata->learned[gsn_rescue] = 50;
-      ch->pcdata->learned[gsn_dodge] = 50;
-      ch->pcdata->num_skills = 5;
-      sprintf( buf, "%s the field medic", ch->name );
-      set_title( ch, buf );
-    }
+  {
+    ch->pcdata->learned[gsn_spacecraft] = 50;
+    ch->pcdata->learned[gsn_aid] = 50;
+    ch->pcdata->learned[gsn_first_aid] = 50;
+    ch->pcdata->learned[gsn_rescue] = 50;
+    ch->pcdata->learned[gsn_dodge] = 50;
+    ch->pcdata->num_skills = 5;
+    sprintf( buf, "%s the field medic", ch->name );
+    set_title( ch, buf );
+  }
   else if( !str_prefix( argument, "assassin" ) )
-    {
-      ch->pcdata->learned[gsn_spacecraft] = 50;
-      ch->pcdata->learned[gsn_backstab] = 50;
-      ch->pcdata->learned[gsn_vibro_blades] = 50;
-      ch->pcdata->learned[gsn_poison_weapon] = 50;
-      ch->pcdata->learned[gsn_track] = 50;
-      ch->pcdata->num_skills = 5;
-      sprintf( buf, "%s the assasin", ch->name );
-      set_title( ch, buf );
-    }
+  {
+    ch->pcdata->learned[gsn_spacecraft] = 50;
+    ch->pcdata->learned[gsn_backstab] = 50;
+    ch->pcdata->learned[gsn_vibro_blades] = 50;
+    ch->pcdata->learned[gsn_poison_weapon] = 50;
+    ch->pcdata->learned[gsn_track] = 50;
+    ch->pcdata->num_skills = 5;
+    sprintf( buf, "%s the assasin", ch->name );
+    set_title( ch, buf );
+  }
   else if( !str_prefix( argument, "pilot" ) )
-    {
-      ch->pcdata->learned[gsn_spacecraft] = 50;
-      ch->pcdata->learned[gsn_shipmaintenance] = 50;
-      ch->pcdata->learned[gsn_shipdesign] = 50;
-      ch->pcdata->learned[gsn_weaponsystems] = 50;
-      ch->pcdata->learned[gsn_spacecombat] = 50;
-      ch->pcdata->num_skills = 5;
-      sprintf( buf, "%s the pilot", ch->name );
-      set_title( ch, buf );
-    }
+  {
+    ch->pcdata->learned[gsn_spacecraft] = 50;
+    ch->pcdata->learned[gsn_shipmaintenance] = 50;
+    ch->pcdata->learned[gsn_shipdesign] = 50;
+    ch->pcdata->learned[gsn_weaponsystems] = 50;
+    ch->pcdata->learned[gsn_spacecombat] = 50;
+    ch->pcdata->num_skills = 5;
+    sprintf( buf, "%s the pilot", ch->name );
+    set_title( ch, buf );
+  }
   else if( !str_prefix( argument, "senator" ) )
-    {
-      ch->pcdata->learned[gsn_spacecraft] = 50;
-      ch->pcdata->learned[gsn_survey] = 50;
-      ch->pcdata->learned[gsn_postguard] = 50;
-      ch->pcdata->learned[gsn_reinforcements] = 50;
-      ch->pcdata->learned[gsn_propeganda] = 50;
-      ch->pcdata->num_skills = 5;
-      sprintf( buf, "Senator %s", ch->name );
-      set_title( ch, buf );
-    }
+  {
+    ch->pcdata->learned[gsn_spacecraft] = 50;
+    ch->pcdata->learned[gsn_survey] = 50;
+    ch->pcdata->learned[gsn_postguard] = 50;
+    ch->pcdata->learned[gsn_reinforcements] = 50;
+    ch->pcdata->learned[gsn_propeganda] = 50;
+    ch->pcdata->num_skills = 5;
+    sprintf( buf, "Senator %s", ch->name );
+    set_title( ch, buf );
+  }
   else if( !str_prefix( argument, "spy" ) )
-    {
-      ch->pcdata->learned[gsn_spacecraft] = 50;
-      ch->pcdata->learned[gsn_sneak] = 50;
-      ch->pcdata->learned[gsn_peek] = 50;
-      ch->pcdata->learned[gsn_pick_lock] = 50;
-      ch->pcdata->learned[gsn_hide] = 50;
-      ch->pcdata->num_skills = 5;
-      sprintf( buf, "%s the spy", ch->name );
-      set_title( ch, buf );
-    }
+  {
+    ch->pcdata->learned[gsn_spacecraft] = 50;
+    ch->pcdata->learned[gsn_sneak] = 50;
+    ch->pcdata->learned[gsn_peek] = 50;
+    ch->pcdata->learned[gsn_pick_lock] = 50;
+    ch->pcdata->learned[gsn_hide] = 50;
+    ch->pcdata->num_skills = 5;
+    sprintf( buf, "%s the spy", ch->name );
+    set_title( ch, buf );
+  }
   else if( !str_prefix( argument, "thief" ) )
-    {
-      ch->pcdata->learned[gsn_spacecraft] = 50;
-      ch->pcdata->learned[gsn_steal] = 50;
-      ch->pcdata->learned[gsn_peek] = 50;
-      ch->pcdata->learned[gsn_pick_lock] = 50;
-      ch->pcdata->learned[gsn_hide] = 50;
-      ch->pcdata->num_skills = 5;
-      sprintf( buf, "%s the kleptomaniac", ch->name );
-      set_title( ch, buf );
-    }
+  {
+    ch->pcdata->learned[gsn_spacecraft] = 50;
+    ch->pcdata->learned[gsn_steal] = 50;
+    ch->pcdata->learned[gsn_peek] = 50;
+    ch->pcdata->learned[gsn_pick_lock] = 50;
+    ch->pcdata->learned[gsn_hide] = 50;
+    ch->pcdata->num_skills = 5;
+    sprintf( buf, "%s the kleptomaniac", ch->name );
+    set_title( ch, buf );
+  }
   else if( !str_prefix( argument, "pirate" ) )
-    {
-      ch->pcdata->learned[gsn_spacecraft] = 50;
-      ch->pcdata->learned[gsn_hijack] = 50;
-      ch->pcdata->learned[gsn_pickshiplock] = 50;
-      ch->pcdata->learned[gsn_weaponsystems] = 50;
-      ch->pcdata->learned[gsn_pick_lock] = 50;
-      ch->pcdata->num_skills = 5;
-      sprintf( buf, "%s the pirate", ch->name );
-      set_title( ch, buf );
-    }
+  {
+    ch->pcdata->learned[gsn_spacecraft] = 50;
+    ch->pcdata->learned[gsn_hijack] = 50;
+    ch->pcdata->learned[gsn_pickshiplock] = 50;
+    ch->pcdata->learned[gsn_weaponsystems] = 50;
+    ch->pcdata->learned[gsn_pick_lock] = 50;
+    ch->pcdata->num_skills = 5;
+    sprintf( buf, "%s the pirate", ch->name );
+    set_title( ch, buf );
+  }
   else if( !str_prefix( argument, "tailor" ) )
-    {
-      ch->pcdata->learned[gsn_spacecraft] = 50;
-      ch->pcdata->learned[gsn_makearmor] = 50;
-      ch->pcdata->learned[gsn_makecontainer] = 50;
-      ch->pcdata->learned[gsn_makejewelry] = 50;
-      ch->pcdata->learned[gsn_quicktalk] = 50;
-      ch->pcdata->num_skills = 5;
-      sprintf( buf, "%s the tailor", ch->name );
-      set_title( ch, buf );
-    }
+  {
+    ch->pcdata->learned[gsn_spacecraft] = 50;
+    ch->pcdata->learned[gsn_makearmor] = 50;
+    ch->pcdata->learned[gsn_makecontainer] = 50;
+    ch->pcdata->learned[gsn_makejewelry] = 50;
+    ch->pcdata->learned[gsn_quicktalk] = 50;
+    ch->pcdata->num_skills = 5;
+    sprintf( buf, "%s the tailor", ch->name );
+    set_title( ch, buf );
+  }
   else if( !str_prefix( argument, "weaponsmith" ) )
-    {
-      ch->pcdata->learned[gsn_spacecraft] = 50;
-      ch->pcdata->learned[gsn_makeblaster] = 50;
-      ch->pcdata->learned[gsn_makeblade] = 50;
-      ch->pcdata->learned[gsn_makeshield] = 50;
-      ch->pcdata->learned[gsn_quicktalk] = 50;
-      ch->pcdata->num_skills = 5;
-      sprintf( buf, "%s the weapons dealer", ch->name );
-      set_title( ch, buf );
-    }
+  {
+    ch->pcdata->learned[gsn_spacecraft] = 50;
+    ch->pcdata->learned[gsn_makeblaster] = 50;
+    ch->pcdata->learned[gsn_makeblade] = 50;
+    ch->pcdata->learned[gsn_makeshield] = 50;
+    ch->pcdata->learned[gsn_quicktalk] = 50;
+    ch->pcdata->num_skills = 5;
+    sprintf( buf, "%s the weapons dealer", ch->name );
+    set_title( ch, buf );
+  }
   else
-    {
-      write_to_buffer( d, "Invalid choice... Please pick a skill package: ",
-		       0 );
-      return;
-    }
+  {
+    write_to_buffer( d, "Invalid choice... Please pick a skill package: ",
+	0 );
+    return;
+  }
 
   ch->perm_str = 10;
   ch->perm_int = 10;
@@ -648,8 +648,8 @@ static void nanny_add_skills( DESCRIPTOR_DATA * d, char *argument )
   ch->perm_cha = 10;
 
   write_to_buffer( d,
-		   "\r\nWould you like ANSI or no graphic/color support, (R/A/N)? ",
-		   0 );
+      "\r\nWould you like ANSI or no graphic/color support, (R/A/N)? ",
+      0 );
   d->connected = CON_GET_WANT_RIPANSI;
 }
 
@@ -658,7 +658,7 @@ static void nanny_get_want_ripansi( DESCRIPTOR_DATA * d, char *argument )
   CHAR_DATA *ch = d->character;
 
   switch ( argument[0] )
-    {
+  {
     case 'a':
     case 'A':
       SET_BIT( ch->act, PLR_ANSI );
@@ -669,7 +669,7 @@ static void nanny_get_want_ripansi( DESCRIPTOR_DATA * d, char *argument )
     default:
       write_to_buffer( d, "Invalid selection.\r\nANSI or NONE? ", 0 );
       return;
-    }
+  }
 
   sprintf( log_buf, "%s@%s new character.", ch->name, d->host );
   log_string_plus( log_buf, LOG_COMM );
@@ -729,88 +729,88 @@ static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument )
   d->connected = CON_PLAYING;
 
   if( ch->top_level == 0 )
+  {
+    OBJ_DATA *obj;
+    SHIP_DATA *ship;
+    SHIP_PROTOTYPE *prototype;
+    char shipname[MAX_STRING_LENGTH];
+    prototype = get_ship_prototype( "NU-b13 Starfighter" );
+
+    if( prototype )
     {
-      OBJ_DATA *obj;
-      SHIP_DATA *ship;
-      SHIP_PROTOTYPE *prototype;
-      char shipname[MAX_STRING_LENGTH];
-      prototype = get_ship_prototype( "NU-b13 Starfighter" );
+      ship = make_ship( prototype );
+      ship_to_room( ship, ROOM_NEWBIE_SHIPYARD );
+      ship->location = ROOM_NEWBIE_SHIPYARD;
+      ship->lastdoc = ROOM_NEWBIE_SHIPYARD;
 
-      if( prototype )
-	{
-	  ship = make_ship( prototype );
-	  ship_to_room( ship, ROOM_NEWBIE_SHIPYARD );
-	  ship->location = ROOM_NEWBIE_SHIPYARD;
-	  ship->lastdoc = ROOM_NEWBIE_SHIPYARD;
+      sprintf( shipname, "%ss %s %s", ch->name, prototype->name,
+	  ship->filename );
 
-	  sprintf( shipname, "%ss %s %s", ch->name, prototype->name,
-		   ship->filename );
-
-	  STRFREE( ship->owner );
-	  ship->owner = STRALLOC( ch->name );
-	  STRFREE( ship->name );
-	  ship->name = STRALLOC( shipname );
-	  save_ship( ship );
-	  write_ship_list(  );
-	}
-
-      ch->gold = 20;
-
-      ch->perm_lck = number_range( 6, 18 );
-      ch->perm_frc = URANGE( 0, ch->perm_frc, 20 );
-
-      ch->top_level = 1;
-      ch->hit = ch->max_hit;
-      ch->move = ch->max_move;
-      if( ch->perm_frc > 0 )
-	ch->max_mana = 100 + 100 * ch->perm_frc;
-      else
-	ch->max_mana = 0;
-      ch->mana = ch->max_mana;
-
-      /* Added by Narn.  Start new characters with autoexit and autgold
-         already turned on.  Very few people don't use those. */
-      SET_BIT( ch->act, PLR_AUTOGOLD );
-      SET_BIT( ch->act, PLR_AUTOEXIT );
-
-      obj = create_object( get_obj_index( OBJ_VNUM_SCHOOL_DAGGER ) );
-      obj_to_char( obj, ch );
-      equip_char( ch, obj, WEAR_WIELD );
-
-      obj = create_object( get_obj_index( OBJ_VNUM_LIGHT ) );
-      obj_to_char( obj, ch );
-
-      /* comlink */
-      obj_ind = get_obj_index( 23 );
-
-      if( obj_ind != NULL )
-	{
-	  obj = create_object( obj_ind );
-	  obj_to_char( obj, ch );
-	}
-
-      if( !sysdata.WAIT_FOR_AUTH )
-	{
-	  char_to_room( ch, get_room_index( ROOM_VNUM_SCHOOL ) );
-	  ch->pcdata->auth_state = 3;
-	}
-      else
-	{
-	  char_to_room( ch, get_room_index( ROOM_VNUM_SCHOOL ) );
-	  ch->pcdata->auth_state = 1;
-	  SET_BIT( ch->pcdata->flags, PCFLAG_UNAUTHED );
-	}
-      /* Display_prompt interprets blank as default */
-      ch->pcdata->prompt = STRALLOC( "" );
+      STRFREE( ship->owner );
+      ship->owner = STRALLOC( ch->name );
+      STRFREE( ship->name );
+      ship->name = STRALLOC( shipname );
+      save_ship( ship );
+      write_ship_list(  );
     }
+
+    ch->gold = 20;
+
+    ch->perm_lck = number_range( 6, 18 );
+    ch->perm_frc = URANGE( 0, ch->perm_frc, 20 );
+
+    ch->top_level = 1;
+    ch->hit = ch->max_hit;
+    ch->move = ch->max_move;
+    if( ch->perm_frc > 0 )
+      ch->max_mana = 100 + 100 * ch->perm_frc;
+    else
+      ch->max_mana = 0;
+    ch->mana = ch->max_mana;
+
+    /* Added by Narn.  Start new characters with autoexit and autgold
+       already turned on.  Very few people don't use those. */
+    SET_BIT( ch->act, PLR_AUTOGOLD );
+    SET_BIT( ch->act, PLR_AUTOEXIT );
+
+    obj = create_object( get_obj_index( OBJ_VNUM_SCHOOL_DAGGER ) );
+    obj_to_char( obj, ch );
+    equip_char( ch, obj, WEAR_WIELD );
+
+    obj = create_object( get_obj_index( OBJ_VNUM_LIGHT ) );
+    obj_to_char( obj, ch );
+
+    /* comlink */
+    obj_ind = get_obj_index( 23 );
+
+    if( obj_ind != NULL )
+    {
+      obj = create_object( obj_ind );
+      obj_to_char( obj, ch );
+    }
+
+    if( !sysdata.WAIT_FOR_AUTH )
+    {
+      char_to_room( ch, get_room_index( ROOM_VNUM_SCHOOL ) );
+      ch->pcdata->auth_state = 3;
+    }
+    else
+    {
+      char_to_room( ch, get_room_index( ROOM_VNUM_SCHOOL ) );
+      ch->pcdata->auth_state = 1;
+      SET_BIT( ch->pcdata->flags, PCFLAG_UNAUTHED );
+    }
+    /* Display_prompt interprets blank as default */
+    ch->pcdata->prompt = STRALLOC( "" );
+  }
   else if( ch->in_room && !IS_IMMORTAL( ch ) )
-    {
-      char_to_room( ch, ch->in_room );
-    }
+  {
+    char_to_room( ch, ch->in_room );
+  }
   else
-    {
-      char_to_room( ch, get_room_index( wherehome( ch ) ) );
-    }
+  {
+    char_to_room( ch, get_room_index( wherehome( ch ) ) );
+  }
 
   if( get_timer( ch, TIMER_SHOVEDRAG ) > 0 )
     remove_timer( ch, TIMER_SHOVEDRAG );
@@ -818,69 +818,69 @@ static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument )
   if( get_timer( ch, TIMER_PKILLED ) > 0 )
     remove_timer( ch, TIMER_PKILLED );
   if( ch->plr_home != NULL )
+  {
+    char filename[256];
+    FILE *fph;
+    ROOM_INDEX_DATA *storeroom = ch->plr_home;
+
+    room_extract_contents( storeroom );
+    sprintf( filename, "%s%c/%s.home", PLAYER_DIR,
+	tolower( ( int ) ch->name[0] ), capitalize( ch->name ) );
+    if( ( fph = fopen( filename, "r" ) ) != NULL )
     {
-      char filename[256];
-      FILE *fph;
-      ROOM_INDEX_DATA *storeroom = ch->plr_home;
+      int iNest;
+      bool found;
+      OBJ_DATA *tobj, *tobj_next;
 
-      room_extract_contents( storeroom );
-      sprintf( filename, "%s%c/%s.home", PLAYER_DIR,
-	       tolower( ( int ) ch->name[0] ), capitalize( ch->name ) );
-      if( ( fph = fopen( filename, "r" ) ) != NULL )
+      rset_supermob( storeroom );
+      for( iNest = 0; iNest < MAX_NEST; iNest++ )
+	rgObjNest[iNest] = NULL;
+
+      found = TRUE;
+      for( ;; )
+      {
+	char letter;
+	char *word;
+
+	letter = fread_letter( fph );
+	if( letter == '*' )
 	{
-	  int iNest;
-	  bool found;
-	  OBJ_DATA *tobj, *tobj_next;
-
-	  rset_supermob( storeroom );
-	  for( iNest = 0; iNest < MAX_NEST; iNest++ )
-	    rgObjNest[iNest] = NULL;
-
-	  found = TRUE;
-	  for( ;; )
-	    {
-	      char letter;
-	      char *word;
-
-	      letter = fread_letter( fph );
-	      if( letter == '*' )
-		{
-		  fread_to_eol( fph );
-		  continue;
-		}
-
-	      if( letter != '#' )
-		{
-		  bug( "Load_plr_home: # not found.", 0 );
-		  bug( ch->name, 0 );
-		  break;
-		}
-
-	      word = fread_word( fph );
-	      if( !str_cmp( word, "OBJECT" ) )	/* Objects      */
-		fread_obj( supermob, fph, OS_CARRY );
-	      else if( !str_cmp( word, "END" ) )	/* Done         */
-		break;
-	      else
-		{
-		  bug( "Load_plr_home: bad section.", 0 );
-		  bug( ch->name, 0 );
-		  break;
-		}
-	    }
-
-	  fclose( fph );
-
-	  for( tobj = supermob->first_carrying; tobj; tobj = tobj_next )
-	    {
-	      tobj_next = tobj->next_content;
-	      obj_from_char( tobj );
-	      obj_to_room( tobj, storeroom );
-	    }
-
-	  release_supermob(  );
+	  fread_to_eol( fph );
+	  continue;
 	}
+
+	if( letter != '#' )
+	{
+	  bug( "Load_plr_home: # not found.", 0 );
+	  bug( ch->name, 0 );
+	  break;
+	}
+
+	word = fread_word( fph );
+	if( !str_cmp( word, "OBJECT" ) )	/* Objects      */
+	  fread_obj( supermob, fph, OS_CARRY );
+	else if( !str_cmp( word, "END" ) )	/* Done         */
+	  break;
+	else
+	{
+	  bug( "Load_plr_home: bad section.", 0 );
+	  bug( ch->name, 0 );
+	  break;
+	}
+      }
+
+      fclose( fph );
+
+      for( tobj = supermob->first_carrying; tobj; tobj = tobj_next )
+      {
+	tobj_next = tobj->next_content;
+	obj_from_char( tobj );
+	obj_to_room( tobj, storeroom );
+      }
+
+      release_supermob(  );
     }
+  }
 
   act( AT_ACTION, "$n has entered the game.", ch, NULL, NULL, TO_ROOM );
   do_look( ch, const_char_to_nonconst( "auto" ) );

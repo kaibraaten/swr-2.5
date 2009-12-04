@@ -379,7 +379,7 @@ const char *const month_name[] = {
 
 const short movement_loss[SECT_MAX] = {
   1, 2, 2, 3, 4, 6, 4, 1, 6, 10, 6, 5, 7, 4, 6, 4, 2, 3, 6, 3, 3, 5, 4, 3, 2,
-    3, 7
+  3, 7
 };
 
 const char *const dir_name[] = {
@@ -439,12 +439,12 @@ const char *const r_flags[] = {
 
 const char *const o_flags[] = {
   "glow", "hum", "dark", "hutt_size", "i4", "invis", "magic", "nodrop",
-    "bless",
+  "bless",
   "i9", "i10", "i11", "noremove", "inventory",
   "i14", "i15", "i16", "i17", "small_size", "large_size",
   "donation", "clanobject", "i22", "i23", "i24",
   "hidden", "poisoned", "covering", "deathrot", "burried", "prototype",
-    "human_size"
+  "human_size"
 };
 
 const char *const mag_flags[] = {
@@ -455,7 +455,7 @@ const char *const mag_flags[] = {
 const char *const w_flags[] = {
   "take", "finger", "neck", "body", "head", "legs", "feet", "hands", "arms",
   "shield", "about", "waist", "wrist", "wield", "hold", "_dual_", "ears",
-    "eyes",
+  "eyes",
   "_missile_", "r1", "r2", "r3", "r4", "r5", "r6",
   "r7", "r8", "r9", "r10", "r11", "r12", "r13"
 };
@@ -484,14 +484,14 @@ const char *const a_types[] = {
   "credits", "experience", "armor", "hitroll", "damroll", "save_poison",
   "save_rod",
   "save_para", "save_breath", "save_spell", "charisma", "affected",
-    "resistant",
+  "resistant",
   "immune", "susceptible", "weaponspell", "luck", "backstab", "pick", "track",
   "steal", "sneak", "hide", "palm", "detrap", "dodge", "peek", "scan",
-    "gouge",
+  "gouge",
   "search", "mount", "disarm", "kick", "parry", "bash", "stun", "punch",
-    "climb",
+  "climb",
   "grip", "scribe", "brew", "wearspell", "removespell", "mentalstate",
-    "emotion",
+  "emotion",
   "stripsn", "remove", "dig", "full", "thirst", "drunk", "blood"
 };
 
@@ -516,7 +516,7 @@ const char *const act_flags[] = {
 
 const char *const pc_flags[] = {
   "r1", "deadly", "unauthed", "norecall", "nointro", "gag", "retired",
-    "guest",
+  "guest",
   "nosummon", "pageron", "notitled", "room", "r6", "r7", "r8", "r9", "r10",
   "r11", "r12", "r13",
   "r14", "r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23", "r24",
@@ -525,7 +525,7 @@ const char *const pc_flags[] = {
 
 const char *const plr_flags[] = {
   "npc", "boughtpet", "shovedrag", "autoexits", "autoloot", "autosac",
-    "blank",
+  "blank",
   "outcast", "brief", "combine", "prompt", "telnet_ga", "holylight",
   "wizinvis", "roomvnum", "silence", "noemote", "attacker", "notell", "log",
   "deny", "freeze", "killer", "pf_3", "litterbug", "ansi", "rip", "nice",
@@ -562,7 +562,7 @@ const char *const trig_flags[] = {
 
 const char *const part_flags[] = {
   "head", "arms", "legs", "heart", "brains", "guts", "hands", "feet",
-    "fingers",
+  "fingers",
   "ear", "eye", "long_tongue", "eyestalks", "tentacles", "fins", "wings",
   "tail", "scales", "claws", "fangs", "horns", "tusks", "tailattack",
   "sharpscales", "beak", "haunches", "hooves", "paws", "forelegs", "feathers",
@@ -797,31 +797,31 @@ int get_defenseflag( const char *flag )
 }
 
 const char *const spell_flag[] =
-  { "water", "earth", "air", "astral", "area", "distant", "reverse",
+{ "water", "earth", "air", "astral", "area", "distant", "reverse",
   "save_half_dam", "save_negates", "accumulative", "recastable", "noscribe",
   "nobrew", "group", "object", "character", "secretskill", "pksensitive"
 };
 
 const char *const spell_saves[] =
-  { "none", "poison_death", "wands", "para_petri", "breath", "spell_staff" };
+{ "none", "poison_death", "wands", "para_petri", "breath", "spell_staff" };
 
 const char *const spell_damage[] =
-  { "none", "fire", "cold", "electricity", "energy", "acid", "poison",
-"drain" };
+{ "none", "fire", "cold", "electricity", "energy", "acid", "poison",
+  "drain" };
 
 const char *const spell_action[] =
-  { "none", "create", "destroy", "resist", "suscept", "divinate", "obscure",
+{ "none", "create", "destroy", "resist", "suscept", "divinate", "obscure",
   "change"
 };
 
 const char *const spell_power[] = { "none", "minor", "greater", "major" };
 
 const char *const spell_class[] =
-  { "none", "lunar", "solar", "travel", "summon", "life", "death",
-"illusion" };
+{ "none", "lunar", "solar", "travel", "summon", "life", "death",
+  "illusion" };
 
 const char *const target_type[] =
-  { "ignore", "offensive", "defensive", "self", "objinv" };
+{ "ignore", "offensive", "defensive", "self", "objinv" };
 
 int get_ssave( const char *name )
 {
@@ -895,7 +895,7 @@ int get_sclass( const char *name )
 
 const char *const sector_name[SECT_MAX] = {
   "inside", "city", "field", "forest", "hills", "mountain", "water swim",
-    "water noswim",
+  "water noswim",
   "underwater", "air", "desert", "unknown", "ocean floor", "underground",
   "scrub", "rocky", "savanna", "tundra", "glacial", "rainforest", "jungle",
   "swamp", "wetlands", "brush", "steppe", "farmland", "volcanic"

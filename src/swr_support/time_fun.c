@@ -9,12 +9,12 @@
 extern "C" {
 #endif
 
-void bug( const char *str, ... );
+  void bug( const char *str, ... );
 
-struct tm *update_time( struct tm* );
-void subtract_times( struct timeval*, struct timeval* );
-void start_timer( struct timeval* );
-time_t end_timer( struct timeval* );
+  struct tm *update_time( struct tm* );
+  void subtract_times( struct timeval*, struct timeval* );
+  void start_timer( struct timeval* );
+  time_t end_timer( struct timeval* );
 
 #ifdef __cplusplus
 }
@@ -32,19 +32,19 @@ void subtract_times(struct timeval *etime, struct timeval *start_time)
   etime->tv_usec -= start_time->tv_usec;
 
   while ( etime->tv_usec < 0 )
-    {
-      etime->tv_usec += 1000000;
-      etime->tv_sec--;
-    }
+  {
+    etime->tv_usec += 1000000;
+    etime->tv_sec--;
+  }
 }
 
 void start_timer(struct timeval *start_time)
 {
   if ( !start_time )
-    {
-      bug( "Start_timer: NULL start_time.", 0 );
-      return;
-    }
+  {
+    bug( "Start_timer: NULL start_time.", 0 );
+    return;
+  }
   gettimeofday(start_time, NULL);
   return;
 }
