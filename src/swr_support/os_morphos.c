@@ -31,6 +31,7 @@
 struct Library *SocketBase = NULL;
 struct Library *UserGroupBase = NULL;
 struct UtilityBase *UtilityBase = NULL;
+struct Library *DynLoadBase = NULL;
 extern FILE *out_stream;
 
 #ifndef __DATE2__
@@ -114,9 +115,16 @@ void os_setup( void )
     exit( 1 );
   }
 
-  if( !( UtilityBase = (struct UtilityBase*) OpenLibrary( (CONST_STRPTR) "utility.library", 0 ) ) )
+  if( !( UtilityBase = (struct UtilityBase*) OpenLibrary( (CONST_STRPTR) "utility.library", 37 ) ) )
   {
     fprintf( out_stream, "%s (%s:%d) - Failed to open utility.library\n",
+	__FUNCTION__, __FILE__, __LINE__ );
+    exit( 1 );
+  }
+
+  if( !( DynLoadBase = OpenLibrary( (CONST_STRPTR) "dynload.library", 51 ) ) )
+  {
+    fprintf( out_stream, "%s (%s:%d) - Failed to open dynload.library\n",
 	__FUNCTION__, __FILE__, __LINE__ );
     exit( 1 );
   }
@@ -124,6 +132,12 @@ void os_setup( void )
 
 void os_cleanup( void )
 {
+  if( DynLoadBase )
+  {
+    CloseLibrary( DynLoadBase );
+    DynLoadBase = NULL;
+  }
+
   if( UtilityBase )
   {
     CloseLibrary( (struct Library*) UtilityBase );
