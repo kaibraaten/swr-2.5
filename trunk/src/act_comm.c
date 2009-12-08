@@ -1113,7 +1113,7 @@ static void send_title( CHAR_DATA * ch, const char *filename )
   if( ( rpfile = fopen( filename, "r" ) ) != NULL )
   {
     size_t num = 0;
-#if defined(AMIGA) || defined(__MORPHOS__)
+#if defined(__MORPHOS__)
     signed
 #endif
       char buf[MAX_STRING_LENGTH * 2];

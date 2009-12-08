@@ -258,7 +258,7 @@ SOCKET init_socket( int listen_port )
 /*
  * LAG alarm!							-Thoric
  */
-#if !defined(AMIGA) && !defined(__MORPHOS__) && !defined(_WIN32)
+#if !defined(__MORPHOS__) && !defined(_WIN32)
 static void caught_alarm( int foo )
 {
   char buf[MAX_STRING_LENGTH];
@@ -320,7 +320,7 @@ void accept_new( SOCKET ctrl )
       break;
   }
 
-#if defined(AMIGA) || defined(__MORPHOS__)
+#if defined(__MORPHOS__)
   result =
     WaitSelect( maxdesc + 1, &in_set, &out_set, &exc_set, &null_time, 0 );
 #else
@@ -362,7 +362,7 @@ void game_loop(  )
   char cmdline[MAX_INPUT_LENGTH];
   DESCRIPTOR_DATA *d = NULL;
 
-#if !defined(AMIGA) && !defined(__MORPHOS__) && !defined(_WIN32)
+#if !defined(__MORPHOS__) && !defined(_WIN32)
   signal( SIGPIPE, SIG_IGN );
   signal( SIGALRM, caught_alarm );
   /* signal( SIGSEGV, SegVio ); */
@@ -574,7 +574,7 @@ void game_loop(  )
 	stall_time.tv_usec = usecDelta;
 	stall_time.tv_sec = secDelta;
 
-#if defined(AMIGA) || defined(__MORPHOS__)
+#if defined(__MORPHOS__)
 	if( WaitSelect( 0, 0, 0, 0, &stall_time, 0 ) == SOCKET_ERROR )
 #elif defined(_WIN32)
 	  if( select( 0, NULL, NULL, &dummy_set, &stall_time ) ==
@@ -664,7 +664,7 @@ void new_descriptor( SOCKET new_desc )
   init_descriptor( dnew, desc );
   dnew->port = ntohs( sock.sin_port );
 
-#if defined(AMIGA) || defined(__MORPHOS__)
+#if defined(__MORPHOS__)
   strcpy( buf, Inet_NtoA( *( ( unsigned long * ) &sock.sin_addr ) ) );
 #else
   strcpy( buf, inet_ntoa( sock.sin_addr ) );
@@ -897,7 +897,7 @@ bool read_from_descriptor( DESCRIPTOR_DATA * d )
 
   for( ;; )
   {
-#if defined(AMIGA) || defined(__MORPHOS__)
+#if defined(__MORPHOS__)
     ssize_t nRead = recv( d->descriptor, ( UBYTE * ) ( d->inbuf + iStart ),
 	sizeof( d->inbuf ) - 10 - iStart, 0 );
 #else
