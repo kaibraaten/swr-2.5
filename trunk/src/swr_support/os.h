@@ -28,8 +28,8 @@
 
 #if defined(_WIN32)
 #include "os_win32.h"
-#elif defined(AMIGA) || defined(__MORPHOS__)
-#include "os_amiga.h"
+#elif defined(__MORPHOS__)
+#include "os_morphos.h"
 #else
 #include "os_unix.h"
 #endif

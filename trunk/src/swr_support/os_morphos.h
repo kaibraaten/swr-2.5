@@ -22,21 +22,12 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef _SWR2_OS_AMIGA_H_
-#define _SWR2_OS_AMIGA_H_
+#ifndef _SWR2_OS_MORPHOS_H_
+#define _SWR2_OS_MORPHOS_H_
 
-#ifdef __STORMGCC__
-typedef long clock_t;
-#endif
-
-#ifdef __MORPHOS__
 #include <proto/socket.h>
 #include <sys/filio.h>
-#else
-#include <sys/ioctl.h>
-#include <lineread.h>
-#endif
-
+#include <proto/dynload.h>
 #include <utility/tagitem.h>
 #include <exec/exec.h>
 #include <proto/exec.h>
@@ -52,15 +43,6 @@ typedef long clock_t;
 #include <sys/time.h>
 #include <db.h>
 #include <arpa/telnet.h>
-
-#ifndef __MORPHOS__
-#include <sys/cdefs.h>
-#endif
-
-#if defined( __STORMGCC__ )
-#define unlink(name) !DeleteFile((STRPTR)(name))
-typedef int ssize_t;
-#endif
 
 typedef LONG socklen_t;
 static const int INVALID_SOCKET = -1;

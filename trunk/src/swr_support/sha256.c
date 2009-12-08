@@ -31,8 +31,6 @@
 #include <sys/cdefs.h>
 #if defined(__FreeBSD__)
 #include <sys/endian.h>
-#elif defined(AMIGA)
-#include <machine/endian.h>
 #elif defined(__MORPHOS__)
 /* do nothing; just to prevent endian.h from being included */
 #else

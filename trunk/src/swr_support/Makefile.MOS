@@ -1,5 +1,5 @@
 ODIR = obj
-_OBJ = bet.o file_io.o hashstr.o misc.o os_amiga.o sha256.o string_handling.o time_fun.o vector3.o
+_OBJ = bet.o file_io.o hashstr.o misc.o os_morphos.o sha256.o string_handling.o time_fun.o vector3.o
 OBJ  = $(patsubst %,$(ODIR)/%,$(_OBJ))
 WFLAGS = -Wall -Wformat-security -Winline -Wpointer-arith -Werror -Wwrite-strings -Wno-long-long -Wconversion
 CFLAGS = -O2 -MMD -ansi $(GCC_MARCH) $(WFLAGS) -I. -I/gg/new-include -noixemul
