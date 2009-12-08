@@ -2262,7 +2262,7 @@ void boot_log( const char *str, ... )
 void show_file( const CHAR_DATA * ch, const char *filename )
 {
   FILE *fp = NULL;
-#if defined(AMIGA) || defined(__MORPHOS__)
+#if defined(__MORPHOS__)
   signed
 #endif
     char buf[MAX_STRING_LENGTH];
