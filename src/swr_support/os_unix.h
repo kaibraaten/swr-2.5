@@ -38,6 +38,7 @@
 #include <signal.h>
 #include <unistd.h>
 #include <arpa/telnet.h>
+#include <dlfcn.h>
 #include <dirent.h>
 
 static const int INVALID_SOCKET = -1;
