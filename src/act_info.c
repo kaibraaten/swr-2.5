@@ -2096,10 +2096,8 @@ void do_who( CHAR_DATA * ch, char *argument )
   int nNumber = 0;
   int nMatch = 0;
   bool fImmortalOnly = FALSE;
-  bool fShowHomepage = FALSE;
   bool fClanMatch = FALSE;	/* SB who clan */
   CLAN_DATA *pClan = 0;
-  FILE *whoout = 0;
 
   WHO_DATA *cur_who = NULL;
   WHO_DATA *next_who = NULL;
@@ -2146,11 +2144,13 @@ void do_who( CHAR_DATA * ch, char *argument )
        */
 
       if( !str_cmp( arg, "imm" ) || !str_cmp( arg, "gods" ) )
+      {
 	fImmortalOnly = TRUE;
-      else if( !str_cmp( arg, "www" ) )
-	fShowHomepage = TRUE;
+      }
       else if( ( pClan = get_clan( arg ) ) )
+      {
 	fClanMatch = TRUE;
+      }
       else
       {
 	send_to_char( "That's not an organization.\r\n", ch );
@@ -2165,15 +2165,7 @@ void do_who( CHAR_DATA * ch, char *argument )
   nMatch = 0;
   buf[0] = '\0';
 
-  if( ch )
-    set_pager_color( AT_GREEN, ch );
-  else
-  {
-    if( fShowHomepage )
-      whoout = fopen( WEBWHO_FILE, "w" );
-    else
-      whoout = fopen( WHO_FILE, "w" );
-  }
+  set_pager_color( AT_GREEN, ch );
 
   /* start from last to first to get it in the proper order */
   for( d = last_descriptor; d; d = d->prev )
@@ -2195,12 +2187,7 @@ void do_who( CHAR_DATA * ch, char *argument )
 
     nMatch++;
 
-    if( fShowHomepage
-	&& wch->pcdata->homepage && wch->pcdata->homepage[0] != '\0' )
-      sprintf( char_name, "<A HREF=\"%s\">%s</A>",
-	  show_tilde( wch->pcdata->homepage ), wch->name );
-    else
-      strcpy( char_name, "" );
+    strcpy( char_name, "" );
 
     if( !nifty_is_name( wch->name, wch->pcdata->title )
 	&& ch->top_level > wch->top_level )
@@ -2274,21 +2261,12 @@ void do_who( CHAR_DATA * ch, char *argument )
   /* Deadly list removed for swr ... now only 2 lists */
   if( first_mortal )
   {
-    if( !ch )
-      fprintf( whoout,
-	  "\r\n--------------------------------[ Galactic Citizens ]-------------------------\r\n\r\n" );
-    else
-      send_to_pager
-	( "\r\n&R--------------------------------[ &YGalactic Citizens&R ]-------------------------&W\r\n\r\n",
-	  ch );
+    send_to_pager( "\r\n&R--------------------------------[ &YGalactic Citizens&R ]-------------------------&W\r\n\r\n", ch );
   }
 
   for( cur_who = first_mortal; cur_who; cur_who = next_who )
   {
-    if( !ch )
-      fprintf( whoout, "%s", cur_who->text );
-    else
-      send_to_pager( cur_who->text, ch );
+    send_to_pager( cur_who->text, ch );
 
     next_who = cur_who->next;
     DISPOSE( cur_who->text );
@@ -2297,32 +2275,16 @@ void do_who( CHAR_DATA * ch, char *argument )
 
   if( first_imm )
   {
-    if( !ch )
-      fprintf( whoout, "%s",
-	  "\r\n--------------------------------[ Elected Officials ]-------------------------\r\n\r\n" );
-    else
-      send_to_pager
-	( "\r\n&R--------------------------------[ &YElected Officials&R ]-------------------------&W\r\n\r\n",
-	  ch );
+    send_to_pager( "\r\n&R--------------------------------[ &YElected Officials&R ]-------------------------&W\r\n\r\n", ch );
   }
 
   for( cur_who = first_imm; cur_who; cur_who = next_who )
   {
-    if( !ch )
-      fprintf( whoout, "%s", cur_who->text );
-    else
-      send_to_pager( cur_who->text, ch );
+    send_to_pager( cur_who->text, ch );
 
     next_who = cur_who->next;
     DISPOSE( cur_who->text );
     DISPOSE( cur_who );
-  }
-
-  if( !ch )
-  {
-    fprintf( whoout, "%d player%s.\r\n", nMatch, nMatch == 1 ? "" : "s" );
-    fclose( whoout );
-    return;
   }
 
   set_char_color( AT_YELLOW, ch );

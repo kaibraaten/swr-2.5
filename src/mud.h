@@ -3048,8 +3048,6 @@ DECLARE_SPELL_FUN(	spell_smaug		);
 #define BUG_FILE	SYSTEM_DIR "bugs.txt"	  /* For 'bug' and bug( )*/
 #define TYPO_FILE	SYSTEM_DIR "typos.txt"	  /* For 'typo'		 */
 #define LOG_FILE	SYSTEM_DIR "log.txt"	  /* For talking in logged rooms */
-#define WHO_FILE	SYSTEM_DIR "WHO"	  /* Who output file	 */
-#define WEBWHO_FILE	SYSTEM_DIR "WEBWHO"	  /* WWW Who output file */
 #define SKILL_FILE	SYSTEM_DIR "skills.dat"   /* Skill table	 */
 #define SOCIAL_FILE	SYSTEM_DIR "socials.dat"  /* Socials		 */
 #define COMMAND_FILE	SYSTEM_DIR "commands.dat" /* Commands		 */
