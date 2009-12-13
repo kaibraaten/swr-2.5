@@ -495,9 +495,10 @@ void show_char_to_char_0( CHAR_DATA * victim, CHAR_DATA * ch )
       || ( IS_NPC( victim ) && IS_SET( victim->act, ACT_MOBINVIS ) ) )
   {
     if( !IS_NPC( victim ) )
-      sprintf( buf1, "(Invis %d) ", victim->pcdata->wizinvis );
+      snprintf( buf1, MAX_STRING_LENGTH, "(Invis %d) ",
+	  victim->pcdata->wizinvis );
     else
-      sprintf( buf1, "(Mobinvis %d) ", victim->mobinvis );
+      snprintf( buf1, MAX_STRING_LENGTH, "(Mobinvis %d) ", victim->mobinvis );
     strcat( buf, buf1 );
   }
 
@@ -1461,7 +1462,6 @@ static void examine_obj_corpse( CHAR_DATA * ch, OBJ_DATA * obj )
 {
   short timerfrac = obj->timer;
   char buf[MAX_STRING_LENGTH];
-  *buf = '\0';
 
   if( obj->item_type == ITEM_CORPSE_PC )
     timerfrac = ( int ) obj->timer / 8 + 1;
@@ -1496,7 +1496,7 @@ static void examine_obj_corpse( CHAR_DATA * ch, OBJ_DATA * obj )
     return;
 
   send_to_char( "When you look inside, you see:\r\n", ch );
-  sprintf( buf, "in '%s' noprog", obj->name );
+  snprintf( buf, MAX_STRING_LENGTH, "in '%s' noprog", obj->name );
   do_look( ch, buf );
 }
 
@@ -1504,7 +1504,6 @@ static void examine_obj_droid_corpse( CHAR_DATA * ch, OBJ_DATA * obj )
 {
   short timerfrac = obj->timer;
   char buf[MAX_STRING_LENGTH];
-  *buf = '\0';
 
   switch ( timerfrac )
   {
@@ -1537,16 +1536,15 @@ static void examine_obj_droid_corpse( CHAR_DATA * ch, OBJ_DATA * obj )
     return;
 
   send_to_char( "When you look inside, you see:\r\n", ch );
-  sprintf( buf, "in '%s' noprog", obj->name );
+  snprintf( buf, MAX_STRING_LENGTH, "in '%s' noprog", obj->name );
   do_look( ch, buf );
 }
 
 static void examine_obj_drink_container( CHAR_DATA * ch, OBJ_DATA * obj )
 {
   char buf[MAX_STRING_LENGTH];
-  *buf = '\0';
   send_to_char( "When you look inside, you see:\r\n", ch );
-  sprintf( buf, "in '%s' noprog", obj->name );
+  snprintf( buf, MAX_STRING_LENGTH, "in '%s' noprog", obj->name );
   do_look( ch, buf );
 }
 
@@ -1577,7 +1575,7 @@ void do_examine( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  sprintf( buf, "%s noprog", arg );
+  snprintf( buf, MAX_STRING_LENGTH, "%s noprog", arg );
   do_look( ch, buf );
 
   /*
@@ -1633,7 +1631,7 @@ void do_examine( CHAR_DATA * ch, char *argument )
 
     if( IS_OBJ_STAT( obj, ITEM_COVERING ) )
     {
-      sprintf( buf, "under %s noprog", arg );
+      snprintf( buf, MAX_STRING_LENGTH, "under %s noprog", arg );
       do_look( ch, buf );
     }
 
@@ -1670,30 +1668,34 @@ void do_exits( CHAR_DATA * ch, char *argument )
       {
 	if( IS_SET( pexit->exit_info, EX_CLOSED ) )
 	{
-	  sprintf( buf + strlen( buf ), "%-5s - (closed)\r\n",
+	  snprintf( buf + strlen( buf ), MAX_STRING_LENGTH - strlen( buf ),
+	      "%-5s - (closed)\r\n",
 	      capitalize( dir_name[pexit->vdir] ) );
 	}
 	else if( IS_SET( pexit->exit_info, EX_WINDOW ) )
 	{
-	  sprintf( buf + strlen( buf ), "%-5s - (window)\r\n",
+	  snprintf( buf + strlen( buf ), MAX_STRING_LENGTH - strlen( buf ),
+	      "%-5s - (window)\r\n",
 	      capitalize( dir_name[pexit->vdir] ) );
 	}
 	else if( IS_SET( pexit->exit_info, EX_xAUTO ) )
 	{
-	  sprintf( buf + strlen( buf ), "%-5s - %s\r\n",
+	  snprintf( buf + strlen( buf ), MAX_STRING_LENGTH - strlen( buf ),
+	      "%-5s - %s\r\n",
 	      capitalize( pexit->keyword ),
 	      room_is_dark( pexit->to_room )
 	      ? "Too dark to tell" : pexit->to_room->name );
 	}
 	else
-	  sprintf( buf + strlen( buf ), "%-5s - %s\r\n",
+	  snprintf( buf + strlen( buf ), MAX_STRING_LENGTH - strlen( buf ),
+	      "%-5s - %s\r\n",
 	      capitalize( dir_name[pexit->vdir] ),
 	      room_is_dark( pexit->to_room )
 	      ? "Too dark to tell" : pexit->to_room->name );
       }
       else
       {
-	sprintf( buf + strlen( buf ), " %s",
+	snprintf( buf + strlen( buf ), MAX_STRING_LENGTH - strlen( buf ), " %s",
 	    capitalize( dir_name[pexit->vdir] ) );
       }
     }
@@ -1959,8 +1961,8 @@ void do_hset( CHAR_DATA * ch, char *argument )
     FILE *fpout = NULL;
     char filename[MAX_STRING_LENGTH];
     char bak_filename[MAX_STRING_LENGTH];
-    sprintf( filename, "%shelp.are", AREA_DIR );
-    sprintf( bak_filename, "%s.bak", filename );
+    snprintf( filename, MAX_STRING_LENGTH, "%shelp.are", AREA_DIR );
+    snprintf( bak_filename, MAX_STRING_LENGTH, "%s.bak", filename );
 
     log_string_plus( "Saving help.are...", LOG_NORMAL );
 
@@ -2191,7 +2193,7 @@ void do_who( CHAR_DATA * ch, char *argument )
 
     if( !nifty_is_name( wch->name, wch->pcdata->title )
 	&& ch->top_level > wch->top_level )
-      sprintf( extra_title, " [%s]", wch->name );
+      snprintf( extra_title, MAX_STRING_LENGTH, " [%s]", wch->name );
     else
       strcpy( extra_title, "" );
 
@@ -2210,14 +2212,14 @@ void do_who( CHAR_DATA * ch, char *argument )
       clan_name[0] = '\0';
 
     if( IS_SET( wch->act, PLR_WIZINVIS ) )
-      sprintf( invis_str, "(%d) ", wch->pcdata->wizinvis );
+      snprintf( invis_str, MAX_STRING_LENGTH, "(%d) ", wch->pcdata->wizinvis );
     else
       invis_str[0] = '\0';
 
     if( wch->desc->connected == CON_EDITING )
       strcat( invis_str, "[Writing] " );
 
-    sprintf( buf, "%s%s%s%s %s%s%s\r\n",
+    snprintf( buf, MAX_STRING_LENGTH, "%s%s%s%s %s%s%s\r\n",
 	invis_str,
 	IS_SET( wch->act, PLR_AFK ) ? "[AFK] " : "",
 	char_name,
@@ -2651,9 +2653,9 @@ void do_teach( CHAR_DATA * ch, char *argument )
       if( character_skill_level( victim, sn ) <= 0 )
 	victim->pcdata->num_skills++;
       victim->pcdata->learned[sn] += int_app[get_curr_int( ch )].learn;
-      sprintf( buf, "You teach %s $T.", victim->name );
+      snprintf( buf, MAX_STRING_LENGTH, "You teach %s $T.", victim->name );
       act( AT_ACTION, buf, ch, NULL, skill_table[sn]->name, TO_CHAR );
-      sprintf( buf, "%s teaches you $T.", ch->name );
+      snprintf( buf, MAX_STRING_LENGTH, "%s teaches you $T.", ch->name );
       act( AT_ACTION, buf, victim, NULL, skill_table[sn]->name, TO_CHAR );
     }
   }
@@ -3415,14 +3417,15 @@ void do_whois( CHAR_DATA * ch, char *argument )
 
     if( get_trust( victim ) < get_trust( ch ) )
     {
-      sprintf( buf2, "list %s", buf );
+      snprintf( buf2, MAX_STRING_LENGTH, "list %s", buf );
     }
 
     if( IS_SET( victim->act, PLR_SILENCE )
 	|| IS_SET( victim->act, PLR_NO_EMOTE )
 	|| IS_SET( victim->act, PLR_NO_TELL ) )
     {
-      sprintf( buf2, "This player has the following flags set:" );
+      snprintf( buf2, MAX_STRING_LENGTH,
+	  "This player has the following flags set:" );
       if( IS_SET( victim->act, PLR_SILENCE ) )
 	strcat( buf2, " silence" );
       if( IS_SET( victim->act, PLR_NO_EMOTE ) )
@@ -3434,7 +3437,7 @@ void do_whois( CHAR_DATA * ch, char *argument )
     }
     if( victim->desc && victim->desc->host[0] != '\0' )	/* added by Gorog */
     {
-      sprintf( buf2, "%s's IP info: %s ", victim->name,
+      snprintf( buf2, MAX_STRING_LENGTH, "%s's IP info: %s ", victim->name,
 	  victim->desc->host );
       if( IS_IMMORTAL( ch ) )
       {
@@ -3446,7 +3449,8 @@ void do_whois( CHAR_DATA * ch, char *argument )
     if( IS_IMMORTAL( ch ) && get_trust( ch ) >= get_trust( victim )
 	&& victim->pcdata )
     {
-      sprintf( buf2, "Email: %s\r\n", victim->pcdata->email );
+      snprintf( buf2, MAX_STRING_LENGTH, "Email: %s\r\n",
+	  victim->pcdata->email );
       send_to_char( buf2, ch );
     }
   }

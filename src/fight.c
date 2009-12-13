@@ -2031,7 +2031,7 @@ void dam_message( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
   const char *attack = NULL;
   char punct = 0;
   int dampc = 0;
-  struct skill_type *skill = NULL;
+  SKILLTYPE *skill = NULL;
   bool gcflag = FALSE;
   bool gvflag = FALSE;
 

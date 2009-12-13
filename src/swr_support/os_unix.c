@@ -31,7 +31,7 @@ static const char *get_next_filename( const char *directory )
   }
 
   ++high_num;
-  sprintf( filename, "%s%d.log", directory, high_num );
+  snprintf( filename, 256, "%s%d.log", directory, high_num );
   return filename;
 }
 
