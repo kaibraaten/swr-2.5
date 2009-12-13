@@ -72,17 +72,26 @@ void free_memory( void );
 
 static void execute_on_exit( void )
 {
-  free_memory(  );
-  os_cleanup(  );
+  free_memory();
+  dlclose( sysdata.dl_handle );
+  os_cleanup();
 }
 
 int main( int argc, char **argv )
 {
   struct timeval now_time;
   bool fCopyOver = FALSE;
-  const char *filename = 0;
-  os_setup(  );
+  const char *filename = NULL;
+  os_setup();
   atexit( execute_on_exit );
+
+  sysdata.dl_handle = dlopen( NULL, RTLD_LAZY );
+
+  if( !sysdata.dl_handle )
+  {
+    fprintf( out_stream, "Failed opening dl handle to self: %s\n", dlerror() );
+    exit( 1 );
+  }
 
   num_descriptors = 0;
   first_descriptor = NULL;
