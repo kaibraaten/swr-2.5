@@ -3829,6 +3829,9 @@ void free_skill( SKILLTYPE * skill )
   if( skill->msg_off )
     DISPOSE( skill->msg_off );
 
+  if( skill->fun_name )
+    DISPOSE( skill->fun_name );
+
   DISPOSE( skill );
 }
 

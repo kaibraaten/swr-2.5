@@ -2020,6 +2020,7 @@ struct	system_data
   int save_flags;		/* Toggles for saving conditions */
   short	save_frequency;		/* How old to autosave someone */
   char *exe_filename;
+  void *dl_handle;
 };
 
 struct	vote_data
@@ -2125,39 +2126,40 @@ struct timerset
  */
 struct	skill_type
 {
-    char *	name;			/* Name of skill		*/
-    SPELL_FUN *	spell_fun;		/* Spell pointer (for spells)	*/
-    DO_FUN *	skill_fun;		/* Skill pointer (for skills)	*/
-    short	target;			/* Legal targets		*/
-    short	minimum_position;	/* Position for caster / user	*/
-    short	slot;			/* Slot for #OBJECT loading	*/
-    short	min_mana;		/* Minimum mana used		*/
-    short	beats;			/* Rounds required to use skill	*/
-    char *	noun_damage;		/* Damage message		*/
-    char *	msg_off;		/* Wear off message		*/
-    short	type;			/* Spell/Skill/Weapon   	*/
-    int		flags;			/* extra stuff			*/
-    char *	hit_char;		/* Success message to caster	*/
-    char *	hit_vict;		/* Success message to victim	*/
-    char *	hit_room;		/* Success message to room	*/
-    char *	miss_char;		/* Failure message to caster	*/
-    char *	miss_vict;		/* Failure message to victim	*/
-    char *	miss_room;		/* Failure message to room	*/
-    char *	die_char;		/* Victim death msg to caster	*/
-    char *	die_vict;		/* Victim death msg to victim	*/
-    char *	die_room;		/* Victim death msg to room	*/
-    char *	imm_char;		/* Victim immune msg to caster	*/
-    char *	imm_vict;		/* Victim immune msg to victim	*/
-    char *	imm_room;		/* Victim immune msg to room	*/
-    char *	dice;			/* Dice roll			*/
-    int		value;			/* Misc value			*/
-    char	saves;			/* What saving spell applies	*/
-    char	difficulty;		/* Difficulty of casting/learning */
-    SMAUG_AFF *	affects;		/* Spell affects, if any	*/
-    char *	components;		/* Spell components, if any	*/
-    char	participants;		/* # of required participants	*/
-    struct	timerset	userec;	/* Usage record			*/
-    int         alignment;              /* for jedi powers */
+  char *	name;			/* Name of skill		*/
+  SPELL_FUN *	spell_fun;		/* Spell pointer (for spells)	*/
+  DO_FUN *	skill_fun;		/* Skill pointer (for skills)	*/
+  char *fun_name;
+  short	target;			/* Legal targets		*/
+  short	minimum_position;	/* Position for caster / user	*/
+  short	slot;			/* Slot for #OBJECT loading	*/
+  short	min_mana;		/* Minimum mana used		*/
+  short	beats;			/* Rounds required to use skill	*/
+  char *	noun_damage;		/* Damage message		*/
+  char *	msg_off;		/* Wear off message		*/
+  short	type;			/* Spell/Skill/Weapon   	*/
+  int		flags;			/* extra stuff			*/
+  char *	hit_char;		/* Success message to caster	*/
+  char *	hit_vict;		/* Success message to victim	*/
+  char *	hit_room;		/* Success message to room	*/
+  char *	miss_char;		/* Failure message to caster	*/
+  char *	miss_vict;		/* Failure message to victim	*/
+  char *	miss_room;		/* Failure message to room	*/
+  char *	die_char;		/* Victim death msg to caster	*/
+  char *	die_vict;		/* Victim death msg to victim	*/
+  char *	die_room;		/* Victim death msg to room	*/
+  char *	imm_char;		/* Victim immune msg to caster	*/
+  char *	imm_vict;		/* Victim immune msg to victim	*/
+  char *	imm_room;		/* Victim immune msg to room	*/
+  char *	dice;			/* Dice roll			*/
+  int		value;			/* Misc value			*/
+  char	saves;			/* What saving spell applies	*/
+  char	difficulty;		/* Difficulty of casting/learning */
+  SMAUG_AFF *	affects;		/* Spell affects, if any	*/
+  char *	components;		/* Spell components, if any	*/
+  char	participants;		/* # of required participants	*/
+  struct	timerset	userec;	/* Usage record			*/
+  int         alignment;              /* for jedi powers */
 };
 
 
@@ -2400,13 +2402,14 @@ do								\
  */
 struct	cmd_type
 {
-    CMDTYPE *		next;
-    char *		name;
-    DO_FUN *		do_fun;
-    short		position;
-    short		level;
-    short		log;
-    struct		timerset	userec;
+  CMDTYPE *next;
+  char *name;
+  DO_FUN *do_fun;
+  char *fun_name;
+  short	position;
+  short	level;
+  short	log;
+  struct timerset userec;
 };
 
 
@@ -3401,6 +3404,7 @@ void release_supermob( void );
 void set_title( CHAR_DATA *ch, const char *title );
 
 /* skills.c */
+SKILLTYPE *create_skill( void );
 int character_skill_level( const CHAR_DATA *ch, short skill );
 bool check_skill( CHAR_DATA *ch, const char *command, char *argument );
 void	learn_from_success	args( ( CHAR_DATA *ch, int sn ) );
@@ -3564,8 +3568,6 @@ const char *lookup_spec( SPEC_FUN *special );
 
 /* tables.c */
 int get_skill( const char *skilltype );
-const char *spell_name( SPELL_FUN *spell );
-const char *skill_name( DO_FUN *skill );
 void load_skill_table( void );
 void save_skill_table( void );
 void sort_skill_table( void );

@@ -8,7 +8,7 @@ int ris_save( CHAR_DATA * ch, int chance, int ris );
 bool check_illegal_psteal( CHAR_DATA * ch, CHAR_DATA * victim );
 
 /* from magic.c */
-void failed_casting( struct skill_type *skill, CHAR_DATA * ch,
+void failed_casting( SKILLTYPE *skill, CHAR_DATA * ch,
     CHAR_DATA * victim, OBJ_DATA * obj );
 
 int character_skill_level( const CHAR_DATA * ch, short skill )
@@ -364,9 +364,7 @@ void do_slookup( CHAR_DATA * ch, char *argument )
 	( TAR_IGNORE, skill->target, TAR_OBJ_INV )],
 	skill->minimum_position, skill->min_mana, skill->beats );
     ch_printf( ch, "Flags: %d  Code: %s\r\n", skill->flags,
-	skill->skill_fun ? skill_name( skill->
-	  skill_fun ) :
-	spell_name( skill->spell_fun ) );
+	skill->skill_fun || skill->spell_fun ? skill->fun_name : "(none set)" );
     ch_printf( ch, "Dammsg: %s\r\nWearoff: %s\n", skill->noun_damage,
 	skill->msg_off ? skill->msg_off : "(none set)" );
     if( skill->dice && skill->dice[0] != '\0' )
@@ -481,10 +479,10 @@ void do_sset( CHAR_DATA * ch, char *argument )
 {
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  CHAR_DATA *victim;
-  int value;
-  int sn;
-  bool fAll;
+  CHAR_DATA *victim = NULL;
+  int value = 0;
+  int sn = 0;
+  bool fAll = FALSE;
 
   argument = one_argument( argument, arg1 );
   argument = one_argument( argument, arg2 );
@@ -506,7 +504,7 @@ void do_sset( CHAR_DATA * ch, char *argument )
 	( "  type damtype acttype classtype powertype flag dice value difficulty affect\r\n",
 	  ch );
       send_to_char
-	( "  rmaffect level adept hit miss die imm (char/vict/room)\r\n",
+	( "  rmaffect level hit miss die imm (char/vict/room)\r\n",
 	  ch );
       send_to_char( "  components\r\n", ch );
       send_to_char
@@ -531,7 +529,7 @@ void do_sset( CHAR_DATA * ch, char *argument )
   }
   if( !str_cmp( arg1, "create" ) && !str_cmp( arg2, "skill" ) )
   {
-    struct skill_type *skill;
+    SKILLTYPE *skill = NULL;
     short type = SKILL_UNKNOWN;
 
     if( top_sn >= MAX_SKILL )
@@ -541,9 +539,11 @@ void do_sset( CHAR_DATA * ch, char *argument )
 	  "raised in mud.h, and the mud recompiled.\r\n", top_sn );
       return;
     }
-    CREATE( skill, struct skill_type, 1 );
+
+    skill = create_skill();
     skill_table[top_sn++] = skill;
     skill->name = str_dup( argument );
+    skill->fun_name = str_dup( "" );
     skill->noun_damage = str_dup( "" );
     skill->msg_off = str_dup( "" );
     skill->spell_fun = spell_smaug;
@@ -562,7 +562,7 @@ void do_sset( CHAR_DATA * ch, char *argument )
 	    atoi( arg1 ) ) >=
 	  0 ) ) )
   {
-    struct skill_type *skill;
+    SKILLTYPE *skill = NULL;
 
     if( ( skill = get_skilltype( sn ) ) == NULL )
     {
@@ -670,18 +670,22 @@ void do_sset( CHAR_DATA * ch, char *argument )
 
     if( !str_cmp( arg2, "code" ) )
     {
-      SPELL_FUN *spellfun;
-      DO_FUN *dofun;
+      SPELL_FUN *spellfun = NULL;
+      DO_FUN *dofun = NULL;
 
-      if( ( spellfun = spell_function( argument ) ) != spell_notfound )
+      if( !str_prefix( "do_", argument ) && ( spellfun = spell_function( argument ) ) != spell_notfound )
       {
 	skill->spell_fun = spellfun;
 	skill->skill_fun = NULL;
+	DISPOSE( skill->fun_name );
+	skill->fun_name = str_dup( argument );
       }
       else if( ( dofun = skill_function( argument ) ) != skill_notfound )
       {
 	skill->skill_fun = dofun;
 	skill->spell_fun = NULL;
+	DISPOSE( skill->fun_name );
+	skill->fun_name = str_dup( argument );
       }
       else
       {
@@ -745,7 +749,7 @@ void do_sset( CHAR_DATA * ch, char *argument )
     if( !str_cmp( arg2, "rmaffect" ) )
     {
       SMAUG_AFF *aff = skill->affects;
-      SMAUG_AFF *aff_next;
+      SMAUG_AFF *aff_next = NULL;
       int num = atoi( argument );
       int cnt = 1;
 
@@ -788,8 +792,8 @@ void do_sset( CHAR_DATA * ch, char *argument )
       char modifier[MAX_INPUT_LENGTH];
       char duration[MAX_INPUT_LENGTH];
       char bitvector[MAX_INPUT_LENGTH];
-      int loc, bit, tmpbit;
-      SMAUG_AFF *aff;
+      int loc = 0, bit = 0, tmpbit = 0;
+      SMAUG_AFF *aff = NULL;
 
       argument = one_argument( argument, location );
       argument = one_argument( argument, modifier );
@@ -806,7 +810,7 @@ void do_sset( CHAR_DATA * ch, char *argument )
 	    ch );
 	return;
       }
-      bit = 0;
+
       while( argument[0] != 0 )
       {
 	argument = one_argument( argument, bitvector );
@@ -841,10 +845,7 @@ void do_sset( CHAR_DATA * ch, char *argument )
       send_to_char( "Ok.\n\r", ch );
       return;
     }
-    if( !str_cmp( arg2, "adept" ) )
-    {
-      return;
-    }
+
     if( !str_cmp( arg2, "name" ) )
     {
       if( *argument == '\0' )
@@ -2822,3 +2823,11 @@ void do_scan( CHAR_DATA * ch, char *argument )
 void do_slice( CHAR_DATA * ch, char *argument )
 {
 }
+
+SKILLTYPE *create_skill( void )
+{
+  SKILLTYPE *skill = NULL;
+  CREATE( skill, SKILLTYPE, 1 );
+  return skill;
+}
+

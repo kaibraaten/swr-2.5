@@ -4060,6 +4060,10 @@ void free_command( CMDTYPE * command )
 {
   if( command->name )
     DISPOSE( command->name );
+
+  if( command->fun_name )
+    DISPOSE( command->fun_name );
+
   DISPOSE( command );
 }
 
@@ -4149,7 +4153,7 @@ void add_command( CMDTYPE * command )
  */
 void do_cedit( CHAR_DATA * ch, char *argument )
 {
-  CMDTYPE *command;
+  CMDTYPE *command = NULL;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
 
@@ -4190,15 +4194,30 @@ void do_cedit( CHAR_DATA * ch, char *argument )
     CREATE( command, CMDTYPE, 1 );
     command->name = str_dup( arg1 );
     command->level = get_trust( ch );
+
     if( *argument )
+    {
       one_argument( argument, arg2 );
+    }
     else
+    {
       sprintf( arg2, "do_%s", arg1 );
+    }
+
     command->do_fun = skill_function( arg2 );
     add_command( command );
     send_to_char( "Command added.\r\n", ch );
+
     if( command->do_fun == skill_notfound )
+    {
       ch_printf( ch, "Code %s not found.  Set to no code.\r\n", arg2 );
+      command->fun_name = str_dup( "" );
+    }
+    else
+    {
+      command->fun_name = str_dup( arg2 );
+    }
+
     return;
   }
 
@@ -4218,7 +4237,7 @@ void do_cedit( CHAR_DATA * ch, char *argument )
     ch_printf( ch,
 	"Command:  %s\r\nLevel:    %d\r\nPosition: %d\r\nLog:      %d\r\nCode:     %s\r\n",
 	command->name, command->level, command->position,
-	command->log, skill_name( command->do_fun ) );
+	command->log, command->fun_name );
     if( command->userec.num_uses )
       send_timer( &command->userec, ch );
     return;
@@ -4237,12 +4256,15 @@ void do_cedit( CHAR_DATA * ch, char *argument )
   {
     DO_FUN *fun = skill_function( argument );
 
-    if( fun == skill_notfound )
+    if( str_prefix( "do_", argument ) || fun == skill_notfound )
     {
       send_to_char( "Code not found.\r\n", ch );
       return;
     }
+
     command->do_fun = fun;
+    DISPOSE( command->fun_name );
+    command->fun_name = str_dup( argument );
     send_to_char( "Done.\r\n", ch );
     return;
   }
