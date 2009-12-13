@@ -2697,7 +2697,7 @@ ch_ret spell_create_mob( int sn, int level, CHAR_DATA * ch, void *vo )
  */
 ch_ret spell_smaug( int sn, int level, CHAR_DATA * ch, void *vo )
 {
-  struct skill_type *skill = get_skilltype( sn );
+  SKILLTYPE *skill = get_skilltype( sn );
 
   switch ( skill->target )
   {

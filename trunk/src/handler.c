@@ -190,12 +190,10 @@ bool can_take_proto( const CHAR_DATA * ch )
  */
 void affect_modify( CHAR_DATA * ch, AFFECT_DATA * paf, bool fAdd )
 {
-  OBJ_DATA *wield;
-  int mod;
-  struct skill_type *skill;
-  ch_ret retcode;
-
-  mod = paf->modifier;
+  OBJ_DATA *wield = NULL;
+  int mod = paf->modifier;
+  SKILLTYPE *skill = NULL;
+  ch_ret retcode = rNONE;
 
   if( fAdd )
   {
@@ -498,7 +496,7 @@ void affect_modify( CHAR_DATA * ch, AFFECT_DATA * paf, bool fAdd )
  */
 void affect_to_char( CHAR_DATA * ch, AFFECT_DATA * paf )
 {
-  AFFECT_DATA *paf_new;
+  AFFECT_DATA *paf_new = NULL;
 
   if( !ch )
   {
@@ -548,8 +546,8 @@ void affect_remove( CHAR_DATA * ch, AFFECT_DATA * paf )
  */
 void affect_strip( CHAR_DATA * ch, int sn )
 {
-  AFFECT_DATA *paf;
-  AFFECT_DATA *paf_next;
+  AFFECT_DATA *paf = NULL;
+  AFFECT_DATA *paf_next = NULL;
 
   for( paf = ch->first_affect; paf; paf = paf_next )
   {
@@ -568,7 +566,7 @@ void affect_strip( CHAR_DATA * ch, int sn )
  */
 bool is_affected( const CHAR_DATA * ch, int sn )
 {
-  AFFECT_DATA *paf;
+  AFFECT_DATA *paf = NULL;
 
   for( paf = ch->first_affect; paf; paf = paf->next )
     if( paf->type == sn )
@@ -585,7 +583,7 @@ bool is_affected( const CHAR_DATA * ch, int sn )
  */
 void affect_join( CHAR_DATA * ch, AFFECT_DATA * paf )
 {
-  AFFECT_DATA *paf_old;
+  AFFECT_DATA *paf_old = NULL;
 
   for( paf_old = ch->first_affect; paf_old; paf_old = paf_old->next )
     if( paf_old->type == paf->type )
@@ -609,7 +607,7 @@ void affect_join( CHAR_DATA * ch, AFFECT_DATA * paf )
  */
 void char_from_room( CHAR_DATA * ch )
 {
-  OBJ_DATA *obj;
+  OBJ_DATA *obj = NULL;
 
   if( !ch )
   {
@@ -647,7 +645,7 @@ void char_from_room( CHAR_DATA * ch )
  */
 void char_to_room( CHAR_DATA * ch, ROOM_INDEX_DATA * pRoomIndex )
 {
-  OBJ_DATA *obj;
+  OBJ_DATA *obj = NULL;
 
   if( !ch )
   {
@@ -689,16 +687,13 @@ void char_to_room( CHAR_DATA * ch, ROOM_INDEX_DATA * pRoomIndex )
  */
 OBJ_DATA *obj_to_char( OBJ_DATA * obj, CHAR_DATA * ch )
 {
-  OBJ_DATA *otmp;
+  OBJ_DATA *otmp = NULL;
   OBJ_DATA *oret = obj;
-  bool skipgroup, grouped;
+  bool skipgroup = FALSE, grouped = FALSE;
   int oweight = get_obj_weight( obj );
   int onum = get_obj_number( obj );
   int wear_loc = obj->wear_loc;
   int extra_flags = obj->extra_flags;
-
-  skipgroup = FALSE;
-  grouped = FALSE;
 
   if( IS_OBJ_STAT( obj, ITEM_PROTOTYPE ) )
   {
@@ -709,7 +704,8 @@ OBJ_DATA *obj_to_char( OBJ_DATA * obj, CHAR_DATA * ch )
 
   if( loading_char == ch )
   {
-    int x, y;
+    int x = 0, y = 0;
+
     for( x = 0; x < MAX_WEAR; x++ )
       for( y = 0; y < MAX_LAYERS; y++ )
 	if( save_equipment[x][y] == obj )
@@ -752,7 +748,7 @@ OBJ_DATA *obj_to_char( OBJ_DATA * obj, CHAR_DATA * ch )
  */
 void obj_from_char( OBJ_DATA * obj )
 {
-  CHAR_DATA *ch;
+  CHAR_DATA *ch = NULL;
 
   if( ( ch = obj->carried_by ) == NULL )
   {
@@ -838,7 +834,7 @@ int apply_ac( const OBJ_DATA * obj, int iWear )
  */
 OBJ_DATA *get_eq_char( const CHAR_DATA * ch, int iWear )
 {
-  OBJ_DATA *obj, *maxobj = NULL;
+  OBJ_DATA *obj = NULL, *maxobj = NULL;
 
   for( obj = ch->first_carrying; obj; obj = obj->next_content )
     if( obj->wear_loc == iWear )
@@ -862,8 +858,8 @@ OBJ_DATA *get_eq_char( const CHAR_DATA * ch, int iWear )
  */
 void equip_char( CHAR_DATA * ch, OBJ_DATA * obj, int iWear )
 {
-  AFFECT_DATA *paf;
-  OBJ_DATA *otmp;
+  AFFECT_DATA *paf = NULL;
+  OBJ_DATA *otmp = NULL;
 
   if( ( otmp = get_eq_char( ch, iWear ) ) != NULL
       && ( !otmp->pIndexData->layers || !obj->pIndexData->layers ) )
@@ -899,7 +895,7 @@ void equip_char( CHAR_DATA * ch, OBJ_DATA * obj, int iWear )
  */
 void unequip_char( CHAR_DATA * ch, OBJ_DATA * obj )
 {
-  AFFECT_DATA *paf;
+  AFFECT_DATA *paf = NULL;
 
   if( obj->wear_loc == WEAR_NONE )
   {
@@ -937,10 +933,9 @@ void unequip_char( CHAR_DATA * ch, OBJ_DATA * obj )
  */
 int count_obj_list( const OBJ_INDEX_DATA * pObjIndex, const OBJ_DATA * list )
 {
-  const OBJ_DATA *obj;
-  int nMatch;
+  const OBJ_DATA *obj = NULL;
+  int nMatch = 0;
 
-  nMatch = 0;
   for( obj = list; obj; obj = obj->next_content )
     if( obj->pIndexData == pObjIndex )
       nMatch++;
@@ -959,7 +954,7 @@ int falling = 0;
 
 void obj_from_room( OBJ_DATA * obj )
 {
-  ROOM_INDEX_DATA *in_room;
+  ROOM_INDEX_DATA *in_room = NULL;
 
   if( ( in_room = obj->in_room ) == NULL )
   {
@@ -987,7 +982,7 @@ void obj_from_room( OBJ_DATA * obj )
  */
 OBJ_DATA *obj_to_room( OBJ_DATA * obj, ROOM_INDEX_DATA * pRoomIndex )
 {
-  OBJ_DATA *otmp, *oret;
+  OBJ_DATA *otmp = NULL, *oret = NULL;
 
   for( otmp = pRoomIndex->first_content; otmp; otmp = otmp->next_content )
     if( ( oret = group_object( otmp, obj ) ) == otmp )
@@ -1013,7 +1008,7 @@ OBJ_DATA *obj_to_room( OBJ_DATA * obj, ROOM_INDEX_DATA * pRoomIndex )
  */
 OBJ_DATA *obj_to_obj( OBJ_DATA * obj, OBJ_DATA * obj_to )
 {
-  OBJ_DATA *otmp, *oret;
+  OBJ_DATA *otmp = NULL, *oret = NULL;
 
   if( obj == obj_to )
   {
@@ -1049,7 +1044,7 @@ OBJ_DATA *obj_to_obj( OBJ_DATA * obj, OBJ_DATA * obj_to )
  */
 void obj_from_obj( OBJ_DATA * obj )
 {
-  OBJ_DATA *obj_from;
+  OBJ_DATA *obj_from = NULL;
 
   if( ( obj_from = obj->in_obj ) == NULL )
   {
@@ -1081,7 +1076,7 @@ void obj_from_obj( OBJ_DATA * obj )
  */
 void extract_obj( OBJ_DATA * obj )
 {
-  OBJ_DATA *obj_content;
+  OBJ_DATA *obj_content = NULL;
 
   if( !obj )
   {
@@ -1106,8 +1101,8 @@ void extract_obj( OBJ_DATA * obj )
     extract_obj( obj_content );
 
   {
-    AFFECT_DATA *paf;
-    AFFECT_DATA *paf_next;
+    AFFECT_DATA *paf = NULL;
+    AFFECT_DATA *paf_next = NULL;
 
     for( paf = obj->first_affect; paf; paf = paf_next )
     {
@@ -1118,8 +1113,8 @@ void extract_obj( OBJ_DATA * obj )
   }
 
   {
-    EXTRA_DESCR_DATA *ed;
-    EXTRA_DESCR_DATA *ed_next;
+    EXTRA_DESCR_DATA *ed = NULL;
+    EXTRA_DESCR_DATA *ed_next = NULL;
 
     for( ed = obj->first_extradesc; ed; ed = ed_next )
     {
@@ -1157,9 +1152,9 @@ void extract_obj( OBJ_DATA * obj )
  */
 void extract_char( CHAR_DATA * ch, bool fPull )
 {
-  CHAR_DATA *wch;
+  CHAR_DATA *wch = NULL;
   char buf[MAX_STRING_LENGTH];
-  ROOM_INDEX_DATA *location;
+  ROOM_INDEX_DATA *location = NULL;
 
   if( !ch )
   {

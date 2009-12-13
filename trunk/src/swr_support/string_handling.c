@@ -412,7 +412,7 @@ int number_argument( const char *orig_argument, char *arg )
   char *pdot;
   int number;
   char argument[MAX_STRING_LENGTH];
-  sprintf( argument, "%s", orig_argument );
+  snprintf( argument, MAX_STRING_LENGTH, "%s", orig_argument );
 
   for ( pdot = argument; *pdot != '\0'; pdot++ )
   {
@@ -631,7 +631,7 @@ char *wordwrap( char *txt, short wrap )
 char *const_char_to_nonconst( const char *argument )
 {
   static char buf[MAX_STRING_LENGTH];
-  sprintf( buf, "%s", argument );
+  snprintf( buf, MAX_STRING_LENGTH, "%s", argument );
   return buf;
 }
 

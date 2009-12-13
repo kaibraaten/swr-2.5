@@ -36,7 +36,7 @@ static const char *get_next_filename( const char *directory )
   WIN32_FIND_DATA info;
   HANDLE h;
 
-  sprintf( buf, "%s*.*", directory );
+  snprintf( buf, 256, "%s*.*", directory );
   h = FindFirstFile( buf, &info );
 
   if( h != INVALID_HANDLE_VALUE )
@@ -55,7 +55,7 @@ static const char *get_next_filename( const char *directory )
   }
 
   ++high_num;
-  sprintf( buf, "%s%d.log", directory, high_num );
+  snprintf( buf, 256, "%s%d.log", directory, high_num );
   return buf;
 }
 

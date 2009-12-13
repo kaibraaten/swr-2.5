@@ -129,7 +129,7 @@ void do_beep( CHAR_DATA * ch, char *argument )
   ch_printf( ch, "&WYou beep %s: %s\r\n\a", victim->name, argument );
   send_to_char( "\a", victim );
 
-  sprintf( buf, "%s beeps: '$t'", ch->name );
+  snprintf( buf, MAX_STRING_LENGTH, "%s beeps: '$t'", ch->name );
 
   act( AT_WHITE, buf, ch, argument, victim, TO_VICT );
 }
@@ -290,64 +290,66 @@ const char *drunk_speech( const char *argument, CHAR_DATA * ch )
 }
 
 static void broadcast_channel_default( CHAR_DATA * ch, const char *verb,
-    const char *argument, char *buf )
+    const char *argument, char *buf, size_t len )
 {
   set_char_color( AT_GOSSIP, ch );
   ch_printf( ch, "(%s) %s: %s\r\n", verb, ch->name, argument );
-  sprintf( buf, "(%s) %s: $t", verb, IS_IMMORTAL( ch ) ? "$n" : ch->name );
+  snprintf( buf, len, "(%s) %s: $t",
+      verb, IS_IMMORTAL( ch ) ? "$n" : ch->name );
 }
 
 static void broadcast_channel_clantalk( CHAR_DATA * ch, const char *verb,
-    const char *argument, char *buf )
+    const char *argument, char *buf, size_t len )
 {
   set_char_color( AT_CLAN, ch );
   ch_printf( ch, "Over the organizations private network you say, '%s'\r\n",
       argument );
-  sprintf( buf, "%s speaks over the organizations network, '$t'",
+  snprintf( buf, len, "%s speaks over the organizations network, '$t'",
       IS_IMMORTAL( ch ) ? "$n" : ch->name );
 }
 
 static void broadcast_channel_ship( CHAR_DATA * ch, const char *verb,
-    const char *argument, char *buf )
+    const char *argument, char *buf, size_t len )
 {
   set_char_color( AT_SHIP, ch );
   ch_printf( ch, "You tell the ship, '%s'\r\n", argument );
-  sprintf( buf, "%s says over the ships com system, '$t'",
+  snprintf( buf, len, "%s says over the ships com system, '$t'",
       IS_IMMORTAL( ch ) ? "$n" : ch->name );
 }
 
 static void broadcast_channel_yell( CHAR_DATA * ch, const char *verb,
-    const char *argument, char *buf )
+    const char *argument, char *buf, size_t len )
 {
   set_char_color( AT_GOSSIP, ch );
   ch_printf( ch, "You %s, '%s'\r\n", verb, argument );
-  sprintf( buf, "%s %ss, '$t'", IS_IMMORTAL( ch ) ? "$n" : ch->name, verb );
+  snprintf( buf, len, "%s %ss, '$t'",
+      IS_IMMORTAL( ch ) ? "$n" : ch->name, verb );
 }
 
 static void broadcast_channel_newbie( CHAR_DATA * ch, const char *verb,
-    const char *argument, char *buf )
+    const char *argument, char *buf, size_t len )
 {
   set_char_color( AT_OOC, ch );
   ch_printf( ch, "(NEWBIE) %s: %s\r\n", ch->name, argument );
-  sprintf( buf, "(NEWBIE) %s: $t", IS_IMMORTAL( ch ) ? "$n" : ch->name );
+  snprintf( buf, len, "(NEWBIE) %s: $t", IS_IMMORTAL( ch ) ? "$n" : ch->name );
 }
 
 static void broadcast_channel_ooc( CHAR_DATA * ch, const char *verb,
-    const char *argument, char *buf )
+    const char *argument, char *buf, size_t len )
 {
   short position = ch->position;
   set_char_color( AT_OOC, ch );
-  sprintf( buf, "(OOC) %s: $t", IS_IMMORTAL( ch ) ? "$n" : ch->name );
+  snprintf( buf, len, "(OOC) %s: $t", IS_IMMORTAL( ch ) ? "$n" : ch->name );
   ch->position = POS_STANDING;
   act( AT_OOC, buf, ch, argument, NULL, TO_CHAR );
   ch->position = position;
 }
 
 static void broadcast_channel_immtalk( CHAR_DATA * ch, const char *verb,
-    const char *argument, char *buf )
+    const char *argument, char *buf, size_t len )
 {
   short position = ch->position;
-  sprintf( buf, "%s> $t", IS_IMMORTAL( ch ) ? "$n" : ch->name );
+  snprintf( buf, len, "%s> $t", IS_IMMORTAL( ch ) ? "$n" : ch->name );
   ch->position = POS_STANDING;
   act( AT_IMMORT, buf, ch, argument, NULL, TO_CHAR );
   ch->position = position;
@@ -434,7 +436,7 @@ void talk_channel( CHAR_DATA * ch, const char *argument, int channel,
 
   if( argument[0] == '\0' )
   {
-    sprintf( buf, "%s what?\r\n", verb );
+    snprintf( buf, MAX_STRING_LENGTH, "%s what?\r\n", verb );
     buf[0] = UPPER( buf[0] );
     send_to_char( buf, ch );	/* where'd this line go? */
     return;
@@ -451,31 +453,31 @@ void talk_channel( CHAR_DATA * ch, const char *argument, int channel,
   switch ( channel )
   {
     default:
-      broadcast_channel_default( ch, verb, argument, buf );
+      broadcast_channel_default( ch, verb, argument, buf, MAX_STRING_LENGTH );
       break;
 
     case CHANNEL_CLANTALK:
-      broadcast_channel_clantalk( ch, verb, argument, buf );
+      broadcast_channel_clantalk( ch, verb, argument, buf, MAX_STRING_LENGTH );
       break;
 
     case CHANNEL_SHIP:
-      broadcast_channel_ship( ch, verb, argument, buf );
+      broadcast_channel_ship( ch, verb, argument, buf, MAX_STRING_LENGTH );
       break;
 
     case CHANNEL_YELL:
-      broadcast_channel_yell( ch, verb, argument, buf );
+      broadcast_channel_yell( ch, verb, argument, buf, MAX_STRING_LENGTH );
       break;
 
     case CHANNEL_NEWBIE:
-      broadcast_channel_newbie( ch, verb, argument, buf );
+      broadcast_channel_newbie( ch, verb, argument, buf, MAX_STRING_LENGTH );
       break;
 
     case CHANNEL_OOC:
-      broadcast_channel_ooc( ch, verb, argument, buf );
+      broadcast_channel_ooc( ch, verb, argument, buf, MAX_STRING_LENGTH );
       break;
 
     case CHANNEL_IMMTALK:
-      broadcast_channel_immtalk( ch, verb, argument, buf );
+      broadcast_channel_immtalk( ch, verb, argument, buf, MAX_STRING_LENGTH );
       break;
   }
 
@@ -587,7 +589,7 @@ void to_channel( const char *argument, int channel,
   if( !first_descriptor || argument[0] == '\0' )
     return;
 
-  sprintf( buf, "%s: %s\r\n", verb, argument );
+  snprintf( buf, MAX_STRING_LENGTH, "%s: %s\r\n", verb, argument );
 
   for( d = first_descriptor; d; d = d->next )
   {
@@ -877,11 +879,11 @@ void do_tell( CHAR_DATA * ch, char *argument )
   if( switched_victim )
     victim = switched_victim;
 
-  sprintf( buf, "You tell %s '$t'", victim->name );
+  snprintf( buf, MAX_STRING_LENGTH, "You tell %s '$t'", victim->name );
   act( AT_TELL, buf, ch, argument, victim, TO_CHAR );
   position = victim->position;
   victim->position = POS_STANDING;
-  sprintf( buf, "%s tells you '$t'", ch->name );
+  snprintf( buf, MAX_STRING_LENGTH, "%s tells you '$t'", ch->name );
   act( AT_TELL, buf, ch, argument, victim, TO_VICT );
   victim->position = position;
   victim->reply = ch;
@@ -954,11 +956,11 @@ void do_reply( CHAR_DATA * ch, char *argument )
     }
   }
 
-  sprintf( buf, "You tell %s '$t'", victim->name );
+  snprintf( buf, MAX_STRING_LENGTH, "You tell %s '$t'", victim->name );
   act( AT_TELL, buf, ch, argument, victim, TO_CHAR );
   position = victim->position;
   victim->position = POS_STANDING;
-  sprintf( buf, "%s tells you '$t'", ch->name );
+  snprintf( buf, MAX_STRING_LENGTH, "%s tells you '$t'", ch->name );
   act( AT_TELL, buf, ch, argument, victim, TO_VICT );
   victim->position = position;
   victim->reply = ch;
@@ -1087,7 +1089,7 @@ void do_quit( CHAR_DATA * ch, char *argument )
   act( AT_BYE, "$n has left the game.", ch, NULL, NULL, TO_ROOM );
   set_char_color( AT_GREY, ch );
 
-  sprintf( log_buf, "%s has quit.", ch->name );
+  snprintf( log_buf, MAX_STRING_LENGTH, "%s has quit.", ch->name );
   quitting_char = ch;
   save_char_obj( ch );
   save_home( ch );
@@ -1395,7 +1397,7 @@ void do_order( CHAR_DATA * ch, char *argument )
 
   if( found )
   {
-    sprintf( log_buf, "%s: order %s.", ch->name, argbuf );
+    snprintf( log_buf, MAX_STRING_LENGTH, "%s: order %s.", ch->name, argbuf );
     log_string_plus( log_buf, LOG_NORMAL );
     send_to_char( "Ok.\r\n", ch );
     WAIT_STATE( ch, 12 );
@@ -1608,7 +1610,7 @@ void do_split( CHAR_DATA * ch, char *argument )
       "You split %d credits.  Your share is %d credits.\r\n",
       amount, share + extra );
 
-  sprintf( buf, "$n splits %d credits.  Your share is %d credits.",
+  snprintf( buf, MAX_STRING_LENGTH, "$n splits %d credits. Your share is %d credits.",
       amount, share );
 
   for( gch = ch->in_room->first_person; gch; gch = gch->next_in_room )
@@ -1640,7 +1642,6 @@ void do_gtell( CHAR_DATA * ch, char *argument )
   /*
    * Note use of send_to_char, so gtell works on sleepers.
    */
-  /*    sprintf( buf, "%s tells the group '%s'.\r\n", ch->name, argument ); */
   for( gch = first_char; gch; gch = gch->next )
   {
     if( is_same_group( gch, ch ) )
@@ -1679,7 +1680,7 @@ void talk_auction( const char *argument )
   DESCRIPTOR_DATA *d = NULL;
   char buf[MAX_STRING_LENGTH];
 
-  sprintf( buf, "Auction: %s", argument );	/* last %s to reset color */
+  snprintf( buf, MAX_STRING_LENGTH, "Auction: %s", argument );	/* last %s to reset color */
 
   for( d = first_descriptor; d; d = d->next )
   {

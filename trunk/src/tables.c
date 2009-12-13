@@ -74,72 +74,95 @@ void sort_skill_table(  )
  */
 void fwrite_skill( FILE * fpout, SKILLTYPE * skill )
 {
-  SMAUG_AFF *aff;
+  SMAUG_AFF *aff = NULL;
 
   fprintf( fpout, "Name         %s~\n", skill->name );
   fprintf( fpout, "Type         %s\n", skill_tname[skill->type] );
   fprintf( fpout, "Flags        %d\n", skill->flags );
+
   if( skill->target )
     fprintf( fpout, "Target       %d\n", skill->target );
+
   if( skill->minimum_position )
     fprintf( fpout, "Minpos       %d\n", skill->minimum_position );
+
   if( skill->saves )
     fprintf( fpout, "Saves        %d\n", skill->saves );
+
   if( skill->slot )
     fprintf( fpout, "Slot         %d\n", skill->slot );
+
   if( skill->min_mana )
     fprintf( fpout, "Mana         %d\n", skill->min_mana );
+
   if( skill->beats )
     fprintf( fpout, "Rounds       %d\n", skill->beats );
+
   if( skill->skill_fun )
     fprintf( fpout, "Code         %s\n", skill->fun_name );
   else if( skill->spell_fun )
     fprintf( fpout, "Code         %s\n", skill->fun_name );
+
   fprintf( fpout, "Dammsg       %s~\n", skill->noun_damage );
+
   if( skill->msg_off && skill->msg_off[0] != '\0' )
     fprintf( fpout, "Wearoff      %s~\n", skill->msg_off );
 
   if( skill->hit_char && skill->hit_char[0] != '\0' )
     fprintf( fpout, "Hitchar      %s~\n", skill->hit_char );
+
   if( skill->hit_vict && skill->hit_vict[0] != '\0' )
     fprintf( fpout, "Hitvict      %s~\n", skill->hit_vict );
+
   if( skill->hit_room && skill->hit_room[0] != '\0' )
     fprintf( fpout, "Hitroom      %s~\n", skill->hit_room );
 
   if( skill->miss_char && skill->miss_char[0] != '\0' )
     fprintf( fpout, "Misschar     %s~\n", skill->miss_char );
+
   if( skill->miss_vict && skill->miss_vict[0] != '\0' )
     fprintf( fpout, "Missvict     %s~\n", skill->miss_vict );
+
   if( skill->miss_room && skill->miss_room[0] != '\0' )
     fprintf( fpout, "Missroom     %s~\n", skill->miss_room );
 
   if( skill->die_char && skill->die_char[0] != '\0' )
     fprintf( fpout, "Diechar      %s~\n", skill->die_char );
+
   if( skill->die_vict && skill->die_vict[0] != '\0' )
     fprintf( fpout, "Dievict      %s~\n", skill->die_vict );
+
   if( skill->die_room && skill->die_room[0] != '\0' )
     fprintf( fpout, "Dieroom      %s~\n", skill->die_room );
 
   if( skill->imm_char && skill->imm_char[0] != '\0' )
     fprintf( fpout, "Immchar      %s~\n", skill->imm_char );
+
   if( skill->imm_vict && skill->imm_vict[0] != '\0' )
     fprintf( fpout, "Immvict      %s~\n", skill->imm_vict );
+
   if( skill->imm_room && skill->imm_room[0] != '\0' )
     fprintf( fpout, "Immroom      %s~\n", skill->imm_room );
 
   if( skill->dice && skill->dice[0] != '\0' )
     fprintf( fpout, "Dice         %s~\n", skill->dice );
+
   if( skill->value )
     fprintf( fpout, "Value        %d\n", skill->value );
+
   if( skill->difficulty )
     fprintf( fpout, "Difficulty   %d\n", skill->difficulty );
+
   if( skill->participants )
     fprintf( fpout, "Participants %d\n", skill->participants );
+
   if( skill->components && skill->components[0] != '\0' )
     fprintf( fpout, "Components   %s~\n", skill->components );
+
   for( aff = skill->affects; aff; aff = aff->next )
     fprintf( fpout, "Affect       '%s' %d '%s' %d\n",
 	aff->duration, aff->location, aff->modifier, aff->bitvector );
+
   if( skill->alignment )
     fprintf( fpout, "Alignment   %d\n", skill->alignment );
 
@@ -151,8 +174,8 @@ void fwrite_skill( FILE * fpout, SKILLTYPE * skill )
  */
 void save_skill_table(  )
 {
-  int x;
-  FILE *fpout;
+  int x = 0;
+  FILE *fpout = NULL;
 
   if( ( fpout = fopen( SKILL_FILE, "w" ) ) == NULL )
   {
@@ -178,9 +201,9 @@ void save_skill_table(  )
  */
 void save_socials(  )
 {
-  FILE *fpout;
-  SOCIALTYPE *social;
-  int x;
+  FILE *fpout = NULL;
+  SOCIALTYPE *social = NULL;
+  int x = 0;
 
   if( ( fpout = fopen( SOCIAL_FILE, "w" ) ) == NULL )
   {
@@ -239,9 +262,9 @@ int get_skill( const char *skilltype )
  */
 void save_commands(  )
 {
-  FILE *fpout;
-  CMDTYPE *command;
-  int x;
+  FILE *fpout = NULL;
+  CMDTYPE *command = NULL;
+  int x = 0;
 
   if( ( fpout = fopen( COMMAND_FILE, "w" ) ) == NULL )
   {
@@ -415,7 +438,7 @@ SKILLTYPE *fread_skill( FILE * fp )
 
 void load_skill_table(  )
 {
-  FILE *fp;
+  FILE *fp = NULL;
 
   if( ( fp = fopen( SKILL_FILE, "r" ) ) != NULL )
   {
@@ -472,9 +495,9 @@ void load_skill_table(  )
 void fread_social( FILE * fp )
 {
   char buf[MAX_STRING_LENGTH];
-  const char *word;
-  bool fMatch;
-  SOCIALTYPE *social;
+  const char *word = NULL;
+  bool fMatch = FALSE;
+  SOCIALTYPE *social = NULL;
 
   CREATE( social, SOCIALTYPE, 1 );
 
@@ -543,17 +566,16 @@ void fread_social( FILE * fp )
 
 void load_socials(  )
 {
-  FILE *fp;
+  FILE *fp = NULL;
 
   if( ( fp = fopen( SOCIAL_FILE, "r" ) ) != NULL )
   {
     top_sn = 0;
     for( ;; )
     {
-      char letter;
-      char *word;
+      const char *word = NULL;
+      char letter = fread_letter( fp );
 
-      letter = fread_letter( fp );
       if( letter == '*' )
       {
 	fread_to_eol( fp );
@@ -673,17 +695,16 @@ void fread_command( FILE * fp )
 
 void load_commands(  )
 {
-  FILE *fp;
+  FILE *fp = NULL;
 
   if( ( fp = fopen( COMMAND_FILE, "r" ) ) != NULL )
   {
     top_sn = 0;
     for( ;; )
     {
-      char letter;
-      char *word;
+      const char *word = NULL;
+      char letter = fread_letter( fp );
 
-      letter = fread_letter( fp );
       if( letter == '*' )
       {
 	fread_to_eol( fp );
@@ -717,6 +738,5 @@ void load_commands(  )
     bug( "Cannot open commands.dat", 0 );
     exit( 0 );
   }
-
 }
 
