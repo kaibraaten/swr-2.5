@@ -4,7 +4,7 @@ OBJ  = $(patsubst %,$(ODIR)/%,$(_OBJ))
 DEPS =
 #CC = gcc
 WFLAGS =  -Wall -Wshadow -Wformat-security -Winline -Wpointer-arith -Wcast-align -Wredundant-decls -Werror -Wwrite-strings
-CFLAGS = -O2 -MMD -pedantic -ansi $(GCC_MARCH) $(WFLAGS) -I.
+CFLAGS = -O2 -MMD -pedantic $(GCC_MARCH) $(WFLAGS) -I.
 
 ifndef CYGWIN
 CFLAGS += -fPIC
