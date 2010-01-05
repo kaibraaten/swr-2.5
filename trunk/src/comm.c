@@ -73,7 +73,11 @@ void free_memory( void );
 static void execute_on_exit( void )
 {
   free_memory();
+
+#ifdef SWR2_HAS_DLSYM
   dlclose( sysdata.dl_handle );
+#endif
+
   os_cleanup();
 }
 
@@ -85,6 +89,7 @@ int main( int argc, char **argv )
   os_setup();
   atexit( execute_on_exit );
 
+#ifdef SWR2_HAS_DLSYM
   sysdata.dl_handle = dlopen( NULL, RTLD_LAZY );
 
   if( !sysdata.dl_handle )
@@ -92,6 +97,7 @@ int main( int argc, char **argv )
     fprintf( out_stream, "Failed opening dl handle to self: %s\n", dlerror() );
     exit( 1 );
   }
+#endif
 
   num_descriptors = 0;
   first_descriptor = NULL;

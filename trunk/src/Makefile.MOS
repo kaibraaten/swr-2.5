@@ -1,8 +1,13 @@
 BINARY = swr
+
+#Comment out the next line if your system doesn't have dlsym functionality.
+HAS_DLSYM = -DSWR2_HAS_DLSYM
+
 WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wwrite-strings -Wno-long-long -Wno-unused-variable
 
-CCFLAGS = -MMD $(WFLAGS) -Iswr_support -I/gg/new-include -noixemul
+CCFLAGS = -MMD $(WFLAGS) -Iswr_support -I/gg/new-include -noixemul $(HAS_DLSYM)
 LFLAGS = -lm -Lswr_support -lswr_support -noixemul
+
 DEPS = 
 ODIR = obj
 _OBJ = act_comm.o act_info.o act_move.o act_obj.o act_wiz.o boards.o \

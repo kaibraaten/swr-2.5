@@ -27,7 +27,11 @@
 
 #include <proto/socket.h>
 #include <sys/filio.h>
+
+#ifdef SWR2_HAS_DLSYM
 #include <proto/dynload.h>
+#endif
+
 #include <utility/tagitem.h>
 #include <exec/exec.h>
 #include <proto/exec.h>
