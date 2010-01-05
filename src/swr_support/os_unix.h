@@ -38,7 +38,11 @@
 #include <signal.h>
 #include <unistd.h>
 #include <arpa/telnet.h>
+
+#ifdef SWR2_HAS_DLSYM
 #include <dlfcn.h>
+#endif
+
 #include <dirent.h>
 
 static const int INVALID_SOCKET = -1;
