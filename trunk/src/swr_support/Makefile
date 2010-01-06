@@ -3,7 +3,7 @@ _OBJ = bet.o file_io.o hashstr.o misc.o os_unix.o sha256.o string_handling.o tim
 OBJ  = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 #Comment out the next line if your system doesn't have dlsym functionality.
-#HAS_DLSYM = -DSWR2_HAS_DLSYM
+HAS_DLSYM = -DSWR2_HAS_DLSYM
 
 WFLAGS =  -Wall -Wshadow -Wformat-security -Winline -Wpointer-arith -Wcast-align -Wredundant-decls -Werror -Wwrite-strings
 CFLAGS = -O2 -MMD -pedantic $(GCC_MARCH) $(WFLAGS) -I. $(HAS_DLSYM)
