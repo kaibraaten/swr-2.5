@@ -1,9 +1,8 @@
-#CC = gcc
 BINARY = swr
 WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wwrite-strings -Wshadow
 
 #Comment out the next line if your system doesn't have dlsym functionality.
-#HAS_DLSYM = -DSWR2_HAS_DLSYM
+HAS_DLSYM = -DSWR2_HAS_DLSYM
 
 CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support $(HAS_DLSYM)
 LFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support
