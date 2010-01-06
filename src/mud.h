@@ -3073,144 +3073,140 @@ extern "C" {
 
 /* act_comm.c */
 bool character_has_comlink( const CHAR_DATA *ch );
-void    sound_to_room( const ROOM_INDEX_DATA *room , const char *argument );
-bool	circle_follow	args( ( const CHAR_DATA *ch, const CHAR_DATA *victim ) );
-void	add_follower	args( ( CHAR_DATA *ch, CHAR_DATA *master ) );
-void	stop_follower	args( ( CHAR_DATA *ch ) );
-void	die_follower	args( ( CHAR_DATA *ch ) );
-bool	is_same_group	args( ( const CHAR_DATA *ach, const CHAR_DATA *bch ) );
-void	send_ansi_title args( ( CHAR_DATA *ch ) );
-void	send_ascii_title args( ( CHAR_DATA *ch ) );
-void	to_channel	args( ( const char *argument, int channel,
-				const char *verb, short level ) );
-void  	talk_auction    args( ( const char *argument ) );
-char *	obj_short	args( ( const OBJ_DATA *obj ) );
+void sound_to_room( const ROOM_INDEX_DATA *room , const char *argument );
+bool circle_follow( const CHAR_DATA *ch, const CHAR_DATA *victim );
+void add_follower( CHAR_DATA *ch, CHAR_DATA *master );
+void stop_follower( CHAR_DATA *ch );
+void die_follower( CHAR_DATA *ch );
+bool is_same_group( const CHAR_DATA *ach, const CHAR_DATA *bch );
+void send_ansi_title( CHAR_DATA *ch );
+void send_ascii_title( CHAR_DATA *ch );
+void to_channel( const char *argument, int channel,
+		 const char *verb, short level );
+void talk_auction( const char *argument );
+char *obj_short( const OBJ_DATA *obj );
 
 /* act_info.c */
-int	get_door	args( ( const char *arg ) );
-char *	format_obj_to_char	args( ( const OBJ_DATA *obj, CHAR_DATA *ch,
-				    bool fShort ) );
-void	show_list_to_char	args( ( const OBJ_DATA *list, CHAR_DATA *ch,
-				    bool fShort, bool fShowNothing ) );
+int get_door( const char *arg );
+char *format_obj_to_char( const OBJ_DATA *obj, CHAR_DATA *ch, bool fShort );
+void show_list_to_char( const OBJ_DATA *list, CHAR_DATA *ch,
+			bool fShort, bool fShowNothing );
 void log_printf( const char *fmt, ... );
 void copyover_recover( void );
 
 /* act_move.c */
 char *wordwrap( char *txt, short wrap );
-void	clear_vrooms	args( ( void ) );
-ED *	find_door	args( ( CHAR_DATA *ch, char *arg, bool quiet ) );
-ED *	get_exit	args( ( const ROOM_INDEX_DATA *room, short dir ) );
-ED *	get_exit_to	args( ( const ROOM_INDEX_DATA *room, short dir, long vnum ) );
-ED *	get_exit_num	args( ( const ROOM_INDEX_DATA *room, short count ) );
-ch_ret	move_char	args( ( CHAR_DATA *ch, EXIT_DATA *pexit, int fall ) );
-void	teleport	args( ( CHAR_DATA *ch, short room, int flags ) );
-short	encumbrance	args( ( const CHAR_DATA *ch, short move ) );
-bool	will_fall	args( ( CHAR_DATA *ch, int fall ) );
-int     wherehome       args( ( const CHAR_DATA *ch ) );
+void clear_vrooms( void );
+ED *find_door( CHAR_DATA *ch, char *arg, bool quiet );
+ED *get_exit( const ROOM_INDEX_DATA *room, short dir );
+ED *get_exit_to( const ROOM_INDEX_DATA *room, short dir, long vnum );
+ED *get_exit_num( const ROOM_INDEX_DATA *room, short count );
+ch_ret move_char( CHAR_DATA *ch, EXIT_DATA *pexit, int fall );
+void teleport( CHAR_DATA *ch, short room, int flags );
+short encumbrance( const CHAR_DATA *ch, short move );
+bool will_fall( CHAR_DATA *ch, int fall );
+int wherehome( const CHAR_DATA *ch );
 
 /* act_obj.c */
-
-obj_ret	damage_obj	args( ( OBJ_DATA *obj ) );
-short	get_obj_resistance args( ( const OBJ_DATA *obj ) );
-void    obj_fall  	args( ( OBJ_DATA *obj, bool through ) );
+obj_ret damage_obj( OBJ_DATA *obj );
+short get_obj_resistance( const OBJ_DATA *obj );
+void obj_fall( OBJ_DATA *obj, bool through );
 
 /* act_wiz.c */
-void              close_area    args( ( AREA_DATA *pArea ) );
-RID *	find_location	args( ( CHAR_DATA *ch, const char *arg ) );
-void    echo_to_room    args( ( short AT_COLOR, const ROOM_INDEX_DATA *room, const char *argument ) );
-void	echo_to_all	args( ( short AT_COLOR, const char *argument,
-				short tar ) );
-void	echo_to_area	args( ( const AREA_DATA * area , short AT_COLOR,
-				const char *argument,
-				short tar ) );
-void   	get_reboot_string args( ( void ) );
-void	free_social	args( ( SOCIALTYPE *social ) );
-void	add_social	args( ( SOCIALTYPE *social ) );
-void	free_command	args( ( CMDTYPE *command ) );
-void	unlink_command	args( ( CMDTYPE *command ) );
-void	add_command	args( ( CMDTYPE *command ) );
-
+void close_area( AREA_DATA *pArea );
+RID *find_location( CHAR_DATA *ch, const char *arg );
+void echo_to_room( short AT_COLOR, const ROOM_INDEX_DATA *room,
+		   const char *argument );
+void echo_to_all( short AT_COLOR, const char *argument, short tar );
+void echo_to_area( const AREA_DATA * area, short AT_COLOR,
+		   const char *argument, short tar );
+void get_reboot_string( void );
+void free_social( SOCIALTYPE *social );
+void add_social( SOCIALTYPE *social );
+void free_command( CMDTYPE *command );
+void unlink_command( CMDTYPE *command );
+void add_command( CMDTYPE *command );
 
 /* boards.c */
-void	load_boards	args( ( void ) );
-BD *	get_board	args( ( const OBJ_DATA *obj ) );
-void	free_note	args( ( NOTE_DATA *pnote ) );
+void load_boards( void );
+BD * get_board( const OBJ_DATA *obj );
+void free_note( NOTE_DATA *pnote );
 
 /* build.c */
-int	get_mpflag	args( ( const char *flag ) );
-int	get_dir		args( ( const char *txt  ) );
-int     get_vip_flag    args( ( const char *flag ) );
-int     get_wanted_flag args( ( const char *flag ) );
-void    save_some_areas args( ( void ) );
+int get_mpflag( const char *flag );
+int get_dir( const char *txt  );
+int get_vip_flag( const char *flag );
+int get_wanted_flag( const char *flag );
+void save_some_areas( void );
 
 /* clans.c */
 void clan_add_leader( CLAN_DATA *clan, const char *name );
 void clan_remove_leader( CLAN_DATA *ch, const char *name );
 bool clan_char_is_leader( const CLAN_DATA*, const CHAR_DATA* );
 void clan_decrease_vehicles_owned( CLAN_DATA *clan, const SHIP_DATA *ship );
-CL *	get_clan		args( ( const char *name ) );
-void	load_clans		args( ( void ) );
-void	save_clan		args( ( const CLAN_DATA *clan ) );
+CL *get_clan( const char *name );
+void load_clans( void );
+void save_clan( const CLAN_DATA *clan );
 
 /* vote.c */
-void	load_polls		args( ( void ) );
-void	save_poll		args( ( const VOTE_DATA *poll ) );
+void load_polls( void );
+void save_poll( const VOTE_DATA *poll );
 
 /* planets.c */
-PLANET_DATA *	get_planet	args( ( const char *name ) );
-void	load_planets		args( ( void ) );
-void	save_planet		args( ( const PLANET_DATA *planet ) );
-int     max_population          args( ( const PLANET_DATA *planet ) );
-long    get_taxes               args( ( const PLANET_DATA *planet ) );
+  PLANET_DATA *get_planet( const char *name );
+void load_planets( void );
+void save_planet( const PLANET_DATA *planet );
+int max_population( const PLANET_DATA *planet );
+long get_taxes( const PLANET_DATA *planet );
 
 /* space.c */
 void write_area_list( void );
 void write_starsystem_list( void );
 SHIP_DATA *ship_create( void );
-SPACE_DATA *starsystem_create(  void );
-SH        *  get_ship          	    args( ( const char *name ) );
-void         load_ships        	    args( ( void ) );
-void         save_ship      	    args( ( const SHIP_DATA *ship ) );
-void         load_space             args( ( void ) );
-void         save_starsystem        args( ( const SPACE_DATA *starsystem ) );
-SPACE_DATA * starsystem_from_name   args( ( const char *name ) );
-SPACE_DATA * starsystem_from_room   args( ( const ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_entrance     args( ( const ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_room         args( ( const ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_pilotseat    args( ( const ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_cockpit      args( ( const ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_turret       args( ( const ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_engine       args( ( const ROOM_INDEX_DATA * room ) );
-SHIP_DATA  * ship_from_pilot        args( ( const char *name ) );
-SHIP_DATA  * get_ship_here          args( ( const char *name,
-					    const SPACE_DATA *starsystem ) );
-void         update_space           args( ( void ) );
-void         recharge_ships         args( ( void ) );
+SPACE_DATA *starsystem_create( void );
+SH *get_ship( const char *name );
+void load_ships( void );
+void save_ship( const SHIP_DATA *ship );
+void load_space( void );
+void save_starsystem( const SPACE_DATA *starsystem );
+SPACE_DATA *starsystem_from_name( const char *name );
+SPACE_DATA *starsystem_from_room( const ROOM_INDEX_DATA * room );
+SHIP_DATA *ship_from_entrance( const ROOM_INDEX_DATA * room );
+SHIP_DATA *ship_from_room( const ROOM_INDEX_DATA * room );
+SHIP_DATA *ship_from_pilotseat( const ROOM_INDEX_DATA * room );
+SHIP_DATA *ship_from_cockpit( const ROOM_INDEX_DATA * room );
+SHIP_DATA *ship_from_turret( const ROOM_INDEX_DATA * room );
+SHIP_DATA *ship_from_engine( const ROOM_INDEX_DATA * room );
+SHIP_DATA *ship_from_pilot( const char *name );
+SHIP_DATA *get_ship_here( const char *name, const SPACE_DATA *starsystem );
+void update_space( void );
+void recharge_ships( void );
 void move_missiles( void );
-void         move_ships             args( ( void ) );
-void         update_bus             args( ( void ) );
-void         update_traffic         args( ( void ) );
-bool         check_pilot            args( ( const CHAR_DATA *ch , const SHIP_DATA *ship ) );
-void         echo_to_ship           args( ( int color , const SHIP_DATA *ship , const char *argument ) );
-void         echo_to_cockpit        args( ( int color , const SHIP_DATA *ship , const char *argument ) );
-void         echo_to_system         args( ( int color , const SHIP_DATA *ship , const char *argument , const SHIP_DATA *ignore ) );
-bool         extract_ship           args( ( SHIP_DATA *ship ) );
-bool         ship_to_room           args( ( SHIP_DATA *ship , long vnum ) );
+void move_ships( void );
+void update_bus( void );
+void update_traffic( void );
+bool check_pilot( const CHAR_DATA *ch , const SHIP_DATA *ship );
+void echo_to_ship( int color , const SHIP_DATA *ship , const char *argument );
+void echo_to_cockpit( int color, const SHIP_DATA *ship, const char *argument );
+void echo_to_system( int color , const SHIP_DATA *ship , const char *argument,
+		     const SHIP_DATA *ignore );
+bool extract_ship( SHIP_DATA *ship );
+bool ship_to_room( SHIP_DATA *ship , long vnum );
 void damage_ship( SHIP_DATA *ship , int min , int max , CHAR_DATA *ch );
-void         destroy_ship           args( ( SHIP_DATA *ship , CHAR_DATA *ch ) );
-void         ship_to_starsystem     args( ( SHIP_DATA *ship , SPACE_DATA *starsystem ) );
-void         ship_from_starsystem   args( ( SHIP_DATA *ship , SPACE_DATA *starsystem ) );
-void         new_missile            args( ( SHIP_DATA *ship , SHIP_DATA *target , CHAR_DATA *ch ) );
-void         extract_missile        args( ( MISSILE_DATA *missile ) );
-SHIP_DATA * ship_in_room            args( ( const ROOM_INDEX_DATA *room, const char *name ) ); 
+void destroy_ship( SHIP_DATA *ship , CHAR_DATA *ch );
+void ship_to_starsystem( SHIP_DATA *ship , SPACE_DATA *starsystem );
+void ship_from_starsystem( SHIP_DATA *ship , SPACE_DATA *starsystem );
+void new_missile( SHIP_DATA *ship , SHIP_DATA *target , CHAR_DATA *ch );
+void extract_missile( MISSILE_DATA *missile );
+SHIP_DATA * ship_in_room( const ROOM_INDEX_DATA *room, const char *name ); 
 
 /* morespace.c */
-SHIP_PROTOTYPE *  get_ship_prototype        args( ( const char *name ) );
-SHIP_DATA *  make_ship        		    args( ( const SHIP_PROTOTYPE *protoype ) );
-void         load_prototypes        	    args( ( void ) );
-void         save_ship_protoype      	    args( ( const SHIP_PROTOTYPE *prototype ) );
-long int     get_prototype_value      	    args( ( const SHIP_PROTOTYPE *prototype ) );
-void	     create_ship_rooms		    args( ( SHIP_DATA * ship ) );
+SHIP_PROTOTYPE *get_ship_prototype( const char *name );
+SHIP_DATA *make_ship( const SHIP_PROTOTYPE *protoype );
+void load_prototypes( void );
+void save_ship_protoype( const SHIP_PROTOTYPE *prototype );
+long int get_prototype_value( const SHIP_PROTOTYPE *prototype );
+void create_ship_rooms( SHIP_DATA * ship );
 
 /* comm.c */
 void	close_socket	args( ( DESCRIPTOR_DATA *dclose, bool force ) );
