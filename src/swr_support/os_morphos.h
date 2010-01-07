@@ -28,7 +28,7 @@
 #include <proto/socket.h>
 #include <sys/filio.h>
 
-#ifdef SWR2_HAS_DLSYM
+#ifdef SWR2_USE_DLSYM
 #include <proto/dynload.h>
 #endif
 

@@ -10,7 +10,7 @@ SKILLTYPE *skill_table[MAX_SKILL];
 
 const char *const skill_tname[] = { "unknown", "Spell", "Skill", "Weapon" };
 
-#ifdef SWR2_HAS_DLSYM
+#ifdef SWR2_USE_DLSYM
 
 SPELL_FUN *spell_function( const char *name )
 {
@@ -47,18 +47,18 @@ struct spell_fun_entry
 };
 
 static const struct spell_fun_entry spell_fun_map[] = {
-  { "spell_blindness", spell_blindness },
-  { "spell_charm_person", spell_charm_person },
-  { "spell_fireball", spell_fireball },
-  { "spell_identify", spell_identify },
-  { "spell_invis", spell_invis },
+  { "spell_blindness",      spell_blindness },
+  { "spell_charm_person",   spell_charm_person },
+  { "spell_fireball",       spell_fireball },
+  { "spell_identify",       spell_identify },
+  { "spell_invis",          spell_invis },
   { "spell_lightning_bolt", spell_lightning_bolt },
-  { "spell_notfound", spell_notfound },
-  { "spell_null", spell_null },
-  { "spell_poison", spell_poison },
-  { "spell_possess", spell_possess },
-  { "spell_sleep", spell_sleep },
-  { "spell_smaug", spell_smaug }
+  { "spell_notfound",       spell_notfound },
+  { "spell_null",           spell_null },
+  { "spell_poison",         spell_poison },
+  { "spell_possess",        spell_possess },
+  { "spell_sleep",          spell_sleep },
+  { "spell_smaug",          spell_smaug }
 };
 
 static size_t spell_fun_map_size( void )
@@ -504,7 +504,7 @@ DO_FUN *skill_function( const char *name )
   return fun_ptr;
 }
 
-#endif // SWR2_HAS_DLSYM
+#endif // SWR2_USE_DLSYM
 
 /*
  * Function used by qsort to sort skills

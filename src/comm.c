@@ -74,7 +74,7 @@ static void execute_on_exit( void )
 {
   free_memory();
 
-#ifdef SWR2_HAS_DLSYM
+#ifdef SWR2_USE_DLSYM
   dlclose( sysdata.dl_handle );
 #endif
 
@@ -89,7 +89,7 @@ int main( int argc, char **argv )
   os_setup();
   atexit( execute_on_exit );
 
-#ifdef SWR2_HAS_DLSYM
+#ifdef SWR2_USE_DLSYM
   sysdata.dl_handle = dlopen( NULL, RTLD_LAZY );
 
   if( !sysdata.dl_handle )
