@@ -373,9 +373,9 @@ void fwrite_char( const CHAR_DATA * ch, FILE * fp )
   if( ch->susceptible )
     fprintf( fp, "Susceptible  %d\n", ch->susceptible );
   if( ch->pcdata && ch->pcdata->outcast_time )
-    fprintf( fp, "Outcast_time %ld\n", ch->pcdata->outcast_time );
+    fprintf( fp, "Outcast_time %ld\n", (long) ch->pcdata->outcast_time );
   if( ch->pcdata && ch->pcdata->restore_time )
-    fprintf( fp, "Restore_time %ld\n", ch->pcdata->restore_time );
+    fprintf( fp, "Restore_time %ld\n", (long) ch->pcdata->restore_time );
   if( ch->mental_state != -10 )
     fprintf( fp, "Mentalstate  %d\n", ch->mental_state );
 

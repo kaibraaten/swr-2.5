@@ -39,7 +39,7 @@
 #include <unistd.h>
 #include <arpa/telnet.h>
 
-#ifdef SWR2_HAS_DLSYM
+#ifdef SWR2_USE_DLSYM
 #include <dlfcn.h>
 #endif
 
