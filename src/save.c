@@ -729,7 +729,7 @@ bool load_char_obj( DESCRIPTOR_DATA * d, const char *name, bool preload )
   sprintf( strsave, "%s%c/%s", PLAYER_DIR, tolower( ( int ) name[0] ),
       capitalize( name ) );
 
-#if !defined(__MORPHOS__)
+#if !defined(AMIGA) && !defined(__MORPHOS__)
   if( stat( strsave, &fst ) != -1 )
   {
     if( fst.st_size == 0 )
@@ -1776,7 +1776,7 @@ void fread_obj( CHAR_DATA * ch, FILE * fp, short os_type )
 
 void set_alarm( long seconds )
 {
-#if !defined(__MORPHOS__) && !defined( _WIN32 )
+#if !defined(AMIGA) && !defined(__MORPHOS__) && !defined( _WIN32 )
   alarm( seconds );
 #endif
 }
@@ -1855,8 +1855,8 @@ void write_corpses( const CHAR_DATA * ch, const char *name )
   return;
 }
 
-/* Directory scanning with MorphOS */
-#if defined(__MORPHOS__)
+/* Directory scanning with Amiga and MorphOS */
+#if defined(AMIGA) || defined(__MORPHOS__)
 
 void load_corpses( void )
 {

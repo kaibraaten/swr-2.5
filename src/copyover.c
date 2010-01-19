@@ -49,7 +49,7 @@ void do_copyover( CHAR_DATA * ch, char *argument )
   char buf[100];
   FILE *fp = fopen( COPYOVER_FILE, "w" );
 
-#if defined(__MORPHOS__)
+#if defined(AMIGA) || defined(__MORPHOS__)
   long error_code = 0;
 #else
   char buf2[100];
@@ -80,10 +80,12 @@ void do_copyover( CHAR_DATA * ch, char *argument )
     }
     else
     {
-#if defined(__MORPHOS__)
+#if defined(AMIGA) || defined(__MORPHOS__)
       static long sockID = 0;
+      SOCKET cur_desc = INVALID_SOCKET;
+
       ++sockID;
-      SOCKET cur_desc = ReleaseCopyOfSocket( d->descriptor, sockID );
+      cur_desc = ReleaseCopyOfSocket( d->descriptor, sockID );
 
       if( cur_desc == SOCKET_ERROR )
       {
@@ -104,7 +106,7 @@ void do_copyover( CHAR_DATA * ch, char *argument )
   fprintf( fp, "-1\n" );
   fclose( fp );
 
-#if defined(__MORPHOS__)
+#if defined(AMIGA) || defined(__MORPHOS__)
   sprintf( buf, "run >NIL: %s %d copyover %d",
       sysdata.exe_filename, port, control );
 
@@ -169,7 +171,7 @@ void copyover_recover( void )
     if( desc == -1 )
       break;
 
-#if defined(__MORPHOS__)
+#if defined(AMIGA) || defined(__MORPHOS__)
     desc = ObtainSocket( desc, PF_INET, SOCK_STREAM, IPPROTO_TCP );
 
     if( desc == INVALID_SOCKET )

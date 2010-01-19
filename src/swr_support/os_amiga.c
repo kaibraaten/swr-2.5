@@ -31,7 +31,11 @@
 struct Library *SocketBase = NULL;
 struct Library *UserGroupBase = NULL;
 struct UtilityBase *UtilityBase = NULL;
+
+#if defined(__MORPHOS__) && defined(SWR2_USE_DLSYM)
 struct Library *DynLoadBase = NULL;
+#endif
+
 extern FILE *out_stream;
 
 #ifndef __DATE2__
@@ -122,21 +126,25 @@ void os_setup( void )
     exit( 1 );
   }
 
+#if defined(__MORPHOS__) && defined(SWR2_USE_DLSYM)
   if( !( DynLoadBase = OpenLibrary( (CONST_STRPTR) "dynload.library", 51 ) ) )
   {
     fprintf( out_stream, "%s (%s:%d) - Failed to open dynload.library\n",
 	__FUNCTION__, __FILE__, __LINE__ );
     exit( 1 );
   }
+#endif
 }
 
 void os_cleanup( void )
 {
+#if defined(__MORPHOS__) && defined(SWR2_USE_DLSYM)
   if( DynLoadBase )
   {
     CloseLibrary( DynLoadBase );
     DynLoadBase = NULL;
   }
+#endif
 
   if( UtilityBase )
   {

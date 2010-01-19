@@ -22,13 +22,20 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-#ifndef _SWR2_OS_MORPHOS_H_
-#define _SWR2_OS_MORPHOS_H_
+#ifndef _SWR2_OS_AMIGA_H_
+#define _SWR2_OS_AMIGA_H_
 
+#ifdef __STORMGCC__
+typedef long clock_t;
+#endif
+
+#ifdef __MORPHOS__
 #include <proto/socket.h>
+#endif
+
 #include <sys/filio.h>
 
-#ifdef SWR2_USE_DLSYM
+#if defined(SWR2_USE_DLSYM) && defined(__MORPHOS__)
 #include <proto/dynload.h>
 #endif
 
@@ -39,6 +46,11 @@
 #include <proto/dos.h>
 #include <unistd.h>
 #include <sys/types.h>
+
+#ifdef AMIGA
+#include <lineread.h>
+#endif
+
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <netinet/in.h>
@@ -56,6 +68,17 @@ static const int SOCKET_ERROR = -1;
 typedef int SOCKET;
 static const int MSG_NOSIGNAL = 0;
 typedef unsigned char sockbuf_t;
+
+#ifdef __STORMGCC__
+#include <snprintf.h>
+typedef int ssize_t;
+#define isascii(c) isprint((c))
+
+/*#ifdef __cplusplus*/
+#define unlink(name) !DeleteFile((STRPTR)(name))
+/*#endif*/
+
+#endif
 
 #endif /* include guard */
 

@@ -336,7 +336,7 @@ char *strupper( const char *str )
 /*
  * Returns TRUE or FALSE if a letter is a vowel                 -Thoric
  */
-#if defined(__MORPHOS__)
+#if defined(AMIGA) || defined(__MORPHOS__)
 static bool isavowel( unsigned letter )
 #else
 static bool isavowel( char letter )
