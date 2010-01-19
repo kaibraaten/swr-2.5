@@ -26,12 +26,14 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "os.h"
+
 #if !defined(_WIN32)
 #include <sys/param.h>
 #include <sys/cdefs.h>
 #if defined(__FreeBSD__)
 #include <sys/endian.h>
-#elif defined(__MORPHOS__)
+#elif defined(AMIGA) || defined(__MORPHOS__)
 /* do nothing; just to prevent endian.h from being included */
 #else
 #include <endian.h>
