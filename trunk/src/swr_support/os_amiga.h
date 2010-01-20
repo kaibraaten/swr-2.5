@@ -27,6 +27,9 @@
 
 #ifdef __STORMGCC__
 typedef long clock_t;
+typedef int ssize_t;
+#define isascii(c) isprint((c))
+#define unlink(name) !DeleteFile((STRPTR)(name))
 #endif
 
 #ifdef __MORPHOS__
@@ -68,17 +71,6 @@ static const int SOCKET_ERROR = -1;
 typedef int SOCKET;
 static const int MSG_NOSIGNAL = 0;
 typedef unsigned char sockbuf_t;
-
-#ifdef __STORMGCC__
-#include <snprintf.h>
-typedef int ssize_t;
-#define isascii(c) isprint((c))
-
-/*#ifdef __cplusplus*/
-#define unlink(name) !DeleteFile((STRPTR)(name))
-/*#endif*/
-
-#endif
 
 #endif /* include guard */
 
