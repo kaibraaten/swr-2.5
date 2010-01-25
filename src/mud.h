@@ -252,7 +252,7 @@ typedef enum
   CON_CONFIRM_NEW_NAME,	CON_GET_NEW_PASSWORD,	CON_CONFIRM_NEW_PASSWORD,
   CON_GET_NEW_SEX,	CON_DONE_MOTD,
   CON_GET_EMULATION,	CON_EDITING,
-  CON_GET_WANT_RIPANSI,	CON_TITLE,		CON_PRESS_ENTER,
+  CON_GET_WANT_RIPANSI,	CON_TITLE,
   CON_WAIT_1,		CON_WAIT_2,		CON_WAIT_3,
   CON_ACCEPTED,         CON_GET_PKILL,		CON_READ_IMOTD,
   CON_GET_NEW_EMAIL,    CON_GET_MSP,            CON_GET_NEW_CLASS,
@@ -3034,8 +3034,6 @@ DECLARE_SPELL_FUN(	spell_smaug		);
 #define BOARD_FILE	"boards.txt"		/* For bulletin boards	 */
 #define SHUTDOWN_FILE	"shutdown.txt"		/* For 'shutdown'	 */
 #define COPYOVER_FILE   SYSTEM_DIR "copyover.dat"
-#define ANSITITLE_FILE	SYSTEM_DIR "mudtitle.ans"
-#define ASCTITLE_FILE	SYSTEM_DIR "mudtitle.asc"
 #define BOOTLOG_FILE	SYSTEM_DIR "boot.txt"	  /* Boot up error file	 */
 #define BUG_FILE	SYSTEM_DIR "bugs.txt"	  /* For 'bug' and bug( )*/
 #define TYPO_FILE	SYSTEM_DIR "typos.txt"	  /* For 'typo'		 */
@@ -3079,8 +3077,6 @@ void add_follower( CHAR_DATA *ch, CHAR_DATA *master );
 void stop_follower( CHAR_DATA *ch );
 void die_follower( CHAR_DATA *ch );
 bool is_same_group( const CHAR_DATA *ach, const CHAR_DATA *bch );
-void send_ansi_title( CHAR_DATA *ch );
-void send_ascii_title( CHAR_DATA *ch );
 void to_channel( const char *argument, int channel,
 		 const char *verb, short level );
 void talk_auction( const char *argument );

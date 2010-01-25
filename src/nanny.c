@@ -19,10 +19,10 @@ static void nanny_confirm_new_password( DESCRIPTOR_DATA * d, char *argument );
 static void nanny_get_new_sex( DESCRIPTOR_DATA * d, char *argument );
 static void nanny_add_skills( DESCRIPTOR_DATA * d, char *argument );
 static void nanny_get_want_ripansi( DESCRIPTOR_DATA * d, char *argument );
-static void nanny_press_enter( DESCRIPTOR_DATA * d, char *argument );
 static void nanny_read_imotd( DESCRIPTOR_DATA * d, char *argument );
 static void nanny_read_nmotd( DESCRIPTOR_DATA * d, char *argument );
 static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument );
+static void nanny_on_motd_state( DESCRIPTOR_DATA *d );
 
 static OBJ_DATA *rgObjNest[MAX_NEST];
 extern bool wizlock;
@@ -37,7 +37,6 @@ bool check_parse_name( const char *name );
 bool check_playing( DESCRIPTOR_DATA * d, const char *name, bool kick );
 bool check_multi( DESCRIPTOR_DATA * d, const char *name );
 bool check_reconnect( DESCRIPTOR_DATA * d, const char *name, bool fConn );
-void show_title( DESCRIPTOR_DATA * d );
 void write_ship_list( void );
 void mail_count( CHAR_DATA * ch );
 
@@ -86,10 +85,6 @@ void nanny( DESCRIPTOR_DATA * d, char *argument )
 
     case CON_GET_WANT_RIPANSI:
       nanny_get_want_ripansi( d, argument );
-      break;
-
-    case CON_PRESS_ENTER:
-      nanny_press_enter( d, argument );
       break;
 
     case CON_READ_IMOTD:
@@ -355,7 +350,7 @@ static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
   ch = d->character;
   sprintf( log_buf, "%s@%s has connected.", ch->name, d->host );
   log_string_plus( log_buf, LOG_COMM );
-  show_title( d );
+  nanny_on_motd_state( d );
 
   if( ch->pcdata->area )
     do_loadarea( ch, const_char_to_nonconst( "" ) );
@@ -675,13 +670,12 @@ static void nanny_get_want_ripansi( DESCRIPTOR_DATA * d, char *argument )
   log_string_plus( log_buf, LOG_COMM );
   to_channel( log_buf, CHANNEL_MONITOR, "Monitor", 2 );
   write_to_buffer( d, "Press [ENTER] ", 0 );
-  show_title( d );
   ch->top_level = 0;
   ch->position = POS_STANDING;
-  d->connected = CON_PRESS_ENTER;
+  nanny_on_motd_state( d );
 }
 
-static void nanny_press_enter( DESCRIPTOR_DATA * d, char *argument )
+static void nanny_on_motd_state( DESCRIPTOR_DATA *d )
 {
   CHAR_DATA *ch = d->character;
 

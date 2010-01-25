@@ -1254,24 +1254,6 @@ bool write_to_descriptor( SOCKET desc, const char *txt, int length )
   return TRUE;
 }
 
-void show_title( DESCRIPTOR_DATA * d )
-{
-  CHAR_DATA *ch = d->character;
-
-  if( !IS_SET( ch->pcdata->flags, PCFLAG_NOINTRO ) )
-  {
-    if( IS_SET( ch->act, PLR_ANSI ) )
-      send_ansi_title( ch );
-    else
-      send_ascii_title( ch );
-  }
-  else
-  {
-    write_to_buffer( d, "Press enter...\r\n", 0 );
-  }
-  d->connected = CON_PRESS_ENTER;
-}
-
 /*
  * Parse a name for acceptability.
  */
