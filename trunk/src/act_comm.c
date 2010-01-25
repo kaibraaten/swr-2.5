@@ -1108,40 +1108,6 @@ void do_quit( CHAR_DATA * ch, char *argument )
   log_string_plus( log_buf, LOG_COMM );
 }
 
-static void send_title( CHAR_DATA * ch, const char *filename )
-{
-  FILE *rpfile = NULL;
-
-  if( ( rpfile = fopen( filename, "r" ) ) != NULL )
-  {
-    size_t num = 0;
-#if defined(AMIGA) || defined(__MORPHOS__)
-    signed
-#endif
-      char buf[MAX_STRING_LENGTH * 2];
-
-    while( ( buf[num] = fgetc( rpfile ) ) != EOF )
-    {
-      num++;
-    }
-
-    fclose( rpfile );
-    buf[num] = 0;
-    write_to_buffer( ch->desc, ( const char * ) buf, num );
-  }
-}
-
-void send_ansi_title( CHAR_DATA * ch )
-{
-  send_title( ch, ANSITITLE_FILE );
-}
-
-void send_ascii_title( CHAR_DATA * ch )
-{
-  send_title( ch, ASCTITLE_FILE );
-}
-
-
 void do_ansi( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
