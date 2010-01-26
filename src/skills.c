@@ -16,6 +16,14 @@ int character_skill_level( const CHAR_DATA * ch, short skill )
   return IS_NPC( ch ) ? 100 : ( int ) ch->pcdata->learned[skill];
 }
 
+void set_skill_level( CHAR_DATA *ch, int sn, int lvl )
+{
+  if( !IS_NPC( ch ) )
+    {
+      ch->pcdata->learned[sn] = lvl;
+    }
+}
+
 /*
  * Dummy function
  */
