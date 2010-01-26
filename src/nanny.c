@@ -207,7 +207,7 @@ static size_t longest_package_name( void )
 
       if( current > longest )
 	{
-	  current = longest;
+	  longest = current;
 	}
     }
 
@@ -234,7 +234,7 @@ char *generate_skillpackage_table( void )
 	  strcat( buf, " " );
 	}
 
-      if( n % columns == 0 && n != 0 )
+      if( ( n + 1 ) % columns == 0 )
 	{
 	  strcat( buf, "\r\n" );
 	}
