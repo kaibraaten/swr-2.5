@@ -1999,8 +1999,10 @@ void do_balzhur( CHAR_DATA * ch, char *argument )
   victim->max_hit = 100;
   victim->max_mana = 0;
   victim->max_move = 500;
+
   for( sn = 0; sn < top_sn; sn++ )
-    victim->pcdata->learned[sn] = 0;
+    set_skill_level( victim, sn, 0 );
+
   victim->hit = victim->max_hit;
   victim->mana = victim->max_mana;
   victim->move = victim->max_move;

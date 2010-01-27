@@ -3385,16 +3385,18 @@ void release_supermob( void );
 void set_title( CHAR_DATA *ch, const char *title );
 
 /* skills.c */
+void set_skill_level( CHAR_DATA *ch, int sn, int lvl );
+void modify_skill_level( CHAR_DATA *ch, int sn, int value );
 SKILLTYPE *create_skill( void );
 int character_skill_level( const CHAR_DATA *ch, short skill );
 bool check_skill( CHAR_DATA *ch, const char *command, char *argument );
-void	learn_from_success	args( ( CHAR_DATA *ch, int sn ) );
-void	learn_from_failure	args( ( CHAR_DATA *ch, int sn ) );
-bool	check_parry		args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
-bool	check_dodge		args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
-bool 	check_grip		args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
-void	disarm			args( ( CHAR_DATA *ch, CHAR_DATA *victim) );
-void	trip			args( ( CHAR_DATA *ch, CHAR_DATA *victim) );
+void learn_from_success( CHAR_DATA *ch, int sn );
+void learn_from_failure( CHAR_DATA *ch, int sn );
+bool check_parry( CHAR_DATA *ch, CHAR_DATA *victim );
+bool check_dodge( CHAR_DATA *ch, CHAR_DATA *victim );
+bool check_grip( CHAR_DATA *ch, CHAR_DATA *victim );
+void disarm( CHAR_DATA *ch, CHAR_DATA *victim );
+void trip( CHAR_DATA *ch, CHAR_DATA *victim );
 
 /* handler.c */
 void character_extract_carried_objects( CHAR_DATA *ch );

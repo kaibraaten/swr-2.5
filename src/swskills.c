@@ -2868,7 +2868,7 @@ void do_landscape( CHAR_DATA * ch, char *argument )
 	send_to_char( "You skill level deminishes with your lazyness.\r\n",
 	    ch );
 	if( character_skill_level( ch, gsn_landscape ) > 50 )
-	  ch->pcdata->learned[gsn_landscape] -= 5;
+	  modify_skill_level( ch, gsn_landscape, -5 );
       }
 
       SET_BIT( location->area->flags, AFLAG_MODIFIED );

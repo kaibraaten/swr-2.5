@@ -711,8 +711,10 @@ bool load_char_obj( DESCRIPTOR_DATA * d, const char *name, bool preload )
   ch->pcdata->wizinvis = 0;
   ch->mental_state = -10;
   ch->mobinvis = 0;
+
   for( i = 0; i < MAX_SKILL; i++ )
-    ch->pcdata->learned[i] = 0;
+    set_skill_level( ch, i, 0 );
+
   ch->pcdata->release_date = 0;
   ch->pcdata->helled_by = NULL;
   ch->saving_poison_death = 0;
@@ -1293,8 +1295,7 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
 	      bug( "Fread_char: unknown skill.", 0 );
 	    else
 	    {
-	      ch->pcdata->learned[sn] = value;
-
+	      set_skill_level( ch, sn, value );
 	    }
 	    fMatch = TRUE;
 	    break;
@@ -1319,8 +1320,7 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
 	      bug( "Fread_char: unknown spell.", 0 );
 	    else
 	    {
-	      ch->pcdata->learned[sn] = value;
-
+	      set_skill_level( ch, sn, value );
 	    }
 	    fMatch = TRUE;
 	    break;
@@ -1427,8 +1427,7 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
 	      bug( "Fread_char: unknown weapon.", 0 );
 	    else
 	    {
-	      ch->pcdata->learned[sn] = value;
-
+	      set_skill_level( ch, sn, value );
 	    }
 	    fMatch = TRUE;
 	  }

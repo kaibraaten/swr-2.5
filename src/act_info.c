@@ -2533,9 +2533,8 @@ void do_forget( CHAR_DATA * ch, char *argument )
   }
 
   send_to_char( "Forget what?... *chuckle*\r\n", ch );
-  ch->pcdata->learned[sn] = 0;
+  set_skill_level( ch, sn, 0 );
   ch->pcdata->num_skills--;
-
 }
 
 void do_teach( CHAR_DATA * ch, char *argument )
@@ -2652,7 +2651,7 @@ void do_teach( CHAR_DATA * ch, char *argument )
     {
       if( character_skill_level( victim, sn ) <= 0 )
 	victim->pcdata->num_skills++;
-      victim->pcdata->learned[sn] += int_app[get_curr_int( ch )].learn;
+      modify_skill_level( victim, sn, int_app[get_curr_int( ch )].learn );
       snprintf( buf, MAX_STRING_LENGTH, "You teach %s $T.", victim->name );
       act( AT_ACTION, buf, ch, NULL, skill_table[sn]->name, TO_CHAR );
       snprintf( buf, MAX_STRING_LENGTH, "%s teaches you $T.", ch->name );

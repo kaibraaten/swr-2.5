@@ -327,7 +327,7 @@ void do_score( CHAR_DATA * ch, char *argument )
 
     send_to_char( "&WAdept at: &G", ch );
     for( sn = 0; sn < top_sn; sn++ )
-      if( ch->pcdata->learned[sn] >= 100 )
+      if( character_skill_level( ch, sn ) >= 100 )
 	ch_printf( ch, "%s  ", skill_table[sn]->name );
 
     send_to_char( "\r\n", ch );

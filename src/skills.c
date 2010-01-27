@@ -24,6 +24,14 @@ void set_skill_level( CHAR_DATA *ch, int sn, int lvl )
     }
 }
 
+void modify_skill_level( CHAR_DATA *ch, int sn, int value )
+{
+  if( !IS_NPC( ch ) )
+    {
+      set_skill_level( ch, sn, character_skill_level( ch, sn ) + value );
+    }
+}
+
 /*
  * Dummy function
  */
@@ -1064,53 +1072,54 @@ void do_sset( CHAR_DATA * ch, char *argument )
   }
 
   if( fAll )
-  {
-    for( sn = 0; sn < top_sn; sn++ )
     {
-      victim->pcdata->learned[sn] = value;
+      for( sn = 0; sn < top_sn; sn++ )
+	{
+	  set_skill_level( victim, sn, value );
+	}
     }
-  }
   else
-    victim->pcdata->learned[sn] = value;
-
-  return;
+    {
+      set_skill_level( victim, sn, value );
+    }
 }
 
 void learn_from_success( CHAR_DATA * ch, int sn )
 {
-  int adept, learn, percent, chance;
+  int adept = 100;
 
   if( IS_NPC( ch ) || character_skill_level( ch, sn ) == 0 )
     return;
-
-  adept = 100;
 
   if( character_skill_level( ch, sn ) >= adept )
     return;
 
   if( character_skill_level( ch, sn ) < 100 )
   {
-    chance = character_skill_level( ch, sn ) / 4
+    int chance = character_skill_level( ch, sn ) / 4
       + 50 + ( 5 * skill_table[sn]->difficulty );
-    percent = number_percent(  );
-    learn = 0;
+    int percent = number_percent();
+    int learn = 0;
+
     if( percent > 95 )
       learn = 3;
     else if( percent > 90 )
       learn = 2;
     else if( percent > chance )
       learn = 1;
-    ch->pcdata->learned[sn] = UMIN( adept, character_skill_level( ch, sn )
-	+ learn );
+    set_skill_level( ch, sn, UMIN( adept, character_skill_level( ch, sn )
+				   + learn ) );
+
     if( character_skill_level( ch, sn ) >= adept )	/* fully learned! */
     {
       set_char_color( AT_WHITE, ch );
+
       if( number_bits( 1 ) == 0 && sn != gsn_landscape )
       {
 	send_to_char( "You feel somewhat brighter.\r\n", ch );
 	ch->perm_int++;
 	ch->perm_int = UMIN( ch->perm_int, 25 );
-	ch->pcdata->learned[sn] = adept - 1;
+	set_skill_level( ch, sn, adept - 1 );
       }
       else
       {
@@ -1121,7 +1130,6 @@ void learn_from_success( CHAR_DATA * ch, int sn )
     }
   }
 }
-
 
 void learn_from_failure( CHAR_DATA * ch, int sn )
 {
