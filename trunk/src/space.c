@@ -5278,7 +5278,7 @@ void do_repairship( CHAR_DATA * ch, char *argument )
 	( ship->maxhull - ship->hull ) );
     ship->hull += change;
     ch_printf( ch,
-	"&GRepair complete.. Hull strength inreased by %d points.\r\n",
+	"&GRepair complete. Hull strength increased by %d points.\r\n",
 	change );
   }
 

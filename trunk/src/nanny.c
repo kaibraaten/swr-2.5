@@ -39,7 +39,6 @@ bool check_multi( DESCRIPTOR_DATA * d, const char *name );
 bool check_reconnect( DESCRIPTOR_DATA * d, const char *name, bool fConn );
 void write_ship_list( void );
 void mail_count( CHAR_DATA * ch );
-void set_skill_level( CHAR_DATA *ch, int sn, int lvl );
 
 typedef void SKILLPACKAGE_BUILDER( CHAR_DATA *ch );
 
