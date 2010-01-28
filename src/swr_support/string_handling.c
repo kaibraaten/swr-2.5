@@ -8,78 +8,72 @@ extern FILE *out_stream;
 
 #define HIDDEN_TILDE    '*'
 
+typedef bool STRING_COMPARATOR( const char*, const char* );
+typedef char *STRING_TOKENIZER( char*, char* );
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-  void bug( const char *str, ... );
+void bug( const char *str, ... );
 
-  bool is_name2( const char*, char* );
-  bool is_name2_prefix( const char*, char* );
-  char *wordwrap( char*, short );
+bool is_name2( const char*, const char* );
+bool is_name2_prefix( const char*, const char* );
+char *wordwrap( char*, short );
+static bool is_name_internal( const char*, const char*, STRING_COMPARATOR*, STRING_TOKENIZER* );
 #ifdef __cplusplus
 }
 #endif
+
 /*
  * See if a string is one of the names of an object.
  */
-bool is_name( const char *str, char *namelist )
+static bool is_name_internal( const char *str, const char *namelist,
+			      STRING_COMPARATOR *compare_string,
+			      STRING_TOKENIZER *tokenize_string )
 {
   char name[MAX_INPUT_LENGTH];
+  char tmp_buf[MAX_INPUT_LENGTH];
+  char *tmp = tmp_buf;
+  snprintf( tmp_buf, MAX_INPUT_LENGTH, "%s", namelist );
 
   for ( ; ; )
   {
-    namelist = one_argument( namelist, name );
+    tmp = tokenize_string( tmp, name );
+
     if ( name[0] == '\0' )
-      return FALSE;
-    if ( !str_cmp( str, name ) )
-      return TRUE;
+      {
+	return FALSE;
+      }
+
+    if ( !compare_string( str, name ) )
+      {
+	return TRUE;
+      }
   }
 }
 
-bool is_name_prefix( const char *str, char *namelist )
+bool is_name( const char *str, const char *namelist )
 {
-  char name[MAX_INPUT_LENGTH];
+  return is_name_internal( str, namelist, str_cmp, one_argument );
+}
 
-  for ( ; ; )
-  {
-    namelist = one_argument( namelist, name );
-    if ( name[0] == '\0' )
-      return FALSE;
-    if ( !str_prefix( str, name ) )
-      return TRUE;
-  }
+bool is_name_prefix( const char *str, const char *namelist )
+{
+  return is_name_internal( str, namelist, str_prefix, one_argument );
 }
 
 /*
  * See if a string is one of the names of an object.            -Thoric
  * Treats a dash as a word delimiter as well as a space
  */
-bool is_name2( const char *str, char *namelist )
+bool is_name2( const char *str, const char *namelist )
 {
-  char name[MAX_INPUT_LENGTH];
-
-  for ( ; ; )
-  {
-    namelist = one_argument2( namelist, name );
-    if ( name[0] == '\0' )
-      return FALSE;
-    if ( !str_cmp( str, name ) )
-      return TRUE;
-  }
+  return is_name_internal( str, namelist, str_cmp, one_argument2 );
 }
 
-bool is_name2_prefix( const char *str, char *namelist )
+bool is_name2_prefix( const char *str, const char *namelist )
 {
-  char name[MAX_INPUT_LENGTH];
-
-  for ( ; ; )
-  {
-    namelist = one_argument2( namelist, name );
-    if ( name[0] == '\0' )
-      return FALSE;
-    if ( !str_prefix( str, name ) )
-      return TRUE;
-  }
+  return is_name_internal( str, namelist, str_prefix, one_argument2 );
 }
 
 /*                                                              -Thoric
