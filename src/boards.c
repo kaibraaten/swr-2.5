@@ -669,7 +669,7 @@ void do_note( CHAR_DATA * ch, char *arg_passed, bool IS_MAIL )
       write_board( board );
       return;
     }
-    do_note( ch, const_char_to_nonconst( "" ), FALSE );
+    do_note( ch, STRLIT_EMPTY, FALSE );
   }
   if( !str_cmp( arg, "write" ) )
   {
@@ -1484,15 +1484,14 @@ void do_bset( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_bset( ch, const_char_to_nonconst( "" ) );
-  return;
+  do_bset( ch, STRLIT_EMPTY );
 }
 
 
 void do_bstat( CHAR_DATA * ch, char *argument )
 {
-  BOARD_DATA *board;
-  bool found;
+  BOARD_DATA *board = NULL;
+  bool found = FALSE;
   char arg[MAX_INPUT_LENGTH];
 
   argument = one_argument( argument, arg );
