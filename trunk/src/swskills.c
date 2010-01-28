@@ -3104,7 +3104,7 @@ void do_landscape( CHAR_DATA * ch, char *argument )
   }
   else
   {
-    do_landscape( ch, const_char_to_nonconst( "" ) );
+    do_landscape( ch, STRLIT_EMPTY );
     return;
   }
 
@@ -3445,7 +3445,7 @@ void do_bridge( CHAR_DATA * ch, char *argument )
   }
   else
   {
-    do_bridge( ch, const_char_to_nonconst( "" ) );
+    do_bridge( ch, STRLIT_EMPTY );
     return;
   }
 

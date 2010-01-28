@@ -1040,8 +1040,7 @@ void do_shopset( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_shopset( ch, const_char_to_nonconst( "" ) );
-  return;
+  do_shopset( ch, STRLIT_EMPTY );
 }
 
 
@@ -1305,8 +1304,7 @@ void do_repairset( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_repairset( ch, const_char_to_nonconst( "" ) );
-  return;
+  do_repairset( ch, STRLIT_EMPTY );
 }
 
 

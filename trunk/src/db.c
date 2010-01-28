@@ -4250,6 +4250,8 @@ void free_board_list( void )
   }
 }
 
+static void free_string_literals( void );
+
 void free_memory( void )
 {
   free_ban_list(  );
@@ -4275,4 +4277,22 @@ void free_memory( void )
     DISPOSE( auction );
 
   free_sysdata(  );
+  free_string_literals();
+}
+
+/* Non-const string literals */
+
+char *STRLIT_EMPTY = NULL;
+char *STRLIT_AUTO = NULL;
+
+void allocate_string_literals( void )
+{
+  STRLIT_EMPTY = str_dup( "" );
+  STRLIT_AUTO  = str_dup( "auto" );
+}
+
+static void free_string_literals( void )
+{
+  DISPOSE( STRLIT_EMPTY );
+  DISPOSE( STRLIT_AUTO );
 }

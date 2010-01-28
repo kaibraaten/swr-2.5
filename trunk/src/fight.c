@@ -220,7 +220,7 @@ void violence_update( void )
 
 	  tempsub = ch->substate;
 	  ch->substate = timer->value;
-	  ( timer->do_fun ) ( ch, const_char_to_nonconst( "" ) );
+	  ( timer->do_fun ) ( ch, STRLIT_EMPTY );
 	  if( char_died( ch ) )
 	    break;
 	  ch->substate = tempsub;
@@ -647,7 +647,7 @@ ch_ret one_hit( CHAR_DATA * ch, CHAR_DATA * victim, int dt )
       default:
 	break;
       case ATCK_KICK:
-	do_kick( ch, const_char_to_nonconst( "" ) );
+	do_kick( ch, STRLIT_EMPTY );
 	retcode = global_retcode;
 	break;
       case ATCK_TRIP:
@@ -1586,11 +1586,11 @@ ch_ret damage( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
       int numattempts = 0;
       for( numattempts = 0; numattempts < 5; ++numattempts )
       {
-	do_flee( victim, const_char_to_nonconst( "" ) );
+	do_flee( victim, STRLIT_EMPTY );
       }
 
-      do_hail( victim, const_char_to_nonconst( "" ) );
-      do_quit( victim, const_char_to_nonconst( "" ) );
+      do_hail( victim, STRLIT_EMPTY );
+      do_quit( victim, STRLIT_EMPTY );
       return rNONE;
     }
   }
@@ -1608,7 +1608,7 @@ ch_ret damage( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
       {
 	start_fearing( victim, ch );
 	stop_hunting( victim );
-	do_flee( victim, const_char_to_nonconst( "" ) );
+	do_flee( victim, STRLIT_EMPTY );
       }
     }
   }
@@ -1616,9 +1616,9 @@ ch_ret damage( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
   if( !npcvict
       && victim->hit > 0
       && victim->hit <= victim->wimpy && victim->wait == 0 )
-    do_flee( victim, const_char_to_nonconst( "" ) );
+    do_flee( victim, STRLIT_EMPTY );
   else if( !npcvict && IS_SET( victim->act, PLR_FLEE ) )
-    do_flee( victim, const_char_to_nonconst( "" ) );
+    do_flee( victim, STRLIT_EMPTY );
 
   return rNONE;
 }
@@ -1753,7 +1753,7 @@ void set_fighting( CHAR_DATA * ch, CHAR_DATA * victim )
   if( victim->switched && IS_AFFECTED( victim->switched, AFF_POSSESS ) )
   {
     send_to_char( "You are disturbed!\r\n", victim->switched );
-    do_return( victim->switched, const_char_to_nonconst( "" ) );
+    do_return( victim->switched, STRLIT_EMPTY );
   }
   return;
 }
@@ -1854,7 +1854,7 @@ void raw_kill( CHAR_DATA * ch, CHAR_DATA * victim )
     char_from_room( victim->desc->original );
     char_to_room( victim->desc->original, victim->in_room );
     victmp = victim->desc->original;
-    do_revert( victim, const_char_to_nonconst( "" ) );
+    do_revert( victim, STRLIT_EMPTY );
     raw_kill( ch, victmp );
     return;
   }

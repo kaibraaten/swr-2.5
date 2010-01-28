@@ -557,7 +557,7 @@ static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
   nanny_on_motd_state( d );
 
   if( ch->pcdata->area )
-    do_loadarea( ch, const_char_to_nonconst( "" ) );
+    do_loadarea( ch, STRLIT_EMPTY );
 }
 
 static void nanny_confirm_new_name( DESCRIPTOR_DATA * d, char *argument )
@@ -964,6 +964,6 @@ static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument )
   }
 
   act( AT_ACTION, "$n has entered the game.", ch, NULL, NULL, TO_ROOM );
-  do_look( ch, const_char_to_nonconst( "auto" ) );
+  do_look( ch, STRLIT_AUTO );
   mail_count( ch );
 }

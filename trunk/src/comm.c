@@ -14,6 +14,9 @@ const char go_ahead_str[] = { IAC, GA, '\0' };
 void show_condition( CHAR_DATA * ch, CHAR_DATA * victim );
 void write_ship_list args( ( void ) );
 
+/* db.c */
+void allocate_string_literals( void );
+
 /*
  * Global variables.
  */
@@ -56,7 +59,6 @@ bool check_reconnect( DESCRIPTOR_DATA * d, const char *name, bool fConn );
 bool check_parse_name( const char *name );
 bool check_playing( DESCRIPTOR_DATA * d, const char *name, bool kick );
 bool check_multi( DESCRIPTOR_DATA * d, const char *name );
-int main args( ( int argc, char **argv ) );
 void nanny args( ( DESCRIPTOR_DATA * d, char *argument ) );
 bool flush_buffer args( ( DESCRIPTOR_DATA * d, bool fPrompt ) );
 void read_from_buffer args( ( DESCRIPTOR_DATA * d ) );
@@ -86,6 +88,7 @@ int main( int argc, char **argv )
   struct timeval now_time;
   bool fCopyOver = FALSE;
   const char *filename = NULL;
+  allocate_string_literals();
   os_setup();
   atexit( execute_on_exit );
 
@@ -785,7 +788,7 @@ void close_socket( DESCRIPTOR_DATA * dclose, bool force )
   if( dclose->original )
   {
     if( ( ch = dclose->character ) != NULL )
-      do_return( ch, const_char_to_nonconst( "" ) );
+      do_return( ch, STRLIT_EMPTY );
     else
     {
       bug( "Close_socket: dclose->original without character %s",
@@ -1265,7 +1268,7 @@ bool check_parse_name( const char *name )
   /*
    * Reserved words.
    */
-  if( is_name( name, const_char_to_nonconst( illegal_names ) ) )
+  if( is_name( name, illegal_names ) )
     return FALSE;
 
   /*
@@ -1433,8 +1436,10 @@ bool check_playing( DESCRIPTOR_DATA * d, const char *name, bool kick )
       d->character = ch;
       ch->desc = d;
       ch->timer = 0;
+
       if( ch->switched )
-	do_return( ch->switched, const_char_to_nonconst( "" ) );
+	do_return( ch->switched, STRLIT_EMPTY );
+
       ch->switched = NULL;
       send_to_char( "Reconnecting.\r\n", ch );
       act( AT_ACTION, "$n has reconnected, kicking off old link.",

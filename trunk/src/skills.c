@@ -1025,7 +1025,7 @@ void do_sset( CHAR_DATA * ch, char *argument )
       send_to_char( "Ok.\r\n", ch );
       return;
     }
-    do_sset( ch, const_char_to_nonconst( "" ) );
+    do_sset( ch, STRLIT_EMPTY );
     return;
   }
 
@@ -2083,7 +2083,7 @@ void do_recall( CHAR_DATA * ch, char *argument )
 
   act( AT_ACTION, "$n appears in a swirl of the Force.",
       ch, NULL, NULL, TO_ROOM );
-  do_look( ch, const_char_to_nonconst( "auto" ) );
+  do_look( ch, STRLIT_AUTO );
 }
 
 

@@ -374,7 +374,7 @@ void hunt_victim( CHAR_DATA * ch )
 	return;
     }
     else if( !IS_SET( ch->act, ACT_DROID ) )
-      do_hide( ch, const_char_to_nonconst( "" ) );
+      do_hide( ch, STRLIT_EMPTY );
   }
 
   ret = find_first_step( ch->in_room, ch->hunting->who->in_room, 5000 );

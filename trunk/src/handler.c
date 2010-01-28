@@ -1226,10 +1226,10 @@ void extract_char( CHAR_DATA * ch, bool fPull )
   }
 
   if( ch->desc && ch->desc->original && IS_SET( ch->act, ACT_POLYMORPHED ) )
-    do_revert( ch, const_char_to_nonconst( "" ) );
+    do_revert( ch, STRLIT_EMPTY );
 
   if( ch->desc && ch->desc->original )
-    do_return( ch, const_char_to_nonconst( "" ) );
+    do_return( ch, STRLIT_EMPTY );
 
   for( wch = first_char; wch; wch = wch->next )
     if( wch->reply == ch )

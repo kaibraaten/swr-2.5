@@ -29,11 +29,11 @@ CLAN_DATA *get_clan( const char *name )
       return clan;
 
   for( clan = first_clan; clan; clan = clan->next )
-    if( nifty_is_name( const_char_to_nonconst( name ), clan->name ) )
+    if( nifty_is_name( name, clan->name ) )
       return clan;
 
   for( clan = first_clan; clan; clan = clan->next )
-    if( nifty_is_name_prefix( const_char_to_nonconst( name ), clan->name ) )
+    if( nifty_is_name_prefix( name, clan->name ) )
       return clan;
 
   return NULL;
@@ -586,8 +586,7 @@ void do_setclan( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_setclan( ch, const_char_to_nonconst( "" ) );
-  return;
+  do_setclan( ch, STRLIT_EMPTY );
 }
 
 void do_showclan( CHAR_DATA * ch, char *argument )
@@ -1495,7 +1494,7 @@ bool clan_char_is_leader( const CLAN_DATA * clan, const CHAR_DATA * ch )
 
 void clan_add_leader( CLAN_DATA * clan, const char *name )
 {
-  if( !nifty_is_name( const_char_to_nonconst( name ), clan->leaders ) )
+  if( !nifty_is_name( name, clan->leaders ) )
   {
     char buf[MAX_STRING_LENGTH];
     sprintf( buf, "%s %s", clan->leaders, name );

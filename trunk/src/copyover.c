@@ -212,6 +212,8 @@ void copyover_recover( void )
     }
     else			/* ok! */
     {
+      char argument[MAX_INPUT_LENGTH];
+      snprintf( argument, MAX_INPUT_LENGTH, "%s", "auto noprog" );
       write_to_descriptor( desc, "\r\nCopyover recovery complete.\r\n",
 	  0 );
 
@@ -224,7 +226,7 @@ void copyover_recover( void )
       LINK( d->character, first_char, last_char, next, prev );
 
       char_to_room( d->character, d->character->in_room );
-      do_look( d->character, const_char_to_nonconst( "auto noprog" ) );
+      do_look( d->character, argument );
       load_home( d->character );
       act( AT_ACTION, "$n materializes!", d->character, NULL, NULL,
 	  TO_ROOM );
