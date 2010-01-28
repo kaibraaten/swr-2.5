@@ -625,16 +625,6 @@ char *wordwrap( char *txt, short wrap )
   return bufp;
 }
 
-/*
- * Seriously nasty kludge for passing string literals to do_funs.
- */
-char *const_char_to_nonconst( const char *argument )
-{
-  static char buf[MAX_STRING_LENGTH];
-  snprintf( buf, MAX_STRING_LENGTH, "%s", argument );
-  return buf;
-}
-
 char *encode_string( const char *str )
 {
   return sha256_crypt( str );

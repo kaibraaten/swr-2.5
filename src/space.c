@@ -3874,6 +3874,11 @@ void do_buyship( CHAR_DATA * ch, char *argument )
   SHIP_DATA *ship = NULL;
   SHIP_PROTOTYPE *prototype = NULL;
   char shipname[MAX_STRING_LENGTH];
+  char ships_buf[MAX_STRING_LENGTH];
+  char vehicles_buf[MAX_STRING_LENGTH];
+
+  snprintf( ships_buf, MAX_STRING_LENGTH, "%s", "ships" );
+  snprintf( vehicles_buf, MAX_STRING_LENGTH, "%s", "vehicles" );
 
   if( IS_NPC( ch ) || !ch->pcdata )
   {
@@ -3898,9 +3903,9 @@ void do_buyship( CHAR_DATA * ch, char *argument )
     send_to_char( "&RThat model does not exist.\r\n", ch );
 
     if( IS_SET( ch->in_room->room_flags, ROOM_SHIPYARD ) )
-      do_prototypes( ch, const_char_to_nonconst( "ships" ) );
+      do_prototypes( ch, ships_buf );
     else
-      do_prototypes( ch, const_char_to_nonconst( "vehicles" ) );
+      do_prototypes( ch, vehicles_buf );
 
     return;
   }
@@ -3909,7 +3914,7 @@ void do_buyship( CHAR_DATA * ch, char *argument )
       && prototype->ship_class > SPACE_STATION )
   {
     send_to_char( "&RThats not a ship prototype.\r\n", ch );
-    do_prototypes( ch, const_char_to_nonconst( "ships" ) );
+    do_prototypes( ch, ships_buf );
     return;
   }
 
@@ -3917,7 +3922,7 @@ void do_buyship( CHAR_DATA * ch, char *argument )
       && prototype->ship_class <= SPACE_STATION )
   {
     send_to_char( "&RThats not a vehicle prototype.\r\n", ch );
-    do_prototypes( ch, const_char_to_nonconst( "vehicles" ) );
+    do_prototypes( ch, vehicles_buf );
     return;
   }
 
@@ -3957,7 +3962,11 @@ void do_clanbuyship( CHAR_DATA * ch, char *argument )
   CLAN_DATA *clan;
   SHIP_PROTOTYPE *prototype;
   char shipname[MAX_STRING_LENGTH];
+  char ships_buf[MAX_STRING_LENGTH];
+  char vehicles_buf[MAX_STRING_LENGTH];
 
+  snprintf( ships_buf, MAX_STRING_LENGTH, "%s", "ships" );
+  snprintf( vehicles_buf, MAX_STRING_LENGTH, "%s", "vehicles" );
 
   if( IS_NPC( ch ) || !ch->pcdata )
   {
@@ -4000,9 +4009,9 @@ void do_clanbuyship( CHAR_DATA * ch, char *argument )
   {
     send_to_char( "&RThat model does not exist.\r\n", ch );
     if( IS_SET( ch->in_room->room_flags, ROOM_SHIPYARD ) )
-      do_prototypes( ch, const_char_to_nonconst( "ships" ) );
+      do_prototypes( ch, ships_buf );
     else
-      do_prototypes( ch, const_char_to_nonconst( "vehicles" ) );
+      do_prototypes( ch, vehicles_buf );
     return;
   }
 
@@ -4010,17 +4019,16 @@ void do_clanbuyship( CHAR_DATA * ch, char *argument )
       && prototype->ship_class > SPACE_STATION )
   {
     send_to_char( "&RThats not a ship prototype.\r\n", ch );
-    do_prototypes( ch, const_char_to_nonconst( "ships" ) );
+    do_prototypes( ch, ships_buf );
     return;
   }
   if( IS_SET( ch->in_room->room_flags, ROOM_GARAGE )
       && prototype->ship_class <= SPACE_STATION )
   {
     send_to_char( "&RThats not a vehicle prototype.\r\n", ch );
-    do_prototypes( ch, const_char_to_nonconst( "vehicles" ) );
+    do_prototypes( ch, vehicles_buf );
     return;
   }
-
 
   price = get_prototype_value( prototype );
 

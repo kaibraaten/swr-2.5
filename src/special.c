@@ -66,8 +66,8 @@ const char *lookup_spec( SPEC_FUN * special )
 
 bool spec_clan_guard( CHAR_DATA * ch )
 {
-  CHAR_DATA *victim;
-  CHAR_DATA *v_next;
+  CHAR_DATA *victim = NULL;
+  CHAR_DATA *v_next = NULL;
 
   if( !IS_AWAKE( ch ) || ch->fighting || !ch->mob_clan )
     return FALSE;
@@ -84,9 +84,10 @@ bool spec_clan_guard( CHAR_DATA * ch )
 	&& nifty_is_name( victim->pcdata->clan->name,
 	  ch->mob_clan->atwar ) )
     {
-      do_yell( ch,
-	  const_char_to_nonconst
-	  ( "Hey your not allowed in here!" ) );
+      char buf[MAX_STRING_LENGTH];
+      snprintf( buf, MAX_STRING_LENGTH, "%s",
+		"Hey you're not allowed in here!" );
+      do_yell( ch, buf );
       multi_hit( ch, victim, TYPE_UNDEFINED );
       return TRUE;
     }
@@ -97,8 +98,8 @@ bool spec_clan_guard( CHAR_DATA * ch )
 
 bool spec_ship_guard( CHAR_DATA * ch )
 {
-  CHAR_DATA *victim;
-  CHAR_DATA *v_next;
+  CHAR_DATA *victim = NULL;
+  CHAR_DATA *v_next = NULL;
 
   if( !IS_AWAKE( ch ) || ch->fighting || !ch->mob_clan )
     return FALSE;
@@ -115,9 +116,10 @@ bool spec_ship_guard( CHAR_DATA * ch )
 	&& nifty_is_name( victim->pcdata->clan->name,
 	  ch->mob_clan->atwar ) )
     {
-      do_yell( ch,
-	  const_char_to_nonconst
-	  ( "Hey your not allowed in here!" ) );
+      char buf[MAX_STRING_LENGTH];
+      snprintf( buf, MAX_STRING_LENGTH, "%s",
+                "Hey you're not allowed in here!" );
+      do_yell( ch, buf );
       multi_hit( ch, victim, TYPE_UNDEFINED );
       return TRUE;
     }
@@ -129,10 +131,10 @@ bool spec_ship_guard( CHAR_DATA * ch )
 
 bool spec_fido( CHAR_DATA * ch )
 {
-  OBJ_DATA *corpse;
-  OBJ_DATA *c_next;
-  OBJ_DATA *obj;
-  OBJ_DATA *obj_next;
+  OBJ_DATA *corpse = NULL;
+  OBJ_DATA *c_next = NULL;
+  OBJ_DATA *obj = NULL;
+  OBJ_DATA *obj_next = NULL;
 
   if( !IS_AWAKE( ch ) )
     return FALSE;
@@ -162,18 +164,14 @@ bool spec_fido( CHAR_DATA * ch )
 bool spec_guardian( CHAR_DATA * ch )
 {
   char buf[MAX_STRING_LENGTH];
-  CHAR_DATA *victim;
-  CHAR_DATA *v_next;
-  CHAR_DATA *ech;
-  const char *crime;
-  int max_evil;
+  CHAR_DATA *victim = NULL;
+  CHAR_DATA *v_next = NULL;
+  CHAR_DATA *ech = NULL;
+  const char *crime = "";
+  int max_evil = 300;
 
   if( !IS_AWAKE( ch ) || ch->fighting )
     return FALSE;
-
-  max_evil = 300;
-  ech = NULL;
-  crime = "";
 
   for( victim = ch->in_room->first_person; victim; victim = v_next )
   {
@@ -188,16 +186,16 @@ bool spec_guardian( CHAR_DATA * ch )
 
   if( victim && IS_SET( ch->in_room->room_flags, ROOM_SAFE ) )
   {
-    sprintf( buf, "%s is a %s!  As well as a COWARD!",
-	victim->name, crime );
+    snprintf( buf, MAX_STRING_LENGTH, "%s is a %s! As well as a COWARD!",
+	      victim->name, crime );
     do_yell( ch, buf );
     return TRUE;
   }
 
   if( victim )
   {
-    sprintf( buf, "%s is a %s!  PROTECT THE INNOCENT!!",
-	victim->name, crime );
+    snprintf( buf, MAX_STRING_LENGTH, "%s is a %s! PROTECT THE INNOCENT!!",
+	      victim->name, crime );
     do_yell( ch, buf );
     multi_hit( ch, victim, TYPE_UNDEFINED );
     return TRUE;
@@ -205,7 +203,7 @@ bool spec_guardian( CHAR_DATA * ch )
 
   if( ech )
   {
-    act( AT_YELL, "$n screams 'PROTECT THE INNOCENT!!",
+    act( AT_YELL, "$n screams 'PROTECT THE INNOCENT!'",
 	ch, NULL, NULL, TO_ROOM );
     multi_hit( ch, ech, TYPE_UNDEFINED );
     return TRUE;
@@ -218,8 +216,8 @@ bool spec_guardian( CHAR_DATA * ch )
 
 bool spec_janitor( CHAR_DATA * ch )
 {
-  OBJ_DATA *trash;
-  OBJ_DATA *trash_next;
+  OBJ_DATA *trash = NULL;
+  OBJ_DATA *trash_next = NULL;
 
   if( !IS_AWAKE( ch ) )
     return FALSE;
@@ -261,7 +259,7 @@ bool spec_janitor( CHAR_DATA * ch )
 
 bool spec_poison( CHAR_DATA * ch )
 {
-  CHAR_DATA *victim;
+  CHAR_DATA *victim = NULL;
 
   if( ch->position != POS_FIGHTING
       || ( victim = who_fighting( ch ) ) == NULL
@@ -279,9 +277,9 @@ bool spec_poison( CHAR_DATA * ch )
 
 bool spec_thief( CHAR_DATA * ch )
 {
-  CHAR_DATA *victim;
-  CHAR_DATA *v_next;
-  int gold, maxgold;
+  CHAR_DATA *victim = NULL;
+  CHAR_DATA *v_next = NULL;
+  int gold = 0, maxgold = 0;
 
   if( ch->position != POS_STANDING )
     return FALSE;
@@ -290,7 +288,8 @@ bool spec_thief( CHAR_DATA * ch )
   {
     v_next = victim->next_in_room;
 
-    if( IS_NPC( victim ) || IS_IMMORTAL( victim ) || number_bits( 2 ) != 0 || !can_see( ch, victim ) )	/* Thx Glop */
+    if( IS_NPC( victim ) || IS_IMMORTAL( victim )
+	|| number_bits( 2 ) != 0 || !can_see( ch, victim ) ) /* Thx Glop */
       continue;
 
     if( IS_AWAKE( victim ) && number_range( 0, ch->top_level ) == 0 )
@@ -321,8 +320,8 @@ bool spec_thief( CHAR_DATA * ch )
 
 bool spec_auth( CHAR_DATA * ch )
 {
-  CHAR_DATA *victim;
-  CHAR_DATA *v_next;
+  CHAR_DATA *victim = NULL;
+  CHAR_DATA *v_next = NULL;
   char buf[MAX_STRING_LENGTH];
 
   for( victim = ch->in_room->first_person; victim; victim = v_next )
@@ -338,12 +337,12 @@ bool spec_auth( CHAR_DATA * ch )
     if( victim->pcdata->authed_by )
       STRFREE( victim->pcdata->authed_by );
     victim->pcdata->authed_by = QUICKLINK( ch->name );
-    sprintf( buf, "%s has graduated the academy.", victim->name );
+    snprintf( buf, MAX_STRING_LENGTH,
+	      "%s has graduated the academy.", victim->name );
     to_channel( buf, CHANNEL_MONITOR, "Monitor", ch->top_level );
     if( victim->pcdata->clan )
       victim->pcdata->clan->members++;
-
   }
-  return FALSE;
 
+  return FALSE;
 }

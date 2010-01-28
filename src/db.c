@@ -4284,15 +4284,18 @@ void free_memory( void )
 
 char *STRLIT_EMPTY = NULL;
 char *STRLIT_AUTO = NULL;
+char *STRLIT_FULL = NULL;
 
 void allocate_string_literals( void )
 {
   STRLIT_EMPTY = str_dup( "" );
   STRLIT_AUTO  = str_dup( "auto" );
+  STRLIT_FULL  = str_dup( "full" );
 }
 
 static void free_string_literals( void )
 {
-  DISPOSE( STRLIT_EMPTY );
+  DISPOSE( STRLIT_FULL );
   DISPOSE( STRLIT_AUTO );
+  DISPOSE( STRLIT_EMPTY );
 }

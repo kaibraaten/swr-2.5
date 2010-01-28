@@ -1787,7 +1787,7 @@ void add_reinforcements( CHAR_DATA * ch )
 
       add_follower( mob[mob_cnt], ch );
       SET_BIT( mob[mob_cnt]->affected_by, AFF_CHARM );
-      do_setblaster( mob[mob_cnt], const_char_to_nonconst( "full" ) );
+      do_setblaster( mob[mob_cnt], STRLIT_FULL );
 
       if( ch->pcdata && ch->pcdata->clan )
 	mob[mob_cnt]->mob_clan = ch->pcdata->clan;
@@ -1823,7 +1823,7 @@ void add_reinforcements( CHAR_DATA * ch )
       equip_char( mob, blaster, WEAR_WIELD );
     }
 
-    do_setblaster( mob, const_char_to_nonconst( "full" ) );
+    do_setblaster( mob, STRLIT_FULL );
 
     if( ch->pcdata && ch->pcdata->clan )
       mob->mob_clan = ch->pcdata->clan;

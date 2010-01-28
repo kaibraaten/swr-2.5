@@ -3687,6 +3687,16 @@ void rprog_act_trigger( char *buf, ROOM_INDEX_DATA *room, CHAR_DATA *ch,
 /* Non-const string literals. See db.c */
 extern char *STRLIT_EMPTY;
 extern char *STRLIT_AUTO;
+extern char *STRLIT_FULL;
+
+/* skill_package.c */
+typedef struct skill_package SKILL_PACKAGE;
+
+struct skill_package
+{
+  const char *name;
+  void (*builder_function)( CHAR_DATA *ch );
+};
 
 #ifdef __cplusplus
 }

@@ -2,7 +2,6 @@
 #include <string.h>
 #include "mud.h"
 
-
 /*
  * Local functions
  */
@@ -17,10 +16,9 @@ int get_repaircost( CHAR_DATA * keeper, OBJ_DATA * obj );
  */
 CHAR_DATA *find_keeper( CHAR_DATA * ch )
 {
-  CHAR_DATA *keeper;
-  SHOP_DATA *pShop;
+  CHAR_DATA *keeper = NULL;
+  SHOP_DATA *pShop = NULL;
 
-  pShop = NULL;
   for( keeper = ch->in_room->first_person;
       keeper; keeper = keeper->next_in_room )
     if( IS_NPC( keeper ) && ( pShop = keeper->pIndexData->pShop ) != NULL )
@@ -32,20 +30,22 @@ CHAR_DATA *find_keeper( CHAR_DATA * ch )
     return NULL;
   }
 
-
   /*
    * Shop hours.
    */
   if( time_info.hour < pShop->open_hour )
   {
-    do_say( keeper, const_char_to_nonconst( "Sorry, come back later." ) );
+    char buf[MAX_STRING_LENGTH];
+    snprintf( buf, MAX_STRING_LENGTH, "%s", "Sorry, come back later." );
+    do_say( keeper, buf );
     return NULL;
   }
 
   if( time_info.hour > pShop->close_hour )
   {
-    do_say( keeper,
-	const_char_to_nonconst( "Sorry, come back tomorrow." ) );
+    char buf[MAX_STRING_LENGTH];
+    snprintf( buf, MAX_STRING_LENGTH, "%s", "Sorry, come back tomorrow." );
+    do_say( keeper, buf );
     return NULL;
   }
 
@@ -57,10 +57,9 @@ CHAR_DATA *find_keeper( CHAR_DATA * ch )
  */
 CHAR_DATA *find_fixer( CHAR_DATA * ch )
 {
-  CHAR_DATA *keeper;
-  REPAIR_DATA *rShop;
+  CHAR_DATA *keeper = NULL;
+  REPAIR_DATA *rShop = NULL;
 
-  rShop = NULL;
   for( keeper = ch->in_room->first_person;
       keeper; keeper = keeper->next_in_room )
     if( IS_NPC( keeper ) && ( rShop = keeper->pIndexData->rShop ) != NULL )
@@ -72,23 +71,24 @@ CHAR_DATA *find_fixer( CHAR_DATA * ch )
     return NULL;
   }
 
-
   /*
    * Shop hours.
    */
   if( time_info.hour < rShop->open_hour )
   {
-    do_say( keeper, const_char_to_nonconst( "Sorry, come back later." ) );
+    char buf[MAX_STRING_LENGTH];
+    snprintf( buf, MAX_STRING_LENGTH, "%s", "Sorry, come back later." );
+    do_say( keeper, buf );
     return NULL;
   }
 
   if( time_info.hour > rShop->close_hour )
   {
-    do_say( keeper,
-	const_char_to_nonconst( "Sorry, come back tomorrow." ) );
+    char buf[MAX_STRING_LENGTH];
+    snprintf( buf, MAX_STRING_LENGTH, "%s", "Sorry, come back tomorrow." );
+    do_say( keeper, buf );
     return NULL;
   }
-
 
   return keeper;
 }
@@ -117,8 +117,8 @@ int get_cost( CHAR_DATA * ch, CHAR_DATA * keeper, OBJ_DATA * obj, bool fBuy )
   }
   else
   {
-    OBJ_DATA *obj2;
-    int itype;
+    OBJ_DATA *obj2 = NULL;
+    int itype = 0;
 
     profitmod = get_curr_cha( ch ) - 13 - ( richcustomer ? 15 : 0 );
     cost = 0;
@@ -133,6 +133,7 @@ int get_cost( CHAR_DATA * ch, CHAR_DATA * keeper, OBJ_DATA * obj, bool fBuy )
 	break;
       }
     }
+
     for( obj2 = keeper->first_carrying; obj2; obj2 = obj2->next_content )
     {
       if( obj->pIndexData == obj2->pIndexData
@@ -146,9 +147,7 @@ int get_cost( CHAR_DATA * ch, CHAR_DATA * keeper, OBJ_DATA * obj, bool fBuy )
     }
 
     cost = UMIN( cost, 2500 );
-
   }
-
 
   if( obj->item_type == ITEM_DEVICE )
     cost = ( int ) ( cost * obj->value[2] / obj->value[1] );
@@ -158,16 +157,14 @@ int get_cost( CHAR_DATA * ch, CHAR_DATA * keeper, OBJ_DATA * obj, bool fBuy )
 
 int get_repaircost( CHAR_DATA * keeper, OBJ_DATA * obj )
 {
-  REPAIR_DATA *rShop;
-  int cost;
-  int itype;
-  bool found;
+  REPAIR_DATA *rShop = NULL;
+  int cost = 0;
+  int itype = 0;
+  bool found = FALSE;
 
   if( !obj || ( rShop = keeper->pIndexData->rShop ) == NULL )
     return 0;
 
-  cost = 0;
-  found = FALSE;
   for( itype = 0; itype < MAX_FIX; itype++ )
   {
     if( obj->item_type == rShop->fix_type[itype] )
@@ -214,7 +211,7 @@ int get_repaircost( CHAR_DATA * keeper, OBJ_DATA * obj )
 void do_buy( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
-  int maxgold;
+  int maxgold = 0;
 
   argument = one_argument( argument, arg );
 
@@ -226,9 +223,9 @@ void do_buy( CHAR_DATA * ch, char *argument )
 
   /* in case of different shop types */
   {
-    CHAR_DATA *keeper;
-    OBJ_DATA *obj;
-    int cost;
+    CHAR_DATA *keeper = NULL;
+    OBJ_DATA *obj = NULL;
+    int cost = 0;
     int noi = 1;		/* Number of items */
     short mnoi = 20;		/* Max number of items to be bought at once */
 
@@ -241,6 +238,7 @@ void do_buy( CHAR_DATA * ch, char *argument )
     {
       noi = atoi( arg );
       argument = one_argument( argument, arg );
+
       if( noi > mnoi )
       {
 	act( AT_TELL, "$n tells you 'I don't sell that many items at"
@@ -254,15 +252,14 @@ void do_buy( CHAR_DATA * ch, char *argument )
 
     if( !obj && arg[0] == '#' )
     {
-      int onum, oref;
+      int onum = 0, oref = atoi( arg + 1 );
       bool ofound = FALSE;
 
-      onum = 0;
-      oref = atoi( arg + 1 );
       for( obj = keeper->last_carrying; obj; obj = obj->prev_content )
       {
 	if( obj->wear_loc == WEAR_NONE && can_see_obj( ch, obj ) )
 	  onum++;
+
 	if( onum == oref )
 	{
 	  ofound = TRUE;
@@ -286,7 +283,9 @@ void do_buy( CHAR_DATA * ch, char *argument )
 
     if( !IS_OBJ_STAT( obj, ITEM_INVENTORY ) && ( noi > 1 ) )
     {
-      interpret( keeper, const_char_to_nonconst( "laugh" ) );
+      char buf[MAX_STRING_LENGTH];
+      snprintf( buf, MAX_STRING_LENGTH, "%s", "laugh" );
+      interpret( keeper, buf );
       act( AT_TELL, "$n tells you 'I don't have enough of those in stock"
 	  " to sell more than one at a time.'", keeper, NULL, ch,
 	  TO_VICT );
@@ -357,9 +356,8 @@ void do_buy( CHAR_DATA * ch, char *argument )
 
     if( IS_OBJ_STAT( obj, ITEM_INVENTORY ) )
     {
-      OBJ_DATA *buy_obj, *bag;
-
-      buy_obj = create_object( obj->pIndexData );
+      OBJ_DATA *buy_obj = create_object( obj->pIndexData );
+      OBJ_DATA *bag = NULL;
 
       /*
        * Due to grouped objects and carry limitations in SMAUG
@@ -395,18 +393,17 @@ void do_buy( CHAR_DATA * ch, char *argument )
 void do_list( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
-  CHAR_DATA *keeper;
-  OBJ_DATA *obj;
-  int cost;
+  CHAR_DATA *keeper = NULL;
+  OBJ_DATA *obj = NULL;
+  int cost = 0;
   int oref = 0;
-  bool found;
+  bool found = FALSE;
 
   one_argument( argument, arg );
 
   if( ( keeper = find_keeper( ch ) ) == NULL )
     return;
 
-  found = FALSE;
   for( obj = keeper->last_carrying; obj; obj = obj->prev_content )
   {
     if( obj->wear_loc == WEAR_NONE && can_see_obj( ch, obj ) )
@@ -433,7 +430,6 @@ void do_list( CHAR_DATA * ch, char *argument )
     else
       send_to_char( "You can't buy that here.\r\n", ch );
   }
-  return;
 }
 
 
@@ -441,9 +437,9 @@ void do_sell( CHAR_DATA * ch, char *argument )
 {
   char buf[MAX_STRING_LENGTH];
   char arg[MAX_INPUT_LENGTH];
-  CHAR_DATA *keeper;
-  OBJ_DATA *obj;
-  int cost;
+  CHAR_DATA *keeper = NULL;
+  OBJ_DATA *obj = NULL;
+  int cost = 0;
 
   one_argument( argument, arg );
 
@@ -514,9 +510,9 @@ void do_sell( CHAR_DATA * ch, char *argument )
 void do_value( CHAR_DATA * ch, char *argument )
 {
   char buf[MAX_STRING_LENGTH];
-  CHAR_DATA *keeper;
-  OBJ_DATA *obj;
-  int cost;
+  CHAR_DATA *keeper = NULL;
+  OBJ_DATA *obj = NULL;
+  int cost = 0;
 
   if( argument[0] == '\0' )
   {
@@ -559,10 +555,10 @@ void do_value( CHAR_DATA * ch, char *argument )
  * Repair a single object. Used when handling "repair all" - Gorog
  */
 void repair_one_obj( CHAR_DATA * ch, CHAR_DATA * keeper, OBJ_DATA * obj,
-    char *arg, int maxgold, char *fixstr, char *fixstr2 )
+		     char *arg, int maxgold, char *fixstr, char *fixstr2 )
 {
   char buf[MAX_STRING_LENGTH];
-  int cost;
+  int cost = 0;
 
   if( !can_drop_obj( ch, obj ) )
     ch_printf( ch, "You can't let go of %s.\r\n", obj->name );
@@ -628,11 +624,11 @@ void repair_one_obj( CHAR_DATA * ch, CHAR_DATA * keeper, OBJ_DATA * obj,
 
 void do_repair( CHAR_DATA * ch, char *argument )
 {
-  CHAR_DATA *keeper;
-  OBJ_DATA *obj;
+  CHAR_DATA *keeper = NULL;
+  OBJ_DATA *obj = NULL;
   char fixstr[MAX_STRING_LENGTH];
   char fixstr2[MAX_STRING_LENGTH];
-  int maxgold;
+  int maxgold = 0;
 
   if( argument[0] == '\0' )
   {
@@ -745,10 +741,10 @@ void do_appraise( CHAR_DATA * ch, char *argument )
 {
   char buf[MAX_STRING_LENGTH];
   char arg[MAX_INPUT_LENGTH];
-  CHAR_DATA *keeper;
-  OBJ_DATA *obj;
-  int cost;
-  const char *fixstr;
+  CHAR_DATA *keeper = NULL;
+  OBJ_DATA *obj = NULL;
+  int cost = 0;
+  const char *fixstr = "";
 
   one_argument( argument, arg );
 
@@ -807,11 +803,10 @@ void do_appraise( CHAR_DATA * ch, char *argument )
       "$N tells you, 'It will cost %d credit%s to %s that...'", cost,
       cost == 1 ? "" : "s", fixstr );
   act( AT_TELL, buf, ch, NULL, keeper, TO_CHAR );
+
   if( cost > ch->gold )
     act( AT_TELL, "$N tells you, 'Which I see you can't afford.'", ch,
 	NULL, keeper, TO_CHAR );
-
-  return;
 }
 
 
@@ -820,9 +815,9 @@ void do_appraise( CHAR_DATA * ch, char *argument )
 
 void do_makeshop( CHAR_DATA * ch, char *argument )
 {
-  SHOP_DATA *shop;
-  short vnum;
-  MOB_INDEX_DATA *mob;
+  SHOP_DATA *shop = NULL;
+  short vnum = 0;
+  MOB_INDEX_DATA *mob = NULL;
 
   if( !argument || argument[0] == '\0' )
   {
@@ -857,18 +852,16 @@ void do_makeshop( CHAR_DATA * ch, char *argument )
   shop->close_hour = 23;
   mob->pShop = shop;
   send_to_char( "Done.\r\n", ch );
-  return;
 }
-
 
 void do_shopset( CHAR_DATA * ch, char *argument )
 {
-  SHOP_DATA *shop;
-  MOB_INDEX_DATA *mob, *mob2;
+  SHOP_DATA *shop = NULL;
+  MOB_INDEX_DATA *mob = NULL, *mob2 = NULL;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  short vnum;
-  int value;
+  short vnum = 0;
+  int value = 0;
 
   argument = one_argument( argument, arg1 );
   argument = one_argument( argument, arg2 );
@@ -898,6 +891,7 @@ void do_shopset( CHAR_DATA * ch, char *argument )
     send_to_char( "This mobile doesn't keep a shop.\r\n", ch );
     return;
   }
+
   shop = mob->pShop;
   value = atoi( argument );
 
@@ -1046,9 +1040,9 @@ void do_shopset( CHAR_DATA * ch, char *argument )
 
 void do_shopstat( CHAR_DATA * ch, char *argument )
 {
-  SHOP_DATA *shop;
-  MOB_INDEX_DATA *mob;
-  short vnum;
+  SHOP_DATA *shop = NULL;
+  MOB_INDEX_DATA *mob = NULL;
+  short vnum = 0;
 
   if( argument[0] == '\0' )
   {
@@ -1081,13 +1075,12 @@ void do_shopstat( CHAR_DATA * ch, char *argument )
       shop->profit_buy, shop->profit_sell );
   ch_printf( ch, "Hours:   open %2d  close %2d\r\n",
       shop->open_hour, shop->close_hour );
-  return;
 }
 
 
 void do_shops( CHAR_DATA * ch, char *argument )
 {
-  SHOP_DATA *shop;
+  SHOP_DATA *shop = NULL;
 
   if( !first_shop )
   {
@@ -1103,7 +1096,6 @@ void do_shops( CHAR_DATA * ch, char *argument )
 	shop->open_hour, shop->close_hour, shop->buy_type[0],
 	shop->buy_type[1], shop->buy_type[2], shop->buy_type[3],
 	shop->buy_type[4] );
-  return;
 }
 
 
@@ -1112,9 +1104,9 @@ void do_shops( CHAR_DATA * ch, char *argument )
 
 void do_makerepair( CHAR_DATA * ch, char *argument )
 {
-  REPAIR_DATA *repair;
-  short vnum;
-  MOB_INDEX_DATA *mob;
+  REPAIR_DATA *repair = NULL;
+  short vnum = 0;
+  MOB_INDEX_DATA *mob = NULL;
 
   if( !argument || argument[0] == '\0' )
   {
@@ -1149,18 +1141,17 @@ void do_makerepair( CHAR_DATA * ch, char *argument )
   repair->close_hour = 23;
   mob->rShop = repair;
   send_to_char( "Done.\r\n", ch );
-  return;
 }
 
 
 void do_repairset( CHAR_DATA * ch, char *argument )
 {
-  REPAIR_DATA *repair;
-  MOB_INDEX_DATA *mob, *mob2;
+  REPAIR_DATA *repair = NULL;
+  MOB_INDEX_DATA *mob = NULL, *mob2 = NULL;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  short vnum;
-  int value;
+  short vnum = 0;
+  int value = 0;
 
   argument = one_argument( argument, arg1 );
   argument = one_argument( argument, arg2 );
@@ -1310,9 +1301,9 @@ void do_repairset( CHAR_DATA * ch, char *argument )
 
 void do_repairstat( CHAR_DATA * ch, char *argument )
 {
-  REPAIR_DATA *repair;
-  MOB_INDEX_DATA *mob;
-  short vnum;
+  REPAIR_DATA *repair = NULL;
+  MOB_INDEX_DATA *mob = NULL;
+  short vnum = 0;
 
   if( argument[0] == '\0' )
   {
@@ -1343,13 +1334,11 @@ void do_repairstat( CHAR_DATA * ch, char *argument )
       repair->profit_fix, repair->shop_type );
   ch_printf( ch, "Hours:   open %2d  close %2d\r\n",
       repair->open_hour, repair->close_hour );
-  return;
 }
-
 
 void do_repairshops( CHAR_DATA * ch, char *argument )
 {
-  REPAIR_DATA *repair;
+  REPAIR_DATA *repair = NULL;
 
   if( !first_repair )
   {
@@ -1364,5 +1353,4 @@ void do_repairshops( CHAR_DATA * ch, char *argument )
 	repair->keeper, repair->profit_fix, repair->shop_type,
 	repair->open_hour, repair->close_hour, repair->fix_type[0],
 	repair->fix_type[1], repair->fix_type[2] );
-  return;
 }
