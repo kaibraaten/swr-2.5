@@ -3286,7 +3286,9 @@ void do_config( CHAR_DATA * ch, char *argument )
 
 void do_credits( CHAR_DATA * ch, char *argument )
 {
-  do_help( ch, const_char_to_nonconst( "credits" ) );
+  char credits[MAX_INPUT_LENGTH];
+  snprintf( credits, MAX_INPUT_LENGTH, "%s", "credits" );
+  do_help( ch, credits );
 }
 
 
@@ -3464,13 +3466,23 @@ void do_pager( CHAR_DATA * ch, char *argument )
 
   if( IS_NPC( ch ) )
     return;
+
   argument = one_argument( argument, arg );
+
   if( !*arg )
   {
+    char pager_arg[MAX_INPUT_LENGTH];
+
     if( IS_SET( ch->pcdata->flags, PCFLAG_PAGERON ) )
-      do_config( ch, const_char_to_nonconst( "-pager" ) );
+      {
+	snprintf( pager_arg, MAX_INPUT_LENGTH, "%s", "-pager" );
+      }
     else
-      do_config( ch, const_char_to_nonconst( "+pager" ) );
+      {
+	snprintf( pager_arg, MAX_INPUT_LENGTH, "%s", "+pager" );
+      }
+
+    do_config( ch, pager_arg );
     return;
   }
   if( !is_number( arg ) )

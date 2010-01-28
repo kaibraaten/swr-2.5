@@ -1466,7 +1466,8 @@ void do_reboo( CHAR_DATA * ch, char *argument )
 
 void do_reboot( CHAR_DATA * ch, char *argument )
 {
-  CHAR_DATA *vch;
+  CHAR_DATA *vch = NULL;
+  char buf[MAX_STRING_LENGTH];
 
   if( str_cmp( argument, "mud now" )
       && str_cmp( argument, "nosave" )
@@ -1477,9 +1478,13 @@ void do_reboot( CHAR_DATA * ch, char *argument )
   }
 
   if( auction->item )
-    do_auction( ch, const_char_to_nonconst( "stop" ) );
+    {
+      snprintf( buf, MAX_STRING_LENGTH, "%s", "stop" );
+      do_auction( ch, buf );
+    }
 
-  do_echo( ch, const_char_to_nonconst( "Rebooting mud... See you soon." ) );
+  snprintf( buf, MAX_STRING_LENGTH, "%s", "Rebooting mud... See you soon." );
+  do_echo( ch, buf );
 
   if( !str_cmp( argument, "and sort skill table" ) )
   {
@@ -1497,7 +1502,6 @@ void do_reboot( CHAR_DATA * ch, char *argument )
     save_some_areas(  );
 
   mud_down = TRUE;
-  return;
 }
 
 
@@ -1505,7 +1509,6 @@ void do_reboot( CHAR_DATA * ch, char *argument )
 void do_shutdow( CHAR_DATA * ch, char *argument )
 {
   send_to_char( "If you want to SHUTDOWN, spell it out.\r\n", ch );
-  return;
 }
 
 
@@ -1523,9 +1526,12 @@ void do_shutdown( CHAR_DATA * ch, char *argument )
   }
 
   if( auction->item )
-    do_auction( ch, const_char_to_nonconst( "stop" ) );
+    {
+      snprintf( buf, MAX_STRING_LENGTH, "%s", "stop" );
+      do_auction( ch, buf );
+    }
 
-  sprintf( buf, "Shutdown by %s.", ch->name );
+  snprintf( buf, MAX_STRING_LENGTH, "Shutdown by %s.", ch->name );
   append_file( ch, SHUTDOWN_FILE, buf );
   strcat( buf, "\r\n" );
   do_echo( ch, buf );
@@ -1953,6 +1959,7 @@ void do_balzhur( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
+  char balzhur_text[MAX_STRING_LENGTH];
   CHAR_DATA *victim = NULL;
   int sn = 0;
 
@@ -2007,7 +2014,8 @@ void do_balzhur( CHAR_DATA * ch, char *argument )
   victim->mana = victim->max_mana;
   victim->move = victim->max_move;
 
-  do_help( victim, const_char_to_nonconst( "M_BALZHUR_" ) );
+  snprintf( balzhur_text, MAX_STRING_LENGTH, "%s", "M_BALZHUR_" );
+  do_help( victim, balzhur_text );
   set_char_color( AT_WHITE, victim );
   send_to_char( "You awake after a long period of time...\r\n", victim );
   character_extract_carried_objects( victim );
@@ -2570,12 +2578,14 @@ void do_ban( CHAR_DATA * ch, char *argument )
 {
   char buf[MAX_STRING_LENGTH];
   char arg[MAX_INPUT_LENGTH];
+  char help[MAX_STRING_LENGTH];
   BAN_DATA *pban = NULL;
   int bnum = 0;
 
   if( IS_NPC( ch ) )
     return;
 
+  snprintf( help, MAX_STRING_LENGTH, "%s", "help" );
   argument = one_argument( argument, arg );
 
   set_pager_color( AT_PLAIN, ch );
@@ -2610,7 +2620,7 @@ void do_ban( CHAR_DATA * ch, char *argument )
 
     if( arg[0] == '\0' )
     {
-      do_ban( ch, const_char_to_nonconst( "help" ) );
+      do_ban( ch, help );
       return;
     }
     else if( !str_cmp( arg, "newban" ) )
@@ -2630,7 +2640,7 @@ void do_ban( CHAR_DATA * ch, char *argument )
     }
     else
     {
-      do_ban( ch, const_char_to_nonconst( "help" ) );
+      do_ban( ch, help );
       return;
     }
 
@@ -2968,16 +2978,19 @@ void do_loadup( CHAR_DATA * ch, char *argument )
     add_char( d->character );
     old_room_vnum = d->character->in_room->vnum;
     char_to_room( d->character, ch->in_room );
+
     if( get_trust( d->character ) >= get_trust( ch ) )
     {
-      do_say( d->character,
-	  const_char_to_nonconst( "Do *NOT* disturb me again!" ) );
+      char dnd[MAX_STRING_LENGTH];
+      snprintf( dnd, MAX_STRING_LENGTH, "%s", "Do *NOT* disturb me again!" );
+      do_say( d->character, dnd );
       send_to_char( "I think you'd better leave that player alone!\r\n",
 	  ch );
       d->character->desc = NULL;
       do_quit( d->character, STRLIT_EMPTY );
       return;
     }
+
     d->character->desc = NULL;
     d->character->retran = old_room_vnum;
     d->character = NULL;
@@ -3482,17 +3495,19 @@ void do_for( CHAR_DATA * ch, char *argument )
 {
   char range[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
+  char for_text[MAX_STRING_LENGTH];
   bool fGods = FALSE, fMortals = FALSE, fMobs = FALSE, fEverywhere =
-    FALSE, found;
-  ROOM_INDEX_DATA *room, *old_room;
-  CHAR_DATA *p, *p_prev;	/* p_next to p_prev -- TRI */
-  int i;
+    FALSE, found = FALSE;
+  ROOM_INDEX_DATA *room = NULL, *old_room = NULL;
+  CHAR_DATA *p = NULL, *p_prev = NULL;	/* p_next to p_prev -- TRI */
+  int i = 0;
 
+  snprintf( for_text, MAX_STRING_LENGTH, "%s", "for" );
   argument = one_argument( argument, range );
 
   if( !range[0] || !argument[0] )	/* invalid usage? */
   {
-    do_help( ch, const_char_to_nonconst( "for" ) );
+    do_help( ch, for_text );
     return;
   }
 
@@ -3517,7 +3532,7 @@ void do_for( CHAR_DATA * ch, char *argument )
   else if( !str_cmp( range, "everywhere" ) )
     fEverywhere = TRUE;
   else
-    do_help( ch, const_char_to_nonconst( "for" ) );	/* show syntax */
+    do_help( ch, for_text ); /* show syntax */
 
   /* do not allow # to make it easier */
   if( fEverywhere && strchr( argument, '#' ) )
