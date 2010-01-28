@@ -65,7 +65,7 @@ void do_buyhome( CHAR_DATA * ch, char *argument )
   fold_area( room->area, filename, FALSE );
 
   ch->plr_home = room;
-  do_save( ch, const_char_to_nonconst( "" ) );
+  do_save( ch, STRLIT_EMPTY );
 
 }
 
@@ -352,7 +352,7 @@ void do_setblaster( CHAR_DATA * ch, char *argument )
     return;
   }
   else
-    do_setblaster( ch, const_char_to_nonconst( "" ) );
+    do_setblaster( ch, STRLIT_EMPTY );
 
 }
 
@@ -1369,8 +1369,7 @@ void do_hail( CHAR_DATA * ch, char *argument )
       "arrives on a speederbike, gets off and pays the driver before it leaves.",
       TO_ROOM );
 
-  do_look( ch, const_char_to_nonconst( "auto" ) );
-
+  do_look( ch, STRLIT_AUTO );
 }
 
 void do_suicide( CHAR_DATA * ch, char *argument )
@@ -1448,7 +1447,7 @@ void do_bank( CHAR_DATA * ch, char *argument )
     {
       send_to_char( "You may only deposit amounts greater than zero.\r\n",
 	  ch );
-      do_bank( ch, const_char_to_nonconst( "" ) );
+      do_bank( ch, STRLIT_EMPTY );
       return;
     }
 
@@ -1471,7 +1470,7 @@ void do_bank( CHAR_DATA * ch, char *argument )
     {
       send_to_char
 	( "You may only withdraw amounts greater than zero.\r\n", ch );
-      do_bank( ch, const_char_to_nonconst( "" ) );
+      do_bank( ch, STRLIT_EMPTY );
       return;
     }
 
@@ -1498,7 +1497,7 @@ void do_bank( CHAR_DATA * ch, char *argument )
   }
   else
   {
-    do_bank( ch, const_char_to_nonconst( "" ) );
+    do_bank( ch, STRLIT_EMPTY );
     return;
   }
 }

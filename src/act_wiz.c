@@ -194,7 +194,7 @@ void do_authorize( CHAR_DATA * ch, char *argument )
     sprintf( buf, "%s denied authorization to %s", ch->name, victim->name );
     to_channel( buf, CHANNEL_MONITOR, "Monitor", ch->top_level );
     ch_printf( ch, "You have denied %s.\r\n", victim->name );
-    do_quit( victim, const_char_to_nonconst( "" ) );
+    do_quit( victim, STRLIT_EMPTY );
   }
 
   else if( !str_cmp( arg2, "name" ) || !str_cmp( arg2, "n" ) )
@@ -303,7 +303,7 @@ void do_deny( CHAR_DATA * ch, char *argument )
   SET_BIT( victim->act, PLR_DENY );
   send_to_char( "You are denied access!\r\n", victim );
   send_to_char( "OK.\r\n", ch );
-  do_quit( victim, const_char_to_nonconst( "" ) );
+  do_quit( victim, STRLIT_EMPTY );
 
   return;
 }
@@ -620,7 +620,7 @@ void transfer_char( CHAR_DATA * ch, CHAR_DATA * victim,
     if( ch != victim )
       act( AT_IMMORT, "$n has transferred you.", ch, NULL, victim,
 	  TO_VICT );
-    do_look( victim, const_char_to_nonconst( "auto" ) );
+    do_look( victim, STRLIT_AUTO );
     if( !IS_IMMORTAL( victim ) && !IS_NPC( victim ) )
       act( AT_DANGER,
 	  "Warning:  this player's level is not within the area's level range.",
@@ -2529,7 +2529,7 @@ void do_peace( CHAR_DATA * ch, char *argument )
     if( rch->fighting )
     {
       stop_fighting( rch, TRUE );
-      do_sit( rch, const_char_to_nonconst( "" ) );
+      do_sit( rch, STRLIT_EMPTY );
     }
 
     /* Added by Narn, Nov 28/95 */
@@ -2602,7 +2602,7 @@ void do_ban( CHAR_DATA * ch, char *argument )
 
     if( !pban )
     {
-      do_ban( ch, const_char_to_nonconst( "" ) );
+      do_ban( ch, STRLIT_EMPTY );
       return;
     }
 
@@ -2975,7 +2975,7 @@ void do_loadup( CHAR_DATA * ch, char *argument )
       send_to_char( "I think you'd better leave that player alone!\r\n",
 	  ch );
       d->character->desc = NULL;
-      do_quit( d->character, const_char_to_nonconst( "" ) );
+      do_quit( d->character, STRLIT_EMPTY );
       return;
     }
     d->character->desc = NULL;
@@ -4052,7 +4052,7 @@ void do_sedit( CHAR_DATA * ch, char *argument )
   }
 
   /* display usage message */
-  do_sedit( ch, const_char_to_nonconst( "" ) );
+  do_sedit( ch, STRLIT_EMPTY );
 }
 
 /*
@@ -4350,7 +4350,7 @@ void do_cedit( CHAR_DATA * ch, char *argument )
   }
 
   /* display usage message */
-  do_cedit( ch, const_char_to_nonconst( "" ) );
+  do_cedit( ch, STRLIT_EMPTY );
 }
 
 void do_arrest( CHAR_DATA * ch, char *argument )
@@ -4426,7 +4426,7 @@ void do_arrest( CHAR_DATA * ch, char *argument )
   if( ch != victim )
     act( AT_IMMORT, "$n has ordered your arrest.", ch, NULL, victim,
 	TO_VICT );
-  do_look( victim, const_char_to_nonconst( "auto" ) );
+  do_look( victim, STRLIT_AUTO );
   send_to_char
     ( "Player sent to jail. New characters temporarily banned from address.\r\n",
       ch );

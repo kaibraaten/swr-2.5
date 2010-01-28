@@ -16,7 +16,7 @@ void do_gold( CHAR_DATA * ch, char *argument )
 void do_score( CHAR_DATA * ch, char *argument )
 {
   if( IS_NPC( ch ) || !ch->pcdata )
-    do_oldscore( ch, const_char_to_nonconst( "" ) );
+    do_oldscore( ch, STRLIT_EMPTY );
 
   if( IS_AFFECTED( ch, AFF_POSSESS ) )
   {

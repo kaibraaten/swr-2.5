@@ -1062,7 +1062,7 @@ void char_update( void )
 	      if( ( ch->position == POS_STANDING
 		    || ch->position < POS_FIGHTING )
 		  && number_percent(  ) + 10 < abs( ch->mental_state ) )
-		do_sleep( ch, const_char_to_nonconst( "" ) );
+		do_sleep( ch, STRLIT_EMPTY );
 	      else
 		send_to_char( "You're barely conscious.\r\n", ch );
 	    }
@@ -1074,7 +1074,7 @@ void char_update( void )
 		    || ch->position < POS_FIGHTING )
 		  && ( number_percent(  ) + 20 ) <
 		  abs( ch->mental_state ) )
-		do_sleep( ch, const_char_to_nonconst( "" ) );
+		do_sleep( ch, STRLIT_EMPTY );
 	      else
 		send_to_char( "You can barely keep your eyes open.\r\n",
 		    ch );
@@ -1086,7 +1086,7 @@ void char_update( void )
 	      if( ch->position < POS_SITTING
 		  && ( number_percent(  ) + 30 ) <
 		  abs( ch->mental_state ) )
-		do_sleep( ch, const_char_to_nonconst( "" ) );
+		do_sleep( ch, STRLIT_EMPTY );
 	      else
 		send_to_char( "You're extremely drowsy.\r\n", ch );
 	    }
@@ -1608,8 +1608,7 @@ void aggr_update( void )
 }
 
 /* From interp.c */
-bool check_social
-args( ( CHAR_DATA * ch, const char *command, char *argument ) );
+bool check_social( CHAR_DATA * ch, const char *command, const char *argument );
 
 /*
  * drunk randoms	- Tricops
@@ -1633,13 +1632,13 @@ void drunk_randoms( CHAR_DATA * ch )
   ch->position = POS_STANDING;
 
   if( number_percent(  ) < ( 2 * drunk / 20 ) )
-    check_social( ch, "burp", const_char_to_nonconst( "" ) );
+    check_social( ch, "burp", STRLIT_EMPTY );
   else if( number_percent(  ) < ( 2 * drunk / 20 ) )
-    check_social( ch, "hiccup", const_char_to_nonconst( "" ) );
+    check_social( ch, "hiccup", STRLIT_EMPTY );
   else if( number_percent(  ) < ( 2 * drunk / 20 ) )
-    check_social( ch, "drool", const_char_to_nonconst( "" ) );
+    check_social( ch, "drool", STRLIT_EMPTY );
   else if( number_percent(  ) < ( 2 * drunk / 20 ) )
-    check_social( ch, "fart", const_char_to_nonconst( "" ) );
+    check_social( ch, "fart", STRLIT_EMPTY );
   else
     if( drunk > ( 10 + ( get_curr_con( ch ) / 5 ) )
 	&& number_percent(  ) < ( 2 * drunk / 18 ) )
@@ -1647,8 +1646,7 @@ void drunk_randoms( CHAR_DATA * ch )
       for( vch = ch->in_room->first_person; vch; vch = vch->next_in_room )
 	if( number_percent(  ) < 10 )
 	  rvch = vch;
-      check_social( ch, "puke",
-	  ( rvch ? rvch->name : const_char_to_nonconst( "" ) ) );
+      check_social( ch, "puke", ( rvch ? rvch->name : STRLIT_EMPTY ) );
     }
 
   ch->position = position;

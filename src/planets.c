@@ -31,7 +31,7 @@ PLANET_DATA *get_planet( const char *name )
       return planet;
 
   for( planet = first_planet; planet; planet = planet->next )
-    if( nifty_is_name( const_char_to_nonconst( name ), planet->name ) )
+    if( nifty_is_name( name, planet->name ) )
       return planet;
 
   for( planet = first_planet; planet; planet = planet->next )
@@ -39,7 +39,7 @@ PLANET_DATA *get_planet( const char *name )
       return planet;
 
   for( planet = first_planet; planet; planet = planet->next )
-    if( nifty_is_name_prefix( const_char_to_nonconst( name ), planet->name ) )
+    if( nifty_is_name_prefix( name, planet->name ) )
       return planet;
 
   return NULL;
@@ -452,8 +452,7 @@ void do_setplanet( CHAR_DATA * ch, char *argument )
   }
 
 
-  do_setplanet( ch, const_char_to_nonconst( "" ) );
-  return;
+  do_setplanet( ch, STRLIT_EMPTY );
 }
 
 void do_showplanet( CHAR_DATA * ch, char *argument )

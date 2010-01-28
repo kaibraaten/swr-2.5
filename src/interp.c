@@ -6,8 +6,7 @@
 /*
  * Externals
  */
-bool check_social args( ( CHAR_DATA * ch, const char *command,
-      char *argument ) );
+bool check_social( CHAR_DATA * ch, const char *command, const char *argument );
 
 /*
  * Log-all switch.
@@ -210,7 +209,7 @@ void interpret( CHAR_DATA * ch, char *argument )
   {
     int tempsub = ch->substate;
     ch->substate = SUB_TIMER_DO_ABORT;
-    ( timer->do_fun ) ( ch, const_char_to_nonconst( "" ) );
+    ( timer->do_fun ) ( ch, STRLIT_EMPTY );
     if( char_died( ch ) )
       return;
     if( ch->substate != SUB_TIMER_CANT_ABORT )
@@ -326,11 +325,14 @@ SOCIALTYPE *find_social( const char *command )
   return NULL;
 }
 
-bool check_social( CHAR_DATA * ch, const char *command, char *argument )
+bool check_social( CHAR_DATA * ch, const char *command,
+		   const char *original_argument )
 {
   char arg[MAX_INPUT_LENGTH];
   CHAR_DATA *victim = NULL;
   SOCIALTYPE *social = NULL;
+  char argument[MAX_INPUT_LENGTH];
+  snprintf( argument, MAX_INPUT_LENGTH, "%s", original_argument );
 
   if( ( social = find_social( command ) ) == NULL )
     return FALSE;

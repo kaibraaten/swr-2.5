@@ -82,16 +82,19 @@ void do_mp_offer_job( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  CHAR_DATA *victim;
+  CHAR_DATA *victim = NULL;
   PLANET_DATA *dPlanet = NULL;
   int pCount = 0;
-  int rCount;
-  OBJ_INDEX_DATA *pObjIndex;
-  OBJ_DATA *obj;
+  int rCount = 0;
+  OBJ_INDEX_DATA *pObjIndex = NULL;
+  OBJ_DATA *obj = NULL;
+  char no_jobs_now[MAX_STRING_LENGTH];
 
   if( IS_AFFECTED( ch, AFF_CHARM ) )
     return;
 
+  snprintf( no_jobs_now, MAX_STRING_LENGTH, "%s",
+	    "I have no jobs to offer you at this time." );
   one_argument( argument, arg );
 
   if( arg[0] == '\0' )
@@ -114,9 +117,7 @@ void do_mp_offer_job( CHAR_DATA * ch, char *argument )
 
   if( !ch->in_room || !ch->in_room->area || !ch->in_room->area->planet )
   {
-    do_say( ch,
-	const_char_to_nonconst
-	( "I have no jobs to offer you at this time." ) );
+    do_say( ch, no_jobs_now );
     return;
   }
 
@@ -124,9 +125,7 @@ void do_mp_offer_job( CHAR_DATA * ch, char *argument )
   {
     if( ( pObjIndex = get_obj_index( OBJ_VNUM_PACKAGE ) ) == NULL )
     {
-      do_say( ch,
-	  const_char_to_nonconst
-	  ( "I have no jobs to offer you at this time." ) );
+      do_say( ch, no_jobs_now );
       return;
     }
 
@@ -143,9 +142,7 @@ void do_mp_offer_job( CHAR_DATA * ch, char *argument )
 
     if( !dPlanet || dPlanet == ch->in_room->area->planet )
     {
-      do_say( ch,
-	  const_char_to_nonconst
-	  ( "I have no jobs to offer you at this time." ) );
+      do_say( ch, no_jobs_now );
       return;
     }
 
@@ -153,9 +150,7 @@ void do_mp_offer_job( CHAR_DATA * ch, char *argument )
 
     if( get_obj_world( ch, buf ) )
     {
-      do_say( ch,
-	  const_char_to_nonconst
-	  ( "I have no jobs to offer you at this time." ) );
+      do_say( ch, no_jobs_now );
       return;
     }
 
@@ -178,11 +173,7 @@ void do_mp_offer_job( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_say( ch,
-      const_char_to_nonconst
-      ( "I have no jobs to offer you at this time." ) );
-
-  return;
+  do_say( ch, no_jobs_now );
 }
 
 
@@ -1673,11 +1664,9 @@ void do_mpapplyb( CHAR_DATA * ch, char *argument )
       act( AT_WHITE,
 	  "$n enters this world from within a column of blinding light!",
 	  victim, NULL, NULL, TO_ROOM );
-      do_look( victim, const_char_to_nonconst( "auto" ) );
+      do_look( victim, STRLIT_AUTO );
       break;
   }
-
-  return;
 }
 
 void do_mp_deposit( CHAR_DATA * ch, char *argument )
@@ -1931,7 +1920,7 @@ ch_ret simple_damage( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
   {
     if( number_range( 0, victim->wait ) == 0 )
     {
-      do_recall( victim, const_char_to_nonconst( "" ) );
+      do_recall( victim, STRLIT_EMPTY );
       return rNONE;
     }
   }
@@ -1948,16 +1937,16 @@ ch_ret simple_damage( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
     {
       start_fearing( victim, ch );
       stop_hunting( victim );
-      do_flee( victim, const_char_to_nonconst( "" ) );
+      do_flee( victim, STRLIT_EMPTY );
     }
   }
 
   if( !npcvict
       && victim->hit > 0
       && victim->hit <= victim->wimpy && victim->wait == 0 )
-    do_flee( victim, const_char_to_nonconst( "" ) );
+    do_flee( victim, STRLIT_EMPTY );
   else if( !npcvict && IS_SET( victim->act, PLR_FLEE ) )
-    do_flee( victim, const_char_to_nonconst( "" ) );
+    do_flee( victim, STRLIT_EMPTY );
 
   return rNONE;
 }

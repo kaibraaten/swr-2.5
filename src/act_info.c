@@ -81,15 +81,15 @@ const char *halucinated_object( int ms, bool fShort )
 void show_list_to_char( const OBJ_DATA * list, CHAR_DATA * ch,
     bool fShort, bool fShowNothing )
 {
-  char **prgpstrShow;
-  int *prgnShow;
-  int *pitShow;
-  char *pstrShow;
+  char **prgpstrShow = NULL;
+  int *prgnShow = NULL;
+  int *pitShow = NULL;
+  char *pstrShow = NULL;
   const OBJ_DATA *obj;
-  int nShow;
-  int iShow;
-  int count, offcount, tmp, ms, cnt;
-  bool fCombine;
+  int nShow = 0;
+  int iShow = 0;
+  int count = 0, offcount = 0, tmp = 0, ms = 0, cnt = 0;
+  bool fCombine = FALSE;
 
   if( !ch->desc )
     return;
@@ -277,7 +277,6 @@ void show_list_to_char( const OBJ_DATA * list, CHAR_DATA * ch,
   DISPOSE( prgnShow );
   DISPOSE( pitShow );
 }
-
 
 /*
  * Show fancy descriptions for certain spell affects		-Thoric
@@ -670,7 +669,7 @@ void show_char_to_char_1( CHAR_DATA * victim, CHAR_DATA * ch )
 
 void show_char_to_char( CHAR_DATA * list, CHAR_DATA * ch )
 {
-  CHAR_DATA *rch;
+  CHAR_DATA *rch = NULL;
 
   for( rch = list; rch; rch = rch->next_in_room )
   {
@@ -810,7 +809,7 @@ void do_look( CHAR_DATA * ch, char *argument )
 
   if( arg1[0] == '\0' || !str_cmp( arg1, "auto" ) )
   {
-    SHIP_DATA *ship;
+    SHIP_DATA *ship = NULL;
 
     /* 'look' or 'look auto' */
     set_char_color( AT_RMNAME, ch );
@@ -845,7 +844,7 @@ void do_look( CHAR_DATA * ch, char *argument )
 
 
     if( !IS_NPC( ch ) && IS_SET( ch->act, PLR_AUTOEXIT ) )
-      do_exits( ch, const_char_to_nonconst( "" ) );
+      do_exits( ch, STRLIT_EMPTY );
 
     show_ships_to_char( ch->in_room->first_ship, ch );
     show_list_to_char( ch->in_room->first_content, ch, FALSE, FALSE );
@@ -897,7 +896,7 @@ void do_look( CHAR_DATA * ch, char *argument )
 	    original = ch->in_room;
 	    char_from_room( ch );
 	    char_to_room( ch, to_room );
-	    do_glance( ch, const_char_to_nonconst( "" ) );
+	    do_glance( ch, STRLIT_EMPTY );
 	    char_from_room( ch );
 	    char_to_room( ch, original );
 	  }
@@ -1057,7 +1056,7 @@ void do_look( CHAR_DATA * ch, char *argument )
       original = ch->in_room;
       char_from_room( ch );
       char_to_room( ch, pexit->to_room );
-      do_look( ch, const_char_to_nonconst( "auto" ) );
+      do_look( ch, STRLIT_AUTO );
       do_scan( ch, arg1 );
       char_from_room( ch );
       char_to_room( ch, original );
@@ -1286,7 +1285,7 @@ void do_glance( CHAR_DATA * ch, char *argument )
   {
     save_act = ch->act;
     SET_BIT( ch->act, PLR_BRIEF );
-    do_look( ch, const_char_to_nonconst( "auto" ) );
+    do_look( ch, STRLIT_AUTO );
     ch->act = save_act;
     return;
   }
@@ -1774,16 +1773,20 @@ void do_weather( CHAR_DATA * ch, char *argument )
  * Moved into a separate function so it can be used for other things
  * ie: online help editing				-Thoric
  */
-HELP_DATA *get_help( CHAR_DATA * ch, char *argument )
+HELP_DATA *get_help( CHAR_DATA *ch, const char *orig_argument )
 {
   char argall[MAX_INPUT_LENGTH];
   char argone[MAX_INPUT_LENGTH];
   char argnew[MAX_INPUT_LENGTH];
-  HELP_DATA *pHelp;
-  int lev;
+  char argument_buf[MAX_INPUT_LENGTH];
+  char *argument = argument_buf;
+  HELP_DATA *pHelp = NULL;
+  int lev = 0;
+
+  snprintf( argument_buf, MAX_INPUT_LENGTH, "%s", orig_argument );
 
   if( argument[0] == '\0' )
-    argument = const_char_to_nonconst( "summary" );
+    snprintf( argument_buf, MAX_INPUT_LENGTH, "%s", "summary" );
 
   if( isdigit( ( int ) argument[0] ) )
   {
@@ -2031,7 +2034,7 @@ void do_hset( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_hset( ch, const_char_to_nonconst( "" ) );
+  do_hset( ch, STRLIT_EMPTY );
 }
 
 /*

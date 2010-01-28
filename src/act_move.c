@@ -814,10 +814,10 @@ ch_ret move_char( CHAR_DATA * ch, EXIT_DATA * pexit, int fall )
     }
   }
 
-  do_look( ch, const_char_to_nonconst( "auto" ) );
+  do_look( ch, STRLIT_AUTO );
+
   if( brief )
     SET_BIT( ch->act, PLR_BRIEF );
-
 
   /* BIG ugly looping problem here when the character is mptransed back
      to the starting room.  To avoid this, check how many chars are in 
@@ -1067,7 +1067,7 @@ void do_open( CHAR_DATA * ch, char *argument )
 
   if( arg[0] == '\0' )
   {
-    do_openhatch( ch, const_char_to_nonconst( "" ) );
+    do_openhatch( ch, STRLIT_EMPTY );
     return;
   }
 
@@ -1171,7 +1171,7 @@ void do_close( CHAR_DATA * ch, char *argument )
 
   if( arg[0] == '\0' )
   {
-    do_closehatch( ch, const_char_to_nonconst( "" ) );
+    do_closehatch( ch, STRLIT_EMPTY );
     return;
   }
 
@@ -1812,8 +1812,9 @@ void teleportch( CHAR_DATA * ch, ROOM_INDEX_DATA * room, bool show )
   char_from_room( ch );
   char_to_room( ch, room );
   act( AT_ACTION, "$n arrives suddenly!", ch, NULL, NULL, TO_ROOM );
+
   if( show )
-    do_look( ch, const_char_to_nonconst( "auto" ) );
+    do_look( ch, STRLIT_AUTO );
 }
 
 void teleport( CHAR_DATA * ch, short room, int flags )
@@ -1873,7 +1874,6 @@ void do_climb( CHAR_DATA * ch, char *argument )
     return;
   }
   send_to_char( "You cannot climb there.\r\n", ch );
-  return;
 }
 
 /*
@@ -1904,7 +1904,6 @@ void do_enter( CHAR_DATA * ch, char *argument )
     return;
   }
   do_board( ch, argument );
-  return;
 }
 
 /*
@@ -1924,7 +1923,7 @@ void do_leave( CHAR_DATA * ch, char *argument )
 	move_char( ch, pexit, 0 );
 	return;
       }
-    do_leaveship( ch, const_char_to_nonconst( "" ) );
+    do_leaveship( ch, STRLIT_EMPTY );
     return;
   }
 
@@ -1934,6 +1933,5 @@ void do_leave( CHAR_DATA * ch, char *argument )
     move_char( ch, pexit, 0 );
     return;
   }
-  do_leaveship( ch, const_char_to_nonconst( "" ) );
-  return;
+  do_leaveship( ch, STRLIT_EMPTY );
 }

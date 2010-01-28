@@ -252,8 +252,7 @@ SHIP_PROTOTYPE *get_ship_prototype( const char *name )
 
   for( prototype = first_ship_prototype; prototype;
       prototype = prototype->next )
-    if( nifty_is_name_prefix
-	( const_char_to_nonconst( name ), prototype->name ) )
+    if( nifty_is_name_prefix( name, prototype->name ) )
       return prototype;
 
   return NULL;
@@ -722,7 +721,7 @@ void do_setprototype( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_setprototype( ch, const_char_to_nonconst( "" ) );
+  do_setprototype( ch, STRLIT_EMPTY );
 }
 
 void do_showprototype( CHAR_DATA * ch, char *argument )
@@ -1679,7 +1678,7 @@ void do_designship( CHAR_DATA * ch, char *argument )
     }
     else
     {
-      do_designship( ch, const_char_to_nonconst( "" ) );
+      do_designship( ch, STRLIT_EMPTY );
       return;
     }
   }
@@ -1699,7 +1698,7 @@ void do_designship( CHAR_DATA * ch, char *argument )
 
     if( smodel < 0 )
     {
-      do_designship( ch, const_char_to_nonconst( "" ) );
+      do_designship( ch, STRLIT_EMPTY );
       return;
     }
   }

@@ -1429,8 +1429,7 @@ void do_setstarsystem( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_setstarsystem( ch, const_char_to_nonconst( "" ) );
-  return;
+  do_setstarsystem( ch, STRLIT_EMPTY );
 }
 
 void showstarsystem( const CHAR_DATA * ch, const SPACE_DATA * starsystem )
@@ -1569,7 +1568,7 @@ SHIP_DATA *ship_in_room( const ROOM_INDEX_DATA * room, const char *name )
 	  return ship;
 
   for( ship = room->first_ship; ship; ship = ship->next_in_room )
-    if( nifty_is_name( const_char_to_nonconst( name ), ship->name ) )
+    if( nifty_is_name( name, ship->name ) )
       if( ship->owner && ship->owner[0] != '\0' )
 	if( get_clan( ship->owner ) || is_online( ship->owner )
 	    || is_online( ship->pilot ) || is_online( ship->copilot ) )
@@ -1583,7 +1582,7 @@ SHIP_DATA *ship_in_room( const ROOM_INDEX_DATA * room, const char *name )
 	  return ship;
 
   for( ship = room->first_ship; ship; ship = ship->next_in_room )
-    if( nifty_is_name_prefix( const_char_to_nonconst( name ), ship->name ) )
+    if( nifty_is_name_prefix( name, ship->name ) )
       if( ship->owner && ship->owner[0] != '\0' )
 	if( get_clan( ship->owner ) || is_online( ship->owner )
 	    || is_online( ship->pilot ) || is_online( ship->copilot ) )
@@ -1604,7 +1603,7 @@ SHIP_DATA *get_ship( const char *name )
       return ship;
 
   for( ship = first_ship; ship; ship = ship->next )
-    if( nifty_is_name( const_char_to_nonconst( name ), ship->name ) )
+    if( nifty_is_name( name, ship->name ) )
       return ship;
 
   for( ship = first_ship; ship; ship = ship->next )
@@ -1612,7 +1611,7 @@ SHIP_DATA *get_ship( const char *name )
       return ship;
 
   for( ship = first_ship; ship; ship = ship->next )
-    if( nifty_is_name_prefix( const_char_to_nonconst( name ), ship->name ) )
+    if( nifty_is_name_prefix( name, ship->name ) )
       return ship;
 
   return NULL;
@@ -1633,7 +1632,7 @@ SHIP_DATA *get_ship_here( const char *name, const SPACE_DATA * starsystem )
       return ship;
 
   for( ship = starsystem->first_ship; ship; ship = ship->next_in_starsystem )
-    if( nifty_is_name( const_char_to_nonconst( name ), ship->name ) )
+    if( nifty_is_name( name, ship->name ) )
       return ship;
 
   for( ship = starsystem->first_ship; ship; ship = ship->next_in_starsystem )
@@ -1641,7 +1640,7 @@ SHIP_DATA *get_ship_here( const char *name, const SPACE_DATA * starsystem )
       return ship;
 
   for( ship = starsystem->first_ship; ship; ship = ship->next_in_starsystem )
-    if( nifty_is_name_prefix( const_char_to_nonconst( name ), ship->name ) )
+    if( nifty_is_name_prefix( name, ship->name ) )
       return ship;
 
   return NULL;
@@ -2418,8 +2417,7 @@ void do_setship( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_setship( ch, const_char_to_nonconst( "" ) );
-  return;
+  do_setship( ch, STRLIT_EMPTY );
 }
 
 void do_showship( CHAR_DATA * ch, char *argument )
@@ -3067,9 +3065,7 @@ void do_board( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  if( ( ship =
-	ship_in_room( ch->in_room,
-	  const_char_to_nonconst( argument ) ) ) == NULL )
+  if( ( ship = ship_in_room( ch->in_room, argument ) ) == NULL )
   {
     act( AT_PLAIN, "I see no $T here.", ch, NULL, argument, TO_CHAR );
     return;
@@ -3117,7 +3113,7 @@ void do_board( CHAR_DATA * ch, char *argument )
     char_from_room( ch );
     char_to_room( ch, toroom );
     act( AT_PLAIN, "$n enters the ship.", ch, NULL, argument, TO_ROOM );
-    do_look( ch, const_char_to_nonconst( "auto" ) );
+    do_look( ch, STRLIT_AUTO );
 
   }
   else
@@ -3170,7 +3166,7 @@ void do_leaveship( CHAR_DATA * ch, char *argument )
     char_from_room( ch );
     char_to_room( ch, toroom );
     act( AT_PLAIN, "$n steps out of a ship.", ch, NULL, argument, TO_ROOM );
-    do_look( ch, const_char_to_nonconst( "auto" ) );
+    do_look( ch, STRLIT_AUTO );
   }
   else
     send_to_char( "The exit doesn't seem to be working properly.\r\n", ch );
@@ -3561,7 +3557,7 @@ void do_land( CHAR_DATA * ch, char *argument )
     else
     {
       send_to_char( "&RI don't see that here.\r\n&W", ch );
-      do_land( ch, const_char_to_nonconst( "" ) );
+      do_land( ch, STRLIT_EMPTY );
       return;
     }
   }
@@ -5937,7 +5933,7 @@ ch_ret drive_ship( CHAR_DATA * ch, SHIP_DATA * ship, EXIT_DATA * pexit,
     original = rch->in_room;
     char_from_room( rch );
     char_to_room( rch, to_room );
-    do_look( rch, const_char_to_nonconst( "auto" ) );
+    do_look( rch, STRLIT_AUTO );
     char_from_room( rch );
     char_to_room( rch, original );
   }

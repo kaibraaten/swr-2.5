@@ -252,7 +252,7 @@ void do_goto( CHAR_DATA * ch, char *argument )
 	  TO_ROOM );
   }
 
-  do_look( ch, const_char_to_nonconst( "auto" ) );
+  do_look( ch, STRLIT_AUTO );
 
   if( ch->in_room == in_room )
     return;
@@ -1677,7 +1677,7 @@ void do_mset( CHAR_DATA * ch, char *argument )
   /*
    * Generate usage message.
    */
-  do_mset( ch, const_char_to_nonconst( "" ) );
+  do_mset( ch, STRLIT_EMPTY );
 }
 
 
@@ -2513,7 +2513,7 @@ void do_oset( CHAR_DATA * ch, char *argument )
   /*
    * Generate usage message.
    */
-  do_oset( ch, const_char_to_nonconst( "" ) );
+  do_oset( ch, STRLIT_EMPTY );
 }
 
 
@@ -3378,7 +3378,7 @@ void do_redit( CHAR_DATA * ch, char *argument )
   /*
    * Generate usage message.
    */
-  do_redit( ch, const_char_to_nonconst( "" ) );
+  do_redit( ch, STRLIT_EMPTY );
 }
 
 void do_ocreate( CHAR_DATA * ch, char *argument )
@@ -3817,7 +3817,7 @@ void edit_buffer( CHAR_DATA * ch, char *argument )
       d->connected = CON_PLAYING;
       if( !ch->last_cmd )
 	return;
-      ( *ch->last_cmd ) ( ch, const_char_to_nonconst( "" ) );
+      ( *ch->last_cmd ) ( ch, STRLIT_EMPTY );
       return;
     }
   }
@@ -3878,7 +3878,7 @@ void edit_buffer( CHAR_DATA * ch, char *argument )
     d->connected = CON_PLAYING;
     if( !ch->last_cmd )
       return;
-    ( *ch->last_cmd ) ( ch, const_char_to_nonconst( "" ) );
+    ( *ch->last_cmd ) ( ch, STRLIT_EMPTY );
     return;
   }
   send_to_char( "> ", ch );
@@ -4510,7 +4510,7 @@ void do_aset( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_aset( ch, const_char_to_nonconst( "" ) );
+  do_aset( ch, STRLIT_EMPTY );
   return;
 }
 
@@ -4914,7 +4914,7 @@ void do_mpedit( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_mpedit( ch, const_char_to_nonconst( "" ) );
+  do_mpedit( ch, STRLIT_EMPTY );
 }
 
 void do_opedit( CHAR_DATA * ch, char *argument )
@@ -5195,7 +5195,7 @@ void do_opedit( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_opedit( ch, const_char_to_nonconst( "" ) );
+  do_opedit( ch, STRLIT_EMPTY );
 }
 
 
@@ -5471,7 +5471,7 @@ void do_rpedit( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  do_rpedit( ch, const_char_to_nonconst( "" ) );
+  do_rpedit( ch, STRLIT_EMPTY );
 }
 
 void do_allsave( CHAR_DATA * ch, char *argument )
