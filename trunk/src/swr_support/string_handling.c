@@ -20,6 +20,8 @@ bool is_name2( const char*, const char* );
 bool is_name2_prefix( const char*, const char* );
 char *wordwrap( char*, short );
 static bool is_name_internal( const char*, const char*, STRING_COMPARATOR*, STRING_TOKENIZER* );
+static bool nifty_is_name_internal( const char*, const char*,
+				    STRING_COMPARATOR*, STRING_TOKENIZER* );
 #ifdef __cplusplus
 }
 #endif
@@ -79,38 +81,42 @@ bool is_name2_prefix( const char *str, const char *namelist )
 /*                                                              -Thoric
  * Checks if str is a name in namelist supporting multiple keywords
  */
-bool nifty_is_name( char *str, char *namelist )
+static bool nifty_is_name_internal( const char *str, const char *namelist,
+				    STRING_COMPARATOR *compare_string,
+				    STRING_TOKENIZER *tokenize_string )
 {
   char name[MAX_INPUT_LENGTH];
+  char tmp_str_buf[MAX_INPUT_LENGTH];
+  char *tmp_str = tmp_str_buf;
+  char tmp_namelist_buf[MAX_INPUT_LENGTH];
+  char *tmp_namelist = tmp_namelist_buf;
 
-  if ( !str || str[0] == '\0' )
+  if( !str || str[0] == '\0' )
     return FALSE;
+
+  snprintf( tmp_str_buf, MAX_INPUT_LENGTH, "%s", str );
+  snprintf( tmp_namelist_buf, MAX_INPUT_LENGTH, "%s", namelist );
 
   for ( ; ; )
   {
-    str = one_argument2( str, name );
+    tmp_str = tokenize_string( tmp_str, name );
+
     if ( name[0] == '\0' )
       return TRUE;
-    if ( !is_name2( name, namelist ) )
+
+    if ( !compare_string( name, tmp_namelist ) )
       return FALSE;
   }
 }
 
-bool nifty_is_name_prefix( char *str, char *namelist )
+bool nifty_is_name( const char *str, const char *namelist )
 {
-  char name[MAX_INPUT_LENGTH];
+  return nifty_is_name_internal( str, namelist, is_name2, one_argument2 );
+}
 
-  if ( !str || str[0] == '\0' )
-    return FALSE;
-
-  for ( ; ; )
-  {
-    str = one_argument2( str, name );
-    if ( name[0] == '\0' )
-      return TRUE;
-    if ( !is_name2_prefix( name, namelist ) )
-      return FALSE;
-  }
+bool nifty_is_name_prefix( const char *str, const char *namelist )
+{
+  return nifty_is_name_internal( str, namelist, is_name2_prefix, one_argument2 );
 }
 
 /*
