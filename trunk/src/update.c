@@ -468,14 +468,22 @@ void mobile_update( void )
     if( IS_SET( ch->act, ACT_MOUNTED ) )
     {
       if( IS_SET( ch->act, ACT_AGGRESSIVE ) )
-	do_emote( ch, const_char_to_nonconst( "snarls and growls." ) );
+	{
+	  char snarl[MAX_STRING_LENGTH];
+	  snprintf( snarl, MAX_STRING_LENGTH, "%s", "snarls and growls." );
+	  do_emote( ch, snarl );
+	}
 
       continue;
     }
 
     if( IS_SET( ch->in_room->room_flags, ROOM_SAFE )
 	&& IS_SET( ch->act, ACT_AGGRESSIVE ) )
-      do_emote( ch, const_char_to_nonconst( "glares around and snarls." ) );
+      {
+	char snarl[MAX_STRING_LENGTH];
+	snprintf( snarl, MAX_STRING_LENGTH, "%s", "glares around and snarls.");
+	do_emote( ch, snarl );
+      }
 
     if( last_descriptor )
       mprog_random_trigger( ch );

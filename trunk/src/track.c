@@ -88,7 +88,7 @@ static void bfs_clear_queue( void )
 
 static void room_enqueue( ROOM_INDEX_DATA * room )
 {
-  struct bfs_queue_struct *curr;
+  struct bfs_queue_struct *curr = NULL;
 
   CREATE( curr, struct bfs_queue_struct, 1 );
   curr->room = room;
@@ -99,7 +99,7 @@ static void room_enqueue( ROOM_INDEX_DATA * room )
 
 static void clean_room_queue( void )
 {
-  struct bfs_queue_struct *curr, *curr_next;
+  struct bfs_queue_struct *curr = NULL, *curr_next = NULL;
 
   for( curr = room_queue; curr; curr = curr_next )
   {
@@ -113,7 +113,7 @@ static void clean_room_queue( void )
 
 
 static int find_first_step( ROOM_INDEX_DATA * src,
-    ROOM_INDEX_DATA * target, int maxdist )
+			    ROOM_INDEX_DATA * target, int maxdist )
 {
   int curr_dir = 0, count = 0;
 
@@ -179,21 +179,21 @@ static int find_first_step( ROOM_INDEX_DATA * src,
 
 void do_track( CHAR_DATA * ch, char *argument )
 {
-  CHAR_DATA *vict;
+  CHAR_DATA *vict = NULL;
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  int dir, maxdist;
+  int dir = 0, maxdist = 0;
 
   if( !character_skill_level( ch, gsn_track ) )
   {
-    send_to_char( "You do not know of this skill yet.\n\r", ch );
+    send_to_char( "You do not know of this skill yet.\r\n", ch );
     return;
   }
 
   one_argument( argument, arg );
   if( arg[0] == '\0' )
   {
-    send_to_char( "Whom are you trying to track?\n\r", ch );
+    send_to_char( "Whom are you trying to track?\r\n", ch );
     return;
   }
 
@@ -201,7 +201,7 @@ void do_track( CHAR_DATA * ch, char *argument )
 
   if( !( vict = get_char_world( ch, arg ) ) )
   {
-    send_to_char( "You can't find a trail of anyone like that.\n\r", ch );
+    send_to_char( "You can't find a trail of anyone like that.\r\n", ch );
     return;
   }
 
@@ -214,18 +214,19 @@ void do_track( CHAR_DATA * ch, char *argument )
   switch ( dir )
   {
     case BFS_ERROR:
-      send_to_char( "Hmm... something seems to be wrong.\n\r", ch );
+      send_to_char( "Hmm... something seems to be wrong.\r\n", ch );
       break;
     case BFS_ALREADY_THERE:
-      send_to_char( "You're already in the same room!\n\r", ch );
+      send_to_char( "You're already in the same room!\r\n", ch );
       break;
     case BFS_NO_PATH:
-      sprintf( buf, "You can't sense a trail from here.\n\r" );
+      snprintf( buf, MAX_STRING_LENGTH, "%s",
+		"You can't sense a trail from here.\r\n" );
       send_to_char( buf, ch );
       learn_from_failure( ch, gsn_track );
       break;
     default:
-      ch_printf( ch, "You sense a trail %s from here...\n\r", dir_name[dir] );
+      ch_printf( ch, "You sense a trail %s from here...\r\n", dir_name[dir] );
       learn_from_success( ch, gsn_track );
       break;
   }
@@ -255,8 +256,8 @@ void found_prey( CHAR_DATA * ch, CHAR_DATA * victim )
     return;
   }
 
-  sprintf( victname, "%s",
-      IS_NPC( victim ) ? victim->short_descr : victim->name );
+  snprintf( victname, MAX_STRING_LENGTH, "%s",
+	    IS_NPC( victim ) ? victim->short_descr : victim->name );
 
   if( !can_see( ch, victim ) )
   {
@@ -265,7 +266,8 @@ void found_prey( CHAR_DATA * ch, CHAR_DATA * victim )
     switch ( number_bits( 2 ) )
     {
       case 0:
-	sprintf( buf, "Don't make me find you, %s!", victname );
+	snprintf( buf, MAX_STRING_LENGTH,
+		  "Don't make me find you, %s!", victname );
 	do_say( ch, buf );
 	break;
       case 1:
@@ -275,16 +277,18 @@ void found_prey( CHAR_DATA * ch, CHAR_DATA * victim )
 	    victim, TO_CHAR );
 	act( AT_ACTION, "$n sniffs around the room for you.", ch, NULL,
 	    victim, TO_VICT );
-	sprintf( buf, "I can smell your blood!" );
+	snprintf( buf, MAX_STRING_LENGTH, "%s", "I can smell your blood!" );
 	do_say( ch, buf );
 	break;
       case 2:
-	sprintf( buf, "I'm going to tear %s apart!", victname );
+	snprintf( buf, MAX_STRING_LENGTH,
+		  "I'm going to tear %s apart!", victname );
 	do_yell( ch, buf );
 	break;
       case 3:
-	do_say( ch,
-	    const_char_to_nonconst( "Just wait until I find you..." ) );
+	snprintf( buf, MAX_STRING_LENGTH,
+		  "%s", "Just wait until I find you..." );
+	do_say( ch, buf );
 	break;
     }
     return;
@@ -297,16 +301,19 @@ void found_prey( CHAR_DATA * ch, CHAR_DATA * victim )
     switch ( number_bits( 2 ) )
     {
       case 0:
-	do_say( ch, const_char_to_nonconst( "C'mon out, you coward!" ) );
-	sprintf( buf, "%s is a bloody coward!", victname );
+	snprintf( buf, MAX_STRING_LENGTH, "%s", "C'mon out, you coward!" );
+	do_say( ch, buf );
+	snprintf( buf, MAX_STRING_LENGTH, "%s is a bloody coward!", victname );
 	do_yell( ch, buf );
 	break;
       case 1:
-	sprintf( buf, "Let's take this outside, %s", victname );
+	snprintf( buf, MAX_STRING_LENGTH,
+		  "Let's take this outside, %s", victname );
 	do_say( ch, buf );
 	break;
       case 2:
-	sprintf( buf, "%s is a yellow-bellied wimp!", victname );
+	snprintf( buf, MAX_STRING_LENGTH,
+		  "%s is a yellow-bellied wimp!", victname );
 	do_yell( ch, buf );
 	break;
       case 3:
@@ -336,9 +343,9 @@ void found_prey( CHAR_DATA * ch, CHAR_DATA * victim )
 
 void hunt_victim( CHAR_DATA * ch )
 {
-  bool found;
-  CHAR_DATA *tmp;
-  short ret;
+  bool found = FALSE;
+  CHAR_DATA *tmp = NULL;
+  short ret = 0;
 
   if( !ch || !ch->hunting || !ch->hunting->who )
     return;
@@ -350,7 +357,9 @@ void hunt_victim( CHAR_DATA * ch )
 
   if( !found )
   {
-    do_say( ch, const_char_to_nonconst( "Damn! My prey is gone!!" ) );
+    char buf[MAX_STRING_LENGTH];
+    snprintf( buf, MAX_STRING_LENGTH, "%s", "Damn! My prey is gone!" );
+    do_say( ch, buf );
     stop_hunting( ch );
     return;
   }
@@ -380,8 +389,8 @@ void hunt_victim( CHAR_DATA * ch )
   ret = find_first_step( ch->in_room, ch->hunting->who->in_room, 5000 );
   if( ret == BFS_NO_PATH )
   {
-    EXIT_DATA *pexit;
-    int attempt;
+    EXIT_DATA *pexit = NULL;
+    int attempt = 0;
 
     for( attempt = 0; attempt < 25; attempt++ )
     {
@@ -395,7 +404,9 @@ void hunt_victim( CHAR_DATA * ch )
   }
   if( ret < 0 )
   {
-    do_say( ch, const_char_to_nonconst( "Damn! Lost my prey!" ) );
+    char buf[MAX_STRING_LENGTH];
+    snprintf( buf, MAX_STRING_LENGTH, "%s", "Damn! Lost my prey!" );
+    do_say( ch, buf );
     stop_hunting( ch );
     return;
   }
@@ -406,17 +417,20 @@ void hunt_victim( CHAR_DATA * ch )
       return;
     if( !ch->hunting )
     {
+      char buf[MAX_STRING_LENGTH];
+
       if( !ch->in_room )
       {
-	char buf[MAX_STRING_LENGTH];
-	sprintf( buf,
-	    "Hunt_victim: no ch->in_room!  Mob #%ld, name: %s.  Placing mob in limbo.",
+	snprintf( buf, MAX_STRING_LENGTH,
+	    "Hunt_victim: no ch->in_room! Mob #%ld, name: %s. Placing mob in limbo.",
 	    ch->pIndexData->vnum, ch->name );
 	bug( buf, 0 );
 	char_to_room( ch, get_room_index( ROOM_VNUM_LIMBO ) );
 	return;
       }
-      do_say( ch, const_char_to_nonconst( "Damn! Lost my prey!" ) );
+
+      snprintf( buf, MAX_STRING_LENGTH, "%s", "Damn! Lost my prey!" );
+      do_say( ch, buf );
       return;
     }
     if( ch->in_room == ch->hunting->who->in_room )
@@ -427,11 +441,11 @@ void hunt_victim( CHAR_DATA * ch )
 
 bool mob_snipe( CHAR_DATA * ch, CHAR_DATA * victim )
 {
-  short dir, dist;
-  short max_dist = 3;
-  EXIT_DATA *pexit;
-  ROOM_INDEX_DATA *was_in_room;
-  ROOM_INDEX_DATA *to_room;
+  short dir = 0, dist = 0;
+  const short max_dist = 3;
+  EXIT_DATA *pexit = NULL;
+  ROOM_INDEX_DATA *was_in_room = NULL;
+  ROOM_INDEX_DATA *to_room = NULL;
   char buf[MAX_STRING_LENGTH];
   bool pfound = FALSE;
 
@@ -525,12 +539,12 @@ bool mob_snipe( CHAR_DATA * ch, CHAR_DATA * victim )
     char_from_room( ch );
     char_to_room( ch, victim->in_room );
 
-    sprintf( buf, "A blaster shot fires at you from the %s.",
-	dir_name[dir] );
+    snprintf( buf, MAX_STRING_LENGTH,
+	      "A blaster shot fires at you from the %s.", dir_name[dir] );
     act( AT_ACTION, buf, victim, NULL, ch, TO_CHAR );
     act( AT_ACTION, "You fire at $N.", ch, NULL, victim, TO_CHAR );
-    sprintf( buf, "A blaster shot fires at $N from the %s.",
-	dir_name[dir] );
+    snprintf( buf, MAX_STRING_LENGTH,
+	      "A blaster shot fires at $N from the %s.", dir_name[dir] );
     act( AT_ACTION, buf, ch, NULL, victim, TO_NOTVICT );
 
     one_hit( ch, victim, TYPE_UNDEFINED );

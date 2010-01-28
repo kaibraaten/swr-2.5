@@ -107,7 +107,7 @@ static void reset_make_random_disaster( void )
 		equip_char( mob, obj, WEAR_WIELD );
 	      }
 
-	      do_setblaster( mob, const_char_to_nonconst( "full" ) );
+	      do_setblaster( mob, STRLIT_FULL );
 	    }
 	  }
 	}
@@ -997,7 +997,7 @@ static void reset_barracks( ROOM_INDEX_DATA * pRoomIndex )
       equip_char( mob, blaster, WEAR_WIELD );
     }
 
-    do_setblaster( mob, const_char_to_nonconst( "full" ) );
+    do_setblaster( mob, STRLIT_FULL );
 
     CREATE( guard, GUARD_DATA, 1 );
     guard->planet = pRoomIndex->area->planet;

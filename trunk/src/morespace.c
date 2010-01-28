@@ -1932,7 +1932,7 @@ void post_ship_guard( ROOM_INDEX_DATA * pRoomIndex )
     equip_char( mob, blaster, WEAR_WIELD );
   }
 
-  do_setblaster( mob, const_char_to_nonconst( "full" ) );
+  do_setblaster( mob, STRLIT_FULL );
 
   if( room_is_dark( pRoomIndex ) )
     SET_BIT( mob->affected_by, AFF_INFRARED );

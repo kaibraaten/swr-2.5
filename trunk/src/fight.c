@@ -1250,13 +1250,11 @@ ch_ret damage( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
       }
     }
 
-
     /*
      * More charm stuff.
      */
     if( victim->master == ch )
       stop_follower( victim );
-
 
     /*
      * Inviso attacks ... not.
@@ -1306,11 +1304,8 @@ ch_ret damage( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
 	return rNONE;
     }
 
-
-
     dam_message( ch, victim, dam, dt );
   }
-
 
   /*
    * Code to handle equipment getting damaged, and also support  -Thoric
@@ -1551,21 +1546,32 @@ ch_ret damage( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
       /* Autogold by Scryn 8/12 */
       if( IS_SET( ch->act, PLR_AUTOGOLD ) )
       {
+	char buf[MAX_STRING_LENGTH];
+	snprintf( buf, MAX_STRING_LENGTH, "%s", "credits corpse" );
 	init_gold = ch->gold;
-	do_get( ch, const_char_to_nonconst( "credits corpse" ) );
+	do_get( ch, buf );
 	new_gold = ch->gold;
 	gold_diff = ( new_gold - init_gold );
+
 	if( gold_diff > 0 )
 	{
 	  sprintf( buf1, "%d", gold_diff );
 	  do_split( ch, buf1 );
 	}
       }
-      if( IS_SET( ch->act, PLR_AUTOLOOT ) )
-	do_get( ch, const_char_to_nonconst( "all corpse" ) );
-      else
-	do_look( ch, const_char_to_nonconst( "in corpse" ) );
 
+      if( IS_SET( ch->act, PLR_AUTOLOOT ) )
+	{
+	  char buf[MAX_STRING_LENGTH];
+	  snprintf( buf, MAX_STRING_LENGTH, "%s", "all corpse" );
+	  do_get( ch, buf );
+	}
+      else
+	{
+	  char buf[MAX_STRING_LENGTH];
+	  snprintf( buf, MAX_STRING_LENGTH, "%s", "in corpse" );
+	  do_look( ch, buf );
+	}
     }
 
     if( IS_SET( sysdata.save_flags, SV_KILL ) )
@@ -1829,13 +1835,13 @@ void stop_fighting( CHAR_DATA * ch, bool fBoth )
 
 void raw_kill( CHAR_DATA * ch, CHAR_DATA * victim )
 {
-
-  CHAR_DATA *victmp;
+  CHAR_DATA *victmp = NULL;
   char filename[256];
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   char arg[MAX_STRING_LENGTH];
-  SHIP_DATA *ship;
+  SHIP_DATA *ship = NULL;
+  char diemsg[MAX_STRING_LENGTH];
 
   if( !victim )
   {
@@ -1926,9 +1932,8 @@ void raw_kill( CHAR_DATA * ch, CHAR_DATA * victim )
   }
 
   set_char_color( AT_DIEMSG, victim );
-  do_help( victim, const_char_to_nonconst( "_DIEMSG_" ) );
-
-
+  snprintf( diemsg, MAX_STRING_LENGTH, "%s", "_DIEMSG_" );
+  do_help( victim, diemsg );
 
   for( ship = first_ship; ship; ship = ship->next )
   {
