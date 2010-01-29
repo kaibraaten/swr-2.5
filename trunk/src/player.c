@@ -696,7 +696,6 @@ void do_affected( CHAR_DATA * ch, char *argument )
 	ch_printf( ch, "%-18s\r\n", skill->name );
       }
   }
-  return;
 }
 
 void do_inventory( CHAR_DATA * ch, char *argument )
@@ -704,7 +703,6 @@ void do_inventory( CHAR_DATA * ch, char *argument )
   set_char_color( AT_RED, ch );
   send_to_char( "You are carrying:\r\n", ch );
   show_list_to_char( ch->first_carrying, ch, TRUE, TRUE );
-  return;
 }
 
 

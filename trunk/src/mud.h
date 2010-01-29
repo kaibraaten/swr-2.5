@@ -3093,7 +3093,7 @@ void copyover_recover( void );
 /* act_move.c */
 char *wordwrap( char *txt, short wrap );
 void clear_vrooms( void );
-ED *find_door( CHAR_DATA *ch, char *arg, bool quiet );
+ED *find_door( CHAR_DATA *ch, const char *arg, bool quiet );
 ED *get_exit( const ROOM_INDEX_DATA *room, short dir );
 ED *get_exit_to( const ROOM_INDEX_DATA *room, short dir, long vnum );
 ED *get_exit_num( const ROOM_INDEX_DATA *room, short count );

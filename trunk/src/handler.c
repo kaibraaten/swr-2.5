@@ -3542,7 +3542,7 @@ OBJ_DATA *get_obj_type_char( const CHAR_DATA *ch, short item_type )
 
   for( obj = ch->last_carrying; obj; obj = obj->prev_content )
     {
-      if( obj->pIndexData->item_type = ITEM_COMLINK )
+      if( obj->pIndexData->item_type == item_type )
 	{
 	  break;
 	}

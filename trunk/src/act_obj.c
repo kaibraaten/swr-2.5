@@ -1781,15 +1781,9 @@ void do_bury( CHAR_DATA * ch, char *argument )
   if( ms_find_obj( ch ) )
     return;
 
-  shovel = FALSE;
-  for( obj = ch->first_carrying; obj; obj = obj->next_content )
-    if( obj->item_type == ITEM_SHOVEL )
-    {
-      shovel = TRUE;
-      break;
-    }
-
+  shovel = get_obj_type_char( ch, ITEM_SHOVEL ) ? TRUE : FALSE;
   obj = get_obj_list_rev( ch, arg, ch->in_room->last_content );
+
   if( !obj )
   {
     send_to_char( "You can't find it.\r\n", ch );

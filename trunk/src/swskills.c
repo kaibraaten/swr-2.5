@@ -202,56 +202,33 @@ void do_makeblaster( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      checktool = FALSE;
-      checkdura = FALSE;
-      checkbatt = FALSE;
-      checkoven = FALSE;
-      checkcond = FALSE;
-      checkcirc = FALSE;
-
-      for( obj = ch->last_carrying; obj; obj = obj->prev_content )
-      {
-	if( obj->item_type == ITEM_TOOLKIT )
-	  checktool = TRUE;
-	if( obj->item_type == ITEM_PLASTIC )
-	  checkdura = TRUE;
-	if( obj->item_type == ITEM_BATTERY )
-	  checkbatt = TRUE;
-	if( obj->item_type == ITEM_OVEN )
-	  checkoven = TRUE;
-	if( obj->item_type == ITEM_CIRCUIT )
-	  checkcirc = TRUE;
-	if( obj->item_type == ITEM_SUPERCONDUCTOR )
-	  checkcond = TRUE;
-      }
-
-      if( !checktool )
+      if( !get_obj_type_char( ch, ITEM_TOOLKIT ) )
       {
 	send_to_char( "&RYou need toolkit to make a blaster.\r\n", ch );
 	return;
       }
 
-      if( !checkdura )
+      if( !get_obj_type_char( ch, ITEM_PLASTIC ) )
       {
 	send_to_char( "&RYou need something to make it out of.\r\n", ch );
 	return;
       }
 
-      if( !checkbatt )
+      if( !get_obj_type_char( ch, ITEM_BATTERY ) )
       {
 	send_to_char( "&RYou need a power source for your blaster.\r\n",
 	    ch );
 	return;
       }
 
-      if( !checkoven )
+      if( !get_obj_type_char( ch, ITEM_OVEN ) )
       {
 	send_to_char
 	  ( "&RYou need a small furnace to heat the plastics.\r\n", ch );
 	return;
       }
 
-      if( !checkcirc )
+      if( !get_obj_type_char( ch, ITEM_CIRCUIT ) )
       {
 	send_to_char
 	  ( "&RYou need a small circuit board to control the firing mechanism.\r\n",
@@ -259,7 +236,7 @@ void do_makeblaster( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      if( !checkcond )
+      if( !get_obj_type_char( ch, ITEM_SUPERCONDUCTOR ) )
       {
 	send_to_char( "&RYou still need a small superconductor.\r\n", ch );
 	return;
@@ -452,7 +429,7 @@ void do_makelightsaber( CHAR_DATA * ch, char *argument )
        checkoven, checkcond, checkcirc, checklens, checkgems, checkmirr;
   OBJ_DATA *obj;
   OBJ_INDEX_DATA *pObjIndex;
-  int vnum, level, gems, charge, gemtype;
+  int level, gems, charge, gemtype;
   AFFECT_DATA *paf;
   AFFECT_DATA *paf2;
 
@@ -467,16 +444,6 @@ void do_makelightsaber( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      checktool = FALSE;
-      checkdura = FALSE;
-      checkbatt = FALSE;
-      checkoven = FALSE;
-      checkcond = FALSE;
-      checkcirc = FALSE;
-      checklens = FALSE;
-      checkgems = FALSE;
-      checkmirr = FALSE;
-
       if( !IS_SET( ch->in_room->room_flags, ROOM_SAFE ) )
       {
 	send_to_char
@@ -485,48 +452,27 @@ void do_makelightsaber( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      for( obj = ch->last_carrying; obj; obj = obj->prev_content )
-      {
-	if( obj->item_type == ITEM_TOOLKIT )
-	  checktool = TRUE;
-	if( obj->item_type == ITEM_LENS )
-	  checklens = TRUE;
-	if( obj->item_type == ITEM_CRYSTAL )
-	  checkgems = TRUE;
-	if( obj->item_type == ITEM_MIRROR )
-	  checkmirr = TRUE;
-	if( obj->item_type == ITEM_PLASTIC || obj->item_type == ITEM_METAL )
-	  checkdura = TRUE;
-	if( obj->item_type == ITEM_BATTERY )
-	  checkbatt = TRUE;
-	if( obj->item_type == ITEM_OVEN )
-	  checkoven = TRUE;
-	if( obj->item_type == ITEM_CIRCUIT )
-	  checkcirc = TRUE;
-	if( obj->item_type == ITEM_SUPERCONDUCTOR )
-	  checkcond = TRUE;
-      }
-
-      if( !checktool )
+      if( !get_obj_type_char( ch, ITEM_TOOLKIT ) )
       {
 	send_to_char( "&RYou need toolkit to make a lightsaber.\r\n", ch );
 	return;
       }
 
-      if( !checkdura )
+      if( !get_obj_type_char( ch, ITEM_PLASTIC )
+	  && !get_obj_type_char( ch, ITEM_METAL ) )
       {
 	send_to_char( "&RYou need something to make it out of.\r\n", ch );
 	return;
       }
 
-      if( !checkbatt )
+      if( !get_obj_type_char( ch, ITEM_BATTERY ) )
       {
 	send_to_char( "&RYou need a power source for your lightsaber.\r\n",
 	    ch );
 	return;
       }
 
-      if( !checkoven )
+      if( !get_obj_type_char( ch, ITEM_OVEN ) )
       {
 	send_to_char
 	  ( "&RYou need a small furnace to heat and shape the components.\r\n",
@@ -534,13 +480,13 @@ void do_makelightsaber( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      if( !checkcirc )
+      if( !get_obj_type_char( ch, ITEM_CIRCUIT ) )
       {
 	send_to_char( "&RYou need a small circuit board.\r\n", ch );
 	return;
       }
 
-      if( !checkcond )
+      if( !get_obj_type_char( ch, ITEM_SUPERCONDUCTOR ) )
       {
 	send_to_char
 	  ( "&RYou still need a small superconductor for your lightsaber.\r\n",
@@ -548,21 +494,21 @@ void do_makelightsaber( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      if( !checklens )
+      if( !get_obj_type_char( ch, ITEM_LENS ) )
       {
 	send_to_char( "&RYou still need a lens to focus the beam.\r\n",
 	    ch );
 	return;
       }
 
-      if( !checkgems )
+      if( !get_obj_type_char( ch, ITEM_CRYSTAL ) )
       {
 	send_to_char
 	  ( "&RLightsabers require 1 to 3 gems to work properly.\r\n", ch );
 	return;
       }
 
-      if( !checkmirr )
+      if( !get_obj_type_char( ch, ITEM_MIRROR ) )
       {
 	send_to_char
 	  ( "&RYou need a high intesity reflective cup to create a lightsaber.\r\n",
@@ -607,9 +553,8 @@ void do_makelightsaber( CHAR_DATA * ch, char *argument )
   ch->substate = SUB_NONE;
 
   level = character_skill_level( ch, gsn_lightsaber_crafting );
-  vnum = OBJ_VNUM_PROTO_LIGHTSABER;
 
-  if( ( pObjIndex = get_obj_index( vnum ) ) == NULL )
+  if( ( pObjIndex = get_obj_index( OBJ_VNUM_PROTO_LIGHTSABER ) ) == NULL )
   {
     send_to_char
       ( "&RThe item you are trying to create is missing from the database.\r\nPlease inform the administration of this error.\r\n",
@@ -812,33 +757,19 @@ void do_makejewelry( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      checktool = FALSE;
-      checkoven = FALSE;
-      checkmetal = FALSE;
-
-      for( obj = ch->last_carrying; obj; obj = obj->prev_content )
-      {
-	if( obj->item_type == ITEM_TOOLKIT )
-	  checktool = TRUE;
-	if( obj->item_type == ITEM_OVEN )
-	  checkoven = TRUE;
-	if( obj->item_type == ITEM_RARE_METAL )
-	  checkmetal = TRUE;
-      }
-
-      if( !checktool )
+      if( !get_obj_type_char( ch, ITEM_TOOLKIT ) )
       {
 	send_to_char( "&RYou need a toolkit.\r\n", ch );
 	return;
       }
 
-      if( !checkoven )
+      if( !get_obj_type_char( ch, ITEM_OVEN ) )
       {
 	send_to_char( "&RYou need an oven.\r\n", ch );
 	return;
       }
 
-      if( !checkmetal )
+      if( !get_obj_type_char( ch, ITEM_RARE_METAL ) )
       {
 	send_to_char( "&RYou need some precious metal.\r\n", ch );
 	return;
@@ -1004,25 +935,14 @@ void do_makearmor( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      checksew = FALSE;
-      checkfab = FALSE;
-
-      for( obj = ch->last_carrying; obj; obj = obj->prev_content )
-      {
-	if( obj->item_type == ITEM_FABRIC )
-	  checkfab = TRUE;
-	if( obj->item_type == ITEM_THREAD )
-	  checksew = TRUE;
-      }
-
-      if( !checkfab )
+      if( !get_obj_type_char( ch, ITEM_FABRIC ) )
       {
 	send_to_char( "&RYou need some sort of fabric or material.\r\n",
 	    ch );
 	return;
       }
 
-      if( !checksew )
+      if( !get_obj_type_char( ch, ITEM_THREAD ) )
       {
 	send_to_char( "&RYou need a needle and some thread.\r\n", ch );
 	return;
@@ -1157,47 +1077,27 @@ void do_makeshield( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      checktool = FALSE;
-      checkbatt = FALSE;
-      checkcond = FALSE;
-      checkcirc = FALSE;
-      checkgems = FALSE;
-
-      for( obj = ch->last_carrying; obj; obj = obj->prev_content )
-      {
-	if( obj->item_type == ITEM_TOOLKIT )
-	  checktool = TRUE;
-	if( obj->item_type == ITEM_CRYSTAL )
-	  checkgems = TRUE;
-	if( obj->item_type == ITEM_BATTERY )
-	  checkbatt = TRUE;
-	if( obj->item_type == ITEM_CIRCUIT )
-	  checkcirc = TRUE;
-	if( obj->item_type == ITEM_SUPERCONDUCTOR )
-	  checkcond = TRUE;
-      }
-
-      if( !checktool )
+      if( !get_obj_type_char( ch, ITEM_TOOLKIT ) )
       {
 	send_to_char( "&RYou need toolkit to make an energy shield.\r\n",
 	    ch );
 	return;
       }
 
-      if( !checkbatt )
+      if( !get_obj_type_char( ch, ITEM_BATTERY ) )
       {
 	send_to_char
 	  ( "&RYou need a power source for your energy shield.\r\n", ch );
 	return;
       }
 
-      if( !checkcirc )
+      if( !get_obj_type_char( ch, ITEM_CIRCUIT ) )
       {
 	send_to_char( "&RYou need a small circuit board.\r\n", ch );
 	return;
       }
 
-      if( !checkcond )
+      if( !get_obj_type_char( ch, ITEM_SUPERCONDUCTOR ) )
       {
 	send_to_char
 	  ( "&RYou still need a small superconductor for your energy shield.\r\n",
@@ -1205,7 +1105,7 @@ void do_makeshield( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      if( !checkgems )
+      if( !get_obj_type_char( ch, ITEM_CRYSTAL ) )
       {
 	send_to_char( "&RYou need a small crystal.\r\n", ch );
 	return;
@@ -1387,25 +1287,14 @@ void do_makecontainer( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      checksew = FALSE;
-      checkfab = FALSE;
-
-      for( obj = ch->last_carrying; obj; obj = obj->prev_content )
-      {
-	if( obj->item_type == ITEM_FABRIC )
-	  checkfab = TRUE;
-	if( obj->item_type == ITEM_THREAD )
-	  checksew = TRUE;
-      }
-
-      if( !checkfab )
+      if( !get_obj_type_char( ch, ITEM_FABRIC ) )
       {
 	send_to_char( "&RYou need some sort of fabric or material.\r\n",
 	    ch );
 	return;
       }
 
-      if( !checksew )
+      if( !get_obj_type_char( ch, ITEM_THREAD ) )
       {
 	send_to_char( "&RYou need a needle and some thread.\r\n", ch );
 	return;
