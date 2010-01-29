@@ -154,8 +154,8 @@ void get_obj( CHAR_DATA * ch, OBJ_DATA * obj, OBJ_DATA * container )
 
   if( char_died( ch ) || obj_extracted( obj ) )
     return;
+
   oprog_get_trigger( ch, obj );
-  return;
 }
 
 
@@ -163,13 +163,14 @@ void do_get( CHAR_DATA * ch, char *argument )
 {
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  OBJ_DATA *obj;
-  OBJ_DATA *obj_next;
-  OBJ_DATA *container;
-  short number;
-  bool found;
+  OBJ_DATA *obj = NULL;
+  OBJ_DATA *obj_next = NULL;
+  OBJ_DATA *container = NULL;
+  short number = 0;
+  bool found = FALSE;
 
   argument = one_argument( argument, arg1 );
+
   if( is_number( arg1 ) )
   {
     number = atoi( arg1 );
@@ -186,7 +187,10 @@ void do_get( CHAR_DATA * ch, char *argument )
     argument = one_argument( argument, arg1 );
   }
   else
-    number = 0;
+    {
+      number = 0;
+    }
+
   argument = one_argument( argument, arg2 );
   /* munch optional words */
   if( !str_cmp( arg2, "from" ) && argument[0] != '\0' )
@@ -224,8 +228,8 @@ void do_get( CHAR_DATA * ch, char *argument )
     else
     {
       short cnt = 0;
-      bool fAll;
-      char *chk;
+      bool fAll = FALSE;
+      char *chk = NULL;
 
       if( !str_cmp( arg1, "all" ) )
 	fAll = TRUE;
@@ -235,6 +239,7 @@ void do_get( CHAR_DATA * ch, char *argument )
 	chk = arg1;
       else
 	chk = &arg1[4];
+
       /* 'get all' or 'get all.obj' */
       found = FALSE;
       for( obj = ch->in_room->first_content; obj; obj = obj_next )
@@ -339,8 +344,8 @@ void do_get( CHAR_DATA * ch, char *argument )
     else
     {
       int cnt = 0;
-      bool fAll;
-      char *chk;
+      bool fAll = FALSE;
+      char *chk = NULL;
 
       /* 'get all container' or 'get all.obj container' */
       if( IS_OBJ_STAT( container, ITEM_DONATION ) )
@@ -410,11 +415,11 @@ void do_put( CHAR_DATA * ch, char *argument )
 {
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  OBJ_DATA *container;
-  OBJ_DATA *obj;
-  OBJ_DATA *obj_next;
-  short count;
-  int number;
+  OBJ_DATA *container = NULL;
+  OBJ_DATA *obj = NULL;
+  OBJ_DATA *obj_next = NULL;
+  short count = 0;
+  int number = 0;
   bool save_char = FALSE;
 
   argument = one_argument( argument, arg1 );
@@ -543,8 +548,8 @@ void do_put( CHAR_DATA * ch, char *argument )
   {
     bool found = FALSE;
     int cnt = 0;
-    bool fAll;
-    char *chk;
+    bool fAll = FALSE;
+    char *chk = NULL;
 
     if( !str_cmp( arg1, "all" ) )
       fAll = TRUE;
@@ -610,10 +615,10 @@ void do_put( CHAR_DATA * ch, char *argument )
 void do_drop( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
-  OBJ_DATA *obj;
-  OBJ_DATA *obj_next;
-  bool found;
-  int number;
+  OBJ_DATA *obj = NULL;
+  OBJ_DATA *obj_next = NULL;
+  bool found = FALSE;
+  int number = 0;
 
   argument = one_argument( argument, arg );
   if( is_number( arg ) )
@@ -709,8 +714,8 @@ void do_drop( CHAR_DATA * ch, char *argument )
   else
   {
     int cnt = 0;
-    char *chk;
-    bool fAll;
+    char *chk = NULL;
+    bool fAll = FALSE;
 
     if( !str_cmp( arg, "all" ) )
       fAll = TRUE;
@@ -779,8 +784,8 @@ void do_give( CHAR_DATA * ch, char *argument )
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   char buf[MAX_INPUT_LENGTH];
-  CHAR_DATA *victim;
-  OBJ_DATA *obj;
+  CHAR_DATA *victim = NULL;
+  OBJ_DATA *obj = NULL;
 
   argument = one_argument( argument, arg1 );
   argument = one_argument( argument, arg2 );
@@ -799,9 +804,8 @@ void do_give( CHAR_DATA * ch, char *argument )
   if( is_number( arg1 ) )
   {
     /* 'give NNNN coins victim' */
-    int amount;
+    int amount = atoi( arg1 );
 
-    amount = atoi( arg1 );
     if( amount <= 0
 	|| ( str_cmp( arg2, "credits" ) && str_cmp( arg2, "credit" ) ) )
     {
@@ -1669,8 +1673,8 @@ void do_wear( CHAR_DATA * ch, char *argument )
 {
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  OBJ_DATA *obj;
-  short wear_bit;
+  OBJ_DATA *obj = NULL;
+  short wear_bit = 0;
 
   argument = one_argument( argument, arg1 );
   argument = one_argument( argument, arg2 );
@@ -1721,8 +1725,7 @@ void do_wear( CHAR_DATA * ch, char *argument )
 void do_remove( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
-  OBJ_DATA *obj, *obj_next;
-
+  OBJ_DATA *obj = NULL, *obj_next = NULL;
 
   one_argument( argument, arg );
 
@@ -1766,9 +1769,9 @@ void do_remove( CHAR_DATA * ch, char *argument )
 void do_bury( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
-  OBJ_DATA *obj;
-  bool shovel;
-  short move;
+  OBJ_DATA *obj = NULL;
+  bool shovel = FALSE;
+  short move = 0;
 
   one_argument( argument, arg );
 
@@ -1842,7 +1845,7 @@ void do_bury( CHAR_DATA * ch, char *argument )
 /* put an item on auction, or see the stats on the current item or bet */
 void do_auction( CHAR_DATA * ch, char *argument )
 {
-  OBJ_DATA *obj;
+  OBJ_DATA *obj = NULL;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
@@ -1872,7 +1875,7 @@ void do_auction( CHAR_DATA * ch, char *argument )
   {
     if( auction->item != NULL )
     {
-      AFFECT_DATA *paf;
+      AFFECT_DATA *paf = NULL;
       obj = auction->item;
 
       /* show item data here */
@@ -1984,7 +1987,7 @@ void do_auction( CHAR_DATA * ch, char *argument )
   {
     if( auction->item != NULL )
     {
-      int newbet;
+      int newbet = 0;
 
       if( ch == auction->seller )
       {
@@ -2159,11 +2162,11 @@ void do_auction( CHAR_DATA * ch, char *argument )
 
 void obj_fall( OBJ_DATA * obj, bool through )
 {
-  EXIT_DATA *pexit;
-  ROOM_INDEX_DATA *to_room;
+  EXIT_DATA *pexit = NULL;
+  ROOM_INDEX_DATA *to_room = NULL;
   static int fall_count;
   char buf[MAX_STRING_LENGTH];
-  static bool is_falling;	/* Stop loops from the call to obj_to_room()  -- Altrag */
+  static bool is_falling; /* Stop loops from the call to obj_to_room()  -- Altrag */
 
   if( !obj->in_room || is_falling )
     return;
@@ -2225,7 +2228,7 @@ void obj_fall( OBJ_DATA * obj, bool through )
       /* Damage players */
       if( obj->in_room->first_person && number_percent(  ) > 15 )
       {
-	CHAR_DATA *rch;
+	CHAR_DATA *rch = NULL;
 	CHAR_DATA *vch = NULL;
 	int chcnt = 0;
 
