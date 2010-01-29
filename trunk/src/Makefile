@@ -5,14 +5,13 @@ WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wwrite-st
 USE_DLSYM = -DSWR2_USE_DLSYM
 
 CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support $(USE_DLSYM)
-LFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support
+LDFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support
 
 #On some systems (e.g. FreeBSD) you may need to remove -ldl
 ifdef USE_DLSYM
-LFLAGS += -ldl -rdynamic
+LDFLAGS += -ldl -rdynamic
 endif
 
-DEPS = 
 ODIR = obj
 _OBJ = act_comm.o act_info.o act_move.o act_obj.o act_wiz.o boards.o \
 	build.o clans.o comm.o const.o copyover.o db.o fight.o \
@@ -31,11 +30,11 @@ libs:
 
 $(BINARY):	$(OBJ)
 		@echo "Linking" $(BINARY)
-		@$(CC) -o $@ $^ $(LFLAGS)
+		@$(CC) -o $@ $^ $(LDFLAGS)
 		@mv $(BINARY) ../
 		@echo "Done."
 
-$(ODIR)/%.o:	 %.c $(DEPS)
+$(ODIR)/%.o:	 %.c
 		@echo "Compiling" $<
 		@$(CC) -c -o $@ $< $(CCFLAGS)
 
