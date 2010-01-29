@@ -65,29 +65,31 @@ bool check_skill( CHAR_DATA * ch, const char *command, char *argument )
   int top = gsn_first_weapon - 1;
   struct timeval time_used;
   int mana = 0;
+  SKILLTYPE *skill = NULL;
 
   /* bsearch for the skill */
   for( ;; )
   {
     sn = ( first + top ) >> 1;
+    skill = skill_table[sn];
 
-    if( LOWER( command[0] ) == LOWER( skill_table[sn]->name[0] )
-	&& !str_prefix( command, skill_table[sn]->name )
-	&& ( skill_table[sn]->skill_fun
-	  || skill_table[sn]->spell_fun != spell_null )
+    if( LOWER( command[0] ) == LOWER( skill->name[0] )
+	&& !str_prefix( command, skill->name )
+	&& ( skill->skill_fun
+	  || skill->spell_fun != spell_null )
 	&& ( IS_NPC( ch ) || ( character_skill_level( ch, sn ) > 0 ) ) )
       break;
 
     if( first >= top )
       return FALSE;
 
-    if( strcmp( command, skill_table[sn]->name ) < 1 )
+    if( strcmp( command, skill->name ) < 1 )
       top = sn - 1;
     else
       first = sn + 1;
   }
 
-  if( !check_pos( ch, skill_table[sn]->minimum_position ) )
+  if( !check_pos( ch, skill->minimum_position ) )
     return TRUE;
 
   if( IS_NPC( ch )
@@ -100,9 +102,9 @@ bool check_skill( CHAR_DATA * ch, const char *command, char *argument )
   }
 
   /* check if mana is required */
-  if( skill_table[sn]->min_mana )
+  if( skill->min_mana )
   {
-    mana = IS_NPC( ch ) ? 0 : skill_table[sn]->min_mana;
+    mana = IS_NPC( ch ) ? 0 : skill->min_mana;
 
     if( !IS_NPC( ch ) && ch->mana < mana )
     {
@@ -119,7 +121,7 @@ bool check_skill( CHAR_DATA * ch, const char *command, char *argument )
   /*
    * Is this a real do-fun, or a really a spell?
    */
-  if( !skill_table[sn]->skill_fun )
+  if( !skill->skill_fun )
   {
     ch_ret retcode = rNONE;
     void *vo = NULL;
@@ -128,7 +130,7 @@ bool check_skill( CHAR_DATA * ch, const char *command, char *argument )
 
     target_name = "";
 
-    switch ( skill_table[sn]->target )
+    switch ( skill->target )
     {
       default:
 	bug( "Check_skill: bad target for sn %d.", sn );
@@ -154,7 +156,7 @@ bool check_skill( CHAR_DATA * ch, const char *command, char *argument )
 	if( argument[0] == '\0' && ( victim = who_fighting( ch ) ) == NULL )
 	{
 	  ch_printf( ch, "%s who?\r\n",
-	      capitalize( skill_table[sn]->name ) );
+	      capitalize( skill->name ) );
 	  return TRUE;
 	}
 	else if( argument[0] != '\0'
@@ -200,13 +202,13 @@ bool check_skill( CHAR_DATA * ch, const char *command, char *argument )
     }
 
     /* waitstate */
-    WAIT_STATE( ch, skill_table[sn]->beats );
+    WAIT_STATE( ch, skill->beats );
 
     /* check for failure */
-    if( ( number_percent(  ) + skill_table[sn]->difficulty * 5 )
+    if( ( number_percent() + skill->difficulty * 5 )
 	> ( IS_NPC( ch ) ? 75 : character_skill_level( ch, sn ) ) )
     {
-      failed_casting( skill_table[sn], ch, ( CHAR_DATA * ) vo, obj );
+      failed_casting( skill, ch, ( CHAR_DATA * ) vo, obj );
       learn_from_failure( ch, sn );
 
       if( mana )
@@ -223,9 +225,11 @@ bool check_skill( CHAR_DATA * ch, const char *command, char *argument )
     }
 
     start_timer( &time_used );
-    retcode = ( *skill_table[sn]->spell_fun ) ( sn, ch->top_level, ch, vo );
+
+
+    retcode = ( *skill->spell_fun ) ( sn, ch->top_level, ch, vo );
     end_timer( &time_used );
-    update_userec( &time_used, &skill_table[sn]->userec );
+    update_userec( &time_used, &skill->userec );
 
     if( retcode == rCHAR_DIED || retcode == rERROR )
       return TRUE;
@@ -243,7 +247,7 @@ bool check_skill( CHAR_DATA * ch, const char *command, char *argument )
       learn_from_success( ch, sn );
     }
 
-    if( skill_table[sn]->target == TAR_CHAR_OFFENSIVE
+    if( skill->target == TAR_CHAR_OFFENSIVE
 	&& victim != ch && !char_died( victim ) )
     {
       CHAR_DATA *vch = NULL;
@@ -270,11 +274,11 @@ bool check_skill( CHAR_DATA * ch, const char *command, char *argument )
   }
 
   ch->prev_cmd = ch->last_cmd;	/* haus, for automapping */
-  ch->last_cmd = skill_table[sn]->skill_fun;
+  ch->last_cmd = skill->skill_fun;
   start_timer( &time_used );
-  ( *skill_table[sn]->skill_fun ) ( ch, argument );
+  ( *skill->skill_fun ) ( ch, argument );
   end_timer( &time_used );
-  update_userec( &time_used, &skill_table[sn]->userec );
+  update_userec( &time_used, &skill->userec );
 
   return TRUE;
 }
@@ -689,14 +693,16 @@ void do_sset( CHAR_DATA * ch, char *argument )
       SPELL_FUN *spellfun = NULL;
       DO_FUN *dofun = NULL;
 
-      if( !str_prefix( "do_", argument ) && ( spellfun = spell_function( argument ) ) != spell_notfound )
+      if( !str_prefix( "spell_", argument )
+	  && ( spellfun = spell_function( argument ) ) != spell_notfound )
       {
 	skill->spell_fun = spellfun;
 	skill->skill_fun = NULL;
 	DISPOSE( skill->fun_name );
 	skill->fun_name = str_dup( argument );
       }
-      else if( ( dofun = skill_function( argument ) ) != skill_notfound )
+      else if( !str_prefix( "do_", argument )
+	       && ( dofun = skill_function( argument ) ) != skill_notfound )
       {
 	skill->skill_fun = dofun;
 	skill->spell_fun = NULL;

@@ -809,12 +809,14 @@ SKILLTYPE *fread_skill( FILE * fp )
 
 	  fMatch = TRUE;
 
-	  if( ( spellfun = spell_function( w ) ) != spell_notfound )
+	  if( ( spellfun = spell_function( w ) ) != spell_notfound
+	      && !str_prefix( "spell_", w ) )
 	  {
 	    skill->spell_fun = spellfun;
 	    skill->fun_name = str_dup( w );
 	  }
-	  else if( ( dofun = skill_function( w ) ) != skill_notfound )
+	  else if( ( dofun = skill_function( w ) ) != skill_notfound
+		   && !str_prefix( "do_", w ) )
 	  {
 	    skill->skill_fun = dofun;
 	    skill->fun_name = str_dup( w );

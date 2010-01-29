@@ -1641,7 +1641,7 @@ bool is_safe( CHAR_DATA * ch, const CHAR_DATA * victim )
   if( IS_SET( victim->in_room->room_flags, ROOM_SAFE ) )
   {
     set_char_color( AT_MAGIC, ch );
-    send_to_char( "You'll have to do that elswhere.\r\n", ch );
+    send_to_char( "You'll have to do that elsewhere.\r\n", ch );
     return TRUE;
   }
 

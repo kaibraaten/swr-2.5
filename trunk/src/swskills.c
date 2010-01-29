@@ -1911,7 +1911,7 @@ void do_snipe( CHAR_DATA * ch, char *argument )
   if( IS_SET( ch->in_room->room_flags, ROOM_SAFE ) )
   {
     set_char_color( AT_MAGIC, ch );
-    send_to_char( "You'll have to do that elswhere.\r\n", ch );
+    send_to_char( "You'll have to do that elsewhere.\r\n", ch );
     return;
   }
 
@@ -2244,7 +2244,7 @@ void do_throw( CHAR_DATA * ch, char *argument )
       if( IS_SET( ch->in_room->room_flags, ROOM_SAFE ) )
       {
 	set_char_color( AT_MAGIC, ch );
-	send_to_char( "You'll have to do that elswhere.\r\n", ch );
+	send_to_char( "You'll have to do that elsewhere.\r\n", ch );
 	return;
       }
 
