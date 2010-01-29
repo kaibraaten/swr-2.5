@@ -838,8 +838,7 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
 
     if( starsystem == starsystem_from_name( NEWBIE_STARSYSTEM ) )
     {
-      ch_printf( ch, "You cannot explore in that system.\r\n",
-	  tp->governed_by->name );
+      ch_printf( ch, "You cannot explore in that system.\r\n" );
       return;
     }
 
