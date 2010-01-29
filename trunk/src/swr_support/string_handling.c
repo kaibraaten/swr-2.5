@@ -255,11 +255,9 @@ bool str_infix( const char *astr, const char *bstr )
  */
 bool str_suffix( const char *astr, const char *bstr )
 {
-  int sstr1;
-  int sstr2;
+  int sstr1 = strlen(astr);
+  int sstr2 = strlen(bstr);
 
-  sstr1 = strlen(astr);
-  sstr2 = strlen(bstr);
   if ( sstr1 <= sstr2 && !str_cmp( astr, bstr + sstr2 - sstr1 ) )
     return FALSE;
   else
