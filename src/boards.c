@@ -11,15 +11,14 @@
 BOARD_DATA *first_board = NULL;
 BOARD_DATA *last_board = NULL;
 
-bool is_note_to args( ( CHAR_DATA * ch, NOTE_DATA * pnote ) );
-void note_attach args( ( CHAR_DATA * ch ) );
-void note_remove args( ( CHAR_DATA * ch, BOARD_DATA * board,
-      NOTE_DATA * pnote ) );
-void do_note args( ( CHAR_DATA * ch, char *arg_passed, bool IS_MAIL ) );
+bool is_note_to( const CHAR_DATA * ch, const NOTE_DATA * pnote );
+void note_attach( CHAR_DATA * ch );
+void note_remove( BOARD_DATA * board, NOTE_DATA * pnote );
+void do_note( CHAR_DATA * ch, char *arg_passed, bool IS_MAIL );
 
 
 
-bool can_remove( CHAR_DATA * ch, BOARD_DATA * board )
+bool can_remove( const CHAR_DATA * ch, const BOARD_DATA * board )
 {
   /* If your trust is high enough, you can remove it. */
   if( IS_IMMORTAL( ch ) )
@@ -35,12 +34,12 @@ bool can_remove( CHAR_DATA * ch, BOARD_DATA * board )
   return FALSE;
 }
 
-bool can_read( CHAR_DATA * ch, BOARD_DATA * board )
+bool can_read( const CHAR_DATA * ch, const BOARD_DATA * board )
 {
   return TRUE;
 }
 
-bool can_post( CHAR_DATA * ch, BOARD_DATA * board )
+bool can_post( const CHAR_DATA * ch, const BOARD_DATA * board )
 {
   return TRUE;
 
@@ -64,8 +63,8 @@ bool can_post( CHAR_DATA * ch, BOARD_DATA * board )
  */
 void write_boards_txt( void )
 {
-  BOARD_DATA *tboard;
-  FILE *fpout;
+  BOARD_DATA *tboard = NULL;
+  FILE *fpout = NULL;
   char filename[256];
 
   sprintf( filename, "%s%s", BOARD_DIR, BOARD_FILE );
@@ -96,7 +95,7 @@ void write_boards_txt( void )
 
 BOARD_DATA *get_board( const OBJ_DATA * obj )
 {
-  BOARD_DATA *board;
+  BOARD_DATA *board = NULL;
 
   for( board = first_board; board; board = board->next )
     if( board->board_obj == obj->pIndexData->vnum )
@@ -105,10 +104,10 @@ BOARD_DATA *get_board( const OBJ_DATA * obj )
   return NULL;
 }
 
-BOARD_DATA *find_board( CHAR_DATA * ch )
+BOARD_DATA *find_board( const CHAR_DATA * ch )
 {
-  OBJ_DATA *obj;
-  BOARD_DATA *board;
+  OBJ_DATA *obj = NULL;
+  BOARD_DATA *board = NULL;
 
   for( obj = ch->in_room->first_content; obj; obj = obj->next_content )
   {
@@ -119,8 +118,7 @@ BOARD_DATA *find_board( CHAR_DATA * ch )
   return NULL;
 }
 
-
-bool is_note_to( CHAR_DATA * ch, NOTE_DATA * pnote )
+bool is_note_to( const CHAR_DATA * ch, const NOTE_DATA * pnote )
 {
   if( !str_cmp( ch->name, pnote->sender ) )
     return TRUE;
@@ -141,7 +139,7 @@ bool is_note_to( CHAR_DATA * ch, NOTE_DATA * pnote )
 
 void note_attach( CHAR_DATA * ch )
 {
-  NOTE_DATA *pnote;
+  NOTE_DATA *pnote = NULL;
 
   if( ch->pnote )
     return;
@@ -155,14 +153,13 @@ void note_attach( CHAR_DATA * ch )
   pnote->subject = STRALLOC( "" );
   pnote->text = STRALLOC( "" );
   ch->pnote = pnote;
-  return;
 }
 
-void write_board( BOARD_DATA * board )
+void write_board( const BOARD_DATA * board )
 {
-  FILE *fp;
+  FILE *fp = NULL;
   char filename[256];
-  NOTE_DATA *pnote;
+  NOTE_DATA *pnote = NULL;
 
   /*
    * Rewrite entire list.
@@ -195,18 +192,21 @@ void free_note( NOTE_DATA * pnote )
   STRFREE( pnote->to_list );
   STRFREE( pnote->date );
   STRFREE( pnote->sender );
+
   if( pnote->yesvotes )
     DISPOSE( pnote->yesvotes );
+
   if( pnote->novotes )
     DISPOSE( pnote->novotes );
+
   if( pnote->abstentions )
     DISPOSE( pnote->abstentions );
+
   DISPOSE( pnote );
 }
 
-void note_remove( CHAR_DATA * ch, BOARD_DATA * board, NOTE_DATA * pnote )
+void note_remove( BOARD_DATA * board, NOTE_DATA * pnote )
 {
-
   if( !board )
   {
     bug( "note remove: null board", 0 );
@@ -232,7 +232,7 @@ void note_remove( CHAR_DATA * ch, BOARD_DATA * board, NOTE_DATA * pnote )
 
 void do_noteroom( CHAR_DATA * ch, char *argument )
 {
-  BOARD_DATA *board;
+  BOARD_DATA *board = NULL;
   char arg[MAX_STRING_LENGTH];
   char arg_passed[MAX_STRING_LENGTH];
 
@@ -280,7 +280,7 @@ void do_noteroom( CHAR_DATA * ch, char *argument )
 
 void do_mailroom( CHAR_DATA * ch, char *argument )
 {
-  BOARD_DATA *board;
+  BOARD_DATA *board = NULL;
   char arg[MAX_STRING_LENGTH];
   char arg_passed[MAX_STRING_LENGTH];
 
@@ -460,7 +460,7 @@ void do_note( CHAR_DATA * ch, char *arg_passed, bool IS_MAIL )
 
   if( !str_cmp( arg, "read" ) )
   {
-    bool fAll;
+    bool fAll = FALSE;
 
     board = find_board( ch );
     if( !board )
@@ -799,9 +799,9 @@ void do_note( CHAR_DATA * ch, char *arg_passed, bool IS_MAIL )
 
   if( !str_cmp( arg, "show" ) )
   {
-    const char *subject;
-    const char *to_list;
-    const char *text;
+    const char *subject = "";
+    const char *to_list = "";
+    const char *text = "";
 
     if( ( paper = get_eq_char( ch, WEAR_HOLD ) ) == NULL
 	|| paper->item_type != ITEM_PAPER )
@@ -827,7 +827,8 @@ void do_note( CHAR_DATA * ch, char *arg_passed, bool IS_MAIL )
 
   if( !str_cmp( arg, "post" ) )
   {
-    char *strtime, *text;
+    char *strtime = NULL;
+    const char *text = NULL;
 
     if( ( paper = get_eq_char( ch, WEAR_HOLD ) ) == NULL
 	|| paper->item_type != ITEM_PAPER )
@@ -924,7 +925,7 @@ void do_note( CHAR_DATA * ch, char *arg_passed, bool IS_MAIL )
   if( !str_cmp( arg, "remove" )
       || !str_cmp( arg, "take" ) || !str_cmp( arg, "copy" ) )
   {
-    char take;
+    char take = 0;
 
     board = find_board( ch );
     if( !board )
@@ -1029,7 +1030,7 @@ void do_note( CHAR_DATA * ch, char *arg_passed, bool IS_MAIL )
 	  paper->name = STRALLOC( keyword_buf );
 	}
 	if( take != 2 )
-	  note_remove( ch, board, pnote );
+	  note_remove( board, pnote );
 	send_to_char( "Ok.\r\n", ch );
 	if( take == 1 )
 	{
@@ -1054,19 +1055,15 @@ void do_note( CHAR_DATA * ch, char *arg_passed, bool IS_MAIL )
     return;
   }
 
-  send_to_char( "Huh?  Type 'help note' for usage.\r\n", ch );
-  return;
+  send_to_char( "Huh? Type 'help note' for usage.\r\n", ch );
 }
 
-
-
-BOARD_DATA *read_board( char *boardfile, FILE * fp )
+BOARD_DATA *read_board( const char *boardfile, FILE * fp )
 {
-  BOARD_DATA *board;
-  const char *word;
+  BOARD_DATA *board = NULL;
   char buf[MAX_STRING_LENGTH];
-  bool fMatch;
-  char letter;
+  bool fMatch = FALSE;
+  char letter = 0;
 
   do
   {
@@ -1076,9 +1073,8 @@ BOARD_DATA *read_board( char *boardfile, FILE * fp )
       fclose( fp );
       return NULL;
     }
-  }
-  while( isspace( ( int ) letter ) )
-    ;
+  } while( isspace( ( int ) letter ) );
+
 
   ungetc( letter, fp );
 
@@ -1086,7 +1082,7 @@ BOARD_DATA *read_board( char *boardfile, FILE * fp )
 
   for( ;; )
   {
-    word = feof( fp ) ? "End" : fread_word( fp );
+    const char *word = feof( fp ) ? "End" : fread_word( fp );
     fMatch = FALSE;
 
     switch ( UPPER( word[0] ) )
@@ -1146,12 +1142,12 @@ BOARD_DATA *read_board( char *boardfile, FILE * fp )
 
 NOTE_DATA *read_note( char *notefile, FILE * fp )
 {
-  NOTE_DATA *pnote;
-  char *word;
+  NOTE_DATA *pnote = NULL;
 
   for( ;; )
   {
-    char letter;
+    const char *word = NULL;
+    char letter = 0;
 
     do
     {
@@ -1229,27 +1225,26 @@ NOTE_DATA *read_note( char *notefile, FILE * fp )
  */
 void load_boards( void )
 {
-  FILE *board_fp;
-  FILE *note_fp;
-  BOARD_DATA *board;
-  NOTE_DATA *pnote;
+  FILE *board_fp = NULL;
+  BOARD_DATA *board = NULL;
   char boardfile[256];
-  char notefile[256];
-
-  first_board = NULL;
-  last_board = NULL;
 
   sprintf( boardfile, "%s%s", BOARD_DIR, BOARD_FILE );
+
   if( ( board_fp = fopen( boardfile, "r" ) ) == NULL )
     return;
 
   while( ( board = read_board( boardfile, board_fp ) ) != NULL )
   {
+    char notefile[256];
+    FILE *note_fp = NULL;
     LINK( board, first_board, last_board, next, prev );
     sprintf( notefile, "%s%s", BOARD_DIR, board->note_file );
 
     if( ( note_fp = fopen( notefile, "r" ) ) != NULL )
     {
+      NOTE_DATA *pnote = NULL;
+
       while( ( pnote = read_note( notefile, note_fp ) ) != NULL )
       {
 	LINK( pnote, board->first_note, board->last_note, next, prev );
@@ -1257,13 +1252,12 @@ void load_boards( void )
       }
     }
   }
-  return;
 }
 
 
 void do_makeboard( CHAR_DATA * ch, char *argument )
 {
-  BOARD_DATA *board;
+  BOARD_DATA *board = NULL;
 
   if( !argument || argument[0] == '\0' )
   {
@@ -1285,12 +1279,12 @@ void do_makeboard( CHAR_DATA * ch, char *argument )
 
 void do_bset( CHAR_DATA * ch, char *argument )
 {
-  BOARD_DATA *board;
-  bool found;
+  BOARD_DATA *board = NULL;
+  bool found = FALSE;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  int value;
+  int value = 0;
 
   argument = one_argument( argument, arg1 );
   argument = one_argument( argument, arg2 );
@@ -1306,7 +1300,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
   }
 
   value = atoi( argument );
-  found = FALSE;
+
   for( board = first_board; board; board = board->next )
     if( !str_cmp( arg1, board->note_file ) )
     {
@@ -1524,13 +1518,12 @@ void do_bstat( CHAR_DATA * ch, char *argument )
   ch_printf( ch,
       "Read_group: %-15s Post_group: %-15s \r\nExtra_readers: %-10s\r\n",
       board->read_group, board->post_group, board->extra_readers );
-  return;
 }
 
 
 void do_boards( CHAR_DATA * ch, char *argument )
 {
-  BOARD_DATA *board;
+  BOARD_DATA *board = NULL;
 
   if( !first_board )
   {
@@ -1547,10 +1540,10 @@ void do_boards( CHAR_DATA * ch, char *argument )
 	board->max_posts, board->num_posts, board->type );
 }
 
-void mail_count( CHAR_DATA * ch )
+void mail_count( const CHAR_DATA * ch )
 {
-  BOARD_DATA *board;
-  NOTE_DATA *note;
+  BOARD_DATA *board = NULL;
+  NOTE_DATA *note = NULL;
   int cnt = 0;
 
   for( board = first_board; board; board = board->next )
@@ -1558,7 +1551,7 @@ void mail_count( CHAR_DATA * ch )
       for( note = board->first_note; note; note = note->next )
 	if( is_note_to( ch, note ) )
 	  ++cnt;
+
   if( cnt )
     ch_printf( ch, "You have %d mail messages waiting.\r\n", cnt );
-  return;
 }

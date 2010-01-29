@@ -38,7 +38,7 @@ bool check_playing( DESCRIPTOR_DATA * d, const char *name, bool kick );
 bool check_multi( DESCRIPTOR_DATA * d, const char *name );
 bool check_reconnect( DESCRIPTOR_DATA * d, const char *name, bool fConn );
 void write_ship_list( void );
-void mail_count( CHAR_DATA * ch );
+void mail_count( const CHAR_DATA * ch );
 
 char *generate_skillpackage_table( void );
 SKILL_PACKAGE *get_skill_package( const char *argument );

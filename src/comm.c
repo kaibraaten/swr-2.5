@@ -12,7 +12,7 @@ const char go_ahead_str[] = { IAC, GA, '\0' };
 
 /*  from act_info?  */
 void show_condition( CHAR_DATA * ch, CHAR_DATA * victim );
-void write_ship_list args( ( void ) );
+void write_ship_list( void );
 
 /* db.c */
 void allocate_string_literals( void );
@@ -59,17 +59,15 @@ bool check_reconnect( DESCRIPTOR_DATA * d, const char *name, bool fConn );
 bool check_parse_name( const char *name );
 bool check_playing( DESCRIPTOR_DATA * d, const char *name, bool kick );
 bool check_multi( DESCRIPTOR_DATA * d, const char *name );
-void nanny args( ( DESCRIPTOR_DATA * d, char *argument ) );
-bool flush_buffer args( ( DESCRIPTOR_DATA * d, bool fPrompt ) );
-void read_from_buffer args( ( DESCRIPTOR_DATA * d ) );
-void stop_idling args( ( CHAR_DATA * ch ) );
-void free_desc args( ( DESCRIPTOR_DATA * d ) );
-void display_prompt args( ( DESCRIPTOR_DATA * d ) );
-int make_color_sequence args( ( const char *col, char *buf,
-      DESCRIPTOR_DATA * d ) );
-void set_pager_input args( ( DESCRIPTOR_DATA * d, char *argument ) );
-bool pager_output args( ( DESCRIPTOR_DATA * d ) );
-void mail_count args( ( CHAR_DATA * ch ) );
+void nanny( DESCRIPTOR_DATA * d, char *argument );
+bool flush_buffer( DESCRIPTOR_DATA * d, bool fPrompt );
+void read_from_buffer( DESCRIPTOR_DATA * d );
+void stop_idling( CHAR_DATA * ch );
+void free_desc( DESCRIPTOR_DATA * d );
+void display_prompt( DESCRIPTOR_DATA * d );
+int make_color_sequence( const char *col, char *buf, DESCRIPTOR_DATA * d );
+void set_pager_input( DESCRIPTOR_DATA * d, char *argument );
+bool pager_output( DESCRIPTOR_DATA * d );
 void free_memory( void );
 
 static void execute_on_exit( void )
