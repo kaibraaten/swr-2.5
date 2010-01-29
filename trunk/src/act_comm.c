@@ -4,22 +4,11 @@
 #include "mud.h"
 
 /*
- *  Externals
- */
-void send_obj_page_to_char( CHAR_DATA * ch, OBJ_INDEX_DATA * idx, char page );
-void send_room_page_to_char( CHAR_DATA * ch, ROOM_INDEX_DATA * idx,
-    char page );
-void send_page_to_char( CHAR_DATA * ch, MOB_INDEX_DATA * idx, char page );
-void send_control_page_to_char( CHAR_DATA * ch, char page );
-
-/*
  * Local functions.
  */
 void talk_channel( CHAR_DATA * ch, const char *argument,
     int channel, const char *verb );
 const char *drunk_speech( const char *argument, CHAR_DATA * ch );
-
-#define	MAX_NOISE	1
 
 void sound_to_room( const ROOM_INDEX_DATA * room, const char *argument )
 {
@@ -32,7 +21,6 @@ void sound_to_room( const ROOM_INDEX_DATA * room, const char *argument )
     if( !IS_NPC( vic ) && IS_SET( vic->act, PLR_SOUND ) )
       send_to_char( argument, vic );
 }
-
 
 void do_beep( CHAR_DATA * ch, char *argument )
 {
@@ -357,7 +345,6 @@ static void broadcast_channel_immtalk( CHAR_DATA * ch, const char *verb,
 
 bool character_has_comlink( const CHAR_DATA * ch )
 {
-  OBJ_DATA *obj = NULL;
   bool ch_comlink = FALSE;
 
   if( IS_IMMORTAL( ch ) )
@@ -366,10 +353,9 @@ bool character_has_comlink( const CHAR_DATA * ch )
   }
   else
   {
-    for( obj = ch->last_carrying; obj; obj = obj->prev_content )
+    if( get_obj_type_char( ch, ITEM_COMLINK ) )
     {
-      if( obj->pIndexData->item_type == ITEM_COMLINK )
-	ch_comlink = TRUE;
+      ch_comlink = TRUE;
     }
   }
 
