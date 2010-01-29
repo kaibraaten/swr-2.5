@@ -4,17 +4,43 @@
 #include "mud.h"
 
 const int sent_total[SECT_MAX] = {
-  4, 24, 4, 4, 1, 1, 1, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-  1, 1
+  4,  /* SECT_INSIDE */
+  24, /* SECT_CITY */
+  4,  /* SECT_FIELD */
+  4,  /* SECT_FOREST */
+  1,  /* SECT_HILLS */
+  1,  /* SECT_MOUNTAIN */
+  1,  /* SECT_WATER_SWIM */
+  1,  /* SECT_WATER_NOSWIM */
+  1,  /* SECT_UNDERWATER */
+  2,  /* SECT_AIR */
+  2,  /* SECT_DESERT */
+  1,  /* SECT_DUNNO */
+  1,  /* SECT_OCEANFLOOR */
+  1,  /* SECT_UNDERGROUND */
+  1,  /* SECT_SCRUB */
+  1,  /* SECT_ROCKY */
+  1,  /* SECT_SAVANNA */
+  1,  /* SECT_TUNDRA */
+  1,  /* SECT_GLACIAL */
+  1,  /* SECT_RAINFOREST */
+  1,  /* SECT_JUNGLE */
+  1,  /* SECT_SWAMP */
+  1,  /* SECT_WETLANDS */
+  1,  /* SECT_BRUSH */
+  1,  /* SECT_STEPPE */
+  1,  /* SECT_FARMLAND */
+  1   /* SECT_VOLCANIC */
 };
 
 const char *const room_sents[SECT_MAX][25] = {
+  /* SECT_INSIDE */
   {
     "The rough hewn walls are made of granite.",
     "You see an occasional spider crawling around.",
     "You notice signs of a recent battle from the bloodstains on the floor.",
     "This place hasa damp musty odour not unlike rotting vegetation."},
-
+  /* SECT_CITY */
   {
     "You notice the occasional stray looking for food.",
     "Tall buildings loom on either side of you stretching to the sky.",
@@ -43,87 +69,87 @@ const char *const room_sents[SECT_MAX][25] = {
     "You can see you reflection in several of the transparisteel windows as you pass by."
       "You hear a scream far of in the distance.",
   },
-
+  /* SECT_FIELD */
   {
     "You notice sparce patches of brush and shrubs.",
     "There is a small cluster of trees far off in the distance.",
     "Around you are grassy fields as far as the eye can see.",
     "Throughout the plains a wide variety of weeds and wildflowers are scattered."},
-
+  /* SECT_FOREST */
   {
     "Tall, dark evergreens prevent you from seeing very far.",
     "Many huge oak trees that look several hundred years old are here.",
     "You notice a solitary lonely weeping willow.",
     "To your left is a patch of bright white birch trees, slender and tall."},
-
+  /* SECT_HILLS */
   {
     "The rolling hills are lightly speckled with violet wildflowers."},
-
+  /* SECT_MOUNTAIN */
   {
     "The rocky mountain pass offers many hiding places."},
-
+  /* SECT_WATER_SWIM */
   {
     "The water is smooth as glass."},
-
+  /* SECT_WATER_NOSWIM */
   {
     "Rough waves splash about angrily."},
-
+  /* SECT_UNDERWATER */
   {
     "A small school of fish swims by."},
-
+  /* SECT_AIR */
   {
     "The land is far far below.",
     "A misty haze of clouds drifts by."},
-
+  /* SECT_DESERT */
   {
     "Around you is sand as far as the eye can see.",
     "You think you see an oasis far in the distance."},
-
+  /* SECT_DUNNO */
   {
     "You notice nothing unusual."},
-
+  /* SECT_OCEANFLOOR */
   {
     "There are many rocks and coral which litter the ocean floor."},
-
+  /* SECT_UNDERGROUND */
   {
     "You stand in a lengthy tunnel of rock."},
-
+  /* SECT_SCRUB */
   {
     "Hmm..."},
-
+  /* SECT_ROCKY */
   {
     "Hmm..."},
-
+  /* SECT_SAVANNA */
   {
     "Hmm..."},
-
+  /* SECT_TUNDRA */
   {
     "Hmm..."},
-
+  /* SECT_GLACIAL */
   {
     "Hmm..."},
-
+  /* SECT_RAINFOREST */
   {
     "Hmm..."},
-
+  /* SECT_JUNGLE */
   {
     "Hmm..."},
-
+  /* SECT_SWAMP */
   {
     "Hmm..."},
-
+  /* SECT_WETLANDS */
   {
     "Hmm..."},
-
+  /* SECT_BRUSH */
   {
     "Hmm..."},
-
+  /* SECT_STEPPE */
   {
     "Hmm..."},
-
+  /* SECT_FARMLAND */
   {
     "Hmm..."},
-
+  /* SECT_VOLCANIC */
   {
     "Hmm..."}
 };

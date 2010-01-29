@@ -18,11 +18,8 @@ void do_makeblade( CHAR_DATA * ch, char *argument )
   char arg[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
   int level = 0, chance = 0, charge = 0;
-  bool checktool = FALSE, checkdura = FALSE, checkbatt = FALSE, checkoven =
-    FALSE;
-  OBJ_DATA *obj = NULL;
+  OBJ_DATA *vibroblade = NULL, *toolkit = NULL, *durasteel = NULL, *battery = NULL, *oven = NULL;
   OBJ_INDEX_DATA *pObjIndex = NULL;
-  int vnum = 0;
   AFFECT_DATA *paf = NULL;
   AFFECT_DATA *paf2 = NULL;
 
@@ -38,43 +35,25 @@ void do_makeblade( CHAR_DATA * ch, char *argument )
 	return;
       }
 
-      checktool = FALSE;
-      checkdura = FALSE;
-      checkbatt = FALSE;
-      checkoven = FALSE;
-
-      for( obj = ch->last_carrying; obj; obj = obj->prev_content )
-      {
-	if( obj->item_type == ITEM_TOOLKIT )
-	  checktool = TRUE;
-	if( obj->item_type == ITEM_METAL )
-	  checkdura = TRUE;
-	if( obj->item_type == ITEM_BATTERY )
-	  checkbatt = TRUE;
-
-	if( obj->item_type == ITEM_OVEN )
-	  checkoven = TRUE;
-      }
-
-      if( !checktool )
+      if( !get_obj_type_char( ch, ITEM_TOOLKIT ) )
       {
 	send_to_char( "&RYou need toolkit to make a vibro-blade.\r\n", ch );
 	return;
       }
 
-      if( !checkdura )
+      if( !get_obj_type_char( ch, ITEM_METAL ) )
       {
 	send_to_char( "&RYou need something to make it out of.\r\n", ch );
 	return;
       }
 
-      if( !checkbatt )
+      if( !get_obj_type_char( ch, ITEM_BATTERY ) )
       {
 	send_to_char( "&RYou need a power source for your blade.\r\n", ch );
 	return;
       }
 
-      if( !checkoven )
+      if( !get_obj_type_char( ch, ITEM_OVEN ) )
       {
 	send_to_char( "&RYou need a small furnace to heat the metal.\r\n",
 	    ch );
@@ -83,7 +62,7 @@ void do_makeblade( CHAR_DATA * ch, char *argument )
 
       chance = character_skill_level( ch, gsn_makeblade );
 
-      if( number_percent(  ) < chance )
+      if( number_percent() < chance )
       {
 	send_to_char
 	  ( "&GYou begin the long process of crafting a vibroblade.\r\n",
@@ -118,9 +97,8 @@ void do_makeblade( CHAR_DATA * ch, char *argument )
   ch->substate = SUB_NONE;
 
   level = character_skill_level( ch, gsn_makeblade );
-  vnum = OBJ_VNUM_PROTO_BLADE;
 
-  if( ( pObjIndex = get_obj_index( vnum ) ) == NULL )
+  if( ( pObjIndex = get_obj_index( OBJ_VNUM_PROTO_BLADE ) ) == NULL )
   {
     send_to_char
       ( "&RThe item you are trying to create is missing from the database.\r\nPlease inform the administration of this error.\r\n",
@@ -128,63 +106,39 @@ void do_makeblade( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  checktool = FALSE;
-  checkdura = FALSE;
-  checkbatt = FALSE;
-  checkoven = FALSE;
-
-  for( obj = ch->last_carrying; obj; obj = obj->prev_content )
-  {
-    if( obj->item_type == ITEM_TOOLKIT )
-      checktool = TRUE;
-    if( obj->item_type == ITEM_OVEN )
-      checkoven = TRUE;
-    if( obj->item_type == ITEM_METAL && checkdura == FALSE )
+  if( !( toolkit = get_obj_type_char( ch, ITEM_TOOLKIT ) )
+      || !( durasteel = get_obj_type_char( ch, ITEM_METAL ) )
+      || !( battery = get_obj_type_char( ch, ITEM_BATTERY ) )
+      || !( oven = get_obj_type_char( ch, ITEM_OVEN ) ) )
     {
-      checkdura = TRUE;
-      separate_obj( obj );
-      obj_from_char( obj );
-      extract_obj( obj );
+      ch_printf( ch, "&RSome of your materials seem to have gone missing, and you can't finish the vibroblade.\r\n" );
+      return;
     }
-    if( obj->item_type == ITEM_BATTERY && checkbatt == FALSE )
-    {
-      charge = UMAX( 5, obj->value[0] );
-      separate_obj( obj );
-      obj_from_char( obj );
-      extract_obj( obj );
-      checkbatt = TRUE;
-    }
-  }
 
-  if( ( !checktool ) || ( !checkdura ) || ( !checkbatt ) || ( !checkoven ) )
-  {
-    send_to_char( "&RYou activate your newly created vibroblade.\r\n", ch );
-    send_to_char
-      ( "&RIt hums softly for a few seconds then begins to shake violently.\r\n",
-	ch );
-    send_to_char
-      ( "&RIt finally shatters breaking apart into a dozen pieces.\r\n",
-	ch );
-    learn_from_failure( ch, gsn_makeblade );
-    return;
-  }
+  separate_obj( durasteel );
+  obj_from_char( durasteel );
+  extract_obj( durasteel );
 
-  obj = create_object( pObjIndex );
+  charge = UMAX( 5, battery->value[0] );
+  separate_obj( battery );
+  obj_from_char( battery );
+  extract_obj( battery );
 
-  obj->item_type = ITEM_WEAPON;
-  SET_BIT( obj->wear_flags, ITEM_WIELD );
-  SET_BIT( obj->wear_flags, ITEM_TAKE );
-  obj->weight = 3;
-  STRFREE( obj->name );
+  vibroblade = create_object( pObjIndex );
+
+  SET_BIT( vibroblade->wear_flags, ITEM_WIELD );
+  SET_BIT( vibroblade->wear_flags, ITEM_TAKE );
+  vibroblade->weight = 3;
+  STRFREE( vibroblade->name );
   strcpy( buf, arg );
   strcat( buf, " vibro-blade blade" );
-  obj->name = STRALLOC( buf );
+  vibroblade->name = STRALLOC( buf );
   strcpy( buf, arg );
-  STRFREE( obj->short_descr );
-  obj->short_descr = STRALLOC( buf );
-  STRFREE( obj->description );
+  STRFREE( vibroblade->short_descr );
+  vibroblade->short_descr = STRALLOC( buf );
+  STRFREE( vibroblade->description );
   strcat( buf, " was left here." );
-  obj->description = STRALLOC( buf );
+  vibroblade->description = STRALLOC( buf );
   CREATE( paf, AFFECT_DATA, 1 );
   paf->type = -1;
   paf->duration = -1;
@@ -192,7 +146,7 @@ void do_makeblade( CHAR_DATA * ch, char *argument )
   paf->modifier = level / 3;
   paf->bitvector = 0;
   paf->next = NULL;
-  LINK( paf, obj->first_affect, obj->last_affect, next, prev );
+  LINK( paf, vibroblade->first_affect, vibroblade->last_affect, next, prev );
   ++top_affect;
   CREATE( paf2, AFFECT_DATA, 1 );
   paf2->type = -1;
@@ -201,17 +155,17 @@ void do_makeblade( CHAR_DATA * ch, char *argument )
   paf2->modifier = -2;
   paf2->bitvector = 0;
   paf2->next = NULL;
-  LINK( paf2, obj->first_affect, obj->last_affect, next, prev );
+  LINK( paf2, vibroblade->first_affect, vibroblade->last_affect, next, prev );
   ++top_affect;
-  obj->value[0] = INIT_WEAPON_CONDITION;
-  obj->value[1] = ( int ) ( level / 20 + 10 );	/* min dmg  */
-  obj->value[2] = ( int ) ( level / 10 + 20 );	/* max dmg */
-  obj->value[3] = WEAPON_VIBRO_BLADE;
-  obj->value[4] = charge;
-  obj->value[5] = charge;
-  obj->cost = obj->value[2] * 10;
+  vibroblade->value[0] = INIT_WEAPON_CONDITION;
+  vibroblade->value[1] = ( int ) ( level / 20 + 10 );	/* min dmg  */
+  vibroblade->value[2] = ( int ) ( level / 10 + 20 );	/* max dmg */
+  vibroblade->value[3] = WEAPON_VIBRO_BLADE;
+  vibroblade->value[4] = charge;
+  vibroblade->value[5] = charge;
+  vibroblade->cost = vibroblade->value[2] * 10;
 
-  obj = obj_to_char( obj, ch );
+  vibroblade = obj_to_char( vibroblade, ch );
 
   send_to_char
     ( "&GYou finish your work and hold up your newly created blade.&w\r\n",
@@ -1645,7 +1599,6 @@ void do_reinforcements( CHAR_DATA * ch, char *argument )
   ch->backup_mob = MOB_VNUM_SOLDIER;
 
   ch->backup_wait = 1;
-
 }
 
 void do_postguard( CHAR_DATA * ch, char *argument )
@@ -2249,7 +2202,6 @@ void do_snipe( CHAR_DATA * ch, char *argument )
     start_hunting( victim, ch );
 
   }
-
 }
 
 /* syntax throw <obj> [direction] [target] */
@@ -2517,9 +2469,6 @@ void do_throw( CHAR_DATA * ch, char *argument )
     }
 
   }
-
-  return;
-
 }
 
 void do_pickshiplock( CHAR_DATA * ch, char *argument )
@@ -2645,7 +2594,6 @@ void do_hijack( CHAR_DATA * ch, char *argument )
 
   set_char_color( AT_RED, ch );
   send_to_char( "You fail to work the controls properly!\r\n", ch );
-  return;
 }
 
 
@@ -3599,6 +3547,4 @@ void do_quicktalk( CHAR_DATA * ch, char *argument )
 
   send_to_char
     ( "You successfully talk your way out of a sticky situation.\r\n", ch );
-  return;
-
 }

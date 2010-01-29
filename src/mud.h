@@ -3399,6 +3399,7 @@ void disarm( CHAR_DATA *ch, CHAR_DATA *victim );
 void trip( CHAR_DATA *ch, CHAR_DATA *victim );
 
 /* handler.c */
+OBJ_DATA *get_obj_type_char( const CHAR_DATA *ch, short item_type );
 void character_extract_carried_objects( CHAR_DATA *ch );
 void room_extract_mobiles( ROOM_INDEX_DATA *room );
 void room_extract_contents( ROOM_INDEX_DATA *room );

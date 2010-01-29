@@ -3532,3 +3532,21 @@ void act( short AType, const char *format, CHAR_DATA * ch, const void *arg1,
   MOBtrigger = TRUE;
   return;
 }
+
+/* Return the first item of 'item_type' carried by character,
+ * or NULL if no match.
+ */
+OBJ_DATA *get_obj_type_char( const CHAR_DATA *ch, short item_type )
+{
+  OBJ_DATA *obj = NULL;
+
+  for( obj = ch->last_carrying; obj; obj = obj->prev_content )
+    {
+      if( obj->pIndexData->item_type = ITEM_COMLINK )
+	{
+	  break;
+	}
+    }
+
+  return obj;
+}
