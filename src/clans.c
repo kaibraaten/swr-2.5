@@ -12,13 +12,12 @@ void fread_clan( CLAN_DATA * clan, FILE * fp );
 bool load_clan_file( const char *clanfile );
 void write_clan_list( void );
 
-
 /*
  * Get pointer to clan structure from clan name.
  */
 CLAN_DATA *get_clan( const char *name )
 {
-  CLAN_DATA *clan;
+  CLAN_DATA *clan = NULL;
 
   for( clan = first_clan; clan; clan = clan->next )
     if( !str_cmp( name, clan->name ) )
@@ -39,21 +38,24 @@ CLAN_DATA *get_clan( const char *name )
   return NULL;
 }
 
-void write_clan_list(  )
+void write_clan_list()
 {
-  CLAN_DATA *tclan;
-  FILE *fpout;
+  const CLAN_DATA *tclan = NULL;
+  FILE *fpout = NULL;
   char filename[256];
 
   sprintf( filename, "%s%s", CLAN_DIR, CLAN_LIST );
   fpout = fopen( filename, "w" );
+
   if( !fpout )
   {
     bug( "FATAL: cannot open clan.lst for writing!\r\n", 0 );
     return;
   }
+
   for( tclan = first_clan; tclan; tclan = tclan->next )
     fprintf( fpout, "%s\n", tclan->filename );
+
   fprintf( fpout, "$\n" );
   fclose( fpout );
 }
@@ -63,7 +65,7 @@ void write_clan_list(  )
  */
 void save_clan( const CLAN_DATA * clan )
 {
-  FILE *fp;
+  FILE *fp = NULL;
   char filename[256];
   char buf[MAX_STRING_LENGTH];
 
@@ -111,13 +113,11 @@ void save_clan( const CLAN_DATA * clan )
 void fread_clan( CLAN_DATA * clan, FILE * fp )
 {
   char buf[MAX_STRING_LENGTH];
-  const char *word;
-  bool fMatch;
 
   for( ;; )
   {
-    word = feof( fp ) ? "End" : fread_word( fp );
-    fMatch = FALSE;
+    const char *word = feof( fp ) ? "End" : fread_word( fp );
+    bool fMatch = FALSE;
 
     switch ( UPPER( word[0] ) )
     {
@@ -180,29 +180,26 @@ void fread_clan( CLAN_DATA * clan, FILE * fp )
 /*
  * Load a clan file
  */
-
 bool load_clan_file( const char *clanfile )
 {
   char filename[256];
-  CLAN_DATA *clan;
-  FILE *fp;
-  bool found;
+  CLAN_DATA *clan = NULL;
+  FILE *fp = NULL;
+  bool found = FALSE;
 
   CREATE( clan, CLAN_DATA, 1 );
 
-  found = FALSE;
   sprintf( filename, "%s%s", CLAN_DIR, clanfile );
 
   if( ( fp = fopen( filename, "r" ) ) != NULL )
   {
-
     found = TRUE;
+
     for( ;; )
     {
-      char letter;
-      char *word;
+      const char *word = NULL;
+      char letter = fread_letter( fp );
 
-      letter = fread_letter( fp );
       if( letter == '*' )
       {
 	fread_to_eol( fp );
@@ -250,15 +247,10 @@ bool load_clan_file( const char *clanfile )
 /*
  * Load in all the clan files.
  */
-void load_clans(  )
+void load_clans()
 {
-  FILE *fpList;
-  const char *filename;
+  FILE *fpList = NULL;
   char clanlist[256];
-  char buf[MAX_STRING_LENGTH];
-
-  first_clan = NULL;
-  last_clan = NULL;
 
   sprintf( clanlist, "%s%s", CLAN_DIR, CLAN_LIST );
 
@@ -270,15 +262,14 @@ void load_clans(  )
 
   for( ;; )
   {
-    filename = feof( fpList ) ? "$" : fread_word( fpList );
+    const char *filename = feof( fpList ) ? "$" : fread_word( fpList );
 
     if( filename[0] == '$' )
       break;
 
     if( !load_clan_file( filename ) )
     {
-      sprintf( buf, "Cannot load clan file: %s", filename );
-      bug( buf, 0 );
+      bug( "Cannot load clan file: %s", filename );
     }
   }
 
@@ -288,14 +279,13 @@ void load_clans(  )
 void do_make( CHAR_DATA * ch, char *argument )
 {
   send_to_char( "Huh?\r\n", ch );
-  return;
 }
 
 void do_induct( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
-  CHAR_DATA *victim;
-  CLAN_DATA *clan;
+  CHAR_DATA *victim = NULL;
+  CLAN_DATA *clan = NULL;
 
   if( IS_NPC( ch ) || !ch->pcdata->clan )
   {
@@ -361,8 +351,8 @@ void do_induct( CHAR_DATA * ch, char *argument )
 void do_outcast( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
-  CHAR_DATA *victim;
-  CLAN_DATA *clan;
+  CHAR_DATA *victim = NULL;
+  CLAN_DATA *clan = NULL;
   char buf[MAX_STRING_LENGTH];
 
   if( IS_NPC( ch ) || !ch->pcdata->clan )
@@ -435,16 +425,15 @@ void do_outcast( CHAR_DATA * ch, char *argument )
   DISPOSE( victim->pcdata->bestowments );
   victim->pcdata->bestowments = str_dup( "" );
 
-  save_char_obj( victim );	/* clan gets saved when pfile is saved */
-  save_clan( clan );		/* Nope, it doesn't because pcdata->clan is NULL */
-  return;
+  save_char_obj( victim );  /* clan gets saved when pfile is saved */
+  save_clan( clan );        /* Nope, it doesn't because pcdata->clan is NULL */
 }
 
 void do_setclan( CHAR_DATA * ch, char *argument )
 {
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  CLAN_DATA *clan;
+  CLAN_DATA *clan = NULL;
 
   if( IS_NPC( ch ) || !ch->pcdata )
     return;
@@ -591,11 +580,11 @@ void do_setclan( CHAR_DATA * ch, char *argument )
 
 void do_showclan( CHAR_DATA * ch, char *argument )
 {
-  CLAN_DATA *clan;
-  PLANET_DATA *planet;
+  CLAN_DATA *clan = NULL;
+  PLANET_DATA *planet = NULL;
   int pCount = 0;
-  int support;
-  long revenue;
+  int support = 0;
+  long revenue = 0;
 
   if( IS_NPC( ch ) )
   {
@@ -610,15 +599,12 @@ void do_showclan( CHAR_DATA * ch, char *argument )
   }
 
   clan = get_clan( argument );
+
   if( !clan )
   {
     send_to_char( "No such clan.\r\n", ch );
     return;
   }
-
-  pCount = 0;
-  support = 0;
-  revenue = 0;
 
   for( planet = first_planet; planet; planet = planet->next )
     if( clan == planet->governed_by )
@@ -645,15 +631,12 @@ void do_showclan( CHAR_DATA * ch, char *argument )
   ch_printf( ch, "&WMonthly Revenue: &G%ld\r\n", revenue );
   ch_printf( ch, "&WHourly Wages: &G%d\r\n", clan->salary );
   ch_printf( ch, "&WTotal Funds: &G%ld\r\n", clan->funds );
-
-  return;
 }
 
 void do_makeclan( CHAR_DATA * ch, char *argument )
 {
   char filename[256];
-  CLAN_DATA *clan;
-  bool found;
+  CLAN_DATA *clan = NULL;
 
   if( !argument || argument[0] == '\0' )
   {
@@ -661,18 +644,30 @@ void do_makeclan( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  found = FALSE;
-  sprintf( filename, "%s%s", CLAN_DIR, strlower( argument ) );
+  if( get_clan( argument ) )
+    {
+      ch_printf( ch, "&RThere is already an organization with that name.&w\r\n" );
+      return;
+    }
+
+  sprintf( filename, "%s", strlower( argument ) );
+  replace_char( filename, ' ', '_' );
+
+  if( !is_valid_filename( ch, CLAN_DIR, filename ) )
+    return;
 
   CREATE( clan, CLAN_DATA, 1 );
   LINK( clan, first_clan, last_clan, next, prev );
   clan->name = STRALLOC( argument );
+  clan->filename = STRALLOC( filename );
   clan->description = STRALLOC( "" );
   clan->leaders = STRALLOC( "" );
   clan->atwar = STRALLOC( "" );
   clan->funds = 0;
   clan->salary = 0;
   clan->members = 0;
+  save_clan( clan );
+  write_clan_list();
 }
 
 void do_clans( CHAR_DATA * ch, char *argument )
@@ -710,7 +705,6 @@ void do_clans( CHAR_DATA * ch, char *argument )
   set_char_color( AT_WHITE, ch );
   send_to_char( "\r\nFor more information use: SHOWCLAN\r\n", ch );
   send_to_char( "See also: PLANETS\r\n", ch );
-
 }
 
 void do_shove( CHAR_DATA * ch, char *argument )
@@ -726,7 +720,6 @@ void do_shove( CHAR_DATA * ch, char *argument )
 
   argument = one_argument( argument, arg );
   argument = one_argument( argument, arg2 );
-
 
   if( arg[0] == '\0' )
   {
