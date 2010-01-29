@@ -354,14 +354,13 @@ void do_disconnect( CHAR_DATA * ch, char *argument )
 
   bug( "Do_disconnect: *** desc not found ***.", 0 );
   send_to_char( "Descriptor not found!\r\n", ch );
-  return;
 }
 
 void do_forceclose( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
   DESCRIPTOR_DATA *d = NULL;
-  int desc = 0;
+  SOCKET desc = 0;
 
   one_argument( argument, arg );
   if( arg[0] == '\0' )
@@ -432,21 +431,23 @@ void echo_to_area( const AREA_DATA * area, short AT_COLOR,
   {
     if( d->connected == CON_PLAYING )
     {
-      CHAR_DATA *ech;
+      CHAR_DATA *ech = NULL;
 
       if( ( ech = d->character ) == NULL )
 	continue;
+
       if( tar == ECHOTAR_IMM && !IS_IMMORTAL( ech ) )
 	continue;
+
       if( !ech->in_room || !ech->in_room->area
 	  || ech->in_room->area != area )
 	continue;
+
       set_char_color( AT_COLOR, ech );
       send_to_char( argument, ech );
       send_to_char( "\r\n", ech );
     }
   }
-  return;
 }
 
 void do_echo( CHAR_DATA * ch, char *argument )
@@ -470,8 +471,10 @@ void do_echo( CHAR_DATA * ch, char *argument )
 
   if( ( color = get_color( argument ) ) )
     argument = one_argument( argument, arg );
+
   parg = argument;
   argument = one_argument( argument, arg );
+
   if( !str_cmp( arg, "PC" ) || !str_cmp( arg, "player" ) )
     target = ECHOTAR_PC;
   else if( !str_cmp( arg, "imm" ) )
@@ -481,16 +484,21 @@ void do_echo( CHAR_DATA * ch, char *argument )
     target = ECHOTAR_ALL;
     argument = parg;
   }
+
   if( !color && ( color = get_color( argument ) ) )
     argument = one_argument( argument, arg );
+
   if( !color )
     color = AT_IMMORT;
+
   one_argument( argument, arg );
+
   if( !str_cmp( arg, "Merth" ) || !str_cmp( arg, "Durga" ) )
   {
     ch_printf( ch, "I don't think %s would like that!\r\n", arg );
     return;
   }
+
   echo_to_all( color, argument, target );
 }
 
@@ -1014,7 +1022,7 @@ void do_ostat( CHAR_DATA * ch, char *argument )
 
   if( obj->pIndexData->first_extradesc )
   {
-    EXTRA_DESCR_DATA *ed;
+    EXTRA_DESCR_DATA *ed = NULL;
 
     send_to_char( "Primary description keywords:   '", ch );
     for( ed = obj->pIndexData->first_extradesc; ed; ed = ed->next )
@@ -1451,15 +1459,12 @@ void do_owhere( CHAR_DATA * ch, char *argument )
     act( AT_PLAIN, "You didn't find any $T.", ch, NULL, arg, TO_CHAR );
   else
     pager_printf( ch, "%d matches.\r\n", icnt );
-
-  return;
 }
 
 
 void do_reboo( CHAR_DATA * ch, char *argument )
 {
   send_to_char( "If you want to REBOOT, spell it out.\r\n", ch );
-  return;
 }
 
 
@@ -1504,14 +1509,10 @@ void do_reboot( CHAR_DATA * ch, char *argument )
   mud_down = TRUE;
 }
 
-
-
 void do_shutdow( CHAR_DATA * ch, char *argument )
 {
   send_to_char( "If you want to SHUTDOWN, spell it out.\r\n", ch );
 }
-
-
 
 void do_shutdown( CHAR_DATA * ch, char *argument )
 {
@@ -1542,9 +1543,7 @@ void do_shutdown( CHAR_DATA * ch, char *argument )
       if( !IS_NPC( vch ) )
 	save_char_obj( vch );
   mud_down = TRUE;
-  return;
 }
-
 
 void do_snoop( CHAR_DATA * ch, char *argument )
 {
@@ -1610,10 +1609,7 @@ void do_snoop( CHAR_DATA * ch, char *argument )
 
   victim->desc->snoop_by = ch->desc;
   send_to_char( "Ok.\r\n", ch );
-  return;
 }
-
-
 
 void do_switch( CHAR_DATA * ch, char *argument )
 {
@@ -1664,8 +1660,6 @@ void do_switch( CHAR_DATA * ch, char *argument )
   return;
 }
 
-
-
 void do_return( CHAR_DATA * ch, char *argument )
 {
   if( !ch->desc )
@@ -1696,8 +1690,6 @@ void do_return( CHAR_DATA * ch, char *argument )
   ch->desc->character->switched = NULL;
   ch->desc = NULL;
 }
-
-
 
 void do_minvoke( CHAR_DATA * ch, char *argument )
 {
@@ -1833,8 +1825,6 @@ void do_oinvoke( CHAR_DATA * ch, char *argument )
   send_to_char( "Ok.\r\n", ch );
 }
 
-
-
 void do_purge( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
@@ -1901,7 +1891,6 @@ void do_purge( CHAR_DATA * ch, char *argument )
   return;
 }
 
-
 void do_low_purge( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
@@ -1953,7 +1942,6 @@ void do_low_purge( CHAR_DATA * ch, char *argument )
   extract_char( victim, TRUE );
   return;
 }
-
 
 void do_balzhur( CHAR_DATA * ch, char *argument )
 {
@@ -2029,8 +2017,6 @@ void do_immortalize( CHAR_DATA * ch, char *argument )
 {
 }
 
-
-
 void do_trust( CHAR_DATA * ch, char *argument )
 {
   char arg1[MAX_INPUT_LENGTH];
@@ -2075,8 +2061,6 @@ void do_trust( CHAR_DATA * ch, char *argument )
   send_to_char( "Ok.\r\n", ch );
   return;
 }
-
-
 
 void do_restore( CHAR_DATA * ch, char *argument )
 {
@@ -2174,7 +2158,6 @@ void do_restoretime( CHAR_DATA * ch, char *argument )
   minute = ( int ) ( ( time_passed - ( hour * 3600 ) ) / 60 );
   ch_printf( ch, "Your last restore all was %d hours and %d minutes ago.\r\n",
       hour, minute );
-  return;
 }
 
 void do_freeze( CHAR_DATA * ch, char *argument )
@@ -2222,11 +2205,7 @@ void do_freeze( CHAR_DATA * ch, char *argument )
   }
 
   save_char_obj( victim );
-
-  return;
 }
-
-
 
 void do_log( CHAR_DATA * ch, char *argument )
 {
@@ -2329,11 +2308,7 @@ void do_noemote( CHAR_DATA * ch, char *argument )
     send_to_char( "You can't emote!\r\n", victim );
     send_to_char( "NO_EMOTE set.\r\n", ch );
   }
-
-  return;
 }
-
-
 
 void do_notell( CHAR_DATA * ch, char *argument )
 {
@@ -2475,8 +2450,6 @@ void do_silence( CHAR_DATA * ch, char *argument )
     send_to_char( "You can't use channels!\r\n", victim );
     send_to_char( "SILENCE set.\r\n", ch );
   }
-
-  return;
 }
 
 void do_unsilence( CHAR_DATA * ch, char *argument )
@@ -2520,12 +2493,7 @@ void do_unsilence( CHAR_DATA * ch, char *argument )
   {
     send_to_char( "That player is not silenced.\r\n", ch );
   }
-
-  return;
 }
-
-
-
 
 void do_peace( CHAR_DATA * ch, char *argument )
 {
@@ -2547,7 +2515,6 @@ void do_peace( CHAR_DATA * ch, char *argument )
   }
 
   send_to_char( "Ok.\r\n", ch );
-  return;
 }
 
 BAN_DATA *first_ban = NULL;
@@ -2712,10 +2679,7 @@ void do_wizlock( CHAR_DATA * ch, char *argument )
     send_to_char( "Game wizlocked.\r\n", ch );
   else
     send_to_char( "Game un-wizlocked.\r\n", ch );
-
-  return;
 }
-
 
 void do_noresolve( CHAR_DATA * ch, char *argument )
 {
@@ -2725,10 +2689,7 @@ void do_noresolve( CHAR_DATA * ch, char *argument )
     send_to_char( "Name resolving disabled.\r\n", ch );
   else
     send_to_char( "Name resolving enabled.\r\n", ch );
-
-  return;
 }
-
 
 void do_users( CHAR_DATA * ch, char *argument )
 {
@@ -2762,11 +2723,9 @@ void do_users( CHAR_DATA * ch, char *argument )
       send_to_pager( buf, ch );
     }
   }
+
   pager_printf( ch, "%d user%s.\r\n", count, count == 1 ? "" : "s" );
-  return;
 }
-
-
 
 /*
  * Thanks to Grodyn for pointing out bugs in this function.
@@ -2801,8 +2760,6 @@ void do_force( CHAR_DATA * ch, char *argument )
 	if( toomany++ > 1000 )	/* i doubt we'd have that many players */
 	  return;		/* so this would be an infinate loop */
       }
-
-
     }
   }
   else
@@ -2833,9 +2790,7 @@ void do_force( CHAR_DATA * ch, char *argument )
   }
 
   send_to_char( "Ok.\r\n", ch );
-  return;
 }
-
 
 void do_invis( CHAR_DATA * ch, char *argument )
 {
@@ -2897,8 +2852,6 @@ void do_invis( CHAR_DATA * ch, char *argument )
 	TO_ROOM );
     send_to_char( "You slowly vanish into thin air.\r\n", ch );
   }
-
-  return;
 }
 
 
@@ -2917,8 +2870,6 @@ void do_holylight( CHAR_DATA * ch, char *argument )
     SET_BIT( ch->act, PLR_HOLYLIGHT );
     send_to_char( "Holy light mode on.\r\n", ch );
   }
-
-  return;
 }
 
 void do_cmdtable( CHAR_DATA * ch, char *argument )
@@ -2938,7 +2889,6 @@ void do_cmdtable( CHAR_DATA * ch, char *argument )
 	pager_printf( ch, "%-6.6s %4d\r\n", cmd->name,
 	    cmd->userec.num_uses );
     }
-  return;
 }
 
 /*
@@ -3006,7 +2956,6 @@ void do_loadup( CHAR_DATA * ch, char *argument )
   }
   /* else no player file */
   send_to_char( "No such player.\r\n", ch );
-  return;
 }
 
 void do_fixchar( CHAR_DATA * ch, char *argument )
@@ -3081,7 +3030,6 @@ void do_newbieset( CHAR_DATA * ch, char *argument )
      called Spectral Gate.  Brittany */
 
   {
-
     OBJ_INDEX_DATA *obj_ind = get_obj_index( 20 );
     if( obj_ind != NULL )
     {
@@ -3093,7 +3041,6 @@ void do_newbieset( CHAR_DATA * ch, char *argument )
   act( AT_IMMORT, "$n has equipped you with a newbieset.", ch, NULL, victim,
       TO_VICT );
   ch_printf( ch, "You have re-equipped %s.\r\n", victim->name );
-  return;
 }
 
 void do_bestowarea( CHAR_DATA * ch, char *argument )
@@ -3164,9 +3111,7 @@ void do_set_boot_time( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
   char arg1[MAX_INPUT_LENGTH];
-  bool check;
-
-  check = FALSE;
+  bool check = FALSE;
 
   argument = one_argument( argument, arg );
 
@@ -3309,7 +3254,6 @@ void do_set_boot_time( CHAR_DATA * ch, char *argument )
     send_to_char( "Invalid argument for setboot.\r\n", ch );
     return;
   }
-
   else
   {
     get_reboot_string(  );
@@ -3341,7 +3285,6 @@ void do_destro( CHAR_DATA * ch, char *argument )
 {
   set_char_color( AT_RED, ch );
   send_to_char( "If you want to destroy a character, spell it out!\r\n", ch );
-  return;
 }
 
 /*
@@ -3353,7 +3296,7 @@ void close_area( AREA_DATA * pArea )
 
 void do_destroy( CHAR_DATA * ch, char *argument )
 {
-  CHAR_DATA *victim;
+  CHAR_DATA *victim = NULL;
   char buf[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   char arg[MAX_INPUT_LENGTH];
@@ -3370,7 +3313,7 @@ void do_destroy( CHAR_DATA * ch, char *argument )
       break;
   if( !victim )
   {
-    DESCRIPTOR_DATA *d;
+    DESCRIPTOR_DATA *d = NULL;
 
     /* Make sure they aren't halfway logged in. */
     for( d = first_descriptor; d; d = d->next )
@@ -3416,10 +3359,8 @@ void do_destroy( CHAR_DATA * ch, char *argument )
     sprintf( buf, "%s destroying %s", ch->name, arg );
     perror( buf );
   }
-  return;
 }
 extern ROOM_INDEX_DATA *room_index_hash[MAX_KEY_HASH];	/* db.c */
-
 
 /* Super-AT command:
 
@@ -3463,7 +3404,7 @@ target in them. Private rooms are not violated.
 const char *name_expand( CHAR_DATA * ch )
 {
   int count = 1;
-  CHAR_DATA *rch;
+  CHAR_DATA *rch = NULL;
   char name[MAX_INPUT_LENGTH];	/*  HOPEFULLY no mob has a name longer than THAT */
 
   static char outbuf[MAX_INPUT_LENGTH];
@@ -3662,10 +3603,10 @@ void do_vsearch( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
   bool found = FALSE;
-  OBJ_DATA *obj;
-  OBJ_DATA *in_obj;
+  OBJ_DATA *obj = NULL;
+  OBJ_DATA *in_obj = NULL;
   int obj_counter = 1;
-  int argi;
+  int argi = 0;
 
   one_argument( argument, arg );
 
@@ -3705,8 +3646,6 @@ void do_vsearch( CHAR_DATA * ch, char *argument )
 
   if( !found )
     send_to_char( "Nothing like that in hell, earth, or heaven.\r\n", ch );
-
-  return;
 }
 
 /* 
@@ -3716,7 +3655,7 @@ void do_vsearch( CHAR_DATA * ch, char *argument )
  */
 void do_sober( CHAR_DATA * ch, char *argument )
 {
-  CHAR_DATA *victim;
+  CHAR_DATA *victim = NULL;
   char arg1[MAX_INPUT_LENGTH];
 
   smash_tilde( argument );
@@ -3740,7 +3679,6 @@ void do_sober( CHAR_DATA * ch, char *argument )
   return;
 }
 
-
 /*
  * Free a social structure					-Thoric
  */
@@ -3748,20 +3686,28 @@ void free_social( SOCIALTYPE * social )
 {
   if( social->name )
     DISPOSE( social->name );
+
   if( social->char_no_arg )
     DISPOSE( social->char_no_arg );
+
   if( social->others_no_arg )
     DISPOSE( social->others_no_arg );
+
   if( social->char_found )
     DISPOSE( social->char_found );
+
   if( social->others_found )
     DISPOSE( social->others_found );
+
   if( social->vict_found )
     DISPOSE( social->vict_found );
+
   if( social->char_auto )
     DISPOSE( social->char_auto );
+
   if( social->others_auto )
     DISPOSE( social->others_auto );
+
   DISPOSE( social );
 }
 
@@ -3770,8 +3716,8 @@ void free_social( SOCIALTYPE * social )
  */
 void unlink_social( SOCIALTYPE * social )
 {
-  SOCIALTYPE *tmp, *tmp_next;
-  int hash;
+  SOCIALTYPE *tmp = NULL, *tmp_next = NULL;
+  int hash = 0;
 
   if( !social )
   {
@@ -3806,8 +3752,8 @@ void unlink_social( SOCIALTYPE * social )
  */
 void add_social( SOCIALTYPE * social )
 {
-  int hash, x;
-  SOCIALTYPE *tmp, *prev;
+  int hash = 0, x = 0;
+  SOCIALTYPE *tmp = NULL, *prev = NULL;
 
   if( !social )
   {
@@ -3870,7 +3816,6 @@ void add_social( SOCIALTYPE * social )
   /* add to end */
   prev->next = social;
   social->next = NULL;
-  return;
 }
 
 /*
@@ -3878,7 +3823,7 @@ void add_social( SOCIALTYPE * social )
  */
 void do_sedit( CHAR_DATA * ch, char *argument )
 {
-  SOCIALTYPE *social;
+  SOCIALTYPE *social = NULL;
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
 
@@ -4089,8 +4034,8 @@ void free_command( CMDTYPE * command )
  */
 void unlink_command( CMDTYPE * command )
 {
-  CMDTYPE *tmp, *tmp_next;
-  int hash;
+  CMDTYPE *tmp = NULL, *tmp_next = NULL;
+  int hash = 0;
 
   if( !command )
   {
@@ -4121,8 +4066,8 @@ void unlink_command( CMDTYPE * command )
  */
 void add_command( CMDTYPE * command )
 {
-  int hash, x;
-  CMDTYPE *tmp, *prev;
+  int hash = 0, x = 0;
+  CMDTYPE *tmp = NULL, *prev = NULL;
 
   if( !command )
   {
@@ -4162,7 +4107,6 @@ void add_command( CMDTYPE * command )
       tmp->next = command;
       command->next = NULL;
     }
-  return;
 }
 
 /*
