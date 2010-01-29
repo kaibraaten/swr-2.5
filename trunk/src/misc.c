@@ -1786,3 +1786,225 @@ void do_search( CHAR_DATA * ch, char *argument )
   act( AT_SKILL, "$n finds $p!", ch, obj, NULL, TO_ROOM );
   return;
 }
+
+void do_shove( CHAR_DATA * ch, char *argument )
+{
+  char arg[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+  int exit_dir = DIR_SOMEWHERE;
+  EXIT_DATA *pexit = NULL;
+  CHAR_DATA *victim = NULL;
+  bool nogo = FALSE;
+  ROOM_INDEX_DATA *to_room = NULL;
+  int chance = 0;
+
+  argument = one_argument( argument, arg );
+  argument = one_argument( argument, arg2 );
+
+  if( arg[0] == '\0' )
+    {
+      send_to_char( "Shove whom?\r\n", ch );
+      return;
+    }
+
+  if( ( victim = get_char_room( ch, arg ) ) == NULL )
+    {
+      send_to_char( "They aren't here.\r\n", ch );
+      return;
+    }
+
+  if( victim == ch )
+    {
+      send_to_char( "You shove yourself around, to no avail.\r\n", ch );
+      return;
+    }
+
+  if( ( victim->position ) != POS_STANDING )
+    {
+      act( AT_PLAIN, "$N isn't standing up.", ch, NULL, victim, TO_CHAR );
+      return;
+    }
+
+  if( arg2[0] == '\0' )
+    {
+      send_to_char( "Shove them in which direction?\r\n", ch );
+      return;
+    }
+
+  exit_dir = get_dir( arg2 );
+
+  if( IS_SET( victim->in_room->room_flags, ROOM_SAFE )
+      && get_timer( victim, TIMER_SHOVEDRAG ) <= 0 )
+    {
+      send_to_char( "That character cannot be shoved right now.\r\n", ch );
+      return;
+    }
+
+  victim->position = POS_SHOVE;
+  nogo = FALSE;
+
+  if( ( pexit = get_exit( ch->in_room, exit_dir ) ) == NULL )
+    nogo = TRUE;
+  else
+    if( IS_SET( pexit->exit_info, EX_CLOSED )
+        && ( !IS_AFFECTED( victim, AFF_PASS_DOOR )
+	     || IS_SET( pexit->exit_info, EX_NOPASSDOOR ) ) )
+      nogo = TRUE;
+
+  if( nogo )
+    {
+      send_to_char( "There's no exit in that direction.\r\n", ch );
+      victim->position = POS_STANDING;
+      return;
+    }
+
+  to_room = pexit->to_room;
+
+  if( IS_NPC( victim ) )
+    {
+      send_to_char( "You can only shove player characters.\r\n", ch );
+      return;
+    }
+
+  chance = 50;
+
+  /* Add 3 points to chance for every str point above 15, subtract for
+     below 15 */
+  chance += ( ( get_curr_str( ch ) - 15 ) * 3 );
+  chance += ( ch->top_level - victim->top_level );
+
+  /* Debugging purposes - show percentage for testing */
+
+  /* sprintf(buf, "Shove percentage of %s = %d", ch->name, chance);
+     act( AT_ACTION, buf, ch, NULL, NULL, TO_ROOM );
+  */
+
+  if( chance < number_percent(  ) )
+    {
+      send_to_char( "You failed.\r\n", ch );
+      victim->position = POS_STANDING;
+      return;
+    }
+
+  act( AT_ACTION, "You shove $M.", ch, NULL, victim, TO_CHAR );
+  act( AT_ACTION, "$n shoves you.", ch, NULL, victim, TO_VICT );
+  move_char( victim, get_exit( ch->in_room, exit_dir ), 0 );
+
+  if( !char_died( victim ) )
+    victim->position = POS_STANDING;
+
+  WAIT_STATE( ch, 12 );
+
+  /* Remove protection from shove/drag if char shoves -- Blodkai */
+  if( IS_SET( ch->in_room->room_flags, ROOM_SAFE )
+      && get_timer( ch, TIMER_SHOVEDRAG ) <= 0 )
+    add_timer( ch, TIMER_SHOVEDRAG, 10, NULL, 0 );
+}
+
+void do_drag( CHAR_DATA * ch, char *argument )
+{
+  char arg[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+  int exit_dir = DIR_SOMEWHERE;
+  CHAR_DATA *victim = NULL;
+  EXIT_DATA *pexit = NULL;
+  ROOM_INDEX_DATA *to_room = NULL;
+  bool nogo = FALSE;
+  int chance = 0;
+
+  argument = one_argument( argument, arg );
+  argument = one_argument( argument, arg2 );
+
+  if( arg[0] == '\0' )
+    {
+      send_to_char( "Drag whom?\r\n", ch );
+      return;
+    }
+
+  if( ( victim = get_char_room( ch, arg ) ) == NULL )
+    {
+      send_to_char( "They aren't here.\r\n", ch );
+      return;
+    }
+
+  if( victim == ch )
+    {
+    send_to_char
+      ( "You take yourself by the scruff of your neck, but go nowhere.\r\n",
+        ch );
+    return;
+    }
+
+  if( IS_NPC( victim ) )
+    {
+      send_to_char( "You can only drag player characters.\r\n", ch );
+      return;
+    }
+
+  if( victim->fighting )
+    {
+      send_to_char( "You try, but can't get close enough.\r\n", ch );
+      return;
+    }
+
+  if( arg2[0] == '\0' )
+    {
+      send_to_char( "Drag them in which direction?\r\n", ch );
+      return;
+    }
+
+  exit_dir = get_dir( arg2 );
+
+  if( IS_SET( victim->in_room->room_flags, ROOM_SAFE )
+      && get_timer( victim, TIMER_SHOVEDRAG ) <= 0 )
+    {
+      send_to_char( "That character cannot be dragged right now.\r\n", ch );
+      return;
+    }
+
+  nogo = FALSE;
+
+  if( ( pexit = get_exit( ch->in_room, exit_dir ) ) == NULL )
+    nogo = TRUE;
+  else
+    if( IS_SET( pexit->exit_info, EX_CLOSED )
+        && ( !IS_AFFECTED( victim, AFF_PASS_DOOR )
+	     || IS_SET( pexit->exit_info, EX_NOPASSDOOR ) ) )
+      nogo = TRUE;
+  if( nogo )
+    {
+      send_to_char( "There's no exit in that direction.\r\n", ch );
+      return;
+    }
+
+  to_room = pexit->to_room;
+  chance = 50;
+
+  /*
+     sprintf(buf, "Drag percentage of %s = %d", ch->name, chance);
+     act( AT_ACTION, buf, ch, NULL, NULL, TO_ROOM );
+  */
+  if( chance < number_percent(  ) )
+    {
+      send_to_char( "You failed.\r\n", ch );
+      victim->position = POS_STANDING;
+      return;
+    }
+  if( victim->position < POS_STANDING )
+    {
+      short temp = victim->position;
+      victim->position = POS_DRAG;
+      act( AT_ACTION, "You drag $M into the next room.", ch, NULL, victim,
+	   TO_CHAR );
+      act( AT_ACTION, "$n grabs your hair and drags you.", ch, NULL, victim,
+	   TO_VICT );
+      move_char( victim, get_exit( ch->in_room, exit_dir ), 0 );
+      if( !char_died( victim ) )
+	victim->position = temp;
+      /* Move ch to the room too.. they are doing dragging - Scryn */
+      move_char( ch, get_exit( ch->in_room, exit_dir ), 0 );
+      WAIT_STATE( ch, 12 );
+      return;
+    }
+  send_to_char( "You cannot do that to someone who is standing.\r\n", ch );
+}
