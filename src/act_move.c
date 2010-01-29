@@ -988,15 +988,14 @@ void do_southwest( CHAR_DATA * ch, char *argument )
   return;
 }
 
-EXIT_DATA *find_door( CHAR_DATA * ch, char *arg, bool quiet )
+EXIT_DATA *find_door( CHAR_DATA * ch, const char *arg, bool quiet )
 {
-  EXIT_DATA *pexit;
-  int door;
+  EXIT_DATA *pexit = NULL;
+  int door = 0;
 
   if( arg == NULL || !str_cmp( arg, "" ) )
     return NULL;
 
-  pexit = NULL;
   if( !str_cmp( arg, "n" ) || !str_cmp( arg, "north" ) )
     door = 0;
   else if( !str_cmp( arg, "e" ) || !str_cmp( arg, "east" ) )

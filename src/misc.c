@@ -158,7 +158,6 @@ void do_ammo( CHAR_DATA * ch, char *argument )
   }
   else
   {
-
     if( obj && obj->item_type != ITEM_BATTERY )
     {
       send_to_char
@@ -175,20 +174,13 @@ void do_ammo( CHAR_DATA * ch, char *argument )
       separate_obj( obj );
       extract_obj( obj );
     }
-    else
-    {
-      for( obj = ch->last_carrying; obj; obj = obj->prev_content )
+    else if( ( obj = get_obj_type_char( ch, ITEM_BATTERY ) ) )
       {
-	if( obj->item_type == ITEM_BATTERY )
-	{
-	  checkammo = TRUE;
-	  charge = obj->value[0];
-	  separate_obj( obj );
-	  extract_obj( obj );
-	  break;
-	}
+	checkammo = TRUE;
+	charge = obj->value[0];
+	separate_obj( obj );
+	extract_obj( obj );
       }
-    }
 
     if( !checkammo )
     {
@@ -223,7 +215,6 @@ void do_ammo( CHAR_DATA * ch, char *argument )
   }
 
   wield->value[4] = charge;
-
 }
 
 void do_setblaster( CHAR_DATA * ch, char *argument )
@@ -1598,13 +1589,7 @@ void do_dig( CHAR_DATA * ch, char *argument )
   }
 
   /* not having a shovel makes it harder to succeed */
-  shovel = FALSE;
-  for( obj = ch->first_carrying; obj; obj = obj->next_content )
-    if( obj->item_type == ITEM_SHOVEL )
-    {
-      shovel = TRUE;
-      break;
-    }
+  shovel = get_obj_type_char( ch, ITEM_SHOVEL ) ? TRUE : FALSE;
 
   /* dig out an EX_DIG exit... */
   if( arg[0] != '\0' )
