@@ -672,17 +672,16 @@ void do_makeclan( CHAR_DATA * ch, char *argument )
 
 void do_clans( CHAR_DATA * ch, char *argument )
 {
-  CLAN_DATA *clan;
-  PLANET_DATA *planet;
+  CLAN_DATA *clan = NULL;
+  PLANET_DATA *planet = NULL;
   int count = 0;
-  int pCount, revenue;
 
   ch_printf( ch,
       "&WOrganization                                       Planets   Score\r\n" );
   for( clan = first_clan; clan; clan = clan->next )
   {
-    pCount = 0;
-    revenue = 0;
+    int pCount = 0;
+    int revenue = 0;
 
     for( planet = first_planet; planet; planet = planet->next )
       if( clan == planet->governed_by )
