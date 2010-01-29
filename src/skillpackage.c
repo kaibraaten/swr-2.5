@@ -176,7 +176,7 @@ char *generate_skillpackage_table( void )
 
   for( n = 0; n < package_table_size(); ++n )
     {
-      int pad = longest_package_name() - strlen( package_table[n].name ) + min_pad;
+      size_t pad = longest_package_name() - strlen( package_table[n].name ) + min_pad;
       size_t pad_iter = 0;
 
       strcat( buf, package_table[n].name );
