@@ -25,7 +25,7 @@ LIBNAME = libswr_support.$(LIB_EXT)
 
 all:		$(LIBNAME)
 
-$(ODIR)/%.o:	%.c $(DEPS)
+$(ODIR)/%.o:	%.c
 		$(CC) -c -o $@ $< $(CFLAGS)
 
 $(LIBNAME):	$(OBJ)
