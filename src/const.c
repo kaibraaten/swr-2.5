@@ -929,3 +929,41 @@ const char *const d_corpse_descs[] = {
   "The shattered remains %s are here.",
   "The shattered remains %s are here."
 };
+
+const char * const position_name[] = {
+  "dead",
+  "mortally wounded",
+  "incapacitated",
+  "sleeping",
+  "resting",
+  "sitting",
+  "fighting",
+  "standing",
+  "mounted",
+  "shoved",
+  "dragged"
+};
+
+size_t position_name_size( void )
+{
+  return sizeof( position_name ) / sizeof( *position_name );
+}
+
+int get_position( const char *pos )
+{
+  int x = 0;
+
+  for( x = 0; x < (int) position_name_size(); ++x )
+    if( !str_prefix( pos, position_name[x] ) )
+      return x;
+
+  return -1;
+}
+
+const char *get_position_name( int pos )
+{
+  if( pos >= (int) position_name_size() || pos < 0 )
+    return "*out of bounds*";
+
+  return position_name[pos];
+}
