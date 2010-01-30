@@ -207,7 +207,7 @@ void decorate_room( ROOM_INDEX_DATA * room )
   if( room->description )
     STRFREE( room->description );
 
-  room->name = STRALLOC( sect_names[sector][0] );
+  room->name = STRALLOC( get_sector_name( sector ) );
   buf[0] = '\0';
   nRand = number_range( 1, UMIN( 8, sent_total[sector] ) );
 

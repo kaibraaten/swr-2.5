@@ -2831,53 +2831,58 @@ void do_redit( CHAR_DATA * ch, char *argument )
 
   if( !str_cmp( arg, "sector" ) )
   {
+    int sector_type = 0;
+
     if( !argument || argument[0] == '\0' )
     {
+      size_t n = 0;
       send_to_char( "Set the sector type.\r\n", ch );
-      send_to_char( "Usage: redit sector <value>\r\n", ch );
+      send_to_char( "Usage: redit sector <value|name>\r\n", ch );
       send_to_char( "\r\nSector Values:\r\n", ch );
-      send_to_char
-	( "0:dark, 1:city, 2:field, 3:forest, 4:hills, 5:mountain, 6:water_swim\r\n",
-	  ch );
-      send_to_char
-	( "7:water_noswim, 8:underwater, 9:air, 10:desert, 11:unkown, 12:oceanfloor, 13:underground\r\n",
-	  ch );
-      send_to_char
-	( "14:scrub, 15:rocky, 16:savanna, 17:tundra, 18:glacial, 19:rainforest, 20:jungle\r\n",
-	  ch );
-      send_to_char
-	( "21:swamp, 22:wetlands, 23:brush, 24:steppe, 25:farmland, 26:volcano\r\n",
-	  ch );
+
+      for( n = 0; n < sector_names_size(); ++n )
+	{
+	  ch_printf( ch, "%2d: %s\r\n", n, get_sector_name( n ) );
+	}
 
       return;
     }
-    if( location->sector_type <= SECT_CITY && location->area
-	&& location->area->planet )
-      location->area->planet->citysize--;
-    else if( location->sector_type == SECT_FARMLAND && location->area
-	&& location->area->planet )
-      location->area->planet->farmland--;
-    else if( location->sector_type != SECT_DUNNO && location->area
-	&& location->area->planet )
-      location->area->planet->wilderness--;
 
-    location->sector_type = atoi( argument );
-    if( location->sector_type < 0 || location->sector_type >= SECT_MAX )
+    if( is_number( argument ) )
+      sector_type = atoi( argument );
+    else
+      sector_type = get_sector_type( argument );
+
+    if( sector_type < 0 || sector_type >= SECT_MAX )
     {
-      location->sector_type = 1;
-      send_to_char( "Out of range\r\n.", ch );
+      send_to_char( "Out of range.\r\n", ch );
+      return;
     }
     else
       send_to_char( "Done.\r\n", ch );
-    if( location->sector_type <= SECT_CITY && location->area
-	&& location->area->planet )
-      location->area->planet->citysize++;
-    else if( location->sector_type == SECT_FARMLAND && location->area
-	&& location->area->planet )
-      location->area->planet->farmland++;
-    else if( location->sector_type != SECT_DUNNO && location->area
-	&& location->area->planet )
-      location->area->planet->wilderness++;
+
+    if( location->area->planet )
+      {
+	if( location->sector_type <= SECT_CITY )
+	  location->area->planet->citysize--;
+	else if( location->sector_type == SECT_FARMLAND )
+	  location->area->planet->farmland--;
+	else if( location->sector_type != SECT_DUNNO )
+	  location->area->planet->wilderness--;
+      }
+
+    location->sector_type = sector_type;
+
+    if( location->area->planet )
+      {
+	if( location->sector_type <= SECT_CITY )
+	  location->area->planet->citysize++;
+	else if( location->sector_type == SECT_FARMLAND )
+	  location->area->planet->farmland++;
+	else if( location->sector_type != SECT_DUNNO )
+	  location->area->planet->wilderness++;
+      }
+
     return;
   }
 

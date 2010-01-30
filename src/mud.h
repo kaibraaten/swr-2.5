@@ -1404,13 +1404,21 @@ static const int COLONY_COST = 100000;
  */
 typedef enum
 {
-  DIR_NORTH, DIR_EAST, DIR_SOUTH, DIR_WEST, DIR_UP, DIR_DOWN,
-  DIR_NORTHEAST, DIR_NORTHWEST, DIR_SOUTHEAST, DIR_SOUTHWEST, DIR_SOMEWHERE
+  DIR_NORTH,     /*  0 */
+  DIR_EAST,      /*  1 */
+  DIR_SOUTH,     /*  2 */
+  DIR_WEST,      /*  3 */
+  DIR_UP,        /*  4 */
+  DIR_DOWN,      /*  5 */
+  DIR_NORTHEAST, /*  6 */
+  DIR_NORTHWEST, /*  7 */
+  DIR_SOUTHEAST, /*  8 */
+  DIR_SOUTHWEST, /*  9 */
+  DIR_SOMEWHERE  /* 10 */
 } dir_types;
 
 #define MAX_DIR			DIR_SOUTHWEST	/* max for normal walking */
 #define DIR_PORTAL		DIR_SOMEWHERE	/* portal direction	  */
-
 
 /*
  * Exit flags.
@@ -2493,8 +2501,8 @@ extern const char * const halucinated_object_short[];
 extern const char * const halucinated_object_long[];
 extern const char * const day_name[];
 extern const char * const month_name[];
-extern const char * const sect_names[SECT_MAX][2];
-extern const char *  const   ex_flags [];
+extern const char * const sect_names[SECT_MAX];
+extern const char * const ex_flags [];
 extern const char * const spell_flag[];
 extern const char * const spell_saves[];
 extern const char * const spell_damage[];
@@ -3234,6 +3242,9 @@ void	act		args( ( short AType, const char *format, CHAR_DATA *ch,
 void	reset_all	args( ( void ) );
 
 /* const.c */
+size_t sector_names_size( void );
+const char *get_sector_name( int sect );
+int get_sector_type( const char *sect );
 const char *get_position_name( int pos );
 int get_position( const char *pos_name );
 size_t position_name_size( void );
