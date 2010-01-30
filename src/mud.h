@@ -2325,7 +2325,7 @@ do								\
 					 (ch)->in_room->room_flags,              \
 					 ROOM_INDOORS) && !IS_SET(               \
 								  (ch)->in_room->room_flags,              \
-								  ROOM_SPACECRAFT) )
+								  ROOM_SPACECRAFT) && (ch)->in_room->sector_type != SECT_INSIDE )
 
 #define IS_DRUNK(ch, drunk)     (number_percent() < \
 				 ( (ch)->pcdata->condition[COND_DRUNK] \

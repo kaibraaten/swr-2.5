@@ -813,8 +813,8 @@ void do_look( CHAR_DATA * ch, char *argument )
 
     /* 'look' or 'look auto' */
     set_char_color( AT_RMNAME, ch );
-    send_to_char( ch->in_room->name, ch );
-    send_to_char( " ", ch );
+    ch_printf( ch, "%s (%s) ", ch->in_room->name,
+	       sect_names[ch->in_room->sector_type][0] );
 
     if( !ch->desc->original )
     {

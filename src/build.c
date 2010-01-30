@@ -267,8 +267,6 @@ void do_goto( CHAR_DATA * ch, char *argument )
       do_goto( fch, argument );
     }
   }
-
-  return;
 }
 
 void do_mset( CHAR_DATA * ch, char *argument )

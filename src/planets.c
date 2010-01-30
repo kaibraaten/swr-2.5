@@ -791,7 +791,7 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
       write_area_list(  );
       write_planet_list(  );
       sprintf( buf, "%d", top_r_vnum - 17 );
-      do_goto( ch, buf );
+      ch_printf( ch, "You may now travel to your new colony.\r\n" );
       reset_all(  );
 
       return;

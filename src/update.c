@@ -833,8 +833,6 @@ void weather_update( void )
 	act( AT_TEMP, buf, d->character, 0, 0, TO_CHAR );
     }
   }
-
-  return;
 }
 
 /*
