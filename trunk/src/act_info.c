@@ -814,7 +814,7 @@ void do_look( CHAR_DATA * ch, char *argument )
     /* 'look' or 'look auto' */
     set_char_color( AT_RMNAME, ch );
     ch_printf( ch, "%s (%s) ", ch->in_room->name,
-	       sect_names[ch->in_room->sector_type][0] );
+	       get_sector_name(ch->in_room->sector_type) );
 
     if( !ch->desc->original )
     {

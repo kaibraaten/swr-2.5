@@ -388,38 +388,64 @@ const char *const dir_name[] = {
 };
 
 const short rev_dir[] = {
-  2, 3, 0, 1, 5, 4, 9, 8, 7, 6, 10
+  DIR_SOUTH, DIR_WEST, DIR_NORTH, DIR_EAST, DIR_DOWN,
+  DIR_UP, DIR_SOUTHWEST, DIR_SOUTHEAST, DIR_NORTHWEST, DIR_NORTHEAST,
+  DIR_SOMEWHERE
 };
 
-const char *const sect_names[SECT_MAX][2] = {
-  {"Inside", "inside"},
-  {"City Street", "cities"},
-  {"Field", "fields"},
-  {"Forest", "forests"},
-  {"Hill", "hills"},
-  {"Mountain", "mountains"},
-  {"Water", "waters"},
-  {"Rough Water", "waters"},
-  {"Underwater", "underwaters"},
-  {"In the air", "air"},
-  {"Sesert", "deserts"},
-  {"Somewhere", "unknown"},
-  {"Ocean floor", "ocean floor"},
-  {"Underground", "underground"},
-  {"Scrub", "scrub"},
-  {"Rocky Terrain", "rocky"},
-  {"Savanna", "savanna"},
-  {"Tundra", "tundra"},
-  {"Glacier", "glacial"},
-  {"Rainforest", "rainforest"},
-  {"Jungle", "jungle"},
-  {"Swamp", "swamp"},
-  {"Wetlands", "wetlands"},
-  {"Brush", "brush"},
-  {"Steppe", "steppe"},
-  {"Farmland", "farmland"},
-  {"Volcano", "volcanic"}
+const char *const sect_names[SECT_MAX] = {
+  "Inside",        /* SECT_INSIDE */
+  "City Street",   /* SECT_CITY */
+  "Field",         /* SECT_FIELD */
+  "Forest",        /* SECT_FOREST */
+  "Hill",          /* SECT_HILLS */
+  "Mountain",      /* SECT_MOUNTAIN */
+  "Water",         /* SECT_WATER_SWIM */
+  "Rough Water",   /* SECT_WATER_NOSWIM */
+  "Underwater",    /* SECT_UNDERWATER */
+  "In the air",    /* SECT_AIR */
+  "Sesert",        /* SECT_DESERT */
+  "Somewhere",     /* SECT_DUNNO */
+  "Ocean floor",   /* SECT_OCEANFLOOR */
+  "Underground",   /* SECT_UNDERGROUND */
+  "Scrub",         /* SECT_SCRUB */
+  "Rocky Terrain", /* SECT_ROCKY */
+  "Savanna",       /* SECT_SAVANNA */
+  "Tundra",        /* SECT_TUNDRA */
+  "Glacier",       /* SECT_GLACIAL */
+  "Rainforest",    /* SECT_RAINFOREST */
+  "Jungle",        /* SECT_JUNGLE */
+  "Swamp",         /* SECT_SWAMP */
+  "Wetlands",      /* SECT_WETLANDS */
+  "Brush",         /* SECT_BRUSH */
+  "Steppe",        /* SECT_STEPPE */
+  "Farmland",      /* SECT_FARMLAND */
+  "Volcano"        /* SECT_VOLCANIC */
 };
+
+size_t sector_names_size( void )
+{
+  return sizeof( sect_names ) / sizeof( *sect_names );
+}
+
+const char *get_sector_name( int sect )
+{
+  if( sect >= (int) sector_names_size() || sect < 0 )
+    return "*out of bounds*";
+
+  return sect_names[sect];
+}
+
+int get_sector_type( const char *sect )
+{
+  int x = 0;
+
+  for( x = 0; x < (int) sector_names_size(); ++x )
+    if( !str_prefix( sect, sect_names[x] ) )
+      return x;
+
+  return -1;
+}
 
 const char *const save_flag[] = {
   "death", "kill", "passwd", "drop", "put", "give", "auto", "zap",
