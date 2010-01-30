@@ -2666,9 +2666,9 @@ void clear_roomtype( ROOM_INDEX_DATA * location )
 
 void do_landscape( CHAR_DATA * ch, char *argument )
 {
-  CLAN_DATA *clan;
-  ROOM_INDEX_DATA *location;
-  int chance;
+  CLAN_DATA *clan = NULL;
+  ROOM_INDEX_DATA *location = NULL;
+  int chance = 0;
   char arg[MAX_INPUT_LENGTH];
   char filename[256];
 
@@ -2701,9 +2701,9 @@ void do_landscape( CHAR_DATA * ch, char *argument )
 	learn_from_success( ch, gsn_landscape );
       else
       {
-	send_to_char( "That rooms description is too short.\r\n", ch );
-	send_to_char( "You skill level deminishes with your lazyness.\r\n",
-	    ch );
+	ch_printf( ch, "That room's description is too short.\r\n" );
+	ch_printf( ch, "You skill level diminishes with your lazyness.\r\n" );
+
 	if( character_skill_level( ch, gsn_landscape ) > 50 )
 	  modify_skill_level( ch, gsn_landscape, -5 );
       }
@@ -2953,8 +2953,9 @@ void do_landscape( CHAR_DATA * ch, char *argument )
 
   ch->substate = SUB_ROOM_DESC;
   ch->dest_buf = location;
+  STRFREE( location->description );
+  location->description = STRALLOC( "" );
   start_editing( ch, location->description );
-  return;
 }
 
 void do_construction( CHAR_DATA * ch, char *argument )
