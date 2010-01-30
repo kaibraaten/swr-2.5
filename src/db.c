@@ -2305,16 +2305,18 @@ void do_dmesg( CHAR_DATA * ch, char *argument )
  */
 void log_string_plus( const char *str, short log_type )
 {
-  char *strtime;
-  int offset;
+  int offset = 0;
+  char *strtime = ctime( &current_time );
 
-  strtime = ctime( &current_time );
   strtime[strlen( strtime ) - 1] = '\0';
+
   fprintf( out_stream, "%s :: %s\n", strtime, str );
+
   if( strncmp( str, "Log ", 4 ) == 0 )
     offset = 4;
   else
     offset = 0;
+
   switch ( log_type )
   {
     default:

@@ -594,6 +594,7 @@ void to_channel( const char *argument, int channel,
     {
       set_char_color( AT_LOG, vch );
       send_to_char( buf, vch );
+      set_char_color( AT_PLAIN, vch );
     }
   }
 }

@@ -33,6 +33,7 @@ static void echo_to_room_dnr( int ecolor, ROOM_INDEX_DATA * room,
 static ch_ret drive_ship( CHAR_DATA * ch, SHIP_DATA * ship,
     EXIT_DATA * xit, int fall );
 static bool autofly( SHIP_DATA * ship );
+static void ship_untarget_all( SHIP_DATA *ship );
 
 /* from act_info.c */
 bool is_online( const char *argument );
@@ -6105,4 +6106,62 @@ SHIP_DATA *ship_create( void )
     s->description[n] = NULL;
 
   return s;
+}
+
+void ship_untarget_all( SHIP_DATA *ship )
+{
+  TURRET_DATA *turret = NULL;
+
+  ship->target = NULL;
+
+  for( turret = ship->first_turret; turret; turret = turret->next )
+    {
+      turret->target = NULL;
+    }
+}
+
+void do_transship( CHAR_DATA *ch, char *argument )
+{
+  char shipname[MAX_INPUT_LENGTH];
+  SHIP_DATA *ship = NULL;
+  ROOM_INDEX_DATA *destination = NULL;
+  int vnum = 0;
+
+  argument = one_argument( argument, shipname );
+
+  if( *argument == '\0' || *shipname == '\0' )
+    {
+      ch_printf( ch, "Usage: transship <ship> <destination vnum>\r\n" );
+      return;
+    }
+
+  if( !( ship = get_ship( shipname ) ) )
+    {
+      ch_printf( ch, "Can't find a ship with that name.\r\n" );
+      return;
+    }
+
+  vnum = strtol( argument, 0, 10 );
+
+  if( !( destination = get_room_index( vnum ) ) )
+    {
+      ch_printf( ch, "No room with that vnum.\r\n" );
+      return;
+    }
+
+  ship_untarget_by_attackers( ship );
+  ship_untarget_by_missiles( ship );
+
+  if( ship->starsystem )
+    ship_from_starsystem( ship, ship->starsystem );
+
+  extract_ship( ship );
+  ship_to_room( ship, vnum );
+  ship->shipstate = SHIP_DOCKED;
+  ship->location = vnum;
+  ship->lastdoc = vnum;
+  ship_untarget_all( ship );
+  save_ship( ship );
+
+  ch_printf( ch, "Ship successfully transferred to new location.\r\n" );
 }

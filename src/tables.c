@@ -455,6 +455,7 @@ static const struct do_fun_entry command_fun_map[] = {
   { "do_tractorbeam", do_tractorbeam },
   { "do_trajectory", do_trajectory },
   { "do_transfer", do_transfer },
+  { "do_transship", do_transship },
   { "do_trust", do_trust },
   { "do_typo", do_typo },
   { "do_unfoldarea", do_unfoldarea },
