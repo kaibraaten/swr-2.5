@@ -3,6 +3,18 @@
 
 extern int top_r_vnum;
 
+typedef struct room_type_data ROOM_TYPE_DATA;
+typedef void ROOM_TYPE_BUILDER( ROOM_INDEX_DATA* );
+
+ROOM_TYPE_BUILDER *get_room_type_builder( int room_type );
+
+struct room_type_data
+{
+  const char *name;
+  const char *description;
+  ROOM_TYPE_BUILDER *build_room;
+};
+
 void room_set_sector( ROOM_INDEX_DATA *room, int sector_type )
 {
   room->sector_type = sector_type;
@@ -33,7 +45,147 @@ void room_set_sector( ROOM_INDEX_DATA *room, int sector_type )
     }
 }
 
-void make_colony_supply_shop( PLANET_DATA *planet, ROOM_INDEX_DATA *location )
+static void build_room_type_dummy( ROOM_INDEX_DATA *foo )
+{
+
+}
+
+static void build_room_type_city( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_CITY );
+}
+
+static void build_room_type_wilderness( ROOM_INDEX_DATA *location )
+{
+  location->area->planet->wilderness++;
+  location->sector_type = location->area->planet->sector;
+}
+
+static void build_room_type_inside( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_INDOORS );
+}
+
+static void build_room_type_farmland( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_FARMLAND );
+}
+
+static void build_room_type_platform( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_CITY );
+  SET_BIT( location->room_flags, ROOM_CAN_LAND );
+}
+
+static void build_room_type_shipyard( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_CITY );
+  SET_BIT( location->room_flags, ROOM_SHIPYARD );
+}
+
+static void build_room_type_house( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_EMPTY_HOME );
+  SET_BIT( location->room_flags, ROOM_NO_MOB );
+}
+
+static void build_room_type_cave( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_UNDERGROUND );
+  SET_BIT( location->room_flags, ROOM_DARK );
+}
+
+static void build_room_type_info( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_INFO );
+  SET_BIT( location->room_flags, ROOM_NO_MOB );
+}
+
+static void build_room_type_mail( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_MAIL );
+  SET_BIT( location->room_flags, ROOM_NO_MOB );
+}
+
+static void build_room_type_bank( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_BANK );
+}
+
+static void build_room_type_hotel( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_HOTEL );
+  SET_BIT( location->room_flags, ROOM_SAFE );
+  SET_BIT( location->room_flags, ROOM_NO_MOB );
+}
+
+static void build_room_type_trade( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_SAFE );
+  SET_BIT( location->room_flags, ROOM_TRADE );
+}
+
+static void build_room_type_supply( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_SAFE );
+  SET_BIT( location->room_flags, ROOM_SUPPLY );
+}
+
+static void build_room_type_pawn( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_SAFE );
+  SET_BIT( location->room_flags, ROOM_PAWN );
+}
+
+static void build_room_type_restaurant( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_RESTAURANT );
+}
+
+static void build_room_type_bar( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_BAR );
+}
+
+static void build_room_type_control( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  location->area->planet->controls++;
+  SET_BIT( location->room_flags, ROOM_CONTROL );
+}
+
+static void build_room_type_barracks( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  location->area->planet->barracks++;
+  SET_BIT( location->room_flags, ROOM_BARRACKS );
+}
+
+static void build_room_type_garage( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_GARAGE );
+}
+
+static void build_room_type_employment( ROOM_INDEX_DATA *location )
+{
+  room_set_sector( location, SECT_INSIDE );
+  SET_BIT( location->room_flags, ROOM_EMPLOYMENT );
+}
+
+void make_default_colony_supply_shop( PLANET_DATA *planet,
+				      ROOM_INDEX_DATA *location )
 {
   static const char *room_descr =
     "This visible part of this shop consists of a long desk with a couple\r\n"
@@ -57,7 +209,8 @@ void make_colony_supply_shop( PLANET_DATA *planet, ROOM_INDEX_DATA *location )
   SET_BIT( location->room_flags, ROOM_BANK );
 }
 
-void make_colony_center( PLANET_DATA *planet, ROOM_INDEX_DATA *location )
+void make_default_colony_center( PLANET_DATA *planet,
+				 ROOM_INDEX_DATA *location )
 {
   char buf[MAX_STRING_LENGTH];
   static const char *room_descr = 
@@ -84,8 +237,8 @@ void make_colony_center( PLANET_DATA *planet, ROOM_INDEX_DATA *location )
   SET_BIT( location->room_flags, ROOM_INFO );
 }
 
-void make_colony_shuttle_platform( PLANET_DATA *planet,
-				   ROOM_INDEX_DATA *location )
+void make_default_colony_shuttle_platform( PLANET_DATA *planet,
+					   ROOM_INDEX_DATA *location )
 {
   static const char *room_descr =
     "This platform is large enough for several spacecraft to land and take off\r\n"
@@ -105,7 +258,8 @@ void make_colony_shuttle_platform( PLANET_DATA *planet,
   SET_BIT( location->room_flags, ROOM_NOPEDIT );
 }
 
-void make_colony_hotel( PLANET_DATA *planet, ROOM_INDEX_DATA *location )
+void make_default_colony_hotel( PLANET_DATA *planet,
+				ROOM_INDEX_DATA *location )
 {
   char buf[MAX_STRING_LENGTH];
   static const char *room_descr =
@@ -127,9 +281,9 @@ void make_colony_hotel( PLANET_DATA *planet, ROOM_INDEX_DATA *location )
   SET_BIT( location->room_flags, ROOM_NOPEDIT );
 }
 
-void make_colony_wilderness( PLANET_DATA *planet,
-			     ROOM_INDEX_DATA *location,
-			     const char *description )
+void make_default_colony_wilderness( PLANET_DATA *planet,
+				     ROOM_INDEX_DATA *location,
+				     const char *description )
 {
   location->description = STRALLOC( description );
   location->name = STRALLOC( planet->name );
@@ -146,17 +300,7 @@ void make_colony_room_exits( ROOM_INDEX_DATA *location, int room_type )
       && room_type != 23 )
     {
       ROOM_INDEX_DATA *troom = get_room_index( top_r_vnum - 5 );
-      EXIT_DATA *xit = make_exit( location, troom, DIR_NORTH );
-      xit->keyword = STRALLOC( "" );
-      xit->description = STRALLOC( "" );
-      xit->key = -1;
-      xit->exit_info = 0;
-
-      xit = make_exit( troom, location, DIR_SOUTH );
-      xit->keyword = STRALLOC( "" );
-      xit->description = STRALLOC( "" );
-      xit->key = -1;
-      xit->exit_info = 0;
+      make_bexit( location, troom, DIR_NORTH );
     }
 
   if( room_type != COLONY_ROOM_FIRST
@@ -170,113 +314,112 @@ void make_colony_room_exits( ROOM_INDEX_DATA *location, int room_type )
       && room_type != 21 )
     {
       ROOM_INDEX_DATA *troom = get_room_index( top_r_vnum - 1 );
-      EXIT_DATA *xit = make_exit( location, troom, DIR_WEST );
-      xit->keyword = STRALLOC( "" );
-      xit->description = STRALLOC( "" );
-      xit->key = -1;
-      xit->exit_info = 0;
-      xit = make_exit( troom, location, DIR_EAST );
-      xit->keyword = STRALLOC( "" );
-      xit->description = STRALLOC( "" );
-      xit->key = -1;
-      xit->exit_info = 0;
+      make_bexit( location, troom, DIR_WEST );
     }
 }
 
-const char * const room_type_name[][2] = {
+static const ROOM_TYPE_DATA room_type_table[] = {
   /*  0: doesn't exist */
-  { "zero", "zero" },
+  { "_zero", "zero", build_room_type_dummy },
 
   /*  1: COLONY_ROOM_WILDERNESS */
-  { "wilderness", "the planet's default terrain" },
+  { "wilderness", "the planet's default terrain", build_room_type_wilderness },
 
   /*  2: COLONY_ROOM_FARMLAND */
-  { "farmland", "cleared farmland" },
+  { "farmland", "cleared farmland", build_room_type_farmland },
 
   /*  3: COLONY_ROOM_CITY_STREET */
-  { "city", "a city street" },
+  { "city", "a city street", build_room_type_city },
 
   /*  4: COLONY_ROOM_SHIPYARD */
-  { "shipyard", "ships are built here" },
+  { "shipyard", "ships are built here", build_room_type_shipyard },
 
   /*  5: COLONY_ROOM_INSIDE */
-  { "inside", "inside a building" },
+  { "inside", "inside a building", build_room_type_inside },
 
   /*  6: COLONY_ROOM_HOUSE */
-  { "house", "may be used as a player's home" },
+  { "house", "may be used as a player's home", build_room_type_house },
 
   /*  7: COLONY_ROOM_CAVE */
-  { "cave", "a mine or dug out tunnel" },
+  { "cave", "a mine or dug out tunnel", build_room_type_cave },
 
   /*  8: COLONY_ROOM_INFO */
-  { "info", "message and information room" },
+  { "info", "message and information room", build_room_type_info },
 
   /*  9: COLONY_ROOM_MAIL */
-  { "mail", "post office" },
+  { "mail", "post office", build_room_type_mail },
 
   /* 10: COLONY_ROOM_TRADE */
-  { "trade", "players can sell resources here" },
+  { "trade", "players can sell resources here", build_room_type_trade },
 
   /* 11: COLONY_ROOM_PAWN */
-  { "pawn", "will trade useful items" },
+  { "pawn", "will trade useful items", build_room_type_pawn },
 
   /* 12: COLONY_ROOM_SUPPLY_SHOP */
-  { "supply", "a supply store" },
+  { "supply", "a supply store", build_room_type_supply },
 
   /* 13: COLONY_ROOM_COLONIZATION_CENTER */
-  { "center", "the colonization center" },
+  { "center", "the colonization center", build_room_type_dummy },
 
   /* 14: COLONY_ROOM_SHUTTLE_PLATFORM */
-  { "platform", "ships land here" },
+  { "platform", "ships land here", build_room_type_platform },
 
   /* 15: COLONY_ROOM_RESTAURANT */
-  { "restaurant", "food is bought here" },
+  { "restaurant", "food is bought here", build_room_type_restaurant },
 
   /* 16: COLONY_ROOM_BAR */
-  { "bar", "liquor is sold here" },
+  { "bar", "liquor is sold here", build_room_type_bar },
 
   /* 17: COLONY_ROOM_CONTROL */
-  { "control", "control tower for patrol ships" },
+  { "control", "control tower for patrol ships", build_room_type_control },
 
   /* 18: COLONY_ROOM_HOTEL */
-  { "hotel", "players can enter/leave game here" },
+  { "hotel", "players can enter/leave game here", build_room_type_hotel },
 
   /* 19: COLONY_ROOM_BARRACKS */
-  { "barracks", "houses military patrols" },
+  { "barracks", "houses military patrols", build_room_type_barracks },
 
   /* 20: COLONY_ROOM_GARAGE */
-  { "garage", "vehicles are built here" },
+  { "garage", "vehicles are built here", build_room_type_garage },
 
   /* 21: COLONY_ROOM_BANK */
-  { "bank", "room is a bank" },
+  { "bank", "room is a bank", build_room_type_bank },
 
   /* 22: COLONY_ROOM_EMPLOYMENT */
-  { "employment", "room is an employment office" },
+  { "employment", "room is an employment office", build_room_type_employment },
 
   /* 23: COLONY_ROOM_UNUSED23*/
-  { "_unused23", "_unused23" },
+  { "_unused23", "_unused23", build_room_type_dummy },
 
   /* 24: COLONY_ROOM_UNUSED24 */
-  { "_unused24", "_unused24" },
+  { "_unused24", "_unused24", build_room_type_dummy },
 
   /* 25: COLONY_ROOM_LAST */
-  { "last", "last" }
+  { "_last", "last", build_room_type_dummy }
 };
 
-size_t room_type_name_size( void )
+size_t room_type_table_size( void )
 {
-  return sizeof( room_type_name ) / sizeof( *room_type_name );
+  return sizeof( room_type_table ) / sizeof( *room_type_table );
 }
 
-int get_room_type( const char *name )
+int get_room_type_id( const char *name )
 {
   int x = 0;
 
-  for( x = 0; x < room_type_name_size(); ++x )
-    if( !str_cmp( name, room_type_name[x][0] ) )
+  for( x = 0; x < room_type_table_size(); ++x )
+    if( !str_cmp( name, room_type_table[x].name ) )
       return x;
 
   return -1;
+}
+
+const ROOM_TYPE_DATA *get_room_type( int n )
+{
+  if( n < COLONY_ROOM_FIRST || n > COLONY_ROOM_LAST )
+    return NULL;
+
+  return &room_type_table[n];
 }
 
 const char *get_room_type_name( int room_type )
@@ -284,7 +427,7 @@ const char *get_room_type_name( int room_type )
   if( room_type < COLONY_ROOM_FIRST || room_type > COLONY_ROOM_LAST )
     return "*out of bounds*";
 
-  return room_type_name[room_type][0];
+  return room_type_table[room_type].name;
 }
 
 const char *get_room_type_description( int room_type )
@@ -292,5 +435,215 @@ const char *get_room_type_description( int room_type )
   if( room_type < COLONY_ROOM_FIRST || room_type > COLONY_ROOM_LAST )
     return "*out of bounds*";
 
-  return room_type_name[room_type][1];
+  return room_type_table[room_type].description;
+}
+
+ROOM_TYPE_BUILDER *get_room_type_builder( int room_type )
+{
+  if( room_type < COLONY_ROOM_FIRST || room_type > COLONY_ROOM_LAST )
+    return build_room_type_dummy;
+
+  return room_type_table[room_type].build_room;
+}
+
+bool room_type_in_use( size_t n )
+{
+  const char *name = get_room_type_name( n );
+  return name[0] != '_' && n > 0 && n != COLONY_ROOM_COLONIZATION_CENTER;
+}
+
+void clear_roomtype( ROOM_INDEX_DATA * location )
+{
+  if( location->area->planet )
+    {
+      if( location->sector_type <= SECT_CITY )
+	location->area->planet->citysize--;
+      else if( location->sector_type == SECT_FARMLAND )
+	location->area->planet->farmland--;
+      else if( location->sector_type != SECT_DUNNO )
+	location->area->planet->wilderness--;
+
+      if( IS_SET( location->room_flags, ROOM_BARRACKS ) )
+	location->area->planet->barracks--;
+      if( IS_SET( location->room_flags, ROOM_CONTROL ) )
+	location->area->planet->controls--;
+
+    }
+
+  REMOVE_BIT( location->room_flags, ROOM_NO_MOB );
+  REMOVE_BIT( location->room_flags, ROOM_HOTEL );
+  REMOVE_BIT( location->room_flags, ROOM_SAFE );
+  REMOVE_BIT( location->room_flags, ROOM_CAN_LAND );
+  REMOVE_BIT( location->room_flags, ROOM_SHIPYARD );
+  REMOVE_BIT( location->room_flags, ROOM_EMPTY_HOME );
+  REMOVE_BIT( location->room_flags, ROOM_DARK );
+  REMOVE_BIT( location->room_flags, ROOM_INFO );
+  REMOVE_BIT( location->room_flags, ROOM_MAIL );
+  REMOVE_BIT( location->room_flags, ROOM_TRADE );
+  REMOVE_BIT( location->room_flags, ROOM_SUPPLY );
+  REMOVE_BIT( location->room_flags, ROOM_PAWN );
+  REMOVE_BIT( location->room_flags, ROOM_RESTAURANT );
+  REMOVE_BIT( location->room_flags, ROOM_BAR );
+  REMOVE_BIT( location->room_flags, ROOM_CONTROL );
+  REMOVE_BIT( location->room_flags, ROOM_BARRACKS );
+  REMOVE_BIT( location->room_flags, ROOM_GARAGE );
+  REMOVE_BIT( location->room_flags, ROOM_BANK );
+  REMOVE_BIT( location->room_flags, ROOM_EMPLOYMENT );
+}
+
+/*
+ * In game commands
+ */
+void do_landscape( CHAR_DATA * ch, char *argument )
+{
+  CLAN_DATA *clan = NULL;
+  ROOM_INDEX_DATA *location = NULL;
+  int chance = 0;
+  char arg[MAX_INPUT_LENGTH];
+  char filename[256];
+  int room_type_id = 0;
+
+  if( IS_NPC( ch ) || !ch->pcdata )
+    return;
+
+  if( !ch->desc )
+    return;
+
+  switch ( ch->substate )
+    {
+    default:
+      break;
+
+    case SUB_ROOM_DESC:
+      location = ( ROOM_INDEX_DATA * ) ch->dest_buf;
+
+      if( !location )
+	{
+	  bug( "landscape: sub_room_desc: NULL ch->dest_buf", 0 );
+	  location = ch->in_room;
+	}
+
+      STRFREE( location->description );
+      location->description = copy_buffer( ch );
+      stop_editing( ch );
+      ch->substate = ch->tempnum;
+
+      if( strlen( location->description ) > 150 )
+        learn_from_success( ch, gsn_landscape );
+      else
+	{
+	  ch_printf( ch, "That room's description is too short.\r\n" );
+	  ch_printf( ch, "You skill level diminishes with your lazyness.\r\n" );
+
+	  if( character_skill_level( ch, gsn_landscape ) > 50 )
+	    modify_skill_level( ch, gsn_landscape, -5 );
+	}
+
+      SET_BIT( location->area->flags, AFLAG_MODIFIED );
+      room_extract_contents( ch->in_room );
+      echo_to_room( AT_WHITE, location,
+		    "The construction crew finishes its work." );
+      sprintf( filename, "%s%s", AREA_DIR, location->area->filename );
+      fold_area( location->area, filename, TRUE );
+      return;
+    }
+
+  location = ch->in_room;
+  clan = ch->pcdata->clan;
+
+  if( !clan )
+    {
+    send_to_char
+      ( "You need to be part of an organization before you can do that!\r\n",
+        ch );
+    return;
+    }
+
+  if( ( ch->pcdata && ch->pcdata->bestowments
+        && is_name( "build", ch->pcdata->bestowments ) )
+      || clan_char_is_leader( clan, ch ) )
+    ;
+  else
+    {
+      send_to_char( "Your organization hasn't given you permission to edit their lands!\r\n", ch );
+      return;
+    }
+
+  if( !location->area->planet ||
+      clan != location->area->planet->governed_by )
+    {
+      send_to_char( "You may only landscape areas on planets that your organization controls!\r\n", ch );
+      return;
+    }
+
+  if( IS_SET( location->room_flags, ROOM_NOPEDIT ) )
+    {
+      send_to_char( "Sorry, But you may not edit this room.\r\n", ch );
+      return;
+    }
+
+  argument = one_argument( argument, arg );
+
+  if( argument[0] == '\0' )
+    {
+      size_t n = 0;
+      send_to_char( "Usage: LANDSCAPE  <Room Type>  <New Room Name>\r\n",
+		    ch );
+      send_to_char( "<Room Type> may be one of the following:\r\n\r\n", ch );
+
+      for( n = 0; n < room_type_table_size(); ++n )
+	{
+	  if( room_type_in_use( n ) )
+	    {
+	      ch_printf( ch, "%-12s - %s\r\n",
+			 get_room_type_name( n ),
+			 get_room_type_description( n ) );
+	    }
+	}
+
+      return;
+    }
+
+  chance = character_skill_level( ch, gsn_landscape );
+
+  if( number_percent(  ) > chance )
+    {
+      send_to_char( "You can't quite get the desired affect.\r\n", ch );
+      return;
+    }
+
+  room_type_id = get_room_type_id( arg );
+
+  if( !room_type_in_use( room_type_id ) )
+    {
+      ch_printf( ch, "That's not a valid room type.\r\n" );
+      return;
+    }
+
+  clear_roomtype( location );
+
+  if( IS_SET( location->room_flags, ROOM_PLR_HOME ) )
+    {
+      location->area->planet->citysize++;
+      SET_BIT( location->room_flags, ROOM_NO_MOB );
+      SET_BIT( location->room_flags, ROOM_HOTEL );
+      SET_BIT( location->room_flags, ROOM_SAFE );
+    }
+  else
+    {
+      ROOM_TYPE_BUILDER *build_room = get_room_type_builder( room_type_id );
+      build_room( location );
+    }
+
+  echo_to_room( AT_WHITE, location,
+		"A construction crew enters the room and begins to work." );
+
+  STRFREE( location->name );
+  location->name = STRALLOC( argument );
+
+  ch->substate = SUB_ROOM_DESC;
+  ch->dest_buf = location;
+  STRFREE( location->description );
+  location->description = STRALLOC( "" );
+  start_editing( ch, location->description );
 }
