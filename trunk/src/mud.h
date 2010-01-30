@@ -3198,20 +3198,19 @@ void load_polls( void );
 void save_poll( const VOTE_DATA *poll );
 
 /* colony.c */
-size_t room_type_name_size( void );
-int get_room_type( const char *name );
-const char *get_room_type_name( int room_type );
-const char *get_room_type_description( int room_type );
 void room_set_sector( ROOM_INDEX_DATA *room, int sector_type );
 void make_colony_room_exits( ROOM_INDEX_DATA *location, int room_type );
-void make_colony_supply_shop( PLANET_DATA *planet, ROOM_INDEX_DATA *location );
-void make_colony_center( PLANET_DATA *planet, ROOM_INDEX_DATA *location );
-void make_colony_shuttle_platform( PLANET_DATA *planet,
-				   ROOM_INDEX_DATA *location );
-void make_colony_hotel( PLANET_DATA *planet, ROOM_INDEX_DATA *location );
-void make_colony_wilderness( PLANET_DATA *planet,
-			     ROOM_INDEX_DATA *location,
-			     const char *description );
+void make_default_colony_supply_shop( PLANET_DATA *planet,
+				      ROOM_INDEX_DATA *location );
+void make_default_colony_center( PLANET_DATA *planet,
+				 ROOM_INDEX_DATA *location );
+void make_default_colony_shuttle_platform( PLANET_DATA *planet,
+					   ROOM_INDEX_DATA *location );
+void make_default_colony_hotel( PLANET_DATA *planet,
+				ROOM_INDEX_DATA *location );
+void make_default_colony_wilderness( PLANET_DATA *planet,
+				     ROOM_INDEX_DATA *location,
+				     const char *description );
 
 /* planets.c */
 PLANET_DATA *get_planet( const char *name );
@@ -3331,36 +3330,39 @@ void free_ban( BAN_DATA* );
 void save_sysdata( void );
 bool is_valid_filename( const CHAR_DATA *ch, const char *direct,
 			const char *filename );
-void	show_file	args( ( const CHAR_DATA *ch, const char *filename ) );
-void	boot_db		args( ( bool fCopyOver ) );
-void	area_update	args( ( void ) );
-void	add_char	args( ( CHAR_DATA *ch ) );
-CD *	create_mobile	args( ( MOB_INDEX_DATA *pMobIndex ) );
-OD *	create_object	args( ( OBJ_INDEX_DATA *pObjIndex ) );
-void	clear_char	args( ( CHAR_DATA *ch ) );
-void	free_char	args( ( CHAR_DATA *ch ) );
-char *	get_extra_descr	args( ( const char *name, EXTRA_DESCR_DATA *ed ) );
-MID *	get_mob_index	args( ( long vnum ) );
-OID *	get_obj_index	args( ( long vnum ) );
-RID *	get_room_index	args( ( long vnum ) );
-void	append_file	args( ( CHAR_DATA *ch, const char *file, const char *str ) );
-void	bug		args( ( const char *str, ... ) );
-void	log_string_plus	args( ( const char *str, short log_type ) );
-RID *	make_room	args( ( long vnum ) );
-RID *	make_ship_room	args( ( SHIP_DATA * ship ) );
-OID *	make_object	args( ( long vnum, long cvnum, char *name ) );
-MID *	make_mobile	args( ( long vnum, long cvnum, char *name ) );
-ED  *	make_exit	args( ( ROOM_INDEX_DATA *pRoomIndex, ROOM_INDEX_DATA *to_room, short door ) );
-void	add_help	args( ( HELP_DATA *pHelp ) );
-void	fix_area_exits	args( ( AREA_DATA *tarea ) );
-void	load_area_file	args( ( AREA_DATA *tarea, const char *filename ) );
-void	randomize_exits	args( ( ROOM_INDEX_DATA *room, short maxdir ) );
-void	make_wizlist	args( ( void ) );
-bool    delete_room     args( ( ROOM_INDEX_DATA *room ) );
-bool    delete_obj      args( ( OBJ_INDEX_DATA *obj ) );
-bool    delete_mob      args( ( MOB_INDEX_DATA *mob ) );
-void   load_votes   	args( ( void ) );
-void   save_votes   	args( ( void ) );
+void show_file( const CHAR_DATA *ch, const char *filename );
+void boot_db( bool fCopyOver );
+void area_update( void );
+void add_char( CHAR_DATA *ch );
+CD *create_mobile( MOB_INDEX_DATA *pMobIndex );
+OD *create_object( OBJ_INDEX_DATA *pObjIndex );
+void clear_char( CHAR_DATA *ch );
+void free_char( CHAR_DATA *ch );
+char *get_extra_descr( const char *name, EXTRA_DESCR_DATA *ed );
+MID *get_mob_index( long vnum );
+OID *get_obj_index( long vnum );
+RID *get_room_index( long vnum );
+void append_file( CHAR_DATA *ch, const char *file, const char *str );
+void bug( const char *str, ... );
+void log_string_plus( const char *str, short log_type );
+RID *make_room( long vnum );
+RID *make_ship_room( SHIP_DATA * ship );
+OID *make_object( long vnum, long cvnum, char *name );
+MID *make_mobile( long vnum, long cvnum, char *name );
+void make_bexit( ROOM_INDEX_DATA *location, ROOM_INDEX_DATA *troom,
+		 int direction );
+ED *make_exit( ROOM_INDEX_DATA *pRoomIndex, ROOM_INDEX_DATA *to_room,
+	       short door );
+void add_help( HELP_DATA *pHelp );
+void fix_area_exits( AREA_DATA *tarea );
+void load_area_file( AREA_DATA *tarea, const char *filename );
+void randomize_exits( ROOM_INDEX_DATA *room, short maxdir );
+void make_wizlist( void );
+bool delete_room( ROOM_INDEX_DATA *room );
+bool delete_obj( OBJ_INDEX_DATA *obj );
+bool delete_mob( MOB_INDEX_DATA *mob );
+void load_votes( void );
+void save_votes( void );
 
 /* build.c */
 void start_editing( CHAR_DATA *ch, char *data );

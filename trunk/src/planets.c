@@ -576,23 +576,23 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
 
 	if( rnum == COLONY_ROOM_SUPPLY_SHOP )
 	{
-	  make_colony_supply_shop( planet, location );
+	  make_default_colony_supply_shop( planet, location );
 	}
 	else if( rnum == COLONY_ROOM_COLONIZATION_CENTER )
 	{
-	  make_colony_center( planet, location );
+	  make_default_colony_center( planet, location );
 	}
 	else if( rnum == COLONY_ROOM_SHUTTLE_PLATFORM )
 	{
-	  make_colony_shuttle_platform( planet, location );
+	  make_default_colony_shuttle_platform( planet, location );
 	}
 	else if( rnum == COLONY_ROOM_HOTEL )
 	{
-	  make_colony_hotel( planet, location );
+	  make_default_colony_hotel( planet, location );
 	}
 	else
 	{
-	  make_colony_wilderness( planet, location, description );
+	  make_default_colony_wilderness( planet, location, description );
 	}
 
 	LINK( location, pArea->first_room, pArea->last_room, next_in_area,

@@ -3118,55 +3118,81 @@ MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
 EXIT_DATA *make_exit( ROOM_INDEX_DATA * pRoomIndex, ROOM_INDEX_DATA * to_room,
     short door )
 {
-  EXIT_DATA *pexit, *texit;
-  bool broke;
+  EXIT_DATA *pexit = NULL, *texit = NULL;
+  bool broke = FALSE;
 
   CREATE( pexit, EXIT_DATA, 1 );
   pexit->vdir = door;
   pexit->rvnum = pRoomIndex->vnum;
   pexit->to_room = to_room;
   pexit->distance = 1;
+
   if( to_room )
-  {
-    pexit->vnum = to_room->vnum;
-    texit = get_exit_to( to_room, rev_dir[door], pRoomIndex->vnum );
-    if( texit )		/* assign reverse exit pointers */
     {
-      texit->rexit = pexit;
-      pexit->rexit = texit;
+      pexit->vnum = to_room->vnum;
+      texit = get_exit_to( to_room, rev_dir[door], pRoomIndex->vnum );
+
+      if( texit )		/* assign reverse exit pointers */
+	{
+	  texit->rexit = pexit;
+	  pexit->rexit = texit;
+	}
     }
-  }
-  broke = FALSE;
+
   for( texit = pRoomIndex->first_exit; texit; texit = texit->next )
-    if( door < texit->vdir )
     {
-      broke = TRUE;
-      break;
+      if( door < texit->vdir )
+	{
+	  broke = TRUE;
+	  break;
+	}
     }
+
   if( !pRoomIndex->first_exit )
-    pRoomIndex->first_exit = pexit;
-  else
-  {
-    /* keep exits in incremental order - insert exit into list */
-    if( broke && texit )
     {
-      if( !texit->prev )
-	pRoomIndex->first_exit = pexit;
-      else
-	texit->prev->next = pexit;
-      pexit->prev = texit->prev;
-      pexit->next = texit;
-      texit->prev = pexit;
-      top_exit++;
-      return pexit;
+      pRoomIndex->first_exit = pexit;
     }
-    pRoomIndex->last_exit->next = pexit;
-  }
+  else
+    {
+      /* keep exits in incremental order - insert exit into list */
+      if( broke && texit )
+	{
+	  if( !texit->prev )
+	    pRoomIndex->first_exit = pexit;
+	  else
+	    texit->prev->next = pexit;
+
+	  pexit->prev = texit->prev;
+	  pexit->next = texit;
+	  texit->prev = pexit;
+	  top_exit++;
+	  return pexit;
+	}
+
+      pRoomIndex->last_exit->next = pexit;
+    }
+
   pexit->next = NULL;
   pexit->prev = pRoomIndex->last_exit;
   pRoomIndex->last_exit = pexit;
   top_exit++;
   return pexit;
+}
+
+void make_bexit( ROOM_INDEX_DATA *location, ROOM_INDEX_DATA *troom,
+		 int direction )
+{
+  EXIT_DATA *xit = make_exit( location, troom, direction );
+  xit->keyword = STRALLOC( "" );
+  xit->description = STRALLOC( "" );
+  xit->key = -1;
+  xit->exit_info = 0;
+
+  xit = make_exit( troom, location, rev_dir[direction] );
+  xit->keyword = STRALLOC( "" );
+  xit->description = STRALLOC( "" );
+  xit->key = -1;
+  xit->exit_info = 0;
 }
 
 void fix_area_exits( AREA_DATA * tarea )
