@@ -470,8 +470,8 @@ void do_setclan( CHAR_DATA * ch, char *argument )
   {
     send_to_char( "Usage: setclan <clan> <field> <player>\r\n", ch );
     send_to_char( "\r\nField being one of:\r\n", ch );
-    send_to_char( "members funds\r\n", ch );
-    send_to_char( "leaders name filename desc atwar\r\n", ch );
+    send_to_char( "members funds addleader rmleader\r\n", ch );
+    send_to_char( "name filename desc atwar\r\n", ch );
     return;
   }
 
