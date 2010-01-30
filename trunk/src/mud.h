@@ -2591,6 +2591,7 @@ extern struct act_prog_data *	mob_act_list;
  * Command functions.
  * Defined in act_*.c (mostly).
  */
+DECLARE_DO_FUN( do_transship );
 DECLARE_DO_FUN( do_copyover );
 DECLARE_DO_FUN( do_arrest );
 DECLARE_DO_FUN( do_setwages );
