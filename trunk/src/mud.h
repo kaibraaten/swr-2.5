@@ -2299,11 +2299,13 @@ do								\
     }								\
 } while(0)
 
+#define LEVEL_IMMORTAL 200
+
 /*
  * Character macros.
  */
 #define IS_NPC(ch)              (IS_SET((ch)->act, ACT_IS_NPC))
-#define IS_IMMORTAL(ch)         ((ch)->top_level == 200 )
+#define IS_IMMORTAL(ch)         ((ch)->top_level == LEVEL_IMMORTAL )
 #define IS_OFFICIAL(ch)         (is_name((ch)->name,sysdata.officials))
 #define IS_AFFECTED(ch, sn)     (IS_SET((ch)->affected_by, (sn)))
 #define HAS_BODYPART(ch, part)  ((ch)->xflags == 0 || IS_SET((ch)->xflags, (part)))

@@ -83,7 +83,7 @@ static void reset_make_random_disaster( void )
 	  {
 	    int mCount = 0;
 	    sprintf( dBuf,
-		"(GNET) A Colonist: Help %s is being invaded by alien forces",
+		"(GNET) A Colonist: Help %s is being invaded by alien forces.",
 		dPlanet->name );
 	    echo_to_all( AT_LBLUE, dBuf, ECHOTAR_ALL );
 
