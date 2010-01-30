@@ -2775,6 +2775,14 @@ Log         0
 End
 
 #COMMAND
+Name        transship~
+Code        do_transship
+Position    6
+Level       200
+Log         1
+End
+
+#COMMAND
 Name        up~
 Code        do_up
 Position    8
