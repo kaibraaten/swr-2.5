@@ -1389,6 +1389,36 @@ typedef enum
 /*
  * Colony room types
  */
+
+typedef enum
+  {
+    COLONY_ROOM_FIRST = 1,
+    COLONY_ROOM_WILDERNESS = COLONY_ROOM_FIRST,
+    COLONY_ROOM_FARMLAND,
+    COLONY_ROOM_CITY_STREET,
+    COLONY_ROOM_SHIPYARD,
+    COLONY_ROOM_HOUSE,
+    COLONY_ROOM_CAVE,
+    COLONY_ROOM_INFO,
+    COLONY_ROOM_MAIL,
+    COLONY_ROOM_TRADE,
+    COLONY_ROOM_PAWN,
+    COLONY_ROOM_SUPPLY_SHOP,
+    COLONY_ROOM_COLONIZATION_CENTER,
+    COLONY_ROOM_SHUTTLE_PLATFORM,
+    COLONY_ROOM_RESTAURANT,
+    COLONY_ROOM_BAR,
+    COLONY_ROOM_CONTROL,
+    COLONY_ROOM_HOTEL,
+    COLONY_ROOM_BARRACKS,
+    COLONY_ROOM_GARAGE,
+    COLONY_ROOM_BANK,
+    COLONY_ROOM_EMPLOYMENT,
+    COLONY_ROOM_UNUSED23,
+    COLONY_ROOM_UNUSED24,
+    COLONY_ROOM_LAST
+  } colony_room_types;
+
 #define COLONY_ROOM_FIRST                  1
 #define COLONY_ROOM_SUPPLY_SHOP           12
 #define COLONY_ROOM_COLONIZATION_CENTER   13
@@ -3167,8 +3197,24 @@ void save_clan( const CLAN_DATA *clan );
 void load_polls( void );
 void save_poll( const VOTE_DATA *poll );
 
+/* colony.c */
+size_t room_type_name_size( void );
+int get_room_type( const char *name );
+const char *get_room_type_name( int room_type );
+const char *get_room_type_description( int room_type );
+void room_set_sector( ROOM_INDEX_DATA *room, int sector_type );
+void make_colony_room_exits( ROOM_INDEX_DATA *location, int room_type );
+void make_colony_supply_shop( PLANET_DATA *planet, ROOM_INDEX_DATA *location );
+void make_colony_center( PLANET_DATA *planet, ROOM_INDEX_DATA *location );
+void make_colony_shuttle_platform( PLANET_DATA *planet,
+				   ROOM_INDEX_DATA *location );
+void make_colony_hotel( PLANET_DATA *planet, ROOM_INDEX_DATA *location );
+void make_colony_wilderness( PLANET_DATA *planet,
+			     ROOM_INDEX_DATA *location,
+			     const char *description );
+
 /* planets.c */
-  PLANET_DATA *get_planet( const char *name );
+PLANET_DATA *get_planet( const char *name );
 void load_planets( void );
 void save_planet( const PLANET_DATA *planet );
 int max_population( const PLANET_DATA *planet );
