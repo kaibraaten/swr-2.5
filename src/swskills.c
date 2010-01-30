@@ -2627,7 +2627,7 @@ void do_propeganda( CHAR_DATA * ch, char *argument )
 
 void clear_roomtype( ROOM_INDEX_DATA * location )
 {
-  if( location->area && location->area->planet )
+  if( location->area->planet )
   {
     if( location->sector_type <= SECT_CITY )
       location->area->planet->citysize--;
@@ -2808,8 +2808,7 @@ void do_landscape( CHAR_DATA * ch, char *argument )
   }
   else if( !str_cmp( arg, "city" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_CITY;
+    room_set_sector( location, SECT_CITY );
   }
   else if( !str_cmp( arg, "wilderness" ) )
   {
@@ -2818,125 +2817,106 @@ void do_landscape( CHAR_DATA * ch, char *argument )
   }
   else if( !str_cmp( arg, "inside" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_INDOORS );
   }
   else if( !str_cmp( arg, "farmland" ) )
   {
-    location->area->planet->farmland++;
-    location->sector_type = SECT_FARMLAND;
+    room_set_sector( location, SECT_FARMLAND );
   }
   else if( !str_cmp( arg, "platform" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_CITY;
+    room_set_sector( location, SECT_CITY );
     SET_BIT( location->room_flags, ROOM_CAN_LAND );
   }
   else if( !str_cmp( arg, "shipyard" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_CITY;
+    room_set_sector( location, SECT_CITY );
     SET_BIT( location->room_flags, ROOM_SHIPYARD );
   }
   else if( !str_cmp( arg, "house" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_EMPTY_HOME );
     SET_BIT( location->room_flags, ROOM_NO_MOB );
   }
   else if( !str_cmp( arg, "cave" ) )
   {
-    location->area->planet->wilderness++;
-    location->sector_type = SECT_UNDERGROUND;
+    room_set_sector( location, SECT_UNDERGROUND );
     SET_BIT( location->room_flags, ROOM_DARK );
   }
   else if( !str_cmp( arg, "info" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_INFO );
     SET_BIT( location->room_flags, ROOM_NO_MOB );
   }
   else if( !str_cmp( arg, "mail" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_MAIL );
     SET_BIT( location->room_flags, ROOM_NO_MOB );
   }
   else if( !str_cmp( arg, "bank" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_BANK );
   }
   else if( !str_cmp( arg, "hotel" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_HOTEL );
     SET_BIT( location->room_flags, ROOM_SAFE );
     SET_BIT( location->room_flags, ROOM_NO_MOB );
   }
   else if( !str_cmp( arg, "trade" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_SAFE );
     SET_BIT( location->room_flags, ROOM_TRADE );
   }
   else if( !str_cmp( arg, "supply" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_SAFE );
     SET_BIT( location->room_flags, ROOM_SUPPLY );
   }
   else if( !str_cmp( arg, "pawn" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_SAFE );
     SET_BIT( location->room_flags, ROOM_PAWN );
   }
   else if( !str_cmp( arg, "restaurant" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_RESTAURANT );
   }
   else if( !str_cmp( arg, "bar" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_BAR );
   }
   else if( !str_cmp( arg, "control" ) )
   {
+    room_set_sector( location, SECT_INSIDE );
     location->area->planet->controls++;
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
     SET_BIT( location->room_flags, ROOM_CONTROL );
   }
   else if( !str_cmp( arg, "barracks" ) )
   {
-    location->area->planet->citysize++;
+    room_set_sector( location, SECT_INSIDE );
     location->area->planet->barracks++;
-    location->sector_type = SECT_INSIDE;
     SET_BIT( location->room_flags, ROOM_BARRACKS );
   }
   else if( !str_cmp( arg, "garage" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_GARAGE );
   }
   else if( !str_cmp( arg, "employment" ) )
   {
-    location->area->planet->citysize++;
-    location->sector_type = SECT_INSIDE;
+    room_set_sector( location, SECT_INSIDE );
     SET_BIT( location->room_flags, ROOM_EMPLOYMENT );
   }
   else

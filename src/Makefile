@@ -14,7 +14,7 @@ endif
 
 ODIR = obj
 _OBJ = act_comm.o act_info.o act_move.o act_obj.o act_wiz.o boards.o \
-	build.o clans.o comm.o const.o copyover.o db.o fight.o \
+	build.o clans.o colony.o comm.o const.o copyover.o db.o fight.o \
 	handler.o interp.o magic.o makeobjs.o \
 	misc.o morespace.o mud_comm.o mud_prog.o nanny.o planets.o \
 	player.o reset.o save.o shops.o skills.o skillpackage.o space.o \
