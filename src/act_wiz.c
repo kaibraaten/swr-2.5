@@ -2015,6 +2015,42 @@ void do_advance( CHAR_DATA * ch, char *argument )
 
 void do_immortalize( CHAR_DATA * ch, char *argument )
 {
+  CHAR_DATA *victim = NULL;
+
+  if( IS_NPC( ch ) || !IS_IMMORTAL( ch ) )
+    {
+      ch_printf( ch, "You're not allowed to do that.\r\n" );
+      return;
+    }
+
+  if( *argument == '\0' )
+    {
+      ch_printf( ch, "Immortalize whom?\r\n" );
+      return;
+    }
+
+  if( !( victim = get_char_world( ch, argument ) )
+      || IS_NPC( victim ) )
+    {
+      ch_printf( ch, "No player with that name.\r\n" );
+      return;
+    }
+
+  if( victim == ch )
+    {
+      ch_printf( ch, "You're already an immortal.\r\n" );
+      return;
+    }
+
+  if( IS_IMMORTAL( victim ) )
+    {
+      ch_printf( ch, "%s is already an immortal.\r\n", victim->name );
+      return;
+    }
+
+  victim->top_level = LEVEL_IMMORTAL;
+  ch_printf( ch, "%s is now an immortal.\r\n", victim->name );
+  ch_printf( victim, "%s has turned you into a god, and you already looked devine!\r\n" );
 }
 
 void do_trust( CHAR_DATA * ch, char *argument )
