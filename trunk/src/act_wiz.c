@@ -4232,9 +4232,10 @@ void do_cedit( CHAR_DATA * ch, char *argument )
   if( arg2[0] == '\0' || !str_cmp( arg2, "show" ) )
   {
     ch_printf( ch,
-	"Command:  %s\r\nLevel:    %d\r\nPosition: %d\r\nLog:      %d\r\nCode:     %s\r\n",
-	command->name, command->level, command->position,
-	command->log, command->fun_name );
+	"Command:  %s\r\nLevel:    %d\r\nPosition: %d (%s)\r\nLog:      %d\r\nCode:     %s\r\n",
+	       command->name, command->level, command->position,
+	       get_position_name( command->position ),
+	       command->log, command->fun_name );
     if( command->userec.num_uses )
       send_timer( &command->userec, ch );
     return;
@@ -4296,13 +4297,30 @@ void do_cedit( CHAR_DATA * ch, char *argument )
 
   if( !str_cmp( arg2, "position" ) )
   {
-    int position = atoi( argument );
+    int position = 0;
 
-    if( position < 0 || position > POS_DRAG )
+    if( *argument == '\0' )
+      {
+	size_t n = 0;
+	ch_printf( ch, "Position is one of:\r\n" );
+
+	for( n = 0; n < position_name_size(); ++n )
+	  ch_printf( ch, "%2d: %s\r\n", n, get_position_name( n ) );
+
+	return;
+      }
+
+    if( is_number( argument ) )
+      position = atoi( argument );
+    else
+      position = get_position( argument );
+
+    if( position < 0 || position > position_name_size() )
     {
       send_to_char( "Position out of range.\r\n", ch );
       return;
     }
+
     command->position = position;
     send_to_char( "Done.\r\n", ch );
     return;

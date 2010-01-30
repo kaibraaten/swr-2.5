@@ -2505,6 +2505,7 @@ extern const char * const target_type[];
 extern const char * const sector_name[SECT_MAX];
 extern const char * const corpse_descs[];
 extern const char * const d_corpse_descs[];
+extern const char * const position_name[];
 
 /*
  * Global variables.
@@ -3233,6 +3234,9 @@ void	act		args( ( short AType, const char *format, CHAR_DATA *ch,
 void	reset_all	args( ( void ) );
 
 /* const.c */
+const char *get_position_name( int pos );
+int get_position( const char *pos_name );
+size_t position_name_size( void );
 size_t halucinated_object_short_size( void );
 size_t halucinated_object_long_size( void );
 int get_otype( const char *type );
