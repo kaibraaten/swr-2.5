@@ -690,12 +690,7 @@ void new_descriptor( SOCKET new_desc )
 
   dnew->host = STRALLOC( buf );
 
-#if defined(AMIGA) || defined(__MORPHOS__)
-  from = gethostbyaddr( (const UBYTE*) &sock.sin_addr, sizeof( sock.sin_addr ), AF_INET );
-#else
-  from = gethostbyaddr( (char*) &sock.sin_addr,
-      sizeof( sock.sin_addr ), AF_INET );
-#endif
+  from = gethostbyaddr( (char*) &sock.sin_addr, sizeof( sock.sin_addr ), AF_INET );
 
   if( !sysdata.NO_NAME_RESOLVING )
   {
@@ -1242,7 +1237,7 @@ bool write_to_descriptor( SOCKET desc, const char *txt, int length )
     nBlock = UMIN( length - iStart, 4096 );
 
 #if defined(AMIGA) || defined(__MORPHOS__)
-    if( ( nWrite = send( desc, (UBYTE*) txt + iStart, nBlock, 0 ) ) == SOCKET_ERROR )
+    if( ( nWrite = send( desc, (char*) txt + iStart, nBlock, 0 ) ) == SOCKET_ERROR )
 #else
       if( ( nWrite = send( desc, txt + iStart, nBlock, 0 ) ) == SOCKET_ERROR )
 #endif
