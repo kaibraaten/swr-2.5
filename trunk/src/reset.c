@@ -7,11 +7,11 @@
 extern ROOM_INDEX_DATA *room_index_hash[MAX_KEY_HASH];
 
 SHIP_DATA *make_mob_ship( PLANET_DATA * planet, int ship_model );
-void resetship args( ( SHIP_DATA * ship ) );
+void resetship( SHIP_DATA * ship );
 
 void do_reset( CHAR_DATA * ch, char *argument )
 {
-  reset_all(  );
+  reset_all();
 }
 
 static void reset_make_random_disaster( void )
@@ -64,6 +64,12 @@ static void reset_make_random_disaster( void )
     switch ( number_bits( 2 ) )
     {
       case DISASTER_ALIEN_INVASION:
+	/* Last invasion not yet over? */
+	if( mobile_is_in_area( dPlanet->area, MOB_VNUM_ALIEN ) )
+	  {
+	    return;
+	  }
+
 	for( pRoomIndex = dPlanet->area->first_room;
 	    pRoomIndex; pRoomIndex = pRoomIndex->next_in_area )
 	{
