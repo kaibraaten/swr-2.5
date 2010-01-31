@@ -1,6 +1,9 @@
 #include "mud.h"
 #include <string.h>
 
+const int MAX_COLONY_SIZE = 2000;
+const int CONSTRUCTION_COST = 500;
+
 extern int top_r_vnum;
 
 typedef struct room_type_data ROOM_TYPE_DATA;
@@ -467,7 +470,6 @@ void clear_roomtype( ROOM_INDEX_DATA * location )
 	location->area->planet->barracks--;
       if( IS_SET( location->room_flags, ROOM_CONTROL ) )
 	location->area->planet->controls--;
-
     }
 
   REMOVE_BIT( location->room_flags, ROOM_NO_MOB );
@@ -503,13 +505,10 @@ void do_landscape( CHAR_DATA * ch, char *argument )
   char filename[256];
   int room_type_id = 0;
 
-  if( IS_NPC( ch ) || !ch->pcdata )
+  if( IS_NPC( ch ) || !ch->pcdata || !ch->desc )
     return;
 
-  if( !ch->desc )
-    return;
-
-  switch ( ch->substate )
+  switch( ch->substate )
     {
     default:
       break;
@@ -646,4 +645,393 @@ void do_landscape( CHAR_DATA * ch, char *argument )
   STRFREE( location->description );
   location->description = STRALLOC( "" );
   start_editing( ch, location->description );
+}
+
+void do_construction( CHAR_DATA * ch, char *argument )
+{
+  CLAN_DATA *clan = NULL;
+  int chance = 0, ll = 0;
+  int edir = DIR_SOMEWHERE;
+  ROOM_INDEX_DATA *nRoom = NULL;
+  char buf[MAX_STRING_LENGTH];
+
+  if( IS_NPC( ch ) || !ch->pcdata || !ch->in_room )
+    return;
+
+  clan = ch->pcdata->clan;
+
+  if( !clan )
+    {
+      ch_printf( ch, "You need to be part of an organization before you can do that!\r\n" );
+      return;
+    }
+
+  if( ( ch->pcdata && ch->pcdata->bestowments
+        && is_name( "build", ch->pcdata->bestowments ) )
+      || clan_char_is_leader( clan, ch ) )
+    ;
+  else
+    {
+      ch_printf( ch, "Your organization hasn't given you permission to build on their lands!\r\n" );
+      return;
+    }
+
+  if( !ch->in_room->area || !ch->in_room->area->planet ||
+      clan != ch->in_room->area->planet->governed_by )
+    {
+      ch_printf( ch, "You may only build on planets that your organization controls!\r\n" );
+      return;
+    }
+
+  if( ch->in_room->area->planet->size >= MAX_COLONY_SIZE )
+    {
+      ch_printf( ch, "This planet is big enough. Go build somewhere else...\r\n" );
+      return;
+    }
+
+  if( IS_SET( ch->in_room->room_flags, ROOM_NOPEDIT ) )
+    {
+      send_to_char( "Sorry, But you may not edit this room.\r\n", ch );
+      return;
+    }
+
+  if( argument[0] == '\0' )
+    {
+      send_to_char( "Begin construction in what direction?\r\n", ch );
+      return;
+    }
+
+  if( ch->gold < CONSTRUCTION_COST )
+    {
+      ch_printf( ch, "You do not have enough money. It will cost you %d credits to do that.\r\n", CONSTRUCTION_COST );
+      return;
+    }
+
+  edir = get_dir( argument );
+
+  if( get_exit( ch->in_room, edir ) )
+    {
+      send_to_char( "There is already a room in that direction.\r\n", ch );
+      return;
+    }
+
+  chance = character_skill_level( ch, gsn_construction );
+
+  if( number_percent(  ) > chance )
+    {
+      send_to_char( "You can't quite get the desired affect.\r\n", ch );
+      ch->gold -= CONSTRUCTION_COST / 100;
+      return;
+    }
+
+  ch->gold -= CONSTRUCTION_COST;
+
+  nRoom = make_room( ++top_r_vnum );
+  nRoom->area = ch->in_room->area;
+  LINK( nRoom, ch->in_room->area->first_room, ch->in_room->area->last_room,
+	next_in_area, prev_in_area );
+  STRFREE( nRoom->name );
+  STRFREE( nRoom->description );
+  nRoom->name = STRALLOC( "Construction Site" );
+  nRoom->description = STRALLOC( "\r\nThis area is under construction.\r\nIt still needs some landscaping.\r\n\r\n" );
+  nRoom->sector_type = SECT_DUNNO;
+  SET_BIT( nRoom->room_flags, ROOM_NO_MOB );
+
+  make_bexit( ch->in_room, nRoom, edir );
+
+  ch->in_room->area->planet->size++;
+
+  for( ll = 1; ll <= 20; ll++ )
+    learn_from_success( ch, gsn_construction );
+
+  SET_BIT( ch->in_room->area->flags, AFLAG_MODIFIED );
+
+  sprintf( buf, "A construction crew begins working on a new area to the %s.",
+	   dir_name[edir] );
+  echo_to_room( AT_WHITE, ch->in_room, buf );
+}
+
+void do_bridge( CHAR_DATA * ch, char *argument )
+{
+  CLAN_DATA *clan = NULL;
+  int chance = 0, ll = 0;
+  char arg1[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+  EXIT_DATA *xit = NULL, *texit = NULL;
+  int evnum = 0, edir = 0, ekey = 0;
+  ROOM_INDEX_DATA *toroom = NULL;
+  char buf[MAX_STRING_LENGTH];
+
+  if( IS_NPC( ch ) || !ch->pcdata || !ch->in_room )
+    return;
+
+  clan = ch->pcdata->clan;
+
+  if( !clan )
+    {
+      send_to_char( "You need to be part of an organization before you can do that!\r\n", ch );
+      return;
+    }
+
+  if( ( ch->pcdata && ch->pcdata->bestowments
+        && is_name( "build", ch->pcdata->bestowments ) )
+      || clan_char_is_leader( clan, ch ) )
+    ;
+  else
+    {
+      send_to_char( "Your organization hasn't given you permission to build on their lands!\r\n", ch );
+      return;
+    }
+
+  if( !ch->in_room->area || !ch->in_room->area->planet ||
+      clan != ch->in_room->area->planet->governed_by )
+    {
+      send_to_char( "You may only build on planets that your organization controls!\r\n", ch );
+      return;
+    }
+
+  if( IS_SET( ch->in_room->room_flags, ROOM_NOPEDIT ) )
+    {
+      send_to_char( "Sorry, But you may not edit this room.\r\n", ch );
+      return;
+    }
+
+  if( ch->gold < CONSTRUCTION_COST )
+    {
+      ch_printf( ch, "You do not have enough money. It will cost you %d credits to do that.\r\n", CONSTRUCTION_COST );
+      return;
+    }
+
+  argument = one_argument( argument, arg1 );
+
+  if( argument[0] == '\0' )
+    {
+      send_to_char( "USAGE: bridge <direction> <action> <argument>\r\n", ch );
+      send_to_char( "\r\nAction being one of the following:\r\n", ch );
+      send_to_char( "connect, door, keycode\r\n", ch );
+      return;
+    }
+
+  argument = one_argument( argument, arg2 );
+
+  chance = character_skill_level( ch, gsn_bridge );
+
+  if( number_percent(  ) > chance )
+    {
+      send_to_char( "You can't quite get the desired affect.\r\n", ch );
+      ch->gold -= 10;
+      return;
+    }
+
+  edir = get_dir( arg1 );
+  xit = get_exit( ch->in_room, edir );
+
+  if( !str_cmp( arg2, "connect" ) )
+    {
+      if( xit )
+	{
+	  send_to_char( "There's already an exit in that direction.\r\n",
+			ch );
+	  return;
+	}
+
+      evnum = atoi( argument );
+
+      if( ( toroom = get_room_index( evnum ) ) == NULL )
+	{
+	  ch_printf( ch, "Non-existant room: %d\r\n", evnum );
+	  return;
+	}
+
+      if( ch->in_room->area != toroom->area )
+	{
+	  ch_printf( ch,
+		     "Nice try. Room %d isn't even on the same planet!\r\n",
+		     evnum );
+	  return;
+	}
+
+      if( IS_SET( toroom->room_flags, ROOM_NOPEDIT ) )
+	{
+	  ch_printf( ch, "Room %d isn't editable by players!\r\n", evnum );
+	  return;
+	}
+
+      if( get_exit( toroom, rev_dir[edir] ) )
+	{
+	  ch_printf( ch, "Room %d already has an entrance from that direction!\r\n", evnum );
+	  return;
+	}
+
+      make_bexit( ch->in_room, toroom, edir );
+
+      sprintf( buf, "A construction crew opens up a passage to the %s.",
+	       dir_name[edir] );
+      echo_to_room( AT_WHITE, ch->in_room, buf );
+      sprintf( buf, "A construction crew opens up a passage from the %s.",
+	       dir_name[rev_dir[edir]] );
+      echo_to_room( AT_WHITE, toroom, buf );
+    }
+  else if( !str_cmp( arg2, "keycode" ) )
+    {
+      if( !xit )
+	{
+	  send_to_char( "There's no exit in that direction.\r\n", ch );
+	  return;
+	}
+
+      if( !IS_SET( xit->exit_info, EX_ISDOOR ) )
+	{
+	  send_to_char( "There's no door in that direction.\r\n", ch );
+	  return;
+	}
+
+      ekey = atoi( argument );
+      ch_printf( ch, "Ok the lock code is now: %d", ekey );
+      xit->key = ekey;
+
+    }
+  else if( !str_cmp( arg2, "door" ) )
+    {
+      if( !xit )
+	{
+	  send_to_char( "There's no exit in that direction.\r\n", ch );
+	  return;
+	}
+
+      if( !IS_SET( xit->exit_info, EX_ISDOOR ) )
+	{
+	  sprintf( buf, "A construction crew builds a door to the %s.",
+		   dir_name[edir] );
+	  echo_to_room( AT_WHITE, ch->in_room, buf );
+	  SET_BIT( xit->exit_info, EX_ISDOOR );
+
+	  if( get_exit_to( xit->to_room, rev_dir[edir], ch->in_room->vnum ) )
+	    {
+	      sprintf( buf, "A construction crew builds a door to the %s.",
+		       dir_name[rev_dir[edir]] );
+	      echo_to_room( AT_WHITE, xit->to_room, buf );
+	      SET_BIT( texit->exit_info, EX_ISDOOR );
+	    }
+	}
+      else
+	{
+	  sprintf( buf, "A construction crew removes the door to the %s.",
+		   dir_name[edir] );
+	  echo_to_room( AT_WHITE, ch->in_room, buf );
+	  REMOVE_BIT( xit->exit_info, EX_ISDOOR );
+
+	  if( get_exit_to( xit->to_room, rev_dir[edir], ch->in_room->vnum ) )
+	    {
+	      sprintf( buf, "A construction crew removes the door to the %s.",
+		       dir_name[rev_dir[edir]] );
+	      echo_to_room( AT_WHITE, xit->to_room, buf );
+	      REMOVE_BIT( texit->exit_info, EX_ISDOOR );
+	    }
+	}
+    }
+  else
+    {
+      do_bridge( ch, STRLIT_EMPTY );
+      return;
+    }
+
+  ch->gold -= CONSTRUCTION_COST;
+
+  for( ll = 1; ll <= 20; ll++ )
+    learn_from_success( ch, gsn_bridge );
+
+  SET_BIT( ch->in_room->area->flags, AFLAG_MODIFIED );
+}
+
+void do_survey( CHAR_DATA * ch, char *argument )
+{
+  ROOM_INDEX_DATA *room = ch->in_room;
+  int chance = character_skill_level( ch, gsn_survey );
+
+  if( IS_NPC( ch ) || !ch->pcdata )
+    return;
+
+  if( number_percent() > chance || !room->area->planet )
+    {
+      send_to_char( "You have a hard time surveying this region.\r\n", ch );
+      return;
+    }
+
+  ch_printf( ch, "&Y%s\r\n\r\n", room->name );
+  ch_printf( ch, "&WIndex:&Y %d\r\n", room->vnum );
+
+  if( room->area && room->area->planet )
+    ch_printf( ch, "&WPlanet:&Y %s\r\n", room->area->planet->name );
+
+  ch_printf( ch, "&WSize:&Y %d\r\n", room->tunnel );
+  ch_printf( ch, "&WSector:&Y %s\r\n", sector_name[room->sector_type] );
+  ch_printf( ch, "&WInfo:\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_DARK ) )
+    ch_printf( ch, "&Y   Room is always dark.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_INDOORS ) )
+    ch_printf( ch, "&Y   Room is indoors.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_SHIPYARD ) )
+    ch_printf( ch, "   &YSpacecraft can be built or purchased here.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_CAN_LAND ) )
+    ch_printf( ch, "&Y   Spacecraft can land here.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_EMPLOYMENT ) )
+    ch_printf( ch, "&Y   You can find temporary employment here.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_BANK ) )
+    ch_printf( ch, "&Y   This room may be used as a bank.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_SAFE ) )
+    ch_printf( ch, "&Y   Combat cannot take place in this room.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_HOTEL ) )
+    ch_printf( ch, "&Y   Players may quit and enter the game from here.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_EMPTY_HOME ) )
+    ch_printf( ch, "&Y   This room may be purchased for use as a players home / storage locker.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_PLR_HOME ) )
+    ch_printf( ch, "&Y   This room is a players private home.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_MAIL ) )
+    ch_printf( ch, "&Y   This is a post office.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_INFO ) )
+    ch_printf( ch, "&Y   A message and information terminal may be installed here.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_TRADE ) )
+    ch_printf( ch, "&Y   This room is used for resource trade.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_SUPPLY ) )
+    ch_printf( ch, "&Y   This is a supply store.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_PAWN ) )
+    ch_printf( ch, "&Y   You can buy and sell useful items here.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_RESTAURANT ) )
+    ch_printf( ch, "&Y   This room is a restaurant.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_BARRACKS ) )
+    ch_printf( ch, "&Y   This is a military barracks.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_GARAGE ) )
+    ch_printf( ch, "&Y   Vehicles are built and sold here.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_CONTROL ) )
+    ch_printf( ch, "&Y   This is a control tower for patrol spacecraft.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_BAR ) )
+    ch_printf( ch, "&Y   This is bar.\r\n" );
+
+  if( IS_SET( room->room_flags, ROOM_NOPEDIT ) )
+    ch_printf( ch, "&WThis room is NOT player editable.\r\n" );
+  else
+    ch_printf( ch, "&WThis room IS editable by players.\r\n" );
+
+  learn_from_success( ch, gsn_survey );
 }
