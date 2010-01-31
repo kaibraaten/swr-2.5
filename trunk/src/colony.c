@@ -6,17 +6,16 @@ const int CONSTRUCTION_COST = 500;
 
 extern int top_r_vnum;
 
-typedef struct room_type_data ROOM_TYPE_DATA;
 typedef void ROOM_TYPE_BUILDER( ROOM_INDEX_DATA* );
 
 ROOM_TYPE_BUILDER *get_room_type_builder( int room_type );
 
-struct room_type_data
+typedef struct room_type_data
 {
   const char *name;
   const char *description;
   ROOM_TYPE_BUILDER *build_room;
-};
+} ROOM_TYPE_DATA;
 
 void room_set_sector( ROOM_INDEX_DATA *room, int sector_type )
 {

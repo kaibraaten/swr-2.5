@@ -40,13 +40,13 @@ DO_FUN *skill_function( const char *name )
 
 #else
 
-struct spell_fun_entry
+typedef struct spell_fun_entry
 {
   const char *fun_name;
   SPELL_FUN *fun_ptr;
-};
+} SPELL_FUN_ENTRY;
 
-static const struct spell_fun_entry spell_fun_map[] = {
+static const SPELL_FUN_ENTRY spell_fun_map[] = {
   { "spell_blindness",      spell_blindness },
   { "spell_charm_person",   spell_charm_person },
   { "spell_fireball",       spell_fireball },
@@ -82,13 +82,13 @@ SPELL_FUN *spell_function( const char *name )
   return fun_ptr;
 }
 
-struct do_fun_entry
+typedef struct do_fun_entry
 {
   const char *fun_name;
   DO_FUN *fun_ptr;
-};
+} DO_FUN_ENTRY;
 
-static const struct do_fun_entry command_fun_map[] = {
+static const DO_FUN_ENTRY command_fun_map[] = {
   { "do_aassign", do_aassign },
   { "do_accelerate", do_accelerate },
   { "do_addpilot", do_addpilot },
@@ -167,7 +167,6 @@ static const struct do_fun_entry command_fun_map[] = {
   { "do_deny", do_deny },
   { "do_description", do_description },
   { "do_designship", do_designship },
-  { "do_destro", do_destro },
   { "do_destroy", do_destroy },
   { "do_dig", do_dig },
   { "do_disarm", do_disarm },
@@ -301,7 +300,6 @@ static const struct do_fun_entry command_fun_map[] = {
   { "do_mptransfer", do_mptransfer },
   { "do_mset", do_mset },
   { "do_mstat", do_mstat },
-  { "do_murde", do_murde },
   { "do_murder", do_murder },
   { "do_mwhere", do_mwhere },
   { "do_newbiechat", do_newbiechat },
@@ -345,13 +343,11 @@ static const struct do_fun_entry command_fun_map[] = {
   { "do_prototypes", do_prototypes },
   { "do_purge", do_purge },
   { "do_put", do_put },
-  { "do_qui", do_qui },
   { "do_quicktalk", do_quicktalk },
   { "do_quit", do_quit },
   { "do_radar", do_radar },
   { "do_rank", do_rank },
   { "do_rat", do_rat },
-  { "do_reboo", do_reboo },
   { "do_reboot", do_reboot },
   { "do_recall", do_recall },
   { "do_recharge", do_recharge },
@@ -414,11 +410,9 @@ static const struct do_fun_entry command_fun_map[] = {
   { "do_showprototype", do_showprototype },
   { "do_showship", do_showship },
   { "do_showstarsystem", do_showstarsystem },
-  { "do_shutdow", do_shutdow },
   { "do_shutdown", do_shutdown },
   { "do_silence", do_silence },
   { "do_sit", do_sit },
-  { "do_sla", do_sla },
   { "do_slay", do_slay },
   { "do_sleep", do_sleep },
   { "do_slice", do_slice },

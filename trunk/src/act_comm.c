@@ -1015,12 +1015,6 @@ void do_typo( CHAR_DATA * ch, char *argument )
   send_to_char( "Ok.  Thanks.\r\n", ch );
 }
 
-void do_qui( CHAR_DATA * ch, char *argument )
-{
-  set_char_color( AT_RED, ch );
-  send_to_char( "If you want to QUIT, you have to spell it out.\r\n", ch );
-}
-
 void do_quit( CHAR_DATA * ch, char *argument )
 {
   size_t x = 0, y = 0;
