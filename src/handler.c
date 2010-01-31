@@ -3550,3 +3550,23 @@ OBJ_DATA *get_obj_type_char( const CHAR_DATA *ch, short item_type )
 
   return obj;
 }
+
+bool mobile_is_in_area( const AREA_DATA *area, long vnum )
+{
+  ROOM_INDEX_DATA *room = NULL;
+
+  for( room = area->first_room; room; room = room->next_in_area )
+    {
+      CHAR_DATA *rch = NULL;
+
+      for( rch = room->first_person; rch; rch = rch->next_in_room )      
+	{
+	  if( IS_NPC( rch ) && rch->pIndexData->vnum == vnum )
+	    {
+	      return TRUE;
+	    }
+	}
+    }
+
+  return FALSE;
+}
