@@ -964,7 +964,7 @@ void do_survey( CHAR_DATA * ch, char *argument )
     ch_printf( ch, "&WPlanet:&Y %s\r\n", room->area->planet->name );
 
   ch_printf( ch, "&WSize:&Y %d\r\n", room->tunnel );
-  ch_printf( ch, "&WSector:&Y %s\r\n", sector_name[room->sector_type] );
+  ch_printf( ch, "&WSector:&Y %s\r\n", get_sector_name(room->sector_type) );
   ch_printf( ch, "&WInfo:\r\n" );
 
   if( IS_SET( room->room_flags, ROOM_DARK ) )

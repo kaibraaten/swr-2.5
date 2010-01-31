@@ -457,8 +457,8 @@ void do_setplanet( CHAR_DATA * ch, char *argument )
 
 void do_showplanet( CHAR_DATA * ch, char *argument )
 {
-  GUARD_DATA *guard;
-  PLANET_DATA *planet;
+  GUARD_DATA *guard = NULL;
+  PLANET_DATA *planet = NULL;
   int num_guards = 0;
   int pf = 0;
   int pc = 0;
@@ -502,7 +502,7 @@ void do_showplanet( CHAR_DATA * ch, char *argument )
   if( IS_IMMORTAL( ch ) )
     ch_printf( ch, "&WFilename: &G%s\r\n", planet->filename );
 
-  ch_printf( ch, "&WTerrain: &G%s\r\n", sector_name[planet->sector] );
+  ch_printf( ch, "&WTerrain: &G%s\r\n", get_sector_name(planet->sector) );
   ch_printf( ch, "&WGoverned by: &G%s\r\n",
       planet->governed_by ? planet->governed_by->name : "" );
   ch_printf( ch, "&WPlanet Size: &G%d\r\n", planet->size );
@@ -574,26 +574,28 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
 	STRFREE( location->description );
 	STRFREE( location->name );
 
-	if( rnum == COLONY_ROOM_SUPPLY_SHOP )
-	{
-	  make_default_colony_supply_shop( planet, location );
-	}
-	else if( rnum == COLONY_ROOM_COLONIZATION_CENTER )
-	{
-	  make_default_colony_center( planet, location );
-	}
-	else if( rnum == COLONY_ROOM_SHUTTLE_PLATFORM )
-	{
-	  make_default_colony_shuttle_platform( planet, location );
-	}
-	else if( rnum == COLONY_ROOM_HOTEL )
-	{
-	  make_default_colony_hotel( planet, location );
-	}
-	else
-	{
-	  make_default_colony_wilderness( planet, location, description );
-	}
+	switch( rnum )
+	  {
+	  case COLONY_ROOM_SUPPLY_SHOP:
+	    make_default_colony_supply_shop( planet, location );
+	    break;
+
+	  case COLONY_ROOM_COLONIZATION_CENTER:
+	    make_default_colony_center( planet, location );
+	    break;
+
+	  case COLONY_ROOM_SHUTTLE_PLATFORM:
+	    make_default_colony_shuttle_platform( planet, location );
+	    break;
+
+	  case COLONY_ROOM_HOTEL:
+	    make_default_colony_hotel( planet, location );
+	    break;
+
+	  default:
+	    make_default_colony_wilderness( planet, location, description );
+	    break;
+	  }
 
 	LINK( location, pArea->first_room, pArea->last_room, next_in_area,
 	    prev_in_area );
@@ -634,13 +636,8 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
 
   if( !argument || argument[0] == '\0' )
   {
-    send_to_char
-      ( "Would you like to explore an existing star system or a new one?\r\n\r\n",
-	ch );
+    send_to_char( "Would you like to explore an existing star system or a new one?\r\n\r\n", ch );
     send_to_char( "Usage: explore <starsystem> <planet name>\r\n", ch );
-    send_to_char
-      ( " Note: The first word in the planets name MUST be original.\r\n",
-	ch );
     return;
   }
 
@@ -674,9 +671,6 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
     send_to_char
       ( "What would you call the new planet if you found it?\r\n\r\n", ch );
     send_to_char( "Usage: explore <starsystem> <planet name>\r\n", ch );
-    send_to_char
-      ( " Note: The first word in the planets name MUST be original.\r\n",
-	ch );
     return;
   }
 
@@ -689,36 +683,26 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
   strcpy( pname, argument );
   argument = one_argument( argument, arg3 );
 
-  for( pArea = first_area; pArea; pArea = pArea->next )
-  {
-    if( !str_cmp( pArea->filename, capitalize( arg3 ) ) )
+  snprintf( buf, MAX_STRING_LENGTH, "%s.planet", strlower( arg3 ) );
+  replace_char( buf, ' ', '_' );
+
+  if( !is_valid_filename( ch, PLANET_DIR, buf ) )
     {
-      send_to_char
-	( "Sorry, the first word in the planets name must be original.\r\n",
-	  ch );
       return;
     }
-  }
-
-  strcpy( buf, strlower( arg3 ) );
-  strcat( buf, ".planet" );
 
   for( planet = first_planet; planet; planet = planet->next )
   {
     if( !str_cmp( planet->filename, buf ) )
     {
-      send_to_char( "A planet with that filename already exists.\r\n",
-	  ch );
-      send_to_char
-	( "The first word in the planets name must be original.\r\n",
-	  ch );
+      send_to_char( "A planet with that filename already exists.\r\n", ch );
       return;
     }
   }
 
   ch->gold -= COLONY_COST;
 
-  ch_printf( ch, "You spend %d  credits to launch an explorer probe.\r\n",
+  ch_printf( ch, "You spend %d credits to launch an explorer probe.\r\n",
       COLONY_COST );
 
   echo_to_room( AT_WHITE, ch->in_room,
@@ -784,8 +768,8 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
   planet->filename = str_dup( filename );
 
   send_to_char( "\r\n&YYour probe has discovered a new planet.\r\n", ch );
-  send_to_char( "The terrain apears to be mostly &W", ch );
-  send_to_char( sector_name[sector], ch );
+  send_to_char( "The terrain appears to be mostly &W", ch );
+  send_to_char( strlower( get_sector_name( sector ) ), ch );
   send_to_char( "&Y.\r\n", ch );
   send_to_char( "\r\nPlease enter a description of your planet.\r\n", ch );
   send_to_char( "It should be a short paragraph of 5 or more lines.\r\n",
@@ -813,14 +797,12 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
 
 void do_planets( CHAR_DATA * ch, char *argument )
 {
-  PLANET_DATA *planet;
+  PLANET_DATA *planet = NULL;
   int count = 0;
-  SPACE_DATA *starsystem;
+  SPACE_DATA *starsystem = NULL;
 
   set_char_color( AT_WHITE, ch );
-  send_to_char
-    ( "Planet          Starsystem    Governed By                  Popular Support\r\n",
-      ch );
+  send_to_char( "Planet          Starsystem    Governed By                  Popular Support\r\n", ch );
 
   for( starsystem = first_starsystem; starsystem;
       starsystem = starsystem->next )
@@ -831,6 +813,7 @@ void do_planets( CHAR_DATA * ch, char *argument )
 	  planet->name, starsystem->name,
 	  planet->governed_by ? planet->governed_by->name : "" );
       ch_printf( ch, "%.1f\r\n", planet->pop_support );
+
       if( IS_IMMORTAL( ch ) && !planet->area )
       {
 	ch_printf( ch,
@@ -850,6 +833,7 @@ void do_planets( CHAR_DATA * ch, char *argument )
 	planet->name, "",
 	planet->governed_by ? planet->governed_by->name : "" );
     ch_printf( ch, "%.1f\r\n", planet->pop_support );
+
     if( IS_IMMORTAL( ch ) && !planet->area )
     {
       ch_printf( ch,
@@ -865,15 +849,15 @@ void do_planets( CHAR_DATA * ch, char *argument )
     set_char_color( AT_BLOOD, ch );
     send_to_char( "There are no planets currently formed.\r\n", ch );
   }
-  send_to_char( "&WUse SHOWPLANET for more information.\r\n", ch );
 
+  send_to_char( "&WUse SHOWPLANET for more information.\r\n", ch );
 }
 
 void do_capture( CHAR_DATA * ch, char *argument )
 {
-  CLAN_DATA *clan;
-  PLANET_DATA *planet;
-  PLANET_DATA *cPlanet;
+  CLAN_DATA *clan = NULL;
+  PLANET_DATA *planet = NULL;
+  PLANET_DATA *cPlanet = NULL;
   float support = 0.0;
   int pCount = 0;
   char buf[MAX_STRING_LENGTH];
@@ -904,15 +888,14 @@ void do_capture( CHAR_DATA * ch, char *argument )
 
   if( clan == planet->governed_by )
   {
-    send_to_char( "Your organization already controls this planet.\r\n",
-	ch );
+    send_to_char( "Your organization already controls this planet.\r\n", ch );
     return;
   }
 
   if( planet->starsystem )
   {
-    SHIP_DATA *ship;
-    CLAN_DATA *sClan;
+    SHIP_DATA *ship = NULL;
+    CLAN_DATA *sClan = NULL;
 
     for( ship = planet->starsystem->first_ship; ship;
 	ship = ship->next_in_starsystem )
@@ -973,24 +956,26 @@ void do_capture( CHAR_DATA * ch, char *argument )
   return;
 }
 
+const long TAX_PER_POPULATION = 500;
+const long TAX_PER_RESOURCE = 10000;
+const long TAX_PER_SUPPORT = 100;
+const long TAX_PER_BARRACKS = 5000;
+const long TAX_PER_CONTROL = 10000;
+const long TAX_PER_BIGSHIP = 50000;
+
 long get_taxes( const PLANET_DATA * planet )
 {
-  long gain = 0;
   long bigships = 0;
-  int resource = 0;
+  int resource = UMIN( planet->wilderness, planet->population );
+  long gain = TAX_PER_POPULATION * planet->population;
+  gain += TAX_PER_RESOURCE * resource;
+  gain += ( long ) ( planet->pop_support * TAX_PER_SUPPORT );
 
-  resource = planet->wilderness;
-  resource = UMIN( resource, planet->population );
-
-  gain = 500 * planet->population;
-  gain += 10000 * resource;
-  gain += ( long ) ( planet->pop_support * 100 );
-
-  gain -= 5000 * planet->barracks;
-  gain -= 10000 * planet->controls;
+  gain -= TAX_PER_BARRACKS * planet->barracks;
+  gain -= TAX_PER_CONTROL * planet->controls;
 
   bigships = planet->controls / 5;	/* 100k for destroyers, 1 mil for battleships */
-  gain -= 50000 * bigships;
+  gain -= TAX_PER_BIGSHIP * bigships;
 
   return gain;
 }

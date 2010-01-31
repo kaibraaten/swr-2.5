@@ -2531,7 +2531,6 @@ extern const char * const halucinated_object_short[];
 extern const char * const halucinated_object_long[];
 extern const char * const day_name[];
 extern const char * const month_name[];
-extern const char * const sect_names[SECT_MAX];
 extern const char * const ex_flags [];
 extern const char * const spell_flag[];
 extern const char * const spell_saves[];
@@ -2540,10 +2539,8 @@ extern const char * const spell_action[];
 extern const char * const spell_power[];
 extern const char * const spell_class[];
 extern const char * const target_type[];
-extern const char * const sector_name[SECT_MAX];
 extern const char * const corpse_descs[];
 extern const char * const d_corpse_descs[];
-extern const char * const position_name[];
 
 /*
  * Global variables.
