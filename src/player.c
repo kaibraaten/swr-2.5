@@ -10,7 +10,6 @@ void do_gold( CHAR_DATA * ch, char *argument )
 {
   set_char_color( AT_GOLD, ch );
   ch_printf( ch, "You have %d credits.\r\n", ch->gold );
-  return;
 }
 
 void do_score( CHAR_DATA * ch, char *argument )
@@ -331,17 +330,15 @@ void do_score( CHAR_DATA * ch, char *argument )
 	ch_printf( ch, "%s  ", skill_table[sn]->name );
 
     send_to_char( "\r\n", ch );
-
   }
 
-  ch_printf( ch,
-      "&W------------------------------------------------------------------------\r\n" );
+  ch_printf( ch, "&W------------------------------------------------------------------------\r\n" );
 
   if( !IS_NPC( ch ) && IS_IMMORTAL( ch ) )
   {
     ch_printf( ch, "&WWizInvis level: &G%d   &WWizInvis is &G%s\r\n",
-	ch->pcdata->wizinvis,
-	IS_SET( ch->act, PLR_WIZINVIS ) ? "ON" : "OFF" );
+	       ch->pcdata->wizinvis,
+	       IS_SET( ch->act, PLR_WIZINVIS ) ? "ON" : "OFF" );
   }
 
   switch ( ch->position )
@@ -383,17 +380,13 @@ void do_score( CHAR_DATA * ch, char *argument )
       break;
   }
 
-
   if( !IS_NPC( ch ) && ch->pcdata->condition[COND_THIRST] == 0 )
     send_to_char( "&GYou are thirsty.   ", ch );
+
   if( !IS_NPC( ch ) && ch->pcdata->condition[COND_FULL] == 0 )
     send_to_char( "&GYou are hungry.   ", ch );
 
   send_to_char( "\r\n", ch );
-
-
-  return;
-
 }
 
 void do_oldscore( CHAR_DATA * ch, char *argument )
@@ -562,6 +555,7 @@ void do_oldscore( CHAR_DATA * ch, char *argument )
   }
 
   send_to_char( "You are ", ch );
+
   if( GET_AC( ch ) >= 101 )
     send_to_char( "WORSE than naked!", ch );
   else if( GET_AC( ch ) >= 80 )
@@ -647,23 +641,11 @@ void do_oldscore( CHAR_DATA * ch, char *argument )
 	ch->pcdata->wizinvis,
 	IS_SET( ch->act, PLR_WIZINVIS ) ? "ON" : "OFF" );
   }
-
-  return;
 }
-
-/*								-Thoric
- * Display your current exp, level, and surrounding level exp requirements
- */
-void do_level( CHAR_DATA * ch, char *argument )
-{
-}
-
 
 void do_affected( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
-  AFFECT_DATA *paf;
-  SKILLTYPE *skill;
 
   if( IS_NPC( ch ) )
     return;
@@ -686,7 +668,10 @@ void do_affected( CHAR_DATA * ch, char *argument )
   }
   else
   {
+    AFFECT_DATA *paf = NULL;
+    SKILLTYPE *skill = NULL;
     send_to_char( "\r\n", ch );
+
     for( paf = ch->first_affect; paf; paf = paf->next )
       if( ( skill = get_skilltype( paf->type ) ) != NULL )
       {
@@ -705,13 +690,13 @@ void do_inventory( CHAR_DATA * ch, char *argument )
   show_list_to_char( ch->first_carrying, ch, TRUE, TRUE );
 }
 
-
 void do_equipment( CHAR_DATA * ch, char *argument )
 {
   OBJ_DATA *obj = NULL;
   int iWear = 0, dam = 0;
   bool found = FALSE;
   char buf[MAX_STRING_LENGTH];
+  *buf = '\0';
 
   set_char_color( AT_RED, ch );
   send_to_char( "You are using:\r\n", ch );
@@ -723,10 +708,12 @@ void do_equipment( CHAR_DATA * ch, char *argument )
       if( obj->wear_loc == iWear )
       {
 	send_to_char( where_name[iWear], ch );
+
 	if( can_see_obj( ch, obj ) )
 	{
 	  send_to_char( format_obj_to_char( obj, ch, TRUE ), ch );
 	  strcpy( buf, "" );
+
 	  switch ( obj->item_type )
 	  {
 	    default:
@@ -737,8 +724,9 @@ void do_equipment( CHAR_DATA * ch, char *argument )
 		obj->value[1] = obj->value[0];
 	      if( obj->value[1] == 0 )
 		obj->value[1] = 1;
-	      dam =
-		( short ) ( ( obj->value[0] * 10 ) / obj->value[1] );
+
+	      dam = ( short ) ( ( obj->value[0] * 10 ) / obj->value[1] );
+
 	      if( dam >= 10 )
 		strcat( buf, " (superb) " );
 	      else if( dam >= 7 )
@@ -751,11 +739,13 @@ void do_equipment( CHAR_DATA * ch, char *argument )
 		strcat( buf, " (awful) " );
 	      else if( dam == 0 )
 		strcat( buf, " (broken) " );
+
 	      send_to_char( buf, ch );
 	      break;
 
 	    case ITEM_WEAPON:
 	      dam = INIT_WEAPON_CONDITION - obj->value[0];
+
 	      if( dam < 2 )
 		strcat( buf, " (superb) " );
 	      else if( dam < 4 )
@@ -768,7 +758,9 @@ void do_equipment( CHAR_DATA * ch, char *argument )
 		strcat( buf, " (awful) " );
 	      else if( dam == 12 )
 		strcat( buf, " (broken) " );
+
 	      send_to_char( buf, ch );
+
 	      if( obj->value[3] == WEAPON_BLASTER )
 	      {
 		if( obj->blaster_setting == BLASTER_FULL )
@@ -796,6 +788,7 @@ void do_equipment( CHAR_DATA * ch, char *argument )
 	}
 	else
 	  send_to_char( "something.\r\n", ch );
+
 	found = TRUE;
       }
   }
@@ -804,11 +797,10 @@ void do_equipment( CHAR_DATA * ch, char *argument )
     send_to_char( "Nothing.\r\n", ch );
 }
 
-
-
 void set_title( CHAR_DATA * ch, const char *title )
 {
   char buf[MAX_STRING_LENGTH];
+  *buf = '\0';
 
   if( IS_NPC( ch ) )
   {
@@ -830,8 +822,6 @@ void set_title( CHAR_DATA * ch, const char *title )
   ch->pcdata->title = STRALLOC( buf );
 }
 
-
-
 void do_title( CHAR_DATA * ch, char *argument )
 {
   if( IS_NPC( ch ) )
@@ -842,7 +832,6 @@ void do_title( CHAR_DATA * ch, char *argument )
     send_to_char( "You try but the Force resists you.\r\n", ch );
     return;
   }
-
 
   if( argument[0] == '\0' )
   {
@@ -862,7 +851,6 @@ void do_title( CHAR_DATA * ch, char *argument )
   send_to_char( "Ok.\r\n", ch );
 }
 
-
 void do_homepage( CHAR_DATA * ch, char *argument )
 {
   char buf[MAX_STRING_LENGTH];
@@ -874,8 +862,10 @@ void do_homepage( CHAR_DATA * ch, char *argument )
   {
     if( !ch->pcdata->homepage )
       ch->pcdata->homepage = str_dup( "" );
+
     ch_printf( ch, "Your homepage is: %s\r\n",
 	show_tilde( ch->pcdata->homepage ) );
+
     return;
   }
 
@@ -883,6 +873,7 @@ void do_homepage( CHAR_DATA * ch, char *argument )
   {
     if( ch->pcdata->homepage )
       DISPOSE( ch->pcdata->homepage );
+
     ch->pcdata->homepage = str_dup( "" );
     send_to_char( "Homepage cleared.\r\n", ch );
     return;
@@ -892,17 +883,18 @@ void do_homepage( CHAR_DATA * ch, char *argument )
     strcpy( buf, argument );
   else
     sprintf( buf, "http://%s", argument );
+
   if( strlen( buf ) > 70 )
     buf[70] = '\0';
 
   hide_tilde( buf );
+
   if( ch->pcdata->homepage )
     DISPOSE( ch->pcdata->homepage );
+
   ch->pcdata->homepage = str_dup( buf );
   send_to_char( "Homepage set.\r\n", ch );
 }
-
-
 
 /*
  * Set your personal description				-Thoric
@@ -988,12 +980,6 @@ void do_bio( CHAR_DATA * ch, char *argument )
   }
 }
 
-
-
-void do_report( CHAR_DATA * ch, char *argument )
-{
-}
-
 void do_prompt( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
@@ -1003,13 +989,16 @@ void do_prompt( CHAR_DATA * ch, char *argument )
     send_to_char( "NPC's can't change their prompt..\r\n", ch );
     return;
   }
+
   smash_tilde( argument );
   one_argument( argument, arg );
+
   if( !*arg )
   {
     send_to_char( "Set prompt to what? (try help prompt)\r\n", ch );
     return;
   }
+
   if( ch->pcdata->prompt )
     STRFREE( ch->pcdata->prompt );
 
@@ -1022,6 +1011,6 @@ void do_prompt( CHAR_DATA * ch, char *argument )
     ch->pcdata->prompt = STRALLOC( "" );
   else
     ch->pcdata->prompt = STRALLOC( argument );
+
   send_to_char( "Ok.\r\n", ch );
-  return;
 }

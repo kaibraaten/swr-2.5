@@ -3287,7 +3287,7 @@ void character_extract_carried_objects( CHAR_DATA * ch )
 /* Major overhaul. -- Alty */
 #define NAME(ch)        (IS_NPC(ch) ? ch->short_descr : ch->name)
 char *act_string( const char *format, CHAR_DATA * to, CHAR_DATA * ch,
-    const void *arg1, const void *arg2 )
+		  const void *arg1, const void *arg2 )
 {
   static const char *const he_she[] = { "it", "he", "she" };
   static const char *const him_her[] = { "it", "him", "her" };
@@ -3300,6 +3300,7 @@ char *act_string( const char *format, CHAR_DATA * to, CHAR_DATA * ch,
   CHAR_DATA *vch = ( CHAR_DATA * ) arg2;
   OBJ_DATA *obj1 = ( OBJ_DATA * ) arg1;
   OBJ_DATA *obj2 = ( OBJ_DATA * ) arg2;
+  *buf = '\0';
 
   while( *str != '\0' )
   {
@@ -3424,6 +3425,7 @@ char *act_string( const char *format, CHAR_DATA * to, CHAR_DATA * ch,
     while( ( *point = *i ) != '\0' )
       ++point, ++i;
   }
+
   strcpy( point, "\r\n" );
   buf[0] = UPPER( buf[0] );
   return buf;
