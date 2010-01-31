@@ -4293,7 +4293,7 @@ void do_cedit( CHAR_DATA * ch, char *argument )
     else
       position = get_position( argument );
 
-    if( position < 0 || position > position_name_size() )
+    if( position < 0 || position > (int) position_name_size() )
     {
       send_to_char( "Position out of range.\r\n", ch );
       return;
