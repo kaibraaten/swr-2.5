@@ -647,14 +647,6 @@ Log         0
 End
 
 #COMMAND
-Name        destro~
-Code        do_destro
-Position    8
-Level       200
-Log         0
-End
-
-#COMMAND
 Name        destroy~
 Code        do_destroy
 Position    8
@@ -1567,14 +1559,6 @@ Log         0
 End
 
 #COMMAND
-Name        murde~
-Code        do_murde
-Position    7
-Level       5
-Log         0
-End
-
-#COMMAND
 Name        murder~
 Code        do_murder
 Position    7
@@ -1927,19 +1911,11 @@ Log         0
 End
 
 #COMMAND
-Name        qui~
-Code        do_qui
-Position    0
-Level       0
-Log         0
-End
-
-#COMMAND
 Name        quit~
 Code        do_quit
 Position    0
 Level       0
-Log         0
+Log         1
 End
 
 #COMMAND
@@ -2043,14 +2019,6 @@ Name        reply~
 Code        do_reply
 Position    5
 Level       0
-Log         0
-End
-
-#COMMAND
-Name        reboo~
-Code        do_reboo
-Position    0
-Level       200
 Log         0
 End
 
@@ -2447,14 +2415,6 @@ Log         0
 End
 
 #COMMAND
-Name        shutdow~
-Code        do_shutdow
-Position    0
-Level       200
-Log         0
-End
-
-#COMMAND
 Name        shutdown~
 Code        do_shutdown
 Position    0
@@ -2476,14 +2436,6 @@ Code        do_silence
 Position    0
 Level       200
 Log         1
-End
-
-#COMMAND
-Name        sla~
-Code        do_sla
-Position    0
-Level       200
-Log         0
 End
 
 #COMMAND
