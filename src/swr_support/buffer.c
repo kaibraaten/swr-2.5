@@ -14,7 +14,7 @@ void bug( const char *str, ... );
 /*
  * Create a new buffer.
  */
-BUFFER *buffer_new( int size )
+BUFFER *buffer_new( size_t size )
 {
   BUFFER *buffer = (BUFFER*) malloc( sizeof( BUFFER ) );
   buffer->size = size;
@@ -28,8 +28,8 @@ BUFFER *buffer_new( int size )
  */
 void buffer_strcat( BUFFER *buffer, const char *text )
 {
-  int new_size = 0;
-  int text_len = 0;
+  size_t new_size = 0;
+  size_t text_len = 0;
   char *new_data = NULL;
 
   /* Adding NULL string ? */

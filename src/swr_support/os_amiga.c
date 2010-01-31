@@ -176,3 +176,10 @@ int set_nonblocking( SOCKET sock )
   char optval = 1;
   return IoctlSocket( sock, FIONBIO, &optval );
 }
+
+#ifdef __STORMGCC__
+int isascii( int c )
+{
+  return c > 0 && c <= 127 ? 1 : 0;
+}
+#endif
