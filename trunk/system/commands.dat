@@ -1083,7 +1083,7 @@ Name        immortalize~
 Code        do_immortalize
 Position    0
 Level       200
-Log         0
+Log         1
 End
 
 #COMMAND
