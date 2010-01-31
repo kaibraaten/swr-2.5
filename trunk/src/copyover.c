@@ -162,7 +162,7 @@ void copyover_recover( void )
     exit( 1 );
   }
 
-  unlink( COPYOVER_FILE );	/* In case something crashes
+  remove( COPYOVER_FILE );	/* In case something crashes
 				   - doesn't prevent reading */
   for( ;; )
   {

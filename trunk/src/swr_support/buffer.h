@@ -12,11 +12,11 @@ extern "C" {
 typedef struct buffer_type
 {
   char   * data;        /* The data                      */
-  int      len;         /* The current len of the buffer */
-  int      size;        /* The allocated size of data    */
+  size_t   len;         /* The current len of the buffer */
+  size_t   size;        /* The allocated size of data    */
 } BUFFER;
 
-BUFFER *buffer_new( int size );
+BUFFER *buffer_new( size_t size );
 void buffer_strcat( BUFFER *buffer, const char *text );
 void buffer_free( BUFFER *buffer );
 void buffer_clear( BUFFER *buffer );

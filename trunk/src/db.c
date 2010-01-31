@@ -437,7 +437,7 @@ void boot_db( bool fCopyOver )
 {
   int x = 0;
   show_hash( 32 );
-  unlink( BOOTLOG_FILE );
+  remove( BOOTLOG_FILE );
   boot_log( "---------------------[ Boot Log ]--------------------" );
 
   log_string( "Loading commands" );

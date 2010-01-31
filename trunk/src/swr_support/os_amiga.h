@@ -28,9 +28,14 @@
 #ifdef __STORMGCC__
 typedef long clock_t;
 typedef int ssize_t;
-#define isascii(c) isprint((c))
-#define unlink(name) !DeleteFile((STRPTR)(name))
+#ifdef __cplusplus
+extern "C" {
 #endif
+int isascii( int );
+#ifdef __cplusplus
+}
+#endif
+#endif /* __STORMGCC__ */
 
 #ifdef __MORPHOS__
 #include <proto/socket.h>
