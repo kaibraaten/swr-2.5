@@ -1461,14 +1461,6 @@ void do_owhere( CHAR_DATA * ch, char *argument )
     pager_printf( ch, "%d matches.\r\n", icnt );
 }
 
-
-void do_reboo( CHAR_DATA * ch, char *argument )
-{
-  send_to_char( "If you want to REBOOT, spell it out.\r\n", ch );
-}
-
-
-
 void do_reboot( CHAR_DATA * ch, char *argument )
 {
   CHAR_DATA *vch = NULL;
@@ -1507,11 +1499,6 @@ void do_reboot( CHAR_DATA * ch, char *argument )
     save_some_areas(  );
 
   mud_down = TRUE;
-}
-
-void do_shutdow( CHAR_DATA * ch, char *argument )
-{
-  send_to_char( "If you want to SHUTDOWN, spell it out.\r\n", ch );
 }
 
 void do_shutdown( CHAR_DATA * ch, char *argument )
@@ -3312,15 +3299,6 @@ void do_form_password( CHAR_DATA * ch, char *argument )
 
   ch_printf( ch, "That would result in the following password: %s",
       encode_string( argument ) );
-}
-
-/*
- * Purge a player file.  No more player.  -- Altrag
- */
-void do_destro( CHAR_DATA * ch, char *argument )
-{
-  set_char_color( AT_RED, ch );
-  send_to_char( "If you want to destroy a character, spell it out!\r\n", ch );
 }
 
 /*
