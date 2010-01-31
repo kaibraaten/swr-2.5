@@ -16,51 +16,63 @@ DECLARE_SPEC_FUN( spec_auth );
 DECLARE_SPEC_FUN( spec_clan_guard );
 DECLARE_SPEC_FUN( spec_ship_guard );
 
+typedef struct spec_fun_entry
+{
+  const char *fun_name;
+  SPEC_FUN *fun_ptr;
+} SPEC_FUN_ENTRY;
+
+static const SPEC_FUN_ENTRY spec_fun_table[] = {
+  { "spec_fido",       spec_fido },
+  { "spec_guardian",   spec_guardian },
+  { "spec_janitor",    spec_janitor },
+  { "spec_poison",     spec_poison },
+  { "spec_thief",      spec_thief },
+  { "spec_auth",       spec_auth },
+  { "spec_clan_guard", spec_clan_guard },
+  { "spec_ship_guard", spec_ship_guard }
+};
+
+static size_t spec_fun_table_size( void )
+{
+  return sizeof( spec_fun_table ) / sizeof( *spec_fun_table );
+}
+
 /*
  * Given a name, return the appropriate spec fun.
  */
 SPEC_FUN *spec_lookup( const char *name )
 {
-  if( !str_cmp( name, "spec_fido" ) )
-    return spec_fido;
-  if( !str_cmp( name, "spec_guardian" ) )
-    return spec_guardian;
-  if( !str_cmp( name, "spec_janitor" ) )
-    return spec_janitor;
-  if( !str_cmp( name, "spec_poison" ) )
-    return spec_poison;
-  if( !str_cmp( name, "spec_thief" ) )
-    return spec_thief;
-  if( !str_cmp( name, "spec_auth" ) )
-    return spec_auth;
-  if( !str_cmp( name, "spec_clan_guard" ) )
-    return spec_clan_guard;
-  if( !str_cmp( name, "spec_ship_guard" ) )
-    return spec_ship_guard;
-  return 0;
+  SPEC_FUN *fun_ptr = NULL;
+  size_t i = 0;
+
+  for( i = 0; i < spec_fun_table_size(); ++i )
+    {
+      if( !str_cmp( name, spec_fun_table[i].fun_name ) )
+	{
+	  fun_ptr = spec_fun_table[i].fun_ptr;
+	  break;
+	}
+    }
+
+  return fun_ptr;
 }
 
 /*
  * Given a pointer, return the appropriate spec fun text.
  */
-const char *lookup_spec( SPEC_FUN * special )
+const char *lookup_spec( SPEC_FUN *special )
 {
-  if( special == spec_fido )
-    return "spec_fido";
-  if( special == spec_guardian )
-    return "spec_guardian";
-  if( special == spec_janitor )
-    return "spec_janitor";
-  if( special == spec_poison )
-    return "spec_poison";
-  if( special == spec_thief )
-    return "spec_thief";
-  if( special == spec_auth )
-    return "spec_auth";
-  if( special == spec_clan_guard )
-    return "spec_clan_guard";
-  if( special == spec_ship_guard )
-    return "spec_ship_guard";
+  size_t i = 0;
+
+  for( i = 0; i < spec_fun_table_size(); ++i )
+    {
+      if( spec_fun_table[i].fun_ptr == special )
+	{
+	  return spec_fun_table[i].fun_name;
+	}
+    }
+
   return "";
 }
 

@@ -46,7 +46,7 @@ typedef struct spell_fun_entry
   SPELL_FUN *fun_ptr;
 } SPELL_FUN_ENTRY;
 
-static const SPELL_FUN_ENTRY spell_fun_map[] = {
+static const SPELL_FUN_ENTRY spell_fun_table[] = {
   { "spell_blindness",      spell_blindness },
   { "spell_charm_person",   spell_charm_person },
   { "spell_fireball",       spell_fireball },
@@ -61,9 +61,9 @@ static const SPELL_FUN_ENTRY spell_fun_map[] = {
   { "spell_smaug",          spell_smaug }
 };
 
-static size_t spell_fun_map_size( void )
+static size_t spell_fun_table_size( void )
 {
-  return sizeof( spell_fun_map ) / sizeof( *spell_fun_map );
+  return sizeof( spell_fun_table ) / sizeof( *spell_fun_table );
 }
 
 SPELL_FUN *spell_function( const char *name )
@@ -71,11 +71,12 @@ SPELL_FUN *spell_function( const char *name )
   SPELL_FUN *fun_ptr = spell_notfound;
   size_t i = 0;
 
-  for( i = 0; i < spell_fun_map_size(); ++i )
+  for( i = 0; i < spell_fun_table_size(); ++i )
     {
-      if( !str_cmp( name, spell_fun_map[ i ].fun_name ) )
+      if( !str_cmp( name, spell_fun_table[ i ].fun_name ) )
 	{
-	  fun_ptr = spell_fun_map[ i ].fun_ptr;
+	  fun_ptr = spell_fun_table[ i ].fun_ptr;
+	  break;
 	}
     }
 
@@ -88,7 +89,7 @@ typedef struct do_fun_entry
   DO_FUN *fun_ptr;
 } DO_FUN_ENTRY;
 
-static const DO_FUN_ENTRY command_fun_map[] = {
+static const DO_FUN_ENTRY command_fun_table[] = {
   { "do_aassign", do_aassign },
   { "do_accelerate", do_accelerate },
   { "do_addpilot", do_addpilot },
@@ -478,9 +479,9 @@ static const DO_FUN_ENTRY command_fun_map[] = {
   { "do_zones", do_zones }
 };
 
-static size_t command_fun_map_size( void )
+static size_t command_fun_table_size( void )
 {
-  return sizeof( command_fun_map ) / sizeof( *command_fun_map );
+  return sizeof( command_fun_table ) / sizeof( *command_fun_table );
 }
 
 DO_FUN *skill_function( const char *name )
@@ -488,11 +489,12 @@ DO_FUN *skill_function( const char *name )
   DO_FUN *fun_ptr = skill_notfound;
   size_t i = 0;
 
-  for( i = 0; i < command_fun_map_size(); ++i )
+  for( i = 0; i < command_fun_table_size(); ++i )
     {
-      if( !str_cmp( name, command_fun_map[ i ].fun_name ) )
+      if( !str_cmp( name, command_fun_table[ i ].fun_name ) )
         {
-          fun_ptr = command_fun_map[ i ].fun_ptr;
+          fun_ptr = command_fun_table[ i ].fun_ptr;
+	  break;
         }
     }
 

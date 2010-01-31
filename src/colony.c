@@ -407,7 +407,7 @@ size_t room_type_table_size( void )
 
 int get_room_type_id( const char *name )
 {
-  int x = 0;
+  size_t x = 0;
 
   for( x = 0; x < room_type_table_size(); ++x )
     if( !str_cmp( name, room_type_table[x].name ) )
