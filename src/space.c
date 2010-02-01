@@ -2763,11 +2763,7 @@ bool check_pilot( const CHAR_DATA * ch, const SHIP_DATA * ship )
   {
     if( !str_cmp( ch->pcdata->clan->name, ship->owner ) )
     {
-      if( clan_char_is_leader( ch->pcdata->clan, ch ) )
-	return TRUE;
-
-      if( ch->pcdata->bestowments
-	  && is_name( "pilot", ch->pcdata->bestowments ) )
+      if( clan_char_has_permission( ch->pcdata->clan, ch, CLAN_PERM_PILOT ) )
 	return TRUE;
     }
   }
@@ -3983,11 +3979,7 @@ void do_clanbuyship( CHAR_DATA * ch, char *argument )
 
   clan = ch->pcdata->clan;
 
-  if( ( ch->pcdata->bestowments
-	&& is_name( "clanbuyship", ch->pcdata->bestowments ) )
-      || clan_char_is_leader( clan, ch ) )
-    ;
-  else
+  if( !clan_char_has_permission( clan, ch, CLAN_PERM_BUYSHIP ) )
   {
     send_to_char
       ( "&RYour organization hasn't seen fit to bestow you with that ability.\r\n",

@@ -3180,6 +3180,8 @@ int get_wanted_flag( const char *flag );
 void save_some_areas( void );
 
 /* clans.c */
+bool clan_char_has_permission( const CLAN_DATA *clan,
+			       const CHAR_DATA *ch, int perm );
 void clan_add_leader( CLAN_DATA *clan, const char *name );
 void clan_remove_leader( CLAN_DATA *ch, const char *name );
 bool clan_char_is_leader( const CLAN_DATA*, const CHAR_DATA* );
