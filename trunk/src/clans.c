@@ -771,6 +771,8 @@ void do_clan_withdraw( CHAR_DATA * ch, char *argument )
     return;
   }
 
+  clan = ch->pcdata->clan;
+
   if( ( ch->pcdata && ch->pcdata->bestowments
 	&& is_name( "withdraw", ch->pcdata->bestowments ) )
       || clan_char_is_leader( clan, ch ) )
