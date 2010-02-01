@@ -2617,6 +2617,19 @@ extern WEATHER_DATA		weather_info;
 extern AUCTION_DATA      *     auction;
 extern struct act_prog_data *	mob_act_list;
 
+typedef enum
+  {
+    CLAN_PERM_INVALID = -1,
+    CLAN_PERM_PILOT,
+    CLAN_PERM_WITHDRAW,
+    CLAN_PERM_BUYSHIP,
+    CLAN_PERM_INDUCT,
+    CLAN_PERM_OUTCAST,
+    CLAN_PERM_EMPOWER,
+    CLAN_PERM_BUILD,
+    CLAN_PERM_WAR,
+    CLAN_PERM_PAYROLL
+  } clan_permission_type;
 
 /*
  * Command functions.

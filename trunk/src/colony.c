@@ -526,12 +526,14 @@ void do_landscape( CHAR_DATA * ch, char *argument )
       stop_editing( ch );
       ch->substate = ch->tempnum;
 
-      if( strlen( location->description ) > 150 )
-        learn_from_success( ch, gsn_landscape );
+      if( strlen( location->description ) > 150 || IS_IMMORTAL( ch ) )
+	{
+	  learn_from_success( ch, gsn_landscape );
+	}
       else
 	{
 	  ch_printf( ch, "That room's description is too short.\r\n" );
-	  ch_printf( ch, "You skill level diminishes with your lazyness.\r\n" );
+	  ch_printf( ch, "You skill level diminishes with your lazyness.\r\n");
 
 	  if( character_skill_level( ch, gsn_landscape ) > 50 )
 	    modify_skill_level( ch, gsn_landscape, -5 );
