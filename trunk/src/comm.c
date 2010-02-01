@@ -619,8 +619,6 @@ void init_descriptor( DESCRIPTOR_DATA * dnew, SOCKET desc )
   dnew->connected = CON_GET_NAME;
   dnew->outsize = 2000;
   dnew->idle = 0;
-  dnew->lines = 0;
-  dnew->scrlen = 24;
   dnew->newstate = 0;
   dnew->prevcolor = 0x07;
   dnew->original = NULL;

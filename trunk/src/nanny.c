@@ -226,7 +226,7 @@ static void nanny_get_name( DESCRIPTOR_DATA * d, char *argument )
     if( d->newstate != 0 )
     {
       write_to_buffer( d,
-	  "That name is already taken.  Please choose another: ",
+	  "That name is already taken. Please choose another: ",
 	  0 );
       d->connected = CON_GET_NAME;
       return;

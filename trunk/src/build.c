@@ -2102,10 +2102,12 @@ void do_oset( CHAR_DATA * ch, char *argument )
     }
     CHECK_SUBRESTRICTED( ch );
     ch->tempnum = SUB_NONE;
+
     if( lockobj )
       ch->spare_ptr = obj;
     else
       ch->spare_ptr = NULL;
+
     ch->substate = SUB_OBJ_LONG;
     ch->dest_buf = obj;
     start_editing( ch, obj->description );
@@ -3531,14 +3533,6 @@ void edit_buffer( CHAR_DATA * ch, char *argument )
   {
     send_to_char( "You can't do that!\r\n", ch );
     bug( "Edit_buffer: d->connected != CON_EDITING", 0 );
-    return;
-  }
-
-  if( ch->substate <= SUB_PAUSE )
-  {
-    send_to_char( "You can't do that!\r\n", ch );
-    bug( "Edit_buffer: illegal ch->substate (%d)", ch->substate );
-    d->connected = CON_PLAYING;
     return;
   }
 
