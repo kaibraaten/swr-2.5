@@ -3,7 +3,6 @@
 #include <string.h>
 #include "mud.h"
 
-
 CLAN_DATA *first_clan = NULL;
 CLAN_DATA *last_clan = NULL;
 
@@ -11,6 +10,12 @@ CLAN_DATA *last_clan = NULL;
 void fread_clan( CLAN_DATA * clan, FILE * fp );
 bool load_clan_file( const char *clanfile );
 void write_clan_list( void );
+size_t clan_permission_table_size( void );
+bool clan_char_has_permission( const CLAN_DATA *clan,
+                               const CHAR_DATA *ch, int perm );
+const char *get_clan_permission_name( int id );
+const char *get_clan_permission_description( int id );
+int get_clan_permission_id( const char *name );
 
 /*
  * Get pointer to clan structure from clan name.
@@ -243,7 +248,6 @@ bool load_clan_file( const char *clanfile )
   return found;
 }
 
-
 /*
  * Load in all the clan files.
  */
@@ -276,11 +280,6 @@ void load_clans()
   fclose( fpList );
 }
 
-void do_make( CHAR_DATA * ch, char *argument )
-{
-  send_to_char( "Huh?\r\n", ch );
-}
-
 void do_induct( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
@@ -295,15 +294,12 @@ void do_induct( CHAR_DATA * ch, char *argument )
 
   clan = ch->pcdata->clan;
 
-  if( ( ch->pcdata && ch->pcdata->bestowments
-	&& is_name( "induct", ch->pcdata->bestowments ) )
-      || clan_char_is_leader( clan, ch ) )
-    ;
-  else
-  {
-    send_to_char( "Huh?\r\n", ch );
-    return;
-  }
+  if( !clan_char_has_permission( clan, ch, CLAN_PERM_INDUCT ) )
+    {
+      ch_printf( ch, "You don't have permission to %s.\r\n",
+		 get_clan_permission_description( CLAN_PERM_INDUCT ) );
+      return;
+    }
 
   argument = one_argument( argument, arg );
 
@@ -363,16 +359,12 @@ void do_outcast( CHAR_DATA * ch, char *argument )
 
   clan = ch->pcdata->clan;
 
-  if( ( ch->pcdata && ch->pcdata->bestowments
-	&& is_name( "outcast", ch->pcdata->bestowments ) )
-      || clan_char_is_leader( clan, ch ) )
-    ;
-  else
-  {
-    send_to_char( "Huh?\r\n", ch );
-    return;
-  }
-
+  if( !clan_char_has_permission( clan, ch, CLAN_PERM_OUTCAST ) )
+    {
+      ch_printf( ch, "You don't have permission to %s.\r\n",
+                 get_clan_permission_description( CLAN_PERM_OUTCAST ) );
+      return;
+    }
 
   argument = one_argument( argument, arg );
 
@@ -773,17 +765,12 @@ void do_clan_withdraw( CHAR_DATA * ch, char *argument )
 
   clan = ch->pcdata->clan;
 
-  if( ( ch->pcdata && ch->pcdata->bestowments
-	&& is_name( "withdraw", ch->pcdata->bestowments ) )
-      || clan_char_is_leader( clan, ch ) )
-    ;
-  else
-  {
-    send_to_char
-      ( "&RYour organization hasn't seen fit to bestow you with that ability.",
-	ch );
-    return;
-  }
+  if( !clan_char_has_permission( clan, ch, CLAN_PERM_WITHDRAW ) )
+    {
+      ch_printf( ch, "You don't have permission to %s.\r\n",
+                 get_clan_permission_description( CLAN_PERM_WITHDRAW ) );
+      return;
+    }
 
   clan = ch->pcdata->clan;
 
@@ -924,6 +911,7 @@ void do_empower( CHAR_DATA * ch, char *argument )
   CHAR_DATA *victim;
   CLAN_DATA *clan;
   char buf[MAX_STRING_LENGTH];
+  int clan_perm_id = 0;
 
   if( IS_NPC( ch ) || !ch->pcdata->clan )
   {
@@ -933,16 +921,12 @@ void do_empower( CHAR_DATA * ch, char *argument )
 
   clan = ch->pcdata->clan;
 
-  if( ( ch->pcdata && ch->pcdata->bestowments
-	&& is_name( "empower", ch->pcdata->bestowments ) )
-      || clan_char_is_leader( clan, ch ) )
-    ;
-  else
-  {
-    send_to_char
-      ( "You clan hasn't seen fit to bestow that ability to you!\r\n", ch );
-    return;
-  }
+  if( !clan_char_has_permission( clan, ch, CLAN_PERM_EMPOWER ) )
+    {
+      ch_printf( ch, "You don't have permission to %s.\r\n",
+                 get_clan_permission_description( CLAN_PERM_EMPOWER ) );
+      return;
+    }
 
   argument = one_argument( argument, arg );
   argument = one_argument( argument, arg2 );
@@ -965,11 +949,11 @@ void do_empower( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  if( victim == ch )
-  {
-    send_to_char( "Nice try.\r\n", ch );
-    return;
-  }
+  if( victim == ch && !IS_IMMORTAL( ch ) )
+    {
+      send_to_char( "Nice try.\r\n", ch );
+      return;
+    }
 
   if( victim->pcdata->clan != ch->pcdata->clan )
   {
@@ -1009,93 +993,36 @@ void do_empower( CHAR_DATA * ch, char *argument )
 	ch->name );
     return;
   }
-  else if( !str_cmp( arg2, "pilot" ) )
+  else if( ( clan_perm_id = get_clan_permission_id( arg2 ) ) != CLAN_PERM_INVALID )
   {
     sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
     DISPOSE( victim->pcdata->bestowments );
     victim->pcdata->bestowments = str_dup( buf );
-    ch_printf( victim, "%s has given you permission to fly clan ships.\r\n",
-	ch->name );
-    send_to_char( "Ok, they now have the ability to fly clan ships.\r\n",
-	ch );
-  }
-  else if( !str_cmp( arg2, "withdraw" ) )
-  {
-    sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
-    DISPOSE( victim->pcdata->bestowments );
-    victim->pcdata->bestowments = str_dup( buf );
-    ch_printf( victim,
-	"%s has given you permission to withdraw clan funds.\r\n",
-	ch->name );
-    send_to_char
-      ( "Ok, they now have the ablitity to withdraw clan funds.\r\n", ch );
-  }
-  else if( !str_cmp( arg2, "clanbuyship" ) )
-  {
-    sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
-    DISPOSE( victim->pcdata->bestowments );
-    victim->pcdata->bestowments = str_dup( buf );
-    ch_printf( victim, "%s has given you permission to buy clan ships.\r\n",
-	ch->name );
-    send_to_char( "Ok, they now have the ablitity to use clanbuyship.\r\n",
-	ch );
-  }
-  else if( !str_cmp( arg2, "induct" ) )
-  {
-    sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
-    DISPOSE( victim->pcdata->bestowments );
-    victim->pcdata->bestowments = str_dup( buf );
-    ch_printf( victim,
-	"%s has given you permission to induct new members.\r\n",
-	ch->name );
-    send_to_char
-      ( "Ok, they now have the ablitity to induct new members.\r\n", ch );
-  }
-  else if( !str_cmp( arg2, "empower" ) )
-  {
-    sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
-    DISPOSE( victim->pcdata->bestowments );
-    victim->pcdata->bestowments = str_dup( buf );
-    ch_printf( victim,
-	"%s has given you the ability to empower others.\r\n",
-	ch->name );
-    send_to_char( "Ok, they now have the ablitity to empower others.\r\n",
-	ch );
-  }
-  else if( !str_cmp( arg2, "build" ) )
-  {
-    sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
-    DISPOSE( victim->pcdata->bestowments );
-    victim->pcdata->bestowments = str_dup( buf );
-    ch_printf( victim,
-	"%s has given you permission to build and modify areas.\r\n",
-	ch->name );
-    send_to_char
-      ( "Ok, they now have the ablitity to modify and build areas.\r\n",
-	ch );
+    ch_printf( victim, "%s has given you permission to %s.\r\n",
+	       ch->name, get_clan_permission_description( clan_perm_id ) );
+    ch_printf( ch, "Ok, they now have the ability to %s.\r\n",
+	       get_clan_permission_description( clan_perm_id ) );
   }
   else
   {
+    size_t n = 0;
     send_to_char
       ( "Currently you may empower members with only the following:\r\n",
 	ch );
-    send_to_char( "\r\npilot:        ability to fly clan ships\r\n", ch );
-    send_to_char( "withdraw:     ability to withdraw clan funds\r\n", ch );
-    send_to_char( "clanbuyship:  ability to buy clan ships\r\n", ch );
-    send_to_char( "induct:       ability to induct new members\r\n", ch );
-    send_to_char( "build:        ability to create and edit rooms\r\n",
-	ch );
-    send_to_char
-      ( "bestow:       ability to bestow other members (use with caution)\r\n",
-	ch );
-    send_to_char( "none:         removes bestowed abilities\r\n", ch );
-    send_to_char( "list:         shows bestowed abilities\r\n", ch );
+
+    for( n = 0; n < clan_permission_table_size(); ++n )
+      {
+	ch_printf( ch, "%-12s - ability to %s\r\n",
+		   get_clan_permission_name( n ),
+		   get_clan_permission_description( n ) );
+      }
+
+    ch_printf( ch, "\r\nAdditional options:\r\n" );
+    send_to_char( "none         - removes bestowed abilities\r\n", ch );
+    send_to_char( "list         - shows bestowed abilities\r\n", ch );
   }
 
   save_char_obj( victim );	/* clan gets saved when pfile is saved */
-  return;
-
-
 }
 
 void do_overthrow( CHAR_DATA * ch, char *argument )
@@ -1139,16 +1066,12 @@ void do_war( CHAR_DATA * ch, char *argument )
 
   clan = ch->pcdata->clan;
 
-  if( ( ch->pcdata->bestowments
-	&& is_name( "war", ch->pcdata->bestowments ) )
-      || clan_char_is_leader( clan, ch ) )
-    ;
-  else
-  {
-    send_to_char( "You clan hasn't empowered you to declare war!\r\n", ch );
-    return;
-  }
-
+  if( !clan_char_has_permission( clan, ch, CLAN_PERM_WAR ) )
+    {
+      ch_printf( ch, "You don't have permission to %s.\r\n",
+                 get_clan_permission_description( CLAN_PERM_WAR ) );
+      return;
+    }
 
   if( argument[0] == '\0' )
   {
@@ -1303,4 +1226,95 @@ void clan_remove_leader( CLAN_DATA * clan, const char *name )
   STRFREE( clan->leaders );
   clan->leaders = STRALLOC( tc );
   save_clan( clan );
+}
+
+/*
+ * Clan permission code.
+ */
+
+typedef struct clan_permission
+{
+  const char *name;
+  const char *description;
+} CLAN_PERMISSION;
+
+static const CLAN_PERMISSION clan_permission_table[] =
+  {
+    { "pilot",       "fly clan ships"         }, /* CLAN_PERM_PILOT */
+    { "withdraw",    "withdraw clan funds"    }, /* CLAN_PERM_WITHDRAW */
+    { "clanbuyship", "buy clan ships"         }, /* CLAN_PERM_BUYSHIP */
+    { "induct",      "induct new members"     }, /* CLAN_PERM_INDUCT */
+    { "outcast",     "outcast members"        }, /* CLAN_PERM_OUCAST */
+    { "empower",     "empower others"         }, /* CLAN_PERM_EMPOWER */
+    { "build",       "build and modify areas" }, /* CLAN_PERM_BUILD */
+    { "war",         "declare war"            }, /* CLAN_PERM_WAR */
+    { "payroll",     "set salaries"           }  /* CLAN_PERM_PAYROLL */
+  };
+
+size_t clan_permission_table_size( void )
+{
+  return sizeof( clan_permission_table ) / sizeof( *clan_permission_table );
+}
+
+const CLAN_PERMISSION *get_clan_permission( int id )
+{
+  if( id >= 0 && id < clan_permission_table_size() )
+    return &clan_permission_table[id];
+  else
+    return NULL;
+}
+
+bool clan_char_has_permission( const CLAN_DATA *clan,
+			       const CHAR_DATA *ch, int id )
+{
+  if( ch->pcdata && ch->pcdata->clan && ch->pcdata->clan == clan )
+    {
+      const CLAN_PERMISSION *perm = get_clan_permission( id );
+
+      if( perm )
+	{
+	  if( is_name( perm->name, ch->pcdata->bestowments )
+	      || clan_char_is_leader( clan, ch ) )
+	    {
+	      return TRUE;
+	    }
+	}
+    }
+
+  return FALSE;
+}
+
+const char *get_clan_permission_name( int id )
+{
+  const CLAN_PERMISSION *perm = get_clan_permission( id );
+
+  if( !perm )
+    return "*out of bounds*";
+
+  return perm->name;
+}
+
+const char *get_clan_permission_description( int id )
+{
+  const CLAN_PERMISSION *perm = get_clan_permission( id );
+
+  if( !perm )
+    return "*out of bounds*";
+
+  return perm->description;
+}
+
+int get_clan_permission_id( const char *name )
+{
+  int n = 0;
+
+  for( n = 0; n < clan_permission_table_size(); ++n )
+    {
+      if( !str_cmp( name, get_clan_permission_name( n ) ) )
+	{
+	  return n;
+	}
+    }
+
+  return -1;
 }
