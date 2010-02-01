@@ -559,11 +559,7 @@ void do_landscape( CHAR_DATA * ch, char *argument )
     return;
     }
 
-  if( ( ch->pcdata && ch->pcdata->bestowments
-        && is_name( "build", ch->pcdata->bestowments ) )
-      || clan_char_is_leader( clan, ch ) )
-    ;
-  else
+  if( !clan_char_has_permission( clan, ch, CLAN_PERM_BUILD ) )
     {
       send_to_char( "Your organization hasn't given you permission to edit their lands!\r\n", ch );
       return;
@@ -667,11 +663,7 @@ void do_construction( CHAR_DATA * ch, char *argument )
       return;
     }
 
-  if( ( ch->pcdata && ch->pcdata->bestowments
-        && is_name( "build", ch->pcdata->bestowments ) )
-      || clan_char_is_leader( clan, ch ) )
-    ;
-  else
+  if( !clan_char_has_permission( clan, ch, CLAN_PERM_BUILD ) )
     {
       ch_printf( ch, "Your organization hasn't given you permission to build on their lands!\r\n" );
       return;
@@ -774,11 +766,7 @@ void do_bridge( CHAR_DATA * ch, char *argument )
       return;
     }
 
-  if( ( ch->pcdata && ch->pcdata->bestowments
-        && is_name( "build", ch->pcdata->bestowments ) )
-      || clan_char_is_leader( clan, ch ) )
-    ;
-  else
+  if( !clan_char_has_permission( clan, ch, CLAN_PERM_BUILD ) )
     {
       send_to_char( "Your organization hasn't given you permission to build on their lands!\r\n", ch );
       return;

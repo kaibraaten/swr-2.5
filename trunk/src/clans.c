@@ -16,6 +16,10 @@ bool clan_char_has_permission( const CLAN_DATA *clan,
 const char *get_clan_permission_name( int id );
 const char *get_clan_permission_description( int id );
 int get_clan_permission_id( const char *name );
+void clan_add_permission( const CLAN_DATA *clan, CHAR_DATA *ch, int id );
+void clan_remove_permission( const CLAN_DATA *clan, CHAR_DATA *ch, int id );
+void clan_clear_permissions( const CLAN_DATA *clan, CHAR_DATA *ch );
+const char *get_clan_permission_string( const CHAR_DATA *ch );
 
 /*
  * Get pointer to clan structure from clan name.
@@ -102,8 +106,9 @@ void save_clan( const CLAN_DATA * clan )
     fprintf( fp, "Description  %s~\n", clan->description );
     fprintf( fp, "Leaders      %s~\n", clan->leaders );
     fprintf( fp, "Atwar        %s~\n", clan->atwar );
-    fprintf( fp, "Members      %d\n", clan->members );
+    fprintf( fp, "Members      %d\n",  clan->members );
     fprintf( fp, "Funds        %ld\n", clan->funds );
+    fprintf( fp, "Salary       %d\n",  clan->salary );
     fprintf( fp, "End\n\n" );
     fprintf( fp, "#END\n" );
   }
@@ -120,66 +125,68 @@ void fread_clan( CLAN_DATA * clan, FILE * fp )
   char buf[MAX_STRING_LENGTH];
 
   for( ;; )
-  {
-    const char *word = feof( fp ) ? "End" : fread_word( fp );
-    bool fMatch = FALSE;
-
-    switch ( UPPER( word[0] ) )
     {
-      case '*':
-	fMatch = TRUE;
-	fread_to_eol( fp );
-	break;
+      const char *word = feof( fp ) ? "End" : fread_word( fp );
+      bool fMatch = FALSE;
 
-      case 'A':
-	KEY( "Atwar", clan->atwar, fread_string( fp ) );
-	break;
-
-      case 'D':
-	KEY( "Description", clan->description, fread_string( fp ) );
-	break;
-
-      case 'E':
-	if( !str_cmp( word, "End" ) )
+      switch ( UPPER( word[0] ) )
 	{
-	  if( !clan->name )
-	    clan->name = STRALLOC( "" );
-	  if( !clan->leaders )
-	    clan->leaders = STRALLOC( "" );
-	  if( !clan->atwar )
-	    clan->atwar = STRALLOC( "" );
-	  if( !clan->description )
-	    clan->description = STRALLOC( "" );
-	  return;
+	case '*':
+	  fMatch = TRUE;
+	  fread_to_eol( fp );
+	  break;
+
+	case 'A':
+	  KEY( "Atwar", clan->atwar, fread_string( fp ) );
+	  break;
+
+	case 'D':
+	  KEY( "Description", clan->description, fread_string( fp ) );
+	  break;
+
+	case 'E':
+	  if( !str_cmp( word, "End" ) )
+	    {
+	      if( !clan->name )
+		clan->name = STRALLOC( "" );
+	      if( !clan->leaders )
+		clan->leaders = STRALLOC( "" );
+	      if( !clan->atwar )
+		clan->atwar = STRALLOC( "" );
+	      if( !clan->description )
+		clan->description = STRALLOC( "" );
+	      return;
+	    }
+	  break;
+
+	case 'F':
+	  KEY( "Funds", clan->funds, fread_number( fp ) );
+	  KEY( "Filename", clan->filename, fread_string_nohash( fp ) );
+	  break;
+
+	case 'L':
+	  KEY( "Leaders", clan->leaders, fread_string( fp ) );
+	  break;
+
+	case 'M':
+	  KEY( "Members", clan->members, fread_number( fp ) );
+	  break;
+
+	case 'N':
+	  KEY( "Name", clan->name, fread_string( fp ) );
+	  break;
+
+	case 'S':
+	  KEY( "Salary", clan->salary, fread_number( fp ) );
+	  break;
 	}
-	break;
 
-      case 'F':
-	KEY( "Funds", clan->funds, fread_number( fp ) );
-	KEY( "Filename", clan->filename, fread_string_nohash( fp ) );
-	break;
-
-      case 'L':
-	KEY( "Leaders", clan->leaders, fread_string( fp ) );
-	break;
-
-      case 'M':
-	KEY( "Members", clan->members, fread_number( fp ) );
-	break;
-
-      case 'N':
-	KEY( "Name", clan->name, fread_string( fp ) );
-	break;
-
+      if( !fMatch )
+	{
+	  sprintf( buf, "Fread_clan: no match: %s", word );
+	  bug( buf, 0 );
+	}
     }
-
-    if( !fMatch )
-    {
-      sprintf( buf, "Fread_clan: no match: %s", word );
-      bug( buf, 0 );
-    }
-
-  }
 }
 
 /*
@@ -414,8 +421,7 @@ void do_outcast( CHAR_DATA * ch, char *argument )
   sprintf( buf, "%s has been outcast from %s!", victim->name, clan->name );
   echo_to_all( AT_MAGIC, buf, ECHOTAR_ALL );
 
-  DISPOSE( victim->pcdata->bestowments );
-  victim->pcdata->bestowments = str_dup( "" );
+  clan_clear_permissions( clan, victim );
 
   save_char_obj( victim );  /* clan gets saved when pfile is saved */
   save_clan( clan );        /* Nope, it doesn't because pcdata->clan is NULL */
@@ -737,8 +743,7 @@ void do_resign( CHAR_DATA * ch, char *argument )
   sprintf( buf, "%s has quit %s!", ch->name, clan->name );
   echo_to_all( AT_MAGIC, buf, ECHOTAR_ALL );
 
-  DISPOSE( ch->pcdata->bestowments );
-  ch->pcdata->bestowments = str_dup( "" );
+  clan_clear_permissions( clan, ch );
 
   save_char_obj( ch );
   save_clan( clan );
@@ -908,9 +913,8 @@ void do_empower( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
-  CHAR_DATA *victim;
-  CLAN_DATA *clan;
-  char buf[MAX_STRING_LENGTH];
+  CHAR_DATA *victim = NULL;
+  CLAN_DATA *clan = NULL;
   int clan_perm_id = 0;
 
   if( IS_NPC( ch ) || !ch->pcdata->clan )
@@ -961,68 +965,59 @@ void do_empower( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  if( !victim->pcdata->bestowments )
-    victim->pcdata->bestowments = str_dup( "" );
+  clan_perm_id = get_clan_permission_id( arg2 );
 
-  if( arg2[0] == '\0' )
-    strcpy( arg2, "HelpMeImConfused" );
+  if( clan_perm_id == CLAN_PERM_INVALID
+      && str_cmp( arg2, "list" ) && str_cmp( arg2, "none" ) )
+    {
+      size_t n = 0;
+      send_to_char
+	( "Currently you may empower members with only the following:\r\n",
+	  ch );
+
+      for( n = 0; n < clan_permission_table_size(); ++n )
+	{
+	  ch_printf( ch, "%-12s - ability to %s\r\n",
+		     get_clan_permission_name( n ),
+		     get_clan_permission_description( n ) );
+	}
+
+      ch_printf( ch, "\r\nAdditional options:\r\n" );
+      send_to_char( "none         - removes bestowed abilities\r\n", ch );
+      send_to_char( "list         - shows bestowed abilities\r\n", ch );
+      return;
+    }
 
   if( !str_cmp( arg2, "list" ) )
   {
     ch_printf( ch, "Current bestowed commands on %s: %s.\r\n",
-	victim->name, victim->pcdata->bestowments );
+	       victim->name, get_clan_permission_string( victim ) );
     return;
   }
 
-  if( !clan_char_is_leader( clan, ch ) )
-  {
-    if( !is_name( arg2, ch->pcdata->bestowments ) )
+  if( !str_cmp( arg2, "none" ) && clan_char_is_leader( clan, ch ) )
+    {
+      clan_clear_permissions( clan, victim );
+      ch_printf( ch, "Permissions removed from %s.\r\n", victim->name );
+      ch_printf( victim, "%s has removed your bestowed clan abilities.\r\n",
+		 ch->name );
+      save_char_obj( victim );
+      return;
+    }
+
+  if( !clan_char_has_permission( clan, ch, clan_perm_id ) )
     {
       send_to_char
 	( "&RI don't think you're even allowed to do that.&W\r\n", ch );
       return;
     }
-  }
 
-  if( !str_cmp( arg2, "none" ) )
-  {
-    DISPOSE( victim->pcdata->bestowments );
-    victim->pcdata->bestowments = str_dup( "" );
-    ch_printf( ch, "Bestowments removed from %s.\r\n", victim->name );
-    ch_printf( victim, "%s has removed your bestowed clan abilities.\r\n",
-	ch->name );
-    return;
-  }
-  else if( ( clan_perm_id = get_clan_permission_id( arg2 ) ) != CLAN_PERM_INVALID )
-  {
-    sprintf( buf, "%s %s", victim->pcdata->bestowments, arg2 );
-    DISPOSE( victim->pcdata->bestowments );
-    victim->pcdata->bestowments = str_dup( buf );
-    ch_printf( victim, "%s has given you permission to %s.\r\n",
-	       ch->name, get_clan_permission_description( clan_perm_id ) );
-    ch_printf( ch, "Ok, they now have the ability to %s.\r\n",
-	       get_clan_permission_description( clan_perm_id ) );
-  }
-  else
-  {
-    size_t n = 0;
-    send_to_char
-      ( "Currently you may empower members with only the following:\r\n",
-	ch );
-
-    for( n = 0; n < clan_permission_table_size(); ++n )
-      {
-	ch_printf( ch, "%-12s - ability to %s\r\n",
-		   get_clan_permission_name( n ),
-		   get_clan_permission_description( n ) );
-      }
-
-    ch_printf( ch, "\r\nAdditional options:\r\n" );
-    send_to_char( "none         - removes bestowed abilities\r\n", ch );
-    send_to_char( "list         - shows bestowed abilities\r\n", ch );
-  }
-
-  save_char_obj( victim );	/* clan gets saved when pfile is saved */
+  clan_add_permission( clan, victim, clan_perm_id );
+  ch_printf( victim, "%s has given you permission to %s.\r\n",
+	     ch->name, get_clan_permission_description( clan_perm_id ) );
+  ch_printf( ch, "Ok, they now have the ability to %s.\r\n",
+	     get_clan_permission_description( clan_perm_id ) );
+  save_char_obj( victim );
 }
 
 void do_overthrow( CHAR_DATA * ch, char *argument )
@@ -1143,16 +1138,11 @@ void do_setwages( CHAR_DATA * ch, char *argument )
 
   clan = ch->pcdata->clan;
 
-  if( ( ch->pcdata->bestowments
-	&& is_name( "payroll", ch->pcdata->bestowments ) )
-      || clan_char_is_leader( clan, ch ) )
-    ;
-  else
+  if( !clan_char_has_permission( clan, ch, CLAN_PERM_PAYROLL ) )
   {
     send_to_char( "You clan hasn't empowered you to set wages!\r\n", ch );
     return;
   }
-
 
   if( argument[0] == '\0' )
   {
@@ -1317,4 +1307,37 @@ int get_clan_permission_id( const char *name )
     }
 
   return -1;
+}
+
+void clan_add_permission( const CLAN_DATA *clan, CHAR_DATA *ch, int id )
+{
+  /* No need to add if character already has the permission */
+  /* Disabled during development
+     if( !clan_char_has_permission( clan, ch, id ) )*/
+    {
+      char buf[MAX_STRING_LENGTH];
+      snprintf( buf, MAX_STRING_LENGTH, "%s %s", ch->pcdata->bestowments,
+		get_clan_permission_name( id ) );
+      DISPOSE( ch->pcdata->bestowments );
+      ch->pcdata->bestowments = str_dup( buf );
+    }
+}
+
+void clan_remove_permission( const CLAN_DATA *clan, CHAR_DATA *ch, int id )
+{
+  log_printf( "clan_remove_permission() not implemented" );
+}
+
+void clan_clear_permissions( const CLAN_DATA *clan, CHAR_DATA *ch )
+{
+  if( ch->pcdata && ch->pcdata->clan == clan )
+    {
+      DISPOSE( ch->pcdata->bestowments );
+      ch->pcdata->bestowments = str_dup( "" );
+    }
+}
+
+const char *get_clan_permission_string( const CHAR_DATA *ch )
+{
+  return ch->pcdata ? ch->pcdata->bestowments : "";
 }

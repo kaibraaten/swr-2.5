@@ -3102,9 +3102,6 @@ void do_bestow( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  if( !victim->pcdata->bestowments )
-    victim->pcdata->bestowments = str_dup( "" );
-
   if( argument[0] == '\0' || !str_cmp( argument, "list" ) )
   {
     ch_printf( ch, "Current bestowed commands on %s: %s.\r\n",
