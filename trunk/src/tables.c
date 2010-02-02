@@ -246,7 +246,6 @@ static const DO_FUN_ENTRY command_fun_table[] = {
   { "do_look", do_look },
   { "do_low_purge", do_low_purge },
   { "do_mailroom", do_mailroom },
-  { "do_make", do_make },
   { "do_makearmor", do_makearmor },
   { "do_makeblade", do_makeblade },
   { "do_makeblaster", do_makeblaster },
