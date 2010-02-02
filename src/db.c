@@ -1979,6 +1979,7 @@ void free_char( CHAR_DATA * ch )
   if( ch->pcdata )
   {
     STRFREE( ch->pcdata->clan_name );
+    DISPOSE( ch->pcdata->clan_permissions );
     DISPOSE( ch->pcdata->pwd );	/* no hash */
     DISPOSE( ch->pcdata->email );	/* no hash */
     DISPOSE( ch->pcdata->bamfin );	/* no hash */

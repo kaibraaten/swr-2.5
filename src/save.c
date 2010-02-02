@@ -416,8 +416,15 @@ void fwrite_char( const CHAR_DATA * ch, FILE * fp )
     {
       fprintf( fp, "WizInvis     %d\n", ch->pcdata->wizinvis );
     }
+
     if( ch->pcdata->clan_name && ch->pcdata->clan_name[0] != '\0' )
-      fprintf( fp, "Clan         %s~\n", ch->pcdata->clan_name );
+      {
+	fprintf( fp, "Clan         %s~\n", ch->pcdata->clan_name );
+
+	if( ch->pcdata->clan_permissions[0] != '\0' )
+	  fprintf( fp, "ClanPerms    %s~\n", ch->pcdata->clan_permissions );
+      }
+
     fprintf( fp, "Flags        %d\n", ch->pcdata->flags );
     if( ch->pcdata->release_date > current_time )
       fprintf( fp, "Helled       %d %s~\n",
@@ -812,6 +819,7 @@ bool load_char_obj( DESCRIPTOR_DATA * d, const char *name, bool preload )
     ch->description = STRALLOC( "" );
     ch->editor = NULL;
     ch->pcdata->clan_name = STRALLOC( "" );
+    ch->pcdata->clan_permissions = str_dup( "" );
     ch->pcdata->clan = NULL;
     ch->pcdata->pwd = str_dup( "" );
     ch->pcdata->email = str_dup( "" );
@@ -1014,6 +1022,9 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
 	break;
 
       case 'C':
+	KEY( "ClanPerms", ch->pcdata->clan_permissions,
+	     fread_string_nohash( fp ) );
+
 	if( !str_cmp( word, "Clan" ) )
 	{
 	  ch->pcdata->clan_name = fread_string( fp );
@@ -1360,8 +1371,12 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
 	    ch->pcdata->authed_by = STRALLOC( "" );
 	  if( !ch->pcdata->prompt )
 	    ch->pcdata->prompt = STRALLOC( "" );
+	  if( !ch->pcdata->clan_permissions )
+	    ch->pcdata->clan_permissions = str_dup( "" );
+
 	  ch->editor = NULL;
 	  killcnt = MAX_KILLTRACK;
+
 	  if( killcnt < MAX_KILLTRACK )
 	    ch->pcdata->killed[killcnt].vnum = 0;
 	  if( !ch->pcdata->prompt )

@@ -1870,6 +1870,7 @@ struct	pc_data
     AREA_DATA *		area;
     char *		homepage;
     char *		clan_name;
+  char * clan_permissions;
     char *		pwd;
     char *		email;
     char *		bamfin;
@@ -3182,9 +3183,8 @@ void save_some_areas( void );
 /* clans.c */
 bool clan_char_has_permission( const CLAN_DATA *clan,
 			       const CHAR_DATA *ch, int perm );
-void clan_add_leader( CLAN_DATA *clan, const char *name );
-void clan_remove_leader( CLAN_DATA *ch, const char *name );
 bool clan_char_is_leader( const CLAN_DATA*, const CHAR_DATA* );
+void clan_remove_leader( CLAN_DATA *ch, const char *name );
 void clan_decrease_vehicles_owned( CLAN_DATA *clan, const SHIP_DATA *ship );
 CL *get_clan( const char *name );
 void load_clans( void );

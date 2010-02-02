@@ -7,19 +7,17 @@ CLAN_DATA *first_clan = NULL;
 CLAN_DATA *last_clan = NULL;
 
 /* local routines */
-void fread_clan( CLAN_DATA * clan, FILE * fp );
-bool load_clan_file( const char *clanfile );
-void write_clan_list( void );
-size_t clan_permission_table_size( void );
-bool clan_char_has_permission( const CLAN_DATA *clan,
-                               const CHAR_DATA *ch, int perm );
-const char *get_clan_permission_name( int id );
-const char *get_clan_permission_description( int id );
-int get_clan_permission_id( const char *name );
-void clan_add_permission( const CLAN_DATA *clan, CHAR_DATA *ch, int id );
-void clan_remove_permission( const CLAN_DATA *clan, CHAR_DATA *ch, int id );
-void clan_clear_permissions( const CLAN_DATA *clan, CHAR_DATA *ch );
-const char *get_clan_permission_string( const CHAR_DATA *ch );
+static void fread_clan( CLAN_DATA * clan, FILE * fp );
+static bool load_clan_file( const char *clanfile );
+static void write_clan_list( void );
+static size_t clan_permission_table_size( void );
+static const char *get_clan_permission_name( int id );
+static const char *get_clan_permission_description( int id );
+static int get_clan_permission_id( const char *name );
+static void clan_toggle_permission( const CLAN_DATA *clan, CHAR_DATA *ch, int id );
+static void clan_clear_permissions( const CLAN_DATA *clan, CHAR_DATA *ch );
+static const char *get_clan_permission_string( const CHAR_DATA *ch );
+static void clan_add_leader( CLAN_DATA *clan, const char *name );
 
 /*
  * Get pointer to clan structure from clan name.
@@ -1012,11 +1010,23 @@ void do_empower( CHAR_DATA * ch, char *argument )
       return;
     }
 
-  clan_add_permission( clan, victim, clan_perm_id );
-  ch_printf( victim, "%s has given you permission to %s.\r\n",
-	     ch->name, get_clan_permission_description( clan_perm_id ) );
-  ch_printf( ch, "Ok, they now have the ability to %s.\r\n",
-	     get_clan_permission_description( clan_perm_id ) );
+  clan_toggle_permission( clan, victim, clan_perm_id );
+
+  if( clan_char_has_permission( clan, victim, clan_perm_id ) )
+    {
+      ch_printf( victim, "%s has given you permission to %s.\r\n",
+		 ch->name, get_clan_permission_description( clan_perm_id ) );
+      ch_printf( ch, "Ok, they now have the ability to %s.\r\n",
+		 get_clan_permission_description( clan_perm_id ) );
+    }
+  else
+    {
+      ch_printf( victim, "Your permission to %s was just revoked.\r\n",
+		 get_clan_permission_description( clan_perm_id ) );
+      ch_printf( ch, "Ok, they no longer have the ability to %s.\r\n",
+                 get_clan_permission_description( clan_perm_id ) );
+    }
+
   save_char_obj( victim );
 }
 
@@ -1263,7 +1273,7 @@ bool clan_char_has_permission( const CLAN_DATA *clan,
 
       if( perm )
 	{
-	  if( is_name( perm->name, ch->pcdata->bestowments )
+	  if( is_name( perm->name, ch->pcdata->clan_permissions )
 	      || clan_char_is_leader( clan, ch ) )
 	    {
 	      return TRUE;
@@ -1309,35 +1319,56 @@ int get_clan_permission_id( const char *name )
   return -1;
 }
 
-void clan_add_permission( const CLAN_DATA *clan, CHAR_DATA *ch, int id )
+void clan_toggle_permission( const CLAN_DATA *clan, CHAR_DATA *ch, int id )
 {
-  /* No need to add if character already has the permission */
-  /* Disabled during development
-     if( !clan_char_has_permission( clan, ch, id ) )*/
+  if( !clan_char_has_permission( clan, ch, id ) )
     {
       char buf[MAX_STRING_LENGTH];
-      snprintf( buf, MAX_STRING_LENGTH, "%s %s", ch->pcdata->bestowments,
+      snprintf( buf, MAX_STRING_LENGTH, "%s %s", ch->pcdata->clan_permissions,
 		get_clan_permission_name( id ) );
-      DISPOSE( ch->pcdata->bestowments );
-      ch->pcdata->bestowments = str_dup( buf );
+      DISPOSE( ch->pcdata->clan_permissions );
+      ch->pcdata->clan_permissions = str_dup( buf );
     }
-}
+  else
+    {
+      char tc[MAX_STRING_LENGTH];
+      char on[MAX_STRING_LENGTH];
+      char name[MAX_STRING_LENGTH];
+      char *perms = ch->pcdata->clan_permissions;
 
-void clan_remove_permission( const CLAN_DATA *clan, CHAR_DATA *ch, int id )
-{
-  log_printf( "clan_remove_permission() not implemented" );
+      strcpy( tc, "" );
+      snprintf( name, MAX_STRING_LENGTH, "%s", get_clan_permission_name( id ));
+
+      while( perms[0] != '\0' )
+	{
+	  perms = one_argument( name, on );
+
+	  if( str_cmp( name, on )
+	      && ( strlen( on ) + strlen( tc ) ) < ( MAX_STRING_LENGTH + 1 ) )
+	    {
+	      if( strlen( tc ) != 0 )
+		strcat( tc, " " );
+
+	      strcat( tc, on );
+	    }
+	}
+
+      DISPOSE( ch->pcdata->clan_permissions );
+      ch->pcdata->clan_permissions = str_dup( tc );
+      save_char_obj( ch );
+    }
 }
 
 void clan_clear_permissions( const CLAN_DATA *clan, CHAR_DATA *ch )
 {
   if( ch->pcdata && ch->pcdata->clan == clan )
     {
-      DISPOSE( ch->pcdata->bestowments );
-      ch->pcdata->bestowments = str_dup( "" );
+      DISPOSE( ch->pcdata->clan_permissions );
+      ch->pcdata->clan_permissions = str_dup( "" );
     }
 }
 
 const char *get_clan_permission_string( const CHAR_DATA *ch )
 {
-  return ch->pcdata ? ch->pcdata->bestowments : "";
+  return ch->pcdata ? ch->pcdata->clan_permissions : "";
 }

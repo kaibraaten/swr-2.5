@@ -1175,9 +1175,7 @@ void do_mstat( CHAR_DATA * ch, char *argument )
   ch_printf( ch, "Affected by: %s\r\n",
       affect_bit_name( victim->affected_by ) );
   send_to_char( "\r\n", ch );
-  if( victim->pcdata && victim->pcdata->bestowments
-      && victim->pcdata->bestowments[0] != '\0' )
-    ch_printf( ch, "Bestowments: %s\r\n", victim->pcdata->bestowments );
+  ch_printf( ch, "Bestowments: %s\r\n", victim->pcdata->bestowments );
   ch_printf( ch, "Short description: %s\r\nLong  description: %s",
       victim->short_descr,
       victim->long_descr[0] !=
