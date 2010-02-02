@@ -1991,14 +1991,6 @@ Log         0
 End
 
 #COMMAND
-Name        report~
-Code        do_report
-Position    0
-Level       0
-Log         0
-End
-
-#COMMAND
 Name        repair~
 Code        do_repair
 Position    5
