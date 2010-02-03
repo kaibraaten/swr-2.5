@@ -8,6 +8,8 @@
 #include <string.h>
 #include "mud.h"
 
+#define STARTING_MONEY 1000
+
 /*
  * Local function prototypes.
  */
@@ -676,6 +678,8 @@ static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument )
       obj = create_object( obj_ind );
       obj_to_char( obj, ch );
     }
+
+    ch->gold = STARTING_MONEY;
 
     if( !sysdata.WAIT_FOR_AUTH )
     {
