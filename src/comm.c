@@ -175,7 +175,11 @@ int main( int argc, char **argv )
     if( argv[2] && argv[2][0] )
     {
       fCopyOver = TRUE;
+#if defined(AMIGA) || defined(__MORPHOS__)
+      control = ObtainSocket( atoi( argv[3] ), PF_INET, SOCK_STREAM, IPPROTO_TCP );
+#else
       control = atoi( argv[3] );
+#endif
     }
     else
     {

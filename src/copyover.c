@@ -51,6 +51,8 @@ void do_copyover( CHAR_DATA * ch, char *argument )
 
 #if defined(AMIGA) || defined(__MORPHOS__)
   long error_code = 0;
+  static long sockID = 0;
+  SOCKET coded_control = 0;
 #else
   char buf2[100];
 #endif
@@ -62,6 +64,12 @@ void do_copyover( CHAR_DATA * ch, char *argument )
     perror( "do_copyover:fopen" );
     return;
   }
+
+#ifdef AMIGA
+  coded_control = ReleaseCopyOfSocket( control, UNIQUE_ID );
+#elif defined(__MORPHOS__)
+  coded_control = ReleaseCopyOfSocket( control, ++sockID );
+#endif
 
   strcpy( buf,
       "\r\nA Blinding Flash of light starts heading towards you, before you can think it engulfs you!\r\n" );
@@ -81,10 +89,13 @@ void do_copyover( CHAR_DATA * ch, char *argument )
     else
     {
 #if defined(AMIGA) || defined(__MORPHOS__)
-      static long sockID = 0;
       SOCKET cur_desc = INVALID_SOCKET;
 
+#ifdef __MORPHOS__
       ++sockID;
+#else
+      sockID = UNIQUE_ID;
+#endif
       cur_desc = ReleaseCopyOfSocket( d->descriptor, sockID );
 
       if( cur_desc == SOCKET_ERROR )
@@ -108,7 +119,7 @@ void do_copyover( CHAR_DATA * ch, char *argument )
 
 #if defined(AMIGA) || defined(__MORPHOS__)
   sprintf( buf, "run >NIL: %s %d copyover %d",
-      sysdata.exe_filename, port, control );
+      sysdata.exe_filename, port, coded_control );
 
   error_code = System( (CONST_STRPTR) buf, NULL );
 
