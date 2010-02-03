@@ -3432,7 +3432,7 @@ void do_land( CHAR_DATA * ch, char *argument )
   if( ship->shipstate != SHIP_READY )
   {
     send_to_char
-      ( "&RPlease wait until the ship has finished its current manouver.\r\n",
+      ( "&RPlease wait until the ship has finished its current maneuver.\r\n",
 	ch );
     return;
   }
@@ -3569,7 +3569,7 @@ void do_land( CHAR_DATA * ch, char *argument )
     act( AT_PLAIN, "$n begins the landing sequence.", ch,
 	NULL, "", TO_ROOM );
     echo_to_ship( AT_YELLOW, ship,
-	"The ship slowly begins its landing aproach." );
+	"The ship slowly begins its landing approach." );
     ship->dest = STRALLOC( arg );
     ship->shipstate = SHIP_LAND;
     ship->currspeed = 0;
@@ -3634,7 +3634,7 @@ void landship( SHIP_DATA * ship, char *argument )
   if( !ship_to_room( ship, destination ) )
   {
     echo_to_room( AT_YELLOW, ship->pilotseat,
-	"Could not complete aproach. Landing aborted." );
+	"Could not complete approach. Landing aborted." );
     echo_to_ship( AT_YELLOW, ship,
 	"The ship pulls back up out of its landing sequence." );
     if( ship->shipstate != SHIP_DISABLED )
@@ -3814,7 +3814,7 @@ void do_trajectory( CHAR_DATA * ch, char *argument )
   if( ship->shipstate != SHIP_READY )
   {
     send_to_char
-      ( "&RPlease wait until the ship has finished its current manouver.\r\n",
+      ( "&RPlease wait until the ship has finished its current maneuver.\r\n",
 	ch );
     return;
   }
@@ -3847,7 +3847,7 @@ void do_trajectory( CHAR_DATA * ch, char *argument )
   ship_set_course( ship, &vec );
   ship->energy -= ( ship->currspeed / 10 );
 
-  ch_printf( ch, "&GNew course set, aproaching %.0f %.0f %.0f.\r\n",
+  ch_printf( ch, "&GNew course set, approaching %.0f %.0f %.0f.\r\n",
       vec.x, vec.y, vec.z );
   act( AT_PLAIN, "$n manipulates the ships controls.", ch, NULL, argument,
       TO_ROOM );
@@ -4576,7 +4576,7 @@ void do_hyperspace( CHAR_DATA * ch, char *argument )
   if( ship->shipstate != SHIP_READY )
   {
     send_to_char
-      ( "&RPlease wait until the ship has finished its current manouver.\r\n",
+      ( "&RPlease wait until the ship has finished its current maneuver.\r\n",
 	ch );
     return;
   }

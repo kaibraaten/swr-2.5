@@ -41,7 +41,7 @@ $(ODIR)/%.o:	 %.c
 -include $(ODIR)/*.d
 
 clean :
-		-rm -f $(BINARY) *~ $(ODIR)/*.o core* $(ODIR)/*.d
+		-rm -f $(BINARY) *~ $(ODIR)/*.o ../core* $(ODIR)/*.d
 
 mos:
 		$(MAKE) -f Makefile.MOS
