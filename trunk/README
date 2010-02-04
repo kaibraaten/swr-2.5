@@ -16,7 +16,7 @@ command line argument or edit the script.
 
 To give your character all the commands first save and quit. Then locate your 
 player file in the ~/swr-2.0/player/ directories. Edit the line that says 
-Level changing the number from 1 to 200. Then log back on. Type "holylight"
+Toplevel changing the number from 1 to 200. Then log back on. Type "holylight"
 and "config +roomflags" for full immortal vision.
 
 Oh yeah,
