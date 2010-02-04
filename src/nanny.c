@@ -25,7 +25,7 @@ static void nanny_read_imotd( DESCRIPTOR_DATA * d, char *argument );
 static void nanny_read_nmotd( DESCRIPTOR_DATA * d, char *argument );
 static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument );
 static void nanny_on_motd_state( DESCRIPTOR_DATA *d );
-
+static void nanny_invalid_constate( DESCRIPTOR_DATA * d, char *argument );
 static OBJ_DATA *rgObjNest[MAX_NEST];
 extern bool wizlock;
 #ifndef _WIN32
@@ -45,72 +45,76 @@ void mail_count( const CHAR_DATA * ch );
 char *generate_skillpackage_table( void );
 SKILL_PACKAGE *get_skill_package( const char *argument );
 
+typedef void NANNY_FUN( DESCRIPTOR_DATA * d, char *argument );
+static NANNY_FUN *nanny_get_handler( short constate );
+
 /*
  * Main character generation function.
  */
 void nanny( DESCRIPTOR_DATA * d, char *argument )
 {
+  NANNY_FUN *handler = NULL;
+
   while( isspace( ( int ) *argument ) || !isascii( (int) *argument ) )
     argument++;
 
-  switch( d->connected )
-  {
+  handler = nanny_get_handler( d->connected );
+  handler( d, argument );
+}
+
+NANNY_FUN *nanny_get_handler( short constate )
+{
+  switch( constate )
+    {
     default:
-      bug( "Nanny: bad d->connected %d.", d->connected );
-      close_socket( d, TRUE );
-      return;
+      return nanny_invalid_constate;
 
     case CON_GET_NAME:
-      nanny_get_name( d, argument );
-      break;
+      return nanny_get_name;
 
     case CON_GET_OLD_PASSWORD:
-      nanny_get_old_password( d, argument );
-      break;
+      return nanny_get_old_password;
 
     case CON_CONFIRM_NEW_NAME:
-      nanny_confirm_new_name( d, argument );
-      break;
+      return nanny_confirm_new_name;
 
     case CON_GET_NEW_PASSWORD:
-      nanny_get_new_password( d, argument );
-      break;
+      return nanny_get_new_password;
 
     case CON_CONFIRM_NEW_PASSWORD:
-      nanny_confirm_new_password( d, argument );
-      break;
+      return nanny_confirm_new_password;
 
     case CON_GET_NEW_SEX:
-      nanny_get_new_sex( d, argument );
-      break;
+      return nanny_get_new_sex;
 
     case CON_ADD_SKILLS:
-      nanny_add_skills( d, argument );
-      break;
+      return nanny_add_skills;
 
     case CON_GET_WANT_RIPANSI:
-      nanny_get_want_ripansi( d, argument );
-      break;
+      return nanny_get_want_ripansi;
 
     case CON_READ_IMOTD:
-      nanny_read_imotd( d, argument );
-      break;
+      return nanny_read_imotd;
 
     case CON_READ_NMOTD:
-      nanny_read_nmotd( d, argument );
-      break;
+      return nanny_read_nmotd;
 
     case CON_DONE_MOTD:
-      nanny_done_motd( d, argument );
-      break;
-  }
+      return nanny_done_motd;
+    }
+}
+
+static void nanny_invalid_constate( DESCRIPTOR_DATA *d, char *argument )
+{
+  bug( "Nanny: bad d->connected %d.", d->connected );
+  close_socket( d, TRUE );
 }
 
 static void nanny_get_name( DESCRIPTOR_DATA * d, char *argument )
 {
   char buf[MAX_STRING_LENGTH];
-  BAN_DATA *pban;
-  bool fOld, chk;
+  BAN_DATA *pban = NULL;
+  bool fOld = FALSE, chk = FALSE;
   CHAR_DATA *ch = NULL;
 
   if( argument[0] == '\0' )
@@ -309,7 +313,7 @@ static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
 {
   CHAR_DATA *ch = d->character;
   char buf[MAX_STRING_LENGTH];
-  bool fOld, chk;
+  bool fOld = FALSE, chk = FALSE;
   write_to_buffer( d, "\r\n", 2 );
 
   if( strcmp( encode_string( argument ), ch->pcdata->pwd ) )
@@ -533,7 +537,7 @@ static void nanny_add_skills( DESCRIPTOR_DATA * d, char *argument )
   ch->perm_cha = 10;
 
   write_to_buffer( d,
-      "\r\nWould you like ANSI or no graphic/color support, (R/A/N)? ",
+      "\r\nWould you like ANSI color support, (Y/N)? ",
       0 );
   d->connected = CON_GET_WANT_RIPANSI;
 }
@@ -544,8 +548,8 @@ static void nanny_get_want_ripansi( DESCRIPTOR_DATA * d, char *argument )
 
   switch ( argument[0] )
   {
-    case 'a':
-    case 'A':
+    case 'y':
+    case 'Y':
       SET_BIT( ch->act, PLR_ANSI );
       break;
     case 'n':
@@ -620,11 +624,10 @@ static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument )
 
   if( ch->top_level == 0 )
   {
-    OBJ_DATA *obj;
-    SHIP_DATA *ship;
-    SHIP_PROTOTYPE *prototype;
+    OBJ_DATA *obj = NULL;
+    SHIP_DATA *ship = NULL;
     char shipname[MAX_STRING_LENGTH];
-    prototype = get_ship_prototype( "NU-b13 Starfighter" );
+    SHIP_PROTOTYPE *prototype = get_ship_prototype( NEWBIE_SHIP_PROTOTYPE );
 
     if( prototype )
     {
@@ -634,7 +637,7 @@ static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument )
       ship->lastdoc = ROOM_NEWBIE_SHIPYARD;
 
       sprintf( shipname, "%ss %s %s", ch->name, prototype->name,
-	  ship->filename );
+	       ship->filename );
 
       STRFREE( ship->owner );
       ship->owner = STRALLOC( ch->name );
@@ -643,8 +646,6 @@ static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument )
       save_ship( ship );
       write_ship_list(  );
     }
-
-    ch->gold = 20;
 
     ch->perm_lck = number_range( 6, 18 );
     ch->perm_frc = URANGE( 0, ch->perm_frc, 20 );
@@ -712,7 +713,7 @@ static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument )
   if( ch->plr_home != NULL )
   {
     char filename[256];
-    FILE *fph;
+    FILE *fph = NULL;
     ROOM_INDEX_DATA *storeroom = ch->plr_home;
 
     room_extract_contents( storeroom );
@@ -720,21 +721,19 @@ static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument )
 	tolower( ( int ) ch->name[0] ), capitalize( ch->name ) );
     if( ( fph = fopen( filename, "r" ) ) != NULL )
     {
-      int iNest;
-      bool found;
-      OBJ_DATA *tobj, *tobj_next;
+      int iNest = 0;
+      OBJ_DATA *tobj = NULL, *tobj_next = NULL;
 
       rset_supermob( storeroom );
+
       for( iNest = 0; iNest < MAX_NEST; iNest++ )
 	rgObjNest[iNest] = NULL;
 
-      found = TRUE;
       for( ;; )
       {
-	char letter;
-	char *word;
+	const char *word = NULL;
+	char letter = fread_letter( fph );
 
-	letter = fread_letter( fph );
 	if( letter == '*' )
 	{
 	  fread_to_eol( fph );
