@@ -1,6 +1,8 @@
 #include "mud.h"
 #include <string.h>
 
+void reset_room( ROOM_INDEX_DATA *pRoomIndex );
+
 const int MAX_COLONY_SIZE = 2000;
 const int CONSTRUCTION_COST = 500;
 
@@ -631,6 +633,7 @@ void do_landscape( CHAR_DATA * ch, char *argument )
       build_room( location );
     }
 
+  reset_room( location );
   echo_to_room( AT_WHITE, location,
 		"A construction crew enters the room and begins to work." );
 

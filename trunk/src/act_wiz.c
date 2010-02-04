@@ -1058,8 +1058,6 @@ void do_ostat( CHAR_DATA * ch, char *argument )
   return;
 }
 
-
-
 void do_mstat( CHAR_DATA * ch, char *argument )
 {
   char arg[MAX_INPUT_LENGTH];
@@ -1175,7 +1173,10 @@ void do_mstat( CHAR_DATA * ch, char *argument )
   ch_printf( ch, "Affected by: %s\r\n",
       affect_bit_name( victim->affected_by ) );
   send_to_char( "\r\n", ch );
-  ch_printf( ch, "Bestowments: %s\r\n", victim->pcdata->bestowments );
+
+  if( !IS_NPC( victim ) )
+    ch_printf( ch, "Bestowments: %s\r\n", victim->pcdata->bestowments );
+
   ch_printf( ch, "Short description: %s\r\nLong  description: %s",
       victim->short_descr,
       victim->long_descr[0] !=
