@@ -1258,7 +1258,7 @@ size_t clan_permission_table_size( void )
 
 const CLAN_PERMISSION *get_clan_permission( int id )
 {
-  if( id >= 0 && id < clan_permission_table_size() )
+  if( id >= 0 && id < (int) clan_permission_table_size() )
     return &clan_permission_table[id];
   else
     return NULL;
@@ -1306,7 +1306,7 @@ const char *get_clan_permission_description( int id )
 
 int get_clan_permission_id( const char *name )
 {
-  int n = 0;
+  size_t n = 0;
 
   for( n = 0; n < clan_permission_table_size(); ++n )
     {
