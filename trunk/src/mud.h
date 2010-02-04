@@ -650,6 +650,8 @@ struct ship_prototype_data
     short      maxchaff;
 };
 
+#define NEWBIE_SHIP_PROTOTYPE "NU-b13 Starfighter"
+
 struct turret_data
 {
     TURRET_DATA * next;
