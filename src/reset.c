@@ -8,6 +8,7 @@ extern ROOM_INDEX_DATA *room_index_hash[MAX_KEY_HASH];
 
 SHIP_DATA *make_mob_ship( PLANET_DATA * planet, int ship_model );
 void resetship( SHIP_DATA * ship );
+void reset_room( ROOM_INDEX_DATA *pRoomIndex );
 
 void do_reset( CHAR_DATA * ch, char *argument )
 {
@@ -787,14 +788,12 @@ static void reset_random_colonists( ROOM_INDEX_DATA * pRoomIndex )
 	  break;
 
 	case 3:
-	  mob->long_descr = STRALLOC( "A businessman looks to be in a\
-	      hurry.\r\n" );
+	  mob->long_descr = STRALLOC( "A businessman looks to be in a hurry.\r\n" );
 	  mob->gold = number_range( 20, 50 );
 	  break;
 
 	case 4:
-	  mob->long_descr = STRALLOC( "An elderly colonist strolls by\
-	      .\r\n" );
+	  mob->long_descr = STRALLOC( "An elderly colonist strolls by.\r\n" );
 	  mob->gold = number_range( 20, 50 );
 	  break;
       }
@@ -822,8 +821,6 @@ static void reset_random_wildlife( ROOM_INDEX_DATA * pRoomIndex )
   {
     if( ( pMobIndex = get_mob_index( MOB_VNUM_DRAGON ) ) )
     {
-      OBJ_DATA *nest = NULL;
-
       mob = create_mobile( pMobIndex );
       SET_BIT( mob->act, ACT_CITIZEN );
       char_to_room( mob, pRoomIndex );
@@ -831,7 +828,7 @@ static void reset_random_wildlife( ROOM_INDEX_DATA * pRoomIndex )
 
       if( ( pObjIndex = get_obj_index( OBJ_VNUM_DRAGON_NEST ) ) )
       {
-	nest = create_object( pObjIndex );
+	OBJ_DATA *nest = create_object( pObjIndex );
 	nest = obj_to_room( nest, pRoomIndex );
 
 	if( ( pObjIndex = get_obj_index( OBJ_VNUM_DRAGON_CRYSTAL ) ) )
@@ -968,15 +965,12 @@ static void reset_barracks( ROOM_INDEX_DATA * pRoomIndex )
     CHAR_DATA *mob = NULL;
     MOB_INDEX_DATA *pMobIndex = NULL;
     int guard_count = 0;
-    int vnum = 0;
     OBJ_INDEX_DATA *pObjIndex = NULL;
-    OBJ_DATA *blaster = NULL;
     GUARD_DATA *guard = NULL;
-    char tmpbuf[MAX_STRING_LENGTH];
 
     if( !( pMobIndex = get_mob_index( MOB_VNUM_PATROL ) ) )
     {
-      bug( "Reset_all: Missing default patrol (%d)", vnum );
+      bug( "Reset_all: Missing default patrol (%d)", MOB_VNUM_PATROL );
       return;
     }
 
@@ -998,7 +992,7 @@ static void reset_barracks( ROOM_INDEX_DATA * pRoomIndex )
 
     if( ( pObjIndex = get_obj_index( OBJ_VNUM_BLASTER ) ) != NULL )
     {
-      blaster = create_object( pObjIndex );
+      OBJ_DATA *blaster = create_object( pObjIndex );
       obj_to_char( blaster, mob );
       equip_char( mob, blaster, WEAR_WIELD );
     }
@@ -1019,6 +1013,7 @@ static void reset_barracks( ROOM_INDEX_DATA * pRoomIndex )
 
     if( pRoomIndex->area->planet->governed_by )
     {
+      char tmpbuf[MAX_STRING_LENGTH];
       sprintf( tmpbuf, "A soldier patrols the area. (%s)\r\n",
 	  pRoomIndex->area->planet->governed_by->name );
       STRFREE( mob->long_descr );
@@ -1034,16 +1029,14 @@ static void reset_shipyard( ROOM_INDEX_DATA * pRoomIndex )
 	|| IS_SET( pRoomIndex->room_flags, ROOM_CAN_LAND ) )
       && pRoomIndex->area && pRoomIndex->area->planet )
   {
-    char tmpbuf[MAX_STRING_LENGTH];
-    CHAR_DATA *rch;
+    CHAR_DATA *rch = NULL;
     int numguards = 0;
     MOB_INDEX_DATA *pMobIndex = NULL;
     CHAR_DATA *mob = NULL;
-    int vnum = 0;
 
     if( !( pMobIndex = get_mob_index( MOB_VNUM_GUARD ) ) )
     {
-      bug( "Reset_all: Missing default guard (%d)", vnum );
+      bug( "Reset_all: Missing default guard (%d)", MOB_VNUM_GUARD );
       return;
     }
 
@@ -1069,6 +1062,7 @@ static void reset_shipyard( ROOM_INDEX_DATA * pRoomIndex )
 
     if( pRoomIndex->area->planet->governed_by )
     {
+      char tmpbuf[MAX_STRING_LENGTH];
       sprintf( tmpbuf,
 	  "A Platform Security Guard stands alert and ready for trouble. (%s)\r\n",
 	  pRoomIndex->area->planet->governed_by->name );
@@ -1082,39 +1076,39 @@ static void reset_shipyard( ROOM_INDEX_DATA * pRoomIndex )
 /*
  * Reset everything.
  */
-void reset_all(  )
+void reset_all()
 {
   ROOM_INDEX_DATA *pRoomIndex = NULL;
   int iHash = 0;
 
   /* natural disasters */
-  reset_make_random_disaster(  );
+  reset_make_random_disaster();
 
   for( iHash = 0; iHash < MAX_KEY_HASH; iHash++ )
   {
     for( pRoomIndex = room_index_hash[iHash]; pRoomIndex;
 	pRoomIndex = pRoomIndex->next )
     {
-      reset_room_lock_doors( pRoomIndex );
-      reset_respawn_planetary_fleet( pRoomIndex );
-      reset_mobile_by_room_type( pRoomIndex );
-      reset_object_by_room_type( pRoomIndex );
-      reset_barracks( pRoomIndex );
-      reset_shipyard( pRoomIndex );
-
-      /* hidden food & resources */
-
-      if( !pRoomIndex->area || !pRoomIndex->area->planet )
-	continue;
-
-      reset_hidden_food_and_resources( pRoomIndex );
-
-      /* random mobs start here */
-      reset_random_colonists( pRoomIndex );
-
-      reset_random_wildlife( pRoomIndex );
+      reset_room( pRoomIndex );
     }
   }
+}
+
+void reset_room( ROOM_INDEX_DATA *pRoomIndex )
+{
+  reset_room_lock_doors( pRoomIndex );
+  reset_respawn_planetary_fleet( pRoomIndex );
+  reset_mobile_by_room_type( pRoomIndex );
+  reset_object_by_room_type( pRoomIndex );
+  reset_barracks( pRoomIndex );
+  reset_shipyard( pRoomIndex );
+
+  if( !pRoomIndex->area->planet )
+    return;
+
+  reset_hidden_food_and_resources( pRoomIndex );
+  reset_random_colonists( pRoomIndex );
+  reset_random_wildlife( pRoomIndex );
 }
 
 SHIP_DATA *make_mob_ship( PLANET_DATA * planet, int ship_model )
@@ -1136,7 +1130,7 @@ SHIP_DATA *make_mob_ship( PLANET_DATA * planet, int ship_model )
   shipreg--;
   sprintf( filename, "%d", shipreg );
 
-  ship = ship_create(  );
+  ship = ship_create();
   LINK( ship, first_ship, last_ship, next, prev );
 
   ship->filename = str_dup( filename );
