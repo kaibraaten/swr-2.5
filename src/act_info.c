@@ -1946,23 +1946,20 @@ void do_hset( CHAR_DATA * ch, char *argument )
   if( !str_cmp( arg1, "save" ) )
   {
     FILE *fpout = NULL;
-    char filename[MAX_STRING_LENGTH];
     char bak_filename[MAX_STRING_LENGTH];
-    snprintf( filename, MAX_STRING_LENGTH, "%shelp.are", AREA_DIR );
-    snprintf( bak_filename, MAX_STRING_LENGTH, "%s.bak", filename );
+    snprintf( bak_filename, MAX_STRING_LENGTH, "%s.bak", HELP_FILE );
 
-    log_string_plus( "Saving help.are...", LOG_NORMAL );
+    log_string_plus( "Saving help.dat...", LOG_NORMAL );
 
-    rename( filename, bak_filename );
+    rename( HELP_FILE, bak_filename );
 
-    if( ( fpout = fopen( filename, "w" ) ) == NULL )
+    if( ( fpout = fopen( HELP_FILE, "w" ) ) == NULL )
     {
       bug( "hset save: fopen", 0 );
-      perror( "help.are" );
+      perror( "help.dat" );
       return;
     }
 
-    fprintf( fpout, "#HELPS\n\n" );
     for( pHelp = first_help; pHelp; pHelp = pHelp->next )
       fprintf( fpout, "%d %s~\n%s~\n\n",
 	  pHelp->level, pHelp->keyword, help_fix( pHelp->text ) );

@@ -199,7 +199,7 @@ void init_mm( void );
 static void boot_log( const char *str, ... );
 static void load_area( FILE * fp );
 static void load_flags( AREA_DATA * tarea, FILE * fp );
-static void load_helps( AREA_DATA * tarea, FILE * fp );
+static void boot_load_helps( void );
 static void load_mobiles( AREA_DATA * tarea, FILE * fp );
 static void load_objects( AREA_DATA * tarea, FILE * fp );
 static void load_rooms( AREA_DATA * tarea, FILE * fp );
@@ -506,6 +506,12 @@ void boot_db( bool fCopyOver )
   boot_assign_global_skillnumbers(  );
 
   /*
+   * Read help file.
+   */
+  log_string( "Reading help entries..." );
+  boot_load_helps();
+
+  /*
    * Read in all the area files.
    */
   log_string( "Reading in area files..." );
@@ -645,9 +651,16 @@ void add_help( HELP_DATA * pHelp )
 /*
  * Load a help section.
  */
-void load_helps( AREA_DATA * tarea, FILE * fp )
+void boot_load_helps( void )
 {
+  FILE *fp = NULL;
   HELP_DATA *pHelp = NULL;
+
+  if( !( fp = fopen( HELP_FILE, "r" ) ) )
+    {
+      log_printf( "Unable to open %s", HELP_FILE );
+      return;
+    }
 
   for( ;; )
   {
@@ -3305,8 +3318,6 @@ void load_area_file( AREA_DATA * tarea, const char *filename )
     }
     else if( !str_cmp( word, "FLAGS" ) )
       load_flags( tarea, fpArea );
-    else if( !str_cmp( word, "HELPS" ) )
-      load_helps( tarea, fpArea );
     else if( !str_cmp( word, "MOBILES" ) )
       load_mobiles( tarea, fpArea );
     else if( !str_cmp( word, "OBJECTS" ) )

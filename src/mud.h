@@ -3076,6 +3076,7 @@ DECLARE_SPELL_FUN(	spell_smaug		);
 #define SPACE_LIST      "space.lst"
 #define VOTE_LIST       "vote.lst"      
 
+#define HELP_FILE       SYSTEM_DIR "help.dat"
 #define BOARD_FILE	"boards.txt"		/* For bulletin boards	 */
 #define SHUTDOWN_FILE	"shutdown.txt"		/* For 'shutdown'	 */
 #define COPYOVER_FILE   SYSTEM_DIR "copyover.dat"
