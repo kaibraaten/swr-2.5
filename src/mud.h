@@ -17,8 +17,6 @@ extern FILE *out_stream;
 typedef	int				ch_ret;
 typedef	int				obj_ret;
 
-#define args( list )			list
-
 #ifdef __cplusplus
 #define DECLARE_DO_FUN( fun )    extern "C" { DO_FUN    fun; } DO_FUN fun##_mangled
 #define DECLARE_SPEC_FUN( fun )  extern "C" { SPEC_FUN  fun; } SPEC_FUN fun##_mangled
@@ -3269,22 +3267,20 @@ long int get_prototype_value( const SHIP_PROTOTYPE *prototype );
 void create_ship_rooms( SHIP_DATA * ship );
 
 /* comm.c */
-void	close_socket	args( ( DESCRIPTOR_DATA *dclose, bool force ) );
-void	write_to_buffer	args( ( DESCRIPTOR_DATA *d, const char *txt,
-				size_t length ) );
-void	write_to_pager	args( ( DESCRIPTOR_DATA *d, const char *txt,
-				size_t length ) );
-void	send_to_char_color	args( ( const char *txt, const CHAR_DATA *ch ) );
-void	send_to_pager_color	args( ( const char *txt, const CHAR_DATA *ch ) );
-void	set_char_color  args( ( short AType, CHAR_DATA *ch ) );
-void	set_pager_color	args( ( short AType, CHAR_DATA *ch ) );
-void	ch_printf	args( ( const CHAR_DATA *ch, const char *fmt, ... ) );
-void	pager_printf	args( (const CHAR_DATA *ch, const char *fmt, ...) );
-void	act		args( ( short AType, const char *format, CHAR_DATA *ch,
-			    const void *arg1, const void *arg2, int type ) );
+void close_socket( DESCRIPTOR_DATA *dclose, bool force );
+void write_to_buffer( DESCRIPTOR_DATA *d, const char *txt, size_t length );
+void write_to_pager( DESCRIPTOR_DATA *d, const char *txt, size_t length );
+void send_to_char_color( const char *txt, const CHAR_DATA *ch );
+void send_to_pager_color( const char *txt, const CHAR_DATA *ch );
+void set_char_color( short AType, CHAR_DATA *ch );
+void set_pager_color( short AType, CHAR_DATA *ch );
+void ch_printf( const CHAR_DATA *ch, const char *fmt, ... );
+void pager_printf(const CHAR_DATA *ch, const char *fmt, ...);
+void act( short AType, const char *format, CHAR_DATA *ch,
+	  const void *arg1, const void *arg2, int type );
 
 /* reset.c */
-void	reset_all	args( ( void ) );
+void reset_all( void );
 
 /* const.c */
 size_t sector_names_size( void );
@@ -3397,15 +3393,15 @@ short ris_damage( const CHAR_DATA *ch, short dam, int ris );
 ch_ret damage( CHAR_DATA *ch, CHAR_DATA *victim, int dam, int dt );
 void update_pos( CHAR_DATA *victim );
 void set_fighting( CHAR_DATA *ch, CHAR_DATA *victim );
-void	stop_fighting	args( ( CHAR_DATA *ch, bool fBoth ) );
-void	free_fight	args( ( CHAR_DATA *ch ) );
-CD *	who_fighting	args( ( const CHAR_DATA *ch ) );
-void	stop_hunting	args( ( CHAR_DATA *ch ) );
-void	stop_hating	args( ( CHAR_DATA *ch ) );
-void	stop_fearing	args( ( CHAR_DATA *ch ) );
-void	start_hunting	args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
-void	start_hating	args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
-void	start_fearing	args( ( CHAR_DATA *ch, CHAR_DATA *victim ) );
+void stop_fighting( CHAR_DATA *ch, bool fBoth );
+void free_fight( CHAR_DATA *ch );
+CD * who_fighting( const CHAR_DATA *ch );
+void stop_hunting( CHAR_DATA *ch );
+void stop_hating( CHAR_DATA *ch );
+void stop_fearing( CHAR_DATA *ch );
+void start_hunting( CHAR_DATA *ch, CHAR_DATA *victim );
+void start_hating( CHAR_DATA *ch, CHAR_DATA *victim );
+void start_fearing( CHAR_DATA *ch, CHAR_DATA *victim );
 bool is_hunting( const CHAR_DATA *ch, const CHAR_DATA *victim );
 bool is_hating( const CHAR_DATA *ch, const CHAR_DATA *victim );
 bool is_fearing( const CHAR_DATA *ch, const CHAR_DATA *victim );

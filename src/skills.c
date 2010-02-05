@@ -2663,7 +2663,7 @@ void do_berserk( CHAR_DATA * ch, char *argument )
 }
 
 /* External from fight.c */
-ch_ret one_hit args( ( CHAR_DATA * ch, CHAR_DATA * victim, int dt ) );
+ch_ret one_hit( CHAR_DATA * ch, CHAR_DATA * victim, int dt );
 void do_hitall( CHAR_DATA * ch, char *argument )
 {
   CHAR_DATA *vch;

@@ -12,7 +12,7 @@ bool write_to_descriptor( int desc, char *txt, int length );
 /*
  * Local functions.
  */
-void save_banlist args( ( void ) );
+void save_banlist( void );
 int get_color( char *argument );	/* function proto */
 
 /*

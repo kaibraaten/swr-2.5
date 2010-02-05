@@ -7,29 +7,8 @@ VOTE_DATA *first_poll = NULL;
 VOTE_DATA *last_poll = NULL;
 
 /* local routines */
-void fread_poll args( ( VOTE_DATA * poll, FILE * fp ) );
-bool load_poll_file args( ( const char *pollfile ) );
-void write_poll_list args( ( void ) );
-
-
-void write_poll_list(  )
-{
-  VOTE_DATA *tpoll;
-  FILE *fpout;
-  char player[256];
-
-  sprintf( player, "%s%s", VOTE_DIR, VOTE_LIST );
-  fpout = fopen( player, "w" );
-  if( !fpout )
-  {
-    bug( "FATAL: cannot open vote.lst for writing!\r\n", 0 );
-    return;
-  }
-  for( tpoll = first_poll; tpoll; tpoll = tpoll->next )
-    fprintf( fpout, "%s\n", tpoll->player );
-  fprintf( fpout, "$\n" );
-  fclose( fpout );
-}
+static void fread_poll( VOTE_DATA * poll, FILE * fp );
+static bool load_poll_file( const char *pollfile );
 
 /*
  * Save a poll's data to its data file
