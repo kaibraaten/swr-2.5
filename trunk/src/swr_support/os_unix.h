@@ -37,7 +37,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <unistd.h>
-#include <arpa/telnet.h>
+/*#include <arpa/telnet.h>*/
 
 #ifdef SWR2_USE_DLSYM
 #include <dlfcn.h>

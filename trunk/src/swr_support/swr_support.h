@@ -188,6 +188,8 @@ int umin( int check, int ncheck );
 int umax( int check, int ncheck );
 int urange( int mincheck, int check, int maxcheck );
 
+/* string_handling.c */
+char *cat_sprintf(char *dest, const char *fmt, ...);
 bool is_number( const char *arg );
 int number_argument( const char *argument, char *arg );
 char *one_argument( char *argument, char *arg_first );

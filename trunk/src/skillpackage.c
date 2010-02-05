@@ -127,7 +127,7 @@ static SKILL_PACKAGE package_table[] = {
   { "Weaponsmith", package_builder_weaponsmith }
 };
 
-static size_t package_table_size( void )
+size_t skill_package_table_size( void )
 {
   return sizeof( package_table ) / sizeof( *package_table );
 }
@@ -136,7 +136,7 @@ SKILL_PACKAGE *get_skill_package( const char *argument )
 {
   size_t n = 0;
 
-  for( n = 0; n < package_table_size(); ++n )
+  for( n = 0; n < skill_package_table_size(); ++n )
     {
       SKILL_PACKAGE *package = &(package_table[n]);
 
@@ -153,7 +153,7 @@ static size_t longest_package_name( void )
 {
   size_t longest = 0, n = 0;
 
-  for( n = 0; n < package_table_size(); ++n )
+  for( n = 0; n < skill_package_table_size(); ++n )
     {
       size_t current = strlen( package_table[n].name );
 
@@ -174,7 +174,7 @@ char *generate_skillpackage_table( void )
   static char buf[MAX_STRING_LENGTH];
   *buf = '\0';
 
-  for( n = 0; n < package_table_size(); ++n )
+  for( n = 0; n < skill_package_table_size(); ++n )
     {
       size_t pad = longest_package_name() - strlen( package_table[n].name ) + min_pad;
       size_t pad_iter = 0;
