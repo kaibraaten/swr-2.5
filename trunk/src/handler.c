@@ -2511,7 +2511,6 @@ void clean_mob( MOB_INDEX_DATA * mob )
   mob->act = 0;
   mob->affected_by = 0;
   mob->alignment = 0;
-  mob->mobthac0 = 0;
   mob->ac = 0;
   mob->hitnodice = 0;
   mob->hitsizedice = 0;

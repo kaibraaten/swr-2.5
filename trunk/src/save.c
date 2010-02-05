@@ -417,9 +417,9 @@ void fwrite_char( const CHAR_DATA * ch, FILE * fp )
       fprintf( fp, "WizInvis     %d\n", ch->pcdata->wizinvis );
     }
 
-    if( ch->pcdata->clan_name && ch->pcdata->clan_name[0] != '\0' )
+    if( ch->pcdata->clan )
       {
-	fprintf( fp, "Clan         %s~\n", ch->pcdata->clan_name );
+	fprintf( fp, "Clan         %s~\n", ch->pcdata->clan->name );
 
 	if( ch->pcdata->clan_permissions[0] != '\0' )
 	  fprintf( fp, "ClanPerms    %s~\n", ch->pcdata->clan_permissions );
@@ -818,7 +818,6 @@ bool load_char_obj( DESCRIPTOR_DATA * d, const char *name, bool preload )
     ch->long_descr = STRALLOC( "" );
     ch->description = STRALLOC( "" );
     ch->editor = NULL;
-    ch->pcdata->clan_name = STRALLOC( "" );
     ch->pcdata->clan_permissions = str_dup( "" );
     ch->pcdata->clan = NULL;
     ch->pcdata->pwd = str_dup( "" );
@@ -842,11 +841,6 @@ bool load_char_obj( DESCRIPTOR_DATA * d, const char *name, bool preload )
     int num_skills = 0;
     int adept_skills = 0;
 
-    if( !ch->pcdata->clan_name )
-    {
-      ch->pcdata->clan_name = STRALLOC( "" );
-      ch->pcdata->clan = NULL;
-    }
     if( !ch->pcdata->bio )
       ch->pcdata->bio = STRALLOC( "" );
 
@@ -1027,24 +1021,19 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
 
 	if( !str_cmp( word, "Clan" ) )
 	{
-	  ch->pcdata->clan_name = fread_string( fp );
+	  char *clan_name = fread_string( fp );
 
-	  if( !preload
-	      && ch->pcdata->clan_name[0] != '\0'
-	      && ( ch->pcdata->clan =
-		get_clan( ch->pcdata->clan_name ) ) == NULL )
+	  if( !preload && clan_name[0] != '\0'
+	      && ( ch->pcdata->clan = get_clan( clan_name ) ) == NULL )
 	  {
-	    sprintf( buf,
-		"Warning: the organization %s no longer exists, and therefore you no longer\r\nbelong to that organization.\r\n",
-		ch->pcdata->clan_name );
+	    sprintf( buf, "Warning: the organization %s no longer exists, and therefore you no longer\r\nbelong to that organization.\r\n", clan_name );
 	    send_to_char( buf, ch );
-	    STRFREE( ch->pcdata->clan_name );
-	    ch->pcdata->clan_name = STRALLOC( "" );
 	  }
+
+	  STRFREE( clan_name );
 	  fMatch = TRUE;
 	  break;
 	}
-
 
 	if( !str_cmp( word, "Condition" ) )
 	{
@@ -1085,26 +1074,6 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
       case 'G':
 	KEY( "Glory", ch->pcdata->quest_curr, fread_number( fp ) );
 	KEY( "Gold", ch->gold, fread_number( fp ) );
-	/* temporary measure */
-	if( !str_cmp( word, "Guild" ) )
-	{
-	  ch->pcdata->clan_name = fread_string( fp );
-
-	  if( !preload
-	      && ch->pcdata->clan_name[0] != '\0'
-	      && ( ch->pcdata->clan =
-		get_clan( ch->pcdata->clan_name ) ) == NULL )
-	  {
-	    sprintf( buf,
-		"Warning: the organization %s no longer exists, and therefore you no longer\r\nbelong to that organization.\r\n",
-		ch->pcdata->clan_name );
-	    send_to_char( buf, ch );
-	    STRFREE( ch->pcdata->clan_name );
-	    ch->pcdata->clan_name = STRALLOC( "" );
-	  }
-	  fMatch = TRUE;
-	  break;
-	}
 	break;
 
       case 'H':

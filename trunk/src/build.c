@@ -971,8 +971,7 @@ void do_mset( CHAR_DATA * ch, char *argument )
 	  victim->pcdata->clan->members = 0;
 	save_clan( victim->pcdata->clan );
       }
-      STRFREE( victim->pcdata->clan_name );
-      victim->pcdata->clan_name = STRALLOC( "" );
+
       victim->pcdata->clan = NULL;
       return;
     }
@@ -989,8 +988,7 @@ void do_mset( CHAR_DATA * ch, char *argument )
 	victim->pcdata->clan->members = 0;
       save_clan( victim->pcdata->clan );
     }
-    STRFREE( victim->pcdata->clan_name );
-    victim->pcdata->clan_name = QUICKLINK( clan->name );
+
     victim->pcdata->clan = clan;
     if( !IS_IMMORTAL( victim ) )
     {
@@ -5508,8 +5506,10 @@ void save_mobs(  )
 	  pMobIndex->affected_by,
 	  pMobIndex->alignment, complexmob ? 'Z' : 'S' );
 
-      fprintf( fpout, "%d %d %d ", pMobIndex->level,
-	  pMobIndex->mobthac0, pMobIndex->ac );
+      fprintf( fpout, "%d %d %d ",
+	       pMobIndex->level,
+	       0, /*pMobIndex->mobthac0,*/
+	       pMobIndex->ac );
       fprintf( fpout, "%dd%d+%d ", pMobIndex->hitnodice,
 	  pMobIndex->hitsizedice, pMobIndex->hitplus );
       fprintf( fpout, "%dd%d+%d\n", pMobIndex->damnodice,

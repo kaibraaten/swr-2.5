@@ -340,8 +340,7 @@ void do_induct( CHAR_DATA * ch, char *argument )
   clan->members++;
 
   victim->pcdata->clan = clan;
-  STRFREE( victim->pcdata->clan_name );
-  victim->pcdata->clan_name = QUICKLINK( clan->name );
+
   act( AT_MAGIC, "You induct $N into $t", ch, clan->name, victim, TO_CHAR );
   act( AT_MAGIC, "$n inducts $N into $t", ch, clan->name, victim,
       TO_NOTVICT );
@@ -411,8 +410,7 @@ void do_outcast( CHAR_DATA * ch, char *argument )
 
   --clan->members;
   victim->pcdata->clan = NULL;
-  STRFREE( victim->pcdata->clan_name );
-  victim->pcdata->clan_name = STRALLOC( "" );
+
   act( AT_MAGIC, "You outcast $N from $t", ch, clan->name, victim, TO_CHAR );
   act( AT_MAGIC, "$n outcasts $N from $t", ch, clan->name, victim, TO_ROOM );
   act( AT_MAGIC, "$n outcasts you from $t", ch, clan->name, victim, TO_VICT );
@@ -734,8 +732,7 @@ void do_resign( CHAR_DATA * ch, char *argument )
 
   --clan->members;
   ch->pcdata->clan = NULL;
-  STRFREE( ch->pcdata->clan_name );
-  ch->pcdata->clan_name = STRALLOC( "" );
+
   act( AT_MAGIC, "You resign your position in $t", ch, clan->name, NULL,
       TO_CHAR );
   sprintf( buf, "%s has quit %s!", ch->name, clan->name );
