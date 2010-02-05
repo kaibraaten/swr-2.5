@@ -292,7 +292,8 @@ void do_score( CHAR_DATA * ch, char *argument )
   else
     send_to_char( "satanic", ch );
 
-  ch_printf( ch, "   &WCredits: &G%ld\r\n", ch->gold );
+  ch_printf( ch, "   &WCredits: &G%ld &WBank: &G%ld\r\n",
+	     ch->gold, !IS_NPC( ch ) ? ch->pcdata->bank : 0 );
 
   ch_printf( ch,
       "&W------------------------------------------------------------------------\r\n" );

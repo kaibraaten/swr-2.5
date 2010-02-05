@@ -1843,7 +1843,6 @@ struct	pc_data
   char *helled_by;
   char *bio;		/* Personal Bio */
   char *authed_by;	/* what crazy imm authed this name ;) */
-  SKILLTYPE *special_skills[5]; /* personalized skills/spells */
   char *prompt;		/* User config prompts */
   char *subprompt;	/* Substate prompt */
   short pagerlen;	/* For pager (NOT menus) */
