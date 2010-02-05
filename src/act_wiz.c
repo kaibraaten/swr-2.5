@@ -1130,12 +1130,10 @@ void do_mstat( CHAR_DATA * ch, char *argument )
       victim->master ? victim->master->name : "(none)",
       victim->leader ? victim->leader->name : "(none)" );
   if( !IS_NPC( victim ) )
-    ch_printf( ch,
-	"Thirst: %d   Full: %d   Drunk: %d     Glory: %d/%d\r\n",
-	victim->pcdata->condition[COND_THIRST],
-	victim->pcdata->condition[COND_FULL],
-	victim->pcdata->condition[COND_DRUNK],
-	victim->pcdata->quest_curr, victim->pcdata->quest_accum );
+    ch_printf( ch, "Thirst: %d   Full: %d   Drunk: %d\r\n",
+	       victim->pcdata->condition[COND_THIRST],
+	       victim->pcdata->condition[COND_FULL],
+	       victim->pcdata->condition[COND_DRUNK] );
   else
     ch_printf( ch, "Hit dice: %dd%d+%d.  Damage dice: %dd%d+%d.\r\n",
 	victim->pIndexData->hitnodice,

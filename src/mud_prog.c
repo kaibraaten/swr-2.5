@@ -723,12 +723,7 @@ int mprog_do_ifcheck( char *ifcheck, CHAR_DATA * mob, CHAR_DATA * actor,
     {
       return mprog_veval( chkchar->position, opr, atoi( rval ), mob );
     }
-    if( !str_cmp( chck, "doingquest" ) )
-    {
-      return IS_NPC( actor ) ? FALSE :
-	mprog_veval( chkchar->pcdata->quest_number, opr, atoi( rval ),
-	    mob );
-    }
+
     if( !str_cmp( chck, "ishelled" ) )
     {
       return IS_NPC( actor ) ? FALSE :
