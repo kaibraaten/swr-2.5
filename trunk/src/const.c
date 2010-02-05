@@ -599,15 +599,6 @@ const char *const trig_flags[] = {
   "showroomdesc", "autoreturn", "r2", "r3"
 };
 
-const char *const part_flags[] = {
-  "head", "arms", "legs", "heart", "brains", "guts", "hands", "feet",
-  "fingers",
-  "ear", "eye", "long_tongue", "eyestalks", "tentacles", "fins", "wings",
-  "tail", "scales", "claws", "fangs", "horns", "tusks", "tailattack",
-  "sharpscales", "beak", "haunches", "hooves", "paws", "forelegs", "feathers",
-  "r1", "r2"
-};
-
 const char *const attack_flags[] = {
   "bite", "claws", "tail", "sting", "punch", "kick",
   "r6", "r7", "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15", "r16",
@@ -801,16 +792,6 @@ int get_trigflag( const char *flag )
 
   for( x = 0; x < 32; x++ )
     if( !str_cmp( flag, trig_flags[x] ) )
-      return x;
-  return -1;
-}
-
-int get_partflag( const char *flag )
-{
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, part_flags[x] ) )
       return x;
   return -1;
 }

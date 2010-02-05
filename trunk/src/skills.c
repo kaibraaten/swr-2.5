@@ -273,7 +273,6 @@ bool check_skill( CHAR_DATA * ch, const char *command, char *argument )
     ch->mana -= mana;
   }
 
-  ch->prev_cmd = ch->last_cmd;	/* haus, for automapping */
   ch->last_cmd = skill->skill_fun;
   start_timer( &time_used );
   ( *skill->skill_fun ) ( ch, argument );

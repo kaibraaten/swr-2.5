@@ -834,7 +834,7 @@ void load_mobiles( AREA_DATA * tarea, FILE * fp )
 	  &x1, &x2, &x3, &x4, &x5, &x6, &x7, &x8 );
       pMobIndex->hitroll = x1;
       pMobIndex->damroll = x2;
-      pMobIndex->xflags = x3;
+      /*pMobIndex->xflags = x3;*/
       pMobIndex->resistant = x4;
       pMobIndex->immune = x5;
       pMobIndex->susceptible = x6;
@@ -850,7 +850,6 @@ void load_mobiles( AREA_DATA * tarea, FILE * fp )
       pMobIndex->perm_cha = 10;
       pMobIndex->perm_con = 10;
       pMobIndex->perm_lck = 10;
-      pMobIndex->xflags = 0;
       pMobIndex->resistant = 0;
       pMobIndex->immune = 0;
       pMobIndex->susceptible = 0;
@@ -1662,7 +1661,6 @@ CHAR_DATA *create_mobile( MOB_INDEX_DATA * pMobIndex )
   mob->perm_lck = pMobIndex->perm_lck;
   mob->hitroll = pMobIndex->hitroll;
   mob->damroll = pMobIndex->damroll;
-  mob->xflags = pMobIndex->xflags;
   mob->saving_poison_death = pMobIndex->saving_poison_death;
   mob->saving_wand = pMobIndex->saving_wand;
   mob->saving_para_petri = pMobIndex->saving_para_petri;
@@ -1908,7 +1906,6 @@ void clear_char( CHAR_DATA * ch )
   ch->switched = NULL;
   ch->first_affect = NULL;
   ch->last_affect = NULL;
-  ch->prev_cmd = NULL;		/* maps */
   ch->last_cmd = NULL;
   ch->dest_buf = NULL;
   ch->dest_buf_2 = NULL;
@@ -1926,7 +1923,6 @@ void clear_char( CHAR_DATA * ch )
   ch->max_move = 500;
   ch->height = 72;
   ch->weight = 180;
-  ch->xflags = 0;
   ch->barenumdie = 1;
   ch->baresizedie = 4;
   ch->substate = 0;
@@ -3065,7 +3061,6 @@ MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
     pMobIndex->perm_cha = 10;
     pMobIndex->perm_con = 10;
     pMobIndex->perm_lck = 10;
-    pMobIndex->xflags = 0;
     pMobIndex->resistant = 0;
     pMobIndex->immune = 0;
     pMobIndex->susceptible = 0;
@@ -3107,7 +3102,6 @@ MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
     pMobIndex->perm_cha = cMobIndex->perm_cha;
     pMobIndex->perm_con = cMobIndex->perm_con;
     pMobIndex->perm_lck = cMobIndex->perm_lck;
-    pMobIndex->xflags = cMobIndex->xflags;
     pMobIndex->resistant = cMobIndex->resistant;
     pMobIndex->immune = cMobIndex->immune;
     pMobIndex->susceptible = cMobIndex->susceptible;
