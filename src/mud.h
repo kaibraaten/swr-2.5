@@ -185,7 +185,7 @@ typedef enum
 typedef enum
   {
     DISASTER_ALIEN_INVASION
-  } disaster_types;
+  } disaster_scenarios;
 
 /*
  * do_who output structure -- Narn
@@ -201,7 +201,7 @@ struct who_data
 /*
  * Site ban structure.
  */
-struct	ban_data
+struct ban_data
 {
     BAN_DATA *	next;
     BAN_DATA *	prev;
@@ -209,7 +209,6 @@ struct	ban_data
     int		level;
     char *	ban_time;
 };
-
 
 /*
  * Time and weather stuff.
@@ -224,7 +223,7 @@ typedef enum
   SKY_CLOUDLESS, SKY_CLOUDY, SKY_RAINING, SKY_LIGHTNING
 } sky_conditions;
 
-struct	time_info_data
+struct time_info_data
 {
     int		hour;
     int		day;
@@ -1411,13 +1410,6 @@ typedef enum
     COLONY_ROOM_UNUSED24,
     COLONY_ROOM_LAST
   } colony_room_types;
-
-#define COLONY_ROOM_FIRST                  1
-#define COLONY_ROOM_SUPPLY_SHOP           12
-#define COLONY_ROOM_COLONIZATION_CENTER   13
-#define COLONY_ROOM_SHUTTLE_PLATFORM      14
-#define COLONY_ROOM_HOTEL                 18
-#define COLONY_ROOM_LAST                  25
 
 static const int COLONY_COST = 100000;
 
@@ -3095,22 +3087,6 @@ DECLARE_SPELL_FUN(	spell_smaug		);
  * Our function prototypes.
  * One big lump ... this is every function in Merc.
  */
-#define CD	CHAR_DATA
-#define MID	MOB_INDEX_DATA
-#define OD	OBJ_DATA
-#define OID	OBJ_INDEX_DATA
-#define RID	ROOM_INDEX_DATA
-#define SF	SPEC_FUN
-#define BD	BOARD_DATA
-#define CL	CLAN_DATA
-#define EDD	EXTRA_DESCR_DATA
-#define ED	EXIT_DATA
-#define	ST	SOCIALTYPE
-#define	CO	COUNCIL_DATA
-#define DE	DEITY_DATA
-#define SK	SKILLTYPE
-#define SH      SHIP_DATA
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -3139,10 +3115,10 @@ void copyover_recover( void );
 /* act_move.c */
 char *wordwrap( char *txt, short wrap );
 void clear_vrooms( void );
-ED *find_door( CHAR_DATA *ch, const char *arg, bool quiet );
-ED *get_exit( const ROOM_INDEX_DATA *room, short dir );
-ED *get_exit_to( const ROOM_INDEX_DATA *room, short dir, long vnum );
-ED *get_exit_num( const ROOM_INDEX_DATA *room, short count );
+EXIT_DATA *find_door( CHAR_DATA *ch, const char *arg, bool quiet );
+EXIT_DATA *get_exit( const ROOM_INDEX_DATA *room, short dir );
+EXIT_DATA *get_exit_to( const ROOM_INDEX_DATA *room, short dir, long vnum );
+EXIT_DATA *get_exit_num( const ROOM_INDEX_DATA *room, short count );
 ch_ret move_char( CHAR_DATA *ch, EXIT_DATA *pexit, int fall );
 void teleport( CHAR_DATA *ch, short room, int flags );
 short encumbrance( const CHAR_DATA *ch, short move );
@@ -3156,7 +3132,7 @@ void obj_fall( OBJ_DATA *obj, bool through );
 
 /* act_wiz.c */
 void close_area( AREA_DATA *pArea );
-RID *find_location( CHAR_DATA *ch, const char *arg );
+ROOM_INDEX_DATA *find_location( CHAR_DATA *ch, const char *arg );
 void echo_to_room( short AT_COLOR, const ROOM_INDEX_DATA *room,
 		   const char *argument );
 void echo_to_all( short AT_COLOR, const char *argument, short tar );
@@ -3171,7 +3147,7 @@ void add_command( CMDTYPE *command );
 
 /* boards.c */
 void load_boards( void );
-BD * get_board( const OBJ_DATA *obj );
+BOARD_DATA * get_board( const OBJ_DATA *obj );
 void free_note( NOTE_DATA *pnote );
 
 /* build.c */
@@ -3187,7 +3163,7 @@ bool clan_char_has_permission( const CLAN_DATA *clan,
 bool clan_char_is_leader( const CLAN_DATA*, const CHAR_DATA* );
 void clan_remove_leader( CLAN_DATA *ch, const char *name );
 void clan_decrease_vehicles_owned( CLAN_DATA *clan, const SHIP_DATA *ship );
-CL *get_clan( const char *name );
+CLAN_DATA *get_clan( const char *name );
 void load_clans( void );
 void save_clan( const CLAN_DATA *clan );
 
@@ -3222,7 +3198,7 @@ void write_area_list( void );
 void write_starsystem_list( void );
 SHIP_DATA *ship_create( void );
 SPACE_DATA *starsystem_create( void );
-SH *get_ship( const char *name );
+SHIP_DATA *get_ship( const char *name );
 void load_ships( void );
 void save_ship( const SHIP_DATA *ship );
 void load_space( void );
@@ -3330,25 +3306,25 @@ void show_file( const CHAR_DATA *ch, const char *filename );
 void boot_db( bool fCopyOver );
 void area_update( void );
 void add_char( CHAR_DATA *ch );
-CD *create_mobile( MOB_INDEX_DATA *pMobIndex );
-OD *create_object( OBJ_INDEX_DATA *pObjIndex );
+CHAR_DATA *create_mobile( MOB_INDEX_DATA *pMobIndex );
+OBJ_DATA *create_object( OBJ_INDEX_DATA *pObjIndex );
 void clear_char( CHAR_DATA *ch );
 void free_char( CHAR_DATA *ch );
 char *get_extra_descr( const char *name, EXTRA_DESCR_DATA *ed );
-MID *get_mob_index( long vnum );
-OID *get_obj_index( long vnum );
-RID *get_room_index( long vnum );
+MOB_INDEX_DATA *get_mob_index( long vnum );
+OBJ_INDEX_DATA *get_obj_index( long vnum );
+ROOM_INDEX_DATA *get_room_index( long vnum );
 void append_file( CHAR_DATA *ch, const char *file, const char *str );
 void bug( const char *str, ... );
 void log_string_plus( const char *str, short log_type );
-RID *make_room( long vnum );
-RID *make_ship_room( SHIP_DATA * ship );
-OID *make_object( long vnum, long cvnum, char *name );
-MID *make_mobile( long vnum, long cvnum, char *name );
+ROOM_INDEX_DATA *make_room( long vnum );
+ROOM_INDEX_DATA *make_ship_room( SHIP_DATA * ship );
+OBJ_INDEX_DATA *make_object( long vnum, long cvnum, char *name );
+MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name );
 void make_bexit( ROOM_INDEX_DATA *location, ROOM_INDEX_DATA *troom,
 		 int direction );
-ED *make_exit( ROOM_INDEX_DATA *pRoomIndex, ROOM_INDEX_DATA *to_room,
-	       short door );
+EXIT_DATA *make_exit( ROOM_INDEX_DATA *pRoomIndex,
+		      ROOM_INDEX_DATA *to_room, short door );
 void add_help( HELP_DATA *pHelp );
 void fix_area_exits( AREA_DATA *tarea );
 void load_area_file( AREA_DATA *tarea, const char *filename );
@@ -3370,11 +3346,11 @@ bool can_omodify( const CHAR_DATA *ch, const OBJ_DATA *obj );
 bool can_mmodify( const CHAR_DATA *ch, const CHAR_DATA *mob );
 bool can_medit( const CHAR_DATA *ch, const MOB_INDEX_DATA *mob );
 void free_area( AREA_DATA *are );
-EDD *SetRExtra( ROOM_INDEX_DATA *room, const char *keywords );
+EXTRA_DESCR_DATA *SetRExtra( ROOM_INDEX_DATA *room, const char *keywords );
 bool DelRExtra( ROOM_INDEX_DATA *room, char *keywords );
-EDD *SetOExtra( OBJ_DATA *obj, const char *keywords );
+EXTRA_DESCR_DATA *SetOExtra( OBJ_DATA *obj, const char *keywords );
 bool DelOExtra( OBJ_DATA *obj, char *keywords );
-EDD *SetOExtraProto( OBJ_INDEX_DATA *obj, const char *keywords );
+EXTRA_DESCR_DATA *SetOExtraProto( OBJ_INDEX_DATA *obj, const char *keywords );
 bool DelOExtraProto( OBJ_INDEX_DATA *obj, char *keywords );
 void fold_area( const AREA_DATA *tarea, const char *filename, bool install );
 int get_otype( const char *type );
@@ -3395,7 +3371,7 @@ void update_pos( CHAR_DATA *victim );
 void set_fighting( CHAR_DATA *ch, CHAR_DATA *victim );
 void stop_fighting( CHAR_DATA *ch, bool fBoth );
 void free_fight( CHAR_DATA *ch );
-CD * who_fighting( const CHAR_DATA *ch );
+CHAR_DATA * who_fighting( const CHAR_DATA *ch );
 void stop_hunting( CHAR_DATA *ch );
 void stop_hating( CHAR_DATA *ch );
 void stop_fearing( CHAR_DATA *ch );
@@ -3412,8 +3388,8 @@ void raw_kill( CHAR_DATA *ch, CHAR_DATA *victim );
 /* makeobjs.c */
 void make_corpse( const CHAR_DATA *ch );
 void make_scraps( OBJ_DATA *obj );
-OD *make_trap( int v0, int v1, int v2, int v3 );
-OD *create_money( int amount );
+OBJ_DATA *make_trap( int v0, int v1, int v2, int v3 );
+OBJ_DATA *create_money( int amount );
 
 /* misc.c */
 void actiondesc( CHAR_DATA *ch, const OBJ_DATA *obj, void *vo );
@@ -3495,16 +3471,16 @@ bool is_affected( const CHAR_DATA *ch, int sn );
 void affect_join( CHAR_DATA *ch, AFFECT_DATA *paf );
 void char_from_room( CHAR_DATA *ch );
 void char_to_room( CHAR_DATA *ch, ROOM_INDEX_DATA *pRoomIndex );
-OD * obj_to_char( OBJ_DATA *obj, CHAR_DATA *ch );
+OBJ_DATA * obj_to_char( OBJ_DATA *obj, CHAR_DATA *ch );
 void obj_from_char( OBJ_DATA *obj );
 int apply_ac( const OBJ_DATA *obj, int iWear );
-OD *get_eq_char( const CHAR_DATA *ch, int iWear );
+OBJ_DATA *get_eq_char( const CHAR_DATA *ch, int iWear );
 void equip_char( CHAR_DATA *ch, OBJ_DATA *obj, int iWear );
 void unequip_char( CHAR_DATA *ch, OBJ_DATA *obj );
 int count_obj_list( const OBJ_INDEX_DATA *obj, const OBJ_DATA *list );
 void obj_from_room( OBJ_DATA *obj );
-OD * obj_to_room( OBJ_DATA *obj, ROOM_INDEX_DATA *pRoomIndex );
-OD * obj_to_obj( OBJ_DATA *obj, OBJ_DATA *obj_to );
+OBJ_DATA * obj_to_room( OBJ_DATA *obj, ROOM_INDEX_DATA *pRoomIndex );
+OBJ_DATA * obj_to_obj( OBJ_DATA *obj, OBJ_DATA *obj_to );
 void obj_from_obj( OBJ_DATA *obj );
 void extract_obj( OBJ_DATA *obj );
 void extract_exit( ROOM_INDEX_DATA *room, EXIT_DATA *pexit );
@@ -3513,16 +3489,17 @@ void clean_room( ROOM_INDEX_DATA *room );
 void clean_obj( OBJ_INDEX_DATA *obj );
 void clean_mob( MOB_INDEX_DATA *mob );
 void extract_char( CHAR_DATA *ch, bool fPull );
-CD *get_char_room( const CHAR_DATA *ch, const char *argument );
-CD *get_char_world( const CHAR_DATA *ch, const char *argument );
-OD *get_obj_type( const OBJ_INDEX_DATA *pObjIndexData );
-OD *get_obj_list( const CHAR_DATA *ch, const char *argument, OBJ_DATA *list );
-OD *get_obj_list_rev( const CHAR_DATA *ch, const char *argument,
+CHAR_DATA *get_char_room( const CHAR_DATA *ch, const char *argument );
+CHAR_DATA *get_char_world( const CHAR_DATA *ch, const char *argument );
+OBJ_DATA *get_obj_type( const OBJ_INDEX_DATA *pObjIndexData );
+OBJ_DATA *get_obj_list( const CHAR_DATA *ch, const char *argument,
+			OBJ_DATA *list );
+OBJ_DATA *get_obj_list_rev( const CHAR_DATA *ch, const char *argument,
 			    OBJ_DATA *list );
-OD *get_obj_carry( const CHAR_DATA *ch, const char *argument );
-OD *get_obj_wear( const CHAR_DATA *ch, const char *argument );
-OD *get_obj_here( const CHAR_DATA *ch, const char *argument );
-OD *get_obj_world( const CHAR_DATA *ch, const char *argument );
+OBJ_DATA *get_obj_carry( const CHAR_DATA *ch, const char *argument );
+OBJ_DATA *get_obj_wear( const CHAR_DATA *ch, const char *argument );
+OBJ_DATA *get_obj_here( const CHAR_DATA *ch, const char *argument );
+OBJ_DATA *get_obj_world( const CHAR_DATA *ch, const char *argument );
 int get_obj_number( const OBJ_DATA *obj );
 int get_obj_weight( const OBJ_DATA *obj );
 bool room_is_dark( const ROOM_INDEX_DATA *pRoomIndex );
@@ -3538,7 +3515,7 @@ char *magic_bit_name( int magic_flags );
 ch_ret check_for_trap( CHAR_DATA *ch, OBJ_DATA *obj, int flag );
 ch_ret check_room_for_traps( CHAR_DATA *ch, int flag );
 bool is_trapped( OBJ_DATA *obj );
-OD *get_trap( OBJ_DATA *obj );
+OBJ_DATA *get_trap( OBJ_DATA *obj );
 ch_ret spring_trap( CHAR_DATA *ch, OBJ_DATA *obj );
 void fix_char( CHAR_DATA *ch );
 void showaffect( const CHAR_DATA *ch, const AFFECT_DATA *paf );
@@ -3557,11 +3534,11 @@ short get_timer( const CHAR_DATA *ch, short type );
 void extract_timer( CHAR_DATA *ch, TIMER *timer );
 void remove_timer( CHAR_DATA *ch, short type );
 bool luck_check( const CHAR_DATA *ch, short percent );
-OD *clone_object( const OBJ_DATA *obj );
+OBJ_DATA *clone_object( const OBJ_DATA *obj );
 void split_obj( OBJ_DATA *obj, int num );
 void separate_obj( OBJ_DATA *obj );
 bool empty_obj( OBJ_DATA *obj, OBJ_DATA *destobj, ROOM_INDEX_DATA *destroom );
-OD *find_obj( CHAR_DATA *ch, char *argument, bool carryonly );
+OBJ_DATA *find_obj( CHAR_DATA *ch, char *argument, bool carryonly );
 bool ms_find_obj( const CHAR_DATA *ch );
 void worsen_mental_state( CHAR_DATA *ch, int mod );
 void better_mental_state( CHAR_DATA *ch, int mod );
@@ -3572,7 +3549,7 @@ int times_killed( const CHAR_DATA *ch, const CHAR_DATA *mob );
 void update_userec(struct timeval *time_used, struct timerset *userec);
 bool check_pos( const CHAR_DATA *ch, short position );
 void interpret( CHAR_DATA *ch, char *argument );
-ST * find_social( const char *command );
+SOCIALTYPE * find_social( const char *command );
 CMDTYPE *find_command( const char *command );
 void hash_commands( void );
 void send_timer( struct timerset *vtime, const CHAR_DATA *ch );
@@ -3595,7 +3572,7 @@ bool saves_spell_staff( int level, const CHAR_DATA *victim );
 ch_ret obj_cast_spell( int sn, int level, CHAR_DATA *ch,
 		       CHAR_DATA *victim, OBJ_DATA *obj );
 int dice_parse(const CHAR_DATA *ch, int level, char *expression);
-SK *get_skilltype( int sn );
+SKILLTYPE *get_skilltype( int sn );
 
 /* save.c */
 /* object saving defines for fread/write_obj. -- Altrag */
@@ -3617,7 +3594,7 @@ void load_home( CHAR_DATA *ch );
 /* shops.c */
 
 /* special.c */
-SF *spec_lookup( const char *name );
+SPEC_FUN *spec_lookup( const char *name );
 const char *lookup_spec( SPEC_FUN *special );
 
 /* tables.c */
@@ -3642,20 +3619,6 @@ void update_handler( void );
 void reboot_check( time_t reset );
 void auction_update( void );
 void remove_portal( OBJ_DATA *portal );
-
-#undef	SK
-#undef	CO
-#undef	ST
-#undef	CD
-#undef	MID
-#undef	OD
-#undef	OID
-#undef	RID
-#undef	SF
-#undef	BD 
-#undef	CL
-#undef	EDD
-#undef	ED
 
 /*
  * mudprograms stuff
