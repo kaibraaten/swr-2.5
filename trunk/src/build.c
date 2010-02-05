@@ -782,55 +782,6 @@ void do_mset( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  if( !str_cmp( arg2, "quest" ) )
-  {
-    if( IS_NPC( victim ) )
-    {
-      send_to_char( "Not on NPC's.\r\n", ch );
-      return;
-    }
-
-    if( value < 0 || value > 500 )
-    {
-      send_to_char( "The current quest range is 0 to 500.\r\n", ch );
-      return;
-    }
-
-    victim->pcdata->quest_number = value;
-    return;
-  }
-
-  if( !str_cmp( arg2, "qpa" ) )
-  {
-    if( IS_NPC( victim ) )
-    {
-      send_to_char( "Not on NPC's.\r\n", ch );
-      return;
-    }
-
-    victim->pcdata->quest_accum = value;
-    return;
-  }
-
-  if( !str_cmp( arg2, "qp" ) )
-  {
-    if( IS_NPC( victim ) )
-    {
-      send_to_char( "Not on NPC's.\r\n", ch );
-      return;
-    }
-
-    if( value < 0 || value > 5000 )
-    {
-      send_to_char( "The current quest point range is 0 to 5000.\r\n",
-	  ch );
-      return;
-    }
-
-    victim->pcdata->quest_curr = value;
-    return;
-  }
-
   if( !str_cmp( arg2, "mentalstate" ) )
   {
     if( value < -100 || value > 100 )

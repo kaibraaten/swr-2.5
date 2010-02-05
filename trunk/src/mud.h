@@ -1817,42 +1817,39 @@ struct killed_data
  */
 struct	pc_data
 {
-    CLAN_DATA *		clan;
-    AREA_DATA *		area;
-    char *		homepage;
-  char * clan_permissions;
-    char *		pwd;
-    char *		email;
-    char *		bamfin;
-    char *		bamfout;
-    char *              rank;
-    char *		title;
-    char *		bestowments;	/* Special bestowed commands	   */
-    int                 flags;		/* Whether the player is deadly and whatever else we add.      */
-    int			pkills;		/* Number of pkills on behalf of clan */
-    int			pdeaths;	/* Number of times pkilled (legally)  */
-    time_t            outcast_time;	/* The time at which the char was outcast */
-    time_t            restore_time;	/* The last time the char did a restore all */
-    short		wizinvis;	/* wizinvis level */
-    short		min_snoop;	/* minimum snoop level */
-    short		condition	[MAX_CONDS];
-    short		learned		[MAX_SKILL];
-    KILLED_DATA		killed		[MAX_KILLTRACK];
-    short		quest_number;	/* current *QUEST BEING DONE* DON'T REMOVE! */
-    short		quest_curr;	/* current number of quest points */
-    int			quest_accum;	/* quest points accumulated in players life */
-    int			auth_state;
-    time_t		release_date;	/* Auto-helling.. Altrag */
-    char *		helled_by;
-    char *		bio;		/* Personal Bio */
-    char *		authed_by;	/* what crazy imm authed this name ;) */
-    SKILLTYPE *		special_skills[5]; /* personalized skills/spells */
-    char *		prompt;		/* User config prompts */
-    char *		subprompt;	/* Substate prompt */
-    short		pagerlen;	/* For pager (NOT menus) */
-    long		bank;
-    short		num_skills;
-    short		adept_skills;
+  CLAN_DATA *clan;
+  AREA_DATA *area;
+  char *homepage;
+  char *clan_permissions;
+  char *pwd;
+  char *email;
+  char *bamfin;
+  char *bamfout;
+  char *rank;
+  char *title;
+  char *bestowments;	/* Special bestowed commands	   */
+  int flags;		/* Whether the player is deadly and whatever else we add. */
+  int pkills;		/* Number of pkills on behalf of clan */
+  int pdeaths;	/* Number of times pkilled (legally)  */
+  time_t outcast_time;	/* The time at which the char was outcast */
+  time_t restore_time;	/* The last time the char did a restore all */
+  short wizinvis;	/* wizinvis level */
+  short	min_snoop;	/* minimum snoop level */
+  short	condition[MAX_CONDS];
+  short	learned[MAX_SKILL];
+  KILLED_DATA killed[MAX_KILLTRACK];
+  int auth_state;
+  time_t release_date;	/* Auto-helling.. Altrag */
+  char *helled_by;
+  char *bio;		/* Personal Bio */
+  char *authed_by;	/* what crazy imm authed this name ;) */
+  SKILLTYPE *special_skills[5]; /* personalized skills/spells */
+  char *prompt;		/* User config prompts */
+  char *subprompt;	/* Substate prompt */
+  short pagerlen;	/* For pager (NOT menus) */
+  long bank;
+  short num_skills;
+  short adept_skills;
 };
 
 

@@ -357,8 +357,6 @@ void fwrite_char( const CHAR_DATA * ch, FILE * fp )
       ch->saving_wand,
       ch->saving_para_petri, ch->saving_breath, ch->saving_spell_staff );
   fprintf( fp, "Alignment    %d\n", ch->alignment );
-  fprintf( fp, "Glory        %d\n", ch->pcdata->quest_curr );
-  fprintf( fp, "MGlory       %d\n", ch->pcdata->quest_accum );
   fprintf( fp, "Hitroll      %d\n", ch->hitroll );
   fprintf( fp, "Damroll      %d\n", ch->damroll );
   fprintf( fp, "Armor        %d\n", ch->armor );
@@ -1072,7 +1070,6 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
 	break;
 
       case 'G':
-	KEY( "Glory", ch->pcdata->quest_curr, fread_number( fp ) );
 	KEY( "Gold", ch->gold, fread_number( fp ) );
 	break;
 
@@ -1151,7 +1148,6 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
 
       case 'M':
 	KEY( "Mentalstate", ch->mental_state, fread_number( fp ) );
-	KEY( "MGlory", ch->pcdata->quest_accum, fread_number( fp ) );
 	KEY( "Minsnoop", ch->pcdata->min_snoop, fread_number( fp ) );
 	KEY( "Mobinvis", ch->mobinvis, fread_number( fp ) );
 	break;
