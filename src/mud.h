@@ -1614,7 +1614,6 @@ struct	mob_index_data
     int			act;
     int			affected_by;
     short		alignment;
-    short		mobthac0;		/* Unused */
     short		ac;
     short		hitnodice;
     short		hitsizedice;
@@ -1767,7 +1766,6 @@ struct	char_data
     short		alignment;
     short		barenumdie;
     short		baresizedie;
-    short		mobthac0;
     short		hitroll;
     short		damroll;
     short		hitplus;
@@ -1822,7 +1820,6 @@ struct	pc_data
     CLAN_DATA *		clan;
     AREA_DATA *		area;
     char *		homepage;
-    char *		clan_name;
   char * clan_permissions;
     char *		pwd;
     char *		email;

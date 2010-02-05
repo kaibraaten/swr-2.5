@@ -777,7 +777,7 @@ void load_mobiles( AREA_DATA * tarea, FILE * fp )
     letter = fread_letter( fp );
     /*pMobIndex->level              = */ fread_number( fp );
 
-    pMobIndex->mobthac0 = fread_number( fp );
+    /*pMobIndex->mobthac0 =*/ fread_number( fp );
     pMobIndex->ac = fread_number( fp );
     pMobIndex->hitnodice = fread_number( fp );
     /* 'd'          */ fread_letter( fp );
@@ -1648,7 +1648,6 @@ CHAR_DATA *create_mobile( MOB_INDEX_DATA * pMobIndex )
   mob->defposition = pMobIndex->defposition;
   mob->barenumdie = pMobIndex->damnodice;
   mob->baresizedie = pMobIndex->damsizedice;
-  mob->mobthac0 = pMobIndex->mobthac0;
   mob->hitplus = pMobIndex->hitplus;
   mob->damplus = pMobIndex->damplus;
 
@@ -1987,7 +1986,6 @@ void free_char( CHAR_DATA * ch )
 
   if( ch->pcdata )
   {
-    STRFREE( ch->pcdata->clan_name );
     DISPOSE( ch->pcdata->clan_permissions );
     DISPOSE( ch->pcdata->pwd );	/* no hash */
     DISPOSE( ch->pcdata->email );	/* no hash */
@@ -3042,7 +3040,6 @@ MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
     pMobIndex->progtypes = 0;
     pMobIndex->alignment = 0;
     pMobIndex->level = 1;
-    pMobIndex->mobthac0 = 0;
     pMobIndex->ac = 0;
     pMobIndex->hitnodice = 0;
     pMobIndex->hitsizedice = 0;
@@ -3083,7 +3080,6 @@ MOB_INDEX_DATA *make_mobile( long vnum, long cvnum, char *name )
     pMobIndex->progtypes = 0;
     pMobIndex->alignment = cMobIndex->alignment;
     pMobIndex->level = cMobIndex->level;
-    pMobIndex->mobthac0 = cMobIndex->mobthac0;
     pMobIndex->ac = cMobIndex->ac;
     pMobIndex->hitnodice = cMobIndex->hitnodice;
     pMobIndex->hitsizedice = cMobIndex->hitsizedice;
