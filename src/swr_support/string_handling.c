@@ -1,6 +1,8 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdarg.h>
+
 #include "swr_support.h"
 #include "sha256.h"
 
@@ -628,3 +630,15 @@ char *encode_string( const char *str )
   return sha256_crypt( str );
 }
 
+char *cat_sprintf(char *dest, const char *fmt, ...)
+{
+  char buf[MAX_STRING_LENGTH];
+
+  va_list args;
+
+  va_start(args, fmt);
+  vsprintf(buf, fmt, args);
+  va_end(args);
+
+  return strcat(dest, buf);
+}

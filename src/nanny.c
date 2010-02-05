@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "mud.h"
+#include "telnet.h"
 
 #define STARTING_MONEY 1000
 

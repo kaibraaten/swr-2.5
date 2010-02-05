@@ -6,9 +6,6 @@
 
 #define RESTORE_INTERVAL 21600
 
-/* from comm.c */
-bool write_to_descriptor( int desc, char *txt, int length );
-
 /*
  * Local functions.
  */

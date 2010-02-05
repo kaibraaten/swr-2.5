@@ -36,8 +36,9 @@
 SOCKET init_socket( int port );
 void new_descriptor( SOCKET new_desc );
 bool read_from_descriptor( DESCRIPTOR_DATA * d );
-bool write_to_descriptor( SOCKET desc, const char *txt, int length );
+bool write_to_descriptor( DESCRIPTOR_DATA *d, const char *txt, int length );
 void init_descriptor( DESCRIPTOR_DATA * dnew, SOCKET desc );
+void free_desc( DESCRIPTOR_DATA * d );
 
 /*  Warm reboot stuff, gotta make sure to thank Erwin for this :) */
 extern int port;		/* Port number to be used       */
@@ -82,8 +83,8 @@ void do_copyover( CHAR_DATA * ch, char *argument )
 
     if( !d->character || d->connected != CON_PLAYING )	/* drop those logging on */
     {
-      write_to_descriptor( d->descriptor, "\r\nSorry, we are rebooting."
-	  " Come back in a few minutes.\r\n", 0 );
+      write_to_descriptor( d, "\r\nSorry, we are rebooting."
+			   " Come back in a few minutes.\r\n", 0 );
       close_socket( d, FALSE );	/* throw'em out */
     }
     else
@@ -110,7 +111,7 @@ void do_copyover( CHAR_DATA * ch, char *argument )
 
       fprintf( fp, "%d %s %s\n", cur_desc, och->name, d->host );
       save_char_obj( och );
-      write_to_descriptor( d->descriptor, buf, 0 );
+      write_to_descriptor( d, buf, 0 );
     }
   }
 
@@ -192,20 +193,16 @@ void copyover_recover( void )
     }
 #endif
 
+    CREATE( d, DESCRIPTOR_DATA, 1 );
+    init_descriptor( d, desc ); /* set up various stuff */
+    d->host = STRALLOC( host );
+
     /* Write something, and check if it goes error-free */
-    if( !write_to_descriptor
-	( desc,
-	  "\r\nThe surge of Light passes leaving you unscathed and your world reshaped anew\r\n",
-	  0 ) )
+    if( !write_to_descriptor( d, "\r\nThe surge of Light passes leaving you unscathed and your world reshaped anew\r\n", 0 ) )
     {
-      closesocket( desc );	/* nope */
+      free_desc( d );	/* nope */
       continue;
     }
-
-    CREATE( d, DESCRIPTOR_DATA, 1 );
-    init_descriptor( d, desc );	/* set up various stuff */
-
-    d->host = STRALLOC( host );
 
     LINK( d, first_descriptor, last_descriptor, next, prev );
     d->connected = CON_COPYOVER_RECOVER;	/* negative so close_socket
@@ -216,16 +213,16 @@ void copyover_recover( void )
 
     if( !fOld )		/* Player file not found?! */
     {
-      write_to_descriptor( desc,
-	  "\r\nSomehow, your character was lost in the copyover sorry.\r\n",
-	  0 );
+      write_to_descriptor( d,
+			   "\r\nSomehow, your character was lost in the copyover sorry.\r\n",
+			   0 );
       close_socket( d, FALSE );
     }
     else			/* ok! */
     {
       char argument[MAX_INPUT_LENGTH];
       snprintf( argument, MAX_INPUT_LENGTH, "%s", "auto noprog" );
-      write_to_descriptor( desc, "\r\nCopyover recovery complete.\r\n",
+      write_to_descriptor( d, "\r\nCopyover recovery complete.\r\n",
 	  0 );
 
       /* Just In Case,  Someone said this isn't necassary, but _why_

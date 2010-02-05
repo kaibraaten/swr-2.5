@@ -5,7 +5,7 @@ WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wwrite-st
 USE_DLSYM = -DSWR2_USE_DLSYM
 
 CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support $(USE_DLSYM)
-LDFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support
+LDFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support -lz
 
 #On some systems (e.g. FreeBSD) you may need to remove -ldl
 ifdef USE_DLSYM
@@ -19,7 +19,7 @@ _OBJ = act_comm.o act_info.o act_move.o act_obj.o act_wiz.o boards.o \
 	misc.o morespace.o mud_comm.o mud_prog.o nanny.o planets.o \
 	player.o reset.o save.o shops.o skills.o skillpackage.o space.o \
 	special.o swskills.o \
-	tables.o track.o update.o vector3_aux.o vote.o
+	tables.o telopt.o track.o update.o vector3_aux.o vote.o
 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 

@@ -3379,17 +3379,25 @@ void do_whois( CHAR_DATA * ch, char *argument )
       strcat( buf2, ".\r\n" );
       send_to_char( buf2, ch );
     }
+
     if( victim->desc && victim->desc->host[0] != '\0' )	/* added by Gorog */
     {
       snprintf( buf2, MAX_STRING_LENGTH, "%s's IP info: %s ", victim->name,
 	  victim->desc->host );
+
       if( IS_IMMORTAL( ch ) )
       {
 	strcat( buf2, victim->desc->host );
       }
+
       strcat( buf2, "\r\n" );
       send_to_char( buf2, ch );
+
+      snprintf( buf2, MAX_STRING_LENGTH, "Terminal type: %s\r\n",
+		ch->desc->terminal_type );
+      send_to_char( buf2, ch );
     }
+
     if( IS_IMMORTAL( ch ) && get_trust( ch ) >= get_trust( victim )
 	&& victim->pcdata )
     {

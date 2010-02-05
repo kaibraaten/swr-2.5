@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include "mud.h"
 #include "os.h"
+#include "telnet.h"
 
 #ifndef _WIN32
 const char go_ahead_str[] = { IAC, GA, '\0' };
@@ -50,7 +51,7 @@ void game_loop( void );
 SOCKET init_socket( int listen_port );
 void new_descriptor( SOCKET new_desc );
 bool read_from_descriptor( DESCRIPTOR_DATA * d );
-bool write_to_descriptor( SOCKET desc, const char *txt, int length );
+bool write_to_descriptor( DESCRIPTOR_DATA *d, const char *txt, int length );
 
 /*
  * Other local functions (OS-independent).
@@ -73,6 +74,7 @@ void free_memory( void );
 static void execute_on_exit( void )
 {
   free_memory();
+  DISPOSE( sysdata.mccp_buf );
 
 #ifdef SWR2_USE_DLSYM
   dlclose( sysdata.dl_handle );
@@ -88,8 +90,9 @@ int main( int argc, char **argv )
   const char *filename = NULL;
   allocate_string_literals();
   os_setup();
-  atexit( execute_on_exit );
+  CREATE( sysdata.mccp_buf, unsigned char, COMPRESS_BUF_SIZE );
 
+  atexit( execute_on_exit );
 #ifdef SWR2_USE_DLSYM
   sysdata.dl_handle = dlopen( NULL, RTLD_LAZY );
 
@@ -431,8 +434,7 @@ void game_loop(  )
 	  || ( d->connected != CON_PLAYING && d->idle > 1200 )	/* 5 mins */
 	  || d->idle > 28800 )	/* 2 hrs  */
       {
-	write_to_descriptor( d->descriptor,
-	    "Idle timeout... disconnecting.\r\n", 0 );
+	write_to_descriptor( d, "Idle timeout... disconnecting.\r\n", 0 );
 	d->outtop = 0;
 	close_socket( d, TRUE );
 	continue;
@@ -627,7 +629,12 @@ void init_descriptor( DESCRIPTOR_DATA * dnew, SOCKET desc )
   dnew->prevcolor = 0x07;
   dnew->original = NULL;
   dnew->character = NULL;
-
+  dnew->terminal_type = STRALLOC( "" );
+  dnew->teltop = 0;
+  dnew->comm_flags = 0;
+  dnew->cols = 0;
+  dnew->rows = 0;
+  dnew->mccp = NULL;
   CREATE( dnew->outbuf, char, dnew->outsize );
 }
 
@@ -718,6 +725,11 @@ void new_descriptor( SOCKET new_desc )
   LINK( dnew, first_descriptor, last_descriptor, next, prev );
 
   /*
+   * Send supported protocols.
+   */
+  announce_support( dnew );
+
+  /*
    * Send the greeting.
    */
   {
@@ -751,6 +763,7 @@ void free_desc( DESCRIPTOR_DATA * d )
   closesocket( d->descriptor );
   STRFREE( d->host );
   DISPOSE( d->outbuf );
+  STRFREE( d->terminal_type );
 
   if( d->pagebuf )
     DISPOSE( d->pagebuf );
@@ -868,6 +881,10 @@ void close_socket( DESCRIPTOR_DATA * dclose, bool force )
     }
   }
 
+  if( dclose->mccp )
+    {
+      end_compress(dclose);
+    }
 
   if( !DoNotUnlink )
   {
@@ -900,19 +917,19 @@ bool read_from_descriptor( DESCRIPTOR_DATA * d )
   {
     sprintf( log_buf, "%s input overflow!", d->host );
     log_string( log_buf );
-    write_to_descriptor( d->descriptor,
-	"\r\n*** PUT A LID ON IT!!! ***\r\n", 0 );
+    write_to_descriptor( d, "\r\n*** PUT A LID ON IT!!! ***\r\n", 0 );
     return FALSE;
   }
 
   for( ;; )
   {
+    char bufin[MAX_INPUT_LENGTH];
 #if defined(AMIGA) || defined(__MORPHOS__)
-    ssize_t nRead = recv( d->descriptor, ( UBYTE * ) ( d->inbuf + iStart ),
-	sizeof( d->inbuf ) - 10 - iStart, 0 );
+    ssize_t nRead = recv( d->descriptor, ( UBYTE * ) bufin,
+			  sizeof( bufin ) - 10 - iStart, 0 );
 #else
-    ssize_t nRead = recv( d->descriptor, d->inbuf + iStart,
-	sizeof( d->inbuf ) - 10 - iStart, 0 );
+    ssize_t nRead = recv( d->descriptor, bufin,
+			  sizeof( bufin ) - 10 - iStart, 0 );
 #endif
 
     if( nRead == 0 )
@@ -934,7 +951,7 @@ bool read_from_descriptor( DESCRIPTOR_DATA * d )
       }
     }
 
-    iStart += nRead;
+    iStart += translate_telopts( d, bufin, nRead, d->inbuf + iStart );
 
     if( d->inbuf[iStart - 1] == '\n' || d->inbuf[iStart - 1] == '\r' )
       break;
@@ -974,7 +991,7 @@ void read_from_buffer( DESCRIPTOR_DATA * d )
   {
     if( k >= 254 )
     {
-      write_to_descriptor( d->descriptor, "Line too long.\r\n", 0 );
+      write_to_descriptor( d, "Line too long.\r\n", 0 );
 
       /* skip the rest of the line */
       /*
@@ -1019,8 +1036,7 @@ void read_from_buffer( DESCRIPTOR_DATA * d )
 	/*                sprintf( log_buf, "%s input spamming!", d->host );
 			  log_string( log_buf );
 			  */
-	write_to_descriptor( d->descriptor,
-	    "\r\n*** PUT A LID ON IT!!! ***\r\n", 0 );
+	write_to_descriptor( d, "\r\n*** PUT A LID ON IT!!! ***\r\n", 0 );
       }
     }
   }
@@ -1082,7 +1098,7 @@ bool flush_buffer( DESCRIPTOR_DATA * d, bool fPrompt )
       write_to_buffer( d->snoop_by, "% ", 2 );
       write_to_buffer( d->snoop_by, buf, 0 );
     }
-    if( !write_to_descriptor( d->descriptor, buf, 512 ) )
+    if( !write_to_descriptor( d, buf, 512 ) )
     {
       d->outtop = 0;
       return FALSE;
@@ -1136,7 +1152,7 @@ bool flush_buffer( DESCRIPTOR_DATA * d, bool fPrompt )
   /*
    * OS-dependent output.
    */
-  if( !write_to_descriptor( d->descriptor, d->outbuf, d->outtop ) )
+  if( !write_to_descriptor( d, d->outbuf, d->outtop ) )
   {
     d->outtop = 0;
     return FALSE;
@@ -1225,11 +1241,17 @@ void write_to_buffer( DESCRIPTOR_DATA * d, const char *txt, size_t length )
  * If this gives errors on very long blocks (like 'ofind all'),
  *   try lowering the max block size.
  */
-bool write_to_descriptor( SOCKET desc, const char *txt, int length )
+bool write_to_descriptor( DESCRIPTOR_DATA *d, const char *txt, int length )
 {
   int iStart = 0;
   ssize_t nWrite = 0;
   int nBlock = 0;
+
+  if( d->mccp )
+    {
+      write_compressed(d);
+      return TRUE;
+    }
 
   if( length <= 0 )
     length = strlen( txt );
@@ -1239,9 +1261,9 @@ bool write_to_descriptor( SOCKET desc, const char *txt, int length )
     nBlock = UMIN( length - iStart, 4096 );
 
 #if defined(AMIGA) || defined(__MORPHOS__)
-    if( ( nWrite = send( desc, (char*) txt + iStart, nBlock, 0 ) ) == SOCKET_ERROR )
+    if( ( nWrite = send( d->descriptor, (char*) txt + iStart, nBlock, 0 ) ) == SOCKET_ERROR )
 #else
-      if( ( nWrite = send( desc, txt + iStart, nBlock, 0 ) ) == SOCKET_ERROR )
+      if( ( nWrite = send( d->descriptor, txt + iStart, nBlock, 0 ) ) == SOCKET_ERROR )
 #endif
       {
 	perror( "Write_to_descriptor" );
@@ -2013,8 +2035,7 @@ bool pager_output( DESCRIPTOR_DATA * d )
 
   if( last != d->pagepoint )
   {
-    if( !write_to_descriptor( d->descriptor, d->pagepoint,
-	  ( last - d->pagepoint ) ) )
+    if( !write_to_descriptor( d, d->pagepoint, ( last - d->pagepoint ) ) )
       return FALSE;
     d->pagepoint = last;
   }
@@ -2035,13 +2056,11 @@ bool pager_output( DESCRIPTOR_DATA * d )
   d->pagecmd = -1;
 
   if( IS_SET( ch->act, PLR_ANSI ) )
-    if( write_to_descriptor( d->descriptor, "\033[1;36m", 7 ) == FALSE )
+    if( write_to_descriptor( d, "\033[1;36m", 7 ) == FALSE )
       return FALSE;
 
-  if( ( ret =
-	write_to_descriptor( d->descriptor,
-	  "(C)ontinue, (R)efresh, (B)ack, (Q)uit: [C] ",
-	  0 ) ) == FALSE )
+  if( ( ret = write_to_descriptor( d,
+	  "(C)ontinue, (R)efresh, (B)ack, (Q)uit: [C] ", 0 ) ) == FALSE )
     return FALSE;
 
   if( IS_SET( ch->act, PLR_ANSI ) )
@@ -2054,7 +2073,7 @@ bool pager_output( DESCRIPTOR_DATA * d )
       sprintf( buf, "\033[0;%d;%s%dm", ( d->pagecolor & 8 ) == 8,
 	  ( d->pagecolor > 15 ? "5;" : "" ),
 	  ( d->pagecolor & 7 ) + 30 );
-    ret = write_to_descriptor( d->descriptor, buf, 0 );
+    ret = write_to_descriptor( d, buf, 0 );
   }
 
   return ret;
