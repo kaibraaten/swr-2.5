@@ -353,8 +353,7 @@ void do_mset( CHAR_DATA * ch, char *argument )
     send_to_char( "  str int wis dex con cha lck frc sex\r\n", ch );
     send_to_char( "  credits hp force move align\r\n", ch );
     send_to_char( "  hitroll damroll armor affected level\r\n", ch );
-    send_to_char( "  thirst drunk full blood flags\r\n", ch );
-    send_to_char( "  pos defpos part (see BODYPARTS)\r\n", ch );
+    send_to_char( "  thirst drunk full blood flags pos defpos\r\n", ch );
     send_to_char( "  sav1 sav2 sav4 sav4 sav5 (see SAVINGTHROWS)\r\n", ch );
     send_to_char( "  resistant immune susceptible (see RIS)\r\n", ch );
     send_to_char( "  attack defense numattacks\r\n", ch );
@@ -1367,30 +1366,6 @@ void do_mset( CHAR_DATA * ch, char *argument )
     }
     if( IS_NPC( victim ) && IS_SET( victim->act, ACT_PROTOTYPE ) )
       victim->pIndexData->susceptible = victim->susceptible;
-    return;
-  }
-
-  if( !str_cmp( arg2, "part" ) )
-  {
-    if( !can_mmodify( ch, victim ) )
-      return;
-    if( !argument || argument[0] == '\0' )
-    {
-      send_to_char( "Usage: mset <victim> part <flag> [flag]...\r\n",
-	  ch );
-      return;
-    }
-    while( argument[0] != '\0' )
-    {
-      argument = one_argument( argument, arg3 );
-      value = get_partflag( arg3 );
-      if( value < 0 || value > 31 )
-	ch_printf( ch, "Unknown flag: %s\r\n", arg3 );
-      else
-	TOGGLE_BIT( victim->xflags, 1 << value );
-    }
-    if( IS_NPC( victim ) && IS_SET( victim->act, ACT_PROTOTYPE ) )
-      victim->pIndexData->xflags = victim->xflags;
     return;
   }
 
@@ -5520,7 +5495,7 @@ void save_mobs(  )
 	  || pMobIndex->hitroll != 0 || pMobIndex->damroll != 0
 	  || pMobIndex->attacks != 0 || pMobIndex->defenses != 0
 	  || pMobIndex->height != 0 || pMobIndex->weight != 0
-	  || pMobIndex->xflags != 0 || pMobIndex->numattacks != 1 )
+	  || pMobIndex->numattacks != 1 )
 	complexmob = TRUE;
       else
 	complexmob = FALSE;
@@ -5561,13 +5536,13 @@ void save_mobs(  )
 	    pMobIndex->height,
 	    pMobIndex->weight, pMobIndex->numattacks );
 	fprintf( fpout, "%d %d %d %d %d %d %d %d\n",
-	    pMobIndex->hitroll,
-	    pMobIndex->damroll,
-	    pMobIndex->xflags,
-	    pMobIndex->resistant,
-	    pMobIndex->immune,
-	    pMobIndex->susceptible,
-	    pMobIndex->attacks, pMobIndex->defenses );
+		 pMobIndex->hitroll,
+		 pMobIndex->damroll,
+		 0, /* pMobIndex->xflags, */
+		 pMobIndex->resistant,
+		 pMobIndex->immune,
+		 pMobIndex->susceptible,
+		 pMobIndex->attacks, pMobIndex->defenses );
 	fprintf( fpout, "0 0 0 0 0 0 0 0\n" );
       }
       if( pMobIndex->mudprogs )

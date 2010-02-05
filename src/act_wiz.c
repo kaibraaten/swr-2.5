@@ -1185,8 +1185,6 @@ void do_mstat( CHAR_DATA * ch, char *argument )
     ch_printf( ch, "Mobile has spec fun: %s %s\r\n",
 	lookup_spec( victim->spec_fun ),
 	victim->spec_2 ? lookup_spec( victim->spec_2 ) : "" );
-  ch_printf( ch, "Body Parts : %s\r\n",
-      flag_string( victim->xflags, part_flags ) );
   ch_printf( ch, "Resistant  : %s\r\n",
       flag_string( victim->resistant, ris_flags ) );
   ch_printf( ch, "Immune     : %s\r\n",

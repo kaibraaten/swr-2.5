@@ -1026,42 +1026,6 @@ struct	smaug_affect
 /* 21 def's */
 
 /*
- * Body parts
- */
-#define PART_HEAD		  BV00
-#define PART_ARMS		  BV01
-#define PART_LEGS		  BV02
-#define PART_HEART		  BV03
-#define PART_BRAINS		  BV04
-#define PART_GUTS		  BV05
-#define PART_HANDS		  BV06
-#define PART_FEET		  BV07
-#define PART_FINGERS		  BV08
-#define PART_EAR		  BV09
-#define PART_EYE		  BV10
-#define PART_LONG_TONGUE	  BV11
-#define PART_EYESTALKS		  BV12
-#define PART_TENTACLES		  BV13
-#define PART_FINS		  BV14
-#define PART_WINGS		  BV15
-#define PART_TAIL		  BV16
-#define PART_SCALES		  BV17
-/* for combat */
-#define PART_CLAWS		  BV18
-#define PART_FANGS		  BV19
-#define PART_HORNS		  BV20
-#define PART_TUSKS		  BV21
-#define PART_TAILATTACK		  BV22
-#define PART_SHARPSCALES	  BV23
-#define PART_BEAK		  BV24
-
-#define PART_HAUNCH		  BV25
-#define PART_HOOVES		  BV26
-#define PART_PAWS		  BV27
-#define PART_FORELEGS		  BV28
-#define PART_FEATHERS		  BV29
-
-/*
  * Autosave flags
  */
 #define SV_DEATH		  BV00
@@ -1660,7 +1624,6 @@ struct	mob_index_data
     short		damplus;
     short		numattacks;
     int			gold;
-    int			xflags;
     int			resistant;
     int			immune;
     int			susceptible;
@@ -1758,7 +1721,6 @@ struct	char_data
     ROOM_INDEX_DATA *   plr_home;
     PC_DATA *		pcdata;
     DO_FUN *		last_cmd;
-    DO_FUN *		prev_cmd;   /* mapping */
     void *		dest_buf;
     void *		dest_buf_2;
     void *		spare_ptr;
@@ -1792,7 +1754,6 @@ struct	char_data
     int			affected_by;
     int			carry_weight;
     int			carry_number;
-    int			xflags;
     int			resistant;
     int			immune;
     int			susceptible;
@@ -2332,7 +2293,6 @@ do								\
 #define IS_IMMORTAL(ch)         ((ch)->top_level == LEVEL_IMMORTAL )
 #define IS_OFFICIAL(ch)         (is_name((ch)->name,sysdata.officials))
 #define IS_AFFECTED(ch, sn)     (IS_SET((ch)->affected_by, (sn)))
-#define HAS_BODYPART(ch, part)  ((ch)->xflags == 0 || IS_SET((ch)->xflags, (part)))
 #define IS_GOOD(ch)             ((ch)->alignment >= 350)
 #define IS_EVIL(ch)             ((ch)->alignment <= -350)
 #define IS_NEUTRAL(ch)          (!IS_GOOD(ch) && !IS_EVIL(ch))
@@ -2509,7 +2469,6 @@ extern const char * const pc_flags[];
 extern const char * const trap_flags[];
 extern const char * const ris_flags[];
 extern const char * const trig_flags[];
-extern const char * const part_flags[];
 extern const char * const defense_flags[];
 extern const char * const attack_flags[];
 extern const char * const area_flags[];
@@ -3283,7 +3242,6 @@ int get_pcflag( const char *flag );
 int get_plrflag( const char *flag );
 int get_risflag( const char *flag );
 int get_trigflag( const char *flag );
-int get_partflag( const char *flag );
 int get_attackflag( const char *flag );
 int get_defenseflag( const char *flag );
 int get_ssave( const char *name );
