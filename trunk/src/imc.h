@@ -210,11 +210,11 @@ typedef struct imc_cmd_alias IMC_ALIAS;   /* Big, bad, bloated command alias thi
 typedef struct imc_packet_handler IMC_PHANDLER; /* custom packet handlers added dynamically */
 typedef struct who_template WHO_TEMPLATE; /* The who templates */
 
-typedef void IMC_FUN( CHAR_DATA * ch, char *argument );
-#define IMC_CMD( name ) void (name)( CHAR_DATA *ch, char *argument )
+typedef void IMC_FUN( CHAR_DATA * ch, const char *argument );
+#define IMC_CMD( name ) void (name)( CHAR_DATA *ch, const char *argument )
 
-typedef void PACKET_FUN( IMC_PACKET * q, char *packet );
-#define PFUN( name ) void (name)( IMC_PACKET *q, char *packet )
+typedef void PACKET_FUN( IMC_PACKET * q, const char *packet );
+#define PFUN( name ) void (name)( IMC_PACKET *q, const char *packet )
 
 extern REMOTEINFO *first_rinfo;
 extern REMOTEINFO *last_rinfo;
@@ -412,7 +412,7 @@ struct who_template
    char *master;
 };
 
-bool imc_command_hook( CHAR_DATA * ch, char *command, char *argument );
+bool imc_command_hook( CHAR_DATA * ch, const char *command, const char *argument );
 void imc_hotboot( void );
 void imc_startup( bool force, int desc, bool connected );
 void imc_shutdown( bool reconnect );

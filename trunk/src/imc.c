@@ -7477,6 +7477,7 @@ const char *imc_send_social( CHAR_DATA * ch, const char *argument, int telloptio
 const char *imc_find_social( CHAR_DATA * ch, const char *sname, const char *person, const char *mud, int victim )
 {
    static char socname[LGST];
+   int i = 0;
 #if defined(SMAUGSOCIAL)
    SOCIAL_DATA *social;
 #else
@@ -7489,7 +7490,7 @@ const char *imc_find_social( CHAR_DATA * ch, const char *sname, const char *pers
 #if defined(SMAUGSOCIAL)
    // lower-case the social name before asking the MUD
    static char lcSocName[LGST];
-   for (int i = 0; i < LGST && sname[i] != '\0'; i++) {
+   for (i = 0; i < LGST && sname[i] != '\0'; i++) {
        lcSocName[i] = tolower(sname[i]);
    }
 
