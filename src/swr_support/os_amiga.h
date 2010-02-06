@@ -66,7 +66,6 @@ int isascii( int );
 #include <netdb.h>
 #include <sys/time.h>
 #include <db.h>
-#include <arpa/telnet.h>
 
 typedef LONG socklen_t;
 static const int INVALID_SOCKET = -1;
