@@ -677,6 +677,47 @@ int process_sb_new_environ( DESCRIPTOR_DATA *d, unsigned char *src,
 }
 
 /*
+ * Data for MUD Server Status Protocol (MSSP).
+ *
+ * Please try following the established conventions as
+ * outlined here: http://www.mudbytes.net/index.php?a=articles&s=MSSP_Fields
+ */
+static const char *MSSP_FIELD_MUD_NAME        = "SWR2 Refactor Devel";
+static const char *MSSP_FIELD_HOSTNAME        = "swr2.totj.net";
+static const char *MSSP_FIELD_IP              = "97.107.139.29";
+static const char *MSSP_FIELD_CODEBASE        = "SWR2 Refactor";
+static const char *MSSP_FIELD_CONTACT         = "kai@swr2.totj.net";
+static const char *MSSP_FIELD_CREATED         = "2009";
+static const char *MSSP_FIELD_ICON            = "";
+static const char *MSSP_FIELD_LANGUAGE        = "English";
+static const char *MSSP_FIELD_LOCATION        = "United States";
+static const char *MSSP_FIELD_MINIMUM_AGE     = "13";
+static const char *MSSP_FIELD_WEBSITE         = "http://swr2.totj.net";
+static const char *MSSP_FIELD_FAMILY          = "DikuMUD";
+static const char *MSSP_FIELD_GENRE           = "Science Fiction";
+static const char *MSSP_FIELD_SUBGENRE        = "None";
+static const char *MSSP_FIELD_GAMEPLAY        = "Player versus Player";
+static const char *MSSP_FIELD_GAMESYSTEM      = "Custom";
+static const char *MSSP_FIELD_INTERMUD        = "";
+static const char *MSSP_FIELD_STATUS          = "Open Beta";
+static const int   MSSP_FIELD_LEVELS          = 0;
+static const int   MSSP_FIELD_RACES           = 1;
+static const int   MSSP_FIELD_ANSI            = 1;
+static const int   MSSP_FIELD_MCCP            = 1;
+static const int   MSSP_FIELD_MCP             = 0;
+static const int   MSSP_FIELD_MSP             = 0;
+static const int   MSSP_FIELD_MXP             = 0;
+static const int   MSSP_FIELD_PUEBLO          = 0;
+static const int   MSSP_FIELD_VT100           = 0;
+static const int   MSSP_FIELD_XTERM256        = 0;
+static const int   MSSP_FIELD_PAY_TO_PLAY     = 0;
+static const int   MSSP_FIELD_PAY_FOR_PERKS   = 0;
+static const int   MSSP_FIELD_HIRING_BUILDERS = 0;
+static const int   MSSP_FIELD_HIRING_CODERS   = 0;
+
+extern int port;
+
+/*
   MSSP: Mud Server Status Protocol
 */
 int process_do_mssp( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
@@ -684,7 +725,7 @@ int process_do_mssp( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
   char buffer[MAX_STRING_LENGTH] = { 0 };
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "NAME",
-              MSSP_VAL, "SWR2 Refactor Devel");
+              MSSP_VAL, MSSP_FIELD_MUD_NAME);
 
   cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "PLAYERS",
 	      MSSP_VAL, num_descriptors);
@@ -693,58 +734,58 @@ int process_do_mssp( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
 	      MSSP_VAL, boot_time);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "HOSTNAME",
-	      MSSP_VAL, "swr2.totj.net");
+	      MSSP_VAL, MSSP_FIELD_HOSTNAME);
 
-  cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "PORT",
-              MSSP_VAL, "9999");
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "PORT",
+              MSSP_VAL, port);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "CODEBASE",
-	      MSSP_VAL, "SWR2 Refactor");
+	      MSSP_VAL, MSSP_FIELD_CODEBASE);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "CONTACT",
-	      MSSP_VAL, "kai@swchronicles.com");
+	      MSSP_VAL, MSSP_FIELD_CONTACT);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "CREATED",
-	      MSSP_VAL, "2009");
+	      MSSP_VAL, MSSP_FIELD_CREATED);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "ICON",
-              MSSP_VAL, "");
+              MSSP_VAL, MSSP_FIELD_ICON);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "IP",
-	      MSSP_VAL, "97.107.139.29");
+	      MSSP_VAL, MSSP_FIELD_IP);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "LANGUAGE",
-	      MSSP_VAL, "English");
+	      MSSP_VAL, MSSP_FIELD_LANGUAGE);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "LOCATION",
-	      MSSP_VAL, "United States");
+	      MSSP_VAL, MSSP_FIELD_LOCATION);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "MINIMUM AGE",
-	      MSSP_VAL, "13");
+	      MSSP_VAL, MSSP_FIELD_MINIMUM_AGE);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "WEBSITE",
-	      MSSP_VAL, "http://swr2.totj.net");
+	      MSSP_VAL, MSSP_FIELD_WEBSITE);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "FAMILY",
-	      MSSP_VAL, "DikuMUD");
+	      MSSP_VAL, MSSP_FIELD_FAMILY);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "GENRE",
-	      MSSP_VAL, "Science Fiction");
+	      MSSP_VAL, MSSP_FIELD_GENRE);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "GAMEPLAY",
-	      MSSP_VAL, "Player versus Player");
+	      MSSP_VAL, MSSP_FIELD_GAMEPLAY);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "GAMESYSTEM",
-	      MSSP_VAL, "Custom");
+	      MSSP_VAL, MSSP_FIELD_GAMESYSTEM);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "INTERMUD",
-	      MSSP_VAL, "");
+	      MSSP_VAL, MSSP_FIELD_INTERMUD);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "STATUS",
-	      MSSP_VAL, "Open Beta");
+	      MSSP_VAL, MSSP_FIELD_STATUS);
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "SUBGENRE",
-	      MSSP_VAL, "None");
+	      MSSP_VAL, MSSP_FIELD_SUBGENRE);
 
   cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "AREAS",
 	      MSSP_VAL, top_area);
@@ -765,26 +806,49 @@ int process_do_mssp( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
 	      MSSP_VAL, skill_package_table_size() );
 
   cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "LEVELS",
-	      MSSP_VAL, 0 );
+	      MSSP_VAL, MSSP_FIELD_LEVELS );
 
   cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "RACES",
-	      MSSP_VAL, 1 );
+	      MSSP_VAL, MSSP_FIELD_RACES );
 
   cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "SKILLS",
 	      MSSP_VAL, top_sn);
 
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "ANSI",              MSSP_VAL, 1);
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "MCCP",              MSSP_VAL, 1);
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "MCP",               MSSP_VAL, 0);
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "MSP",               MSSP_VAL, 0);
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "MXP",               MSSP_VAL, 0);
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "PUEBLO",            MSSP_VAL, 0);
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "VT100",             MSSP_VAL, 0);
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "XTERM 256 COLORS",  MSSP_VAL, 0);
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "PAY TO PLAY",       MSSP_VAL, 0);
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "PAY FOR PERKS",     MSSP_VAL, 0);
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "HIRING BUILDERS",   MSSP_VAL, 0);
-  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "HIRING CODERS",     MSSP_VAL, 0);
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "ANSI",
+              MSSP_VAL, MSSP_FIELD_ANSI);
+
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "MCCP",
+              MSSP_VAL, MSSP_FIELD_MCCP);
+
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "MCP",
+	      MSSP_VAL, MSSP_FIELD_MCP);
+
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "MSP",
+	      MSSP_VAL, MSSP_FIELD_MSP);
+
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "MXP",
+	      MSSP_VAL, MSSP_FIELD_MXP);
+
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "PUEBLO",
+	      MSSP_VAL, MSSP_FIELD_PUEBLO);
+
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "VT100",
+	      MSSP_VAL, MSSP_FIELD_VT100);
+
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "XTERM 256 COLORS",
+	      MSSP_VAL, MSSP_FIELD_XTERM256);
+
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "PAY TO PLAY",
+	      MSSP_VAL, MSSP_FIELD_PAY_TO_PLAY);
+
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "PAY FOR PERKS",
+	      MSSP_VAL, MSSP_FIELD_PAY_FOR_PERKS);
+
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "HIRING BUILDERS",
+	      MSSP_VAL, MSSP_FIELD_HIRING_BUILDERS);
+
+  cat_sprintf(buffer, "%c%s%c%d", MSSP_VAR, "HIRING CODERS",
+	      MSSP_VAL, MSSP_FIELD_HIRING_CODERS);
 
   descriptor_printf(d, "%c%c%c%s%c%c", IAC, SB, TELOPT_MSSP, buffer, IAC, SE);
 
