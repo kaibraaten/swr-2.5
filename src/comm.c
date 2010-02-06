@@ -18,6 +18,12 @@ void write_ship_list( void );
 /* db.c */
 void allocate_string_literals( void );
 
+/* telopt.c */
+void announce_support( DESCRIPTOR_DATA *d );
+void end_compress( DESCRIPTOR_DATA *d );
+int translate_telopts( DESCRIPTOR_DATA *d, char *src, int srclen, char *out );
+void write_compressed( DESCRIPTOR_DATA *d );
+
 /*
  * Global variables.
  */
@@ -654,7 +660,6 @@ void init_descriptor( DESCRIPTOR_DATA * dnew, SOCKET desc )
   dnew->character = NULL;
   dnew->terminal_type = STRALLOC( "" );
   dnew->teltop = 0;
-  dnew->comm_flags = 0;
   dnew->cols = 0;
   dnew->rows = 0;
   dnew->mccp = NULL;

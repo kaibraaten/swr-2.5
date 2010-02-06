@@ -123,14 +123,6 @@ typedef ch_ret SPELL_FUN( int sn, int level, CHAR_DATA *ch, void *vo );
 #define BV31		(1 << 31)
 /* 32 USED! DO NOT ADD MORE! SB */
 
-#define COMM_FLAG_DISCONNECT    BV01
-#define COMM_FLAG_MCCP          BV02
-#define COMM_FLAG_COMMAND       BV03
-#define COMM_FLAG_NOINPUT       BV04
-#define COMM_FLAG_ECHO          BV05
-#define COMM_FLAG_PASSWORD      BV06
-#define COMM_FLAG_EOR           BV07
-
 #define	MAX_LAYERS		 8	/* maximum clothing layers */
 #define MAX_NEST	       100	/* maximum container nesting */
 
@@ -321,7 +313,6 @@ struct descriptor_data
   char *terminal_type;
   char telbuf[MAX_INPUT_LENGTH];
   int teltop;
-  short comm_flags;
   short cols;
   short rows;
   z_stream *mccp;
@@ -3596,43 +3587,6 @@ void update_handler( void );
 void reboot_check( time_t reset );
 void auction_update( void );
 void remove_portal( OBJ_DATA *portal );
-
-/*
-  telopt.c
-*/
-int translate_telopts( DESCRIPTOR_DATA *d, char *src, int srclen, char *out );
-void debug_telopts( DESCRIPTOR_DATA *d, unsigned char *src, int srclen );
-int process_will_ttype( DESCRIPTOR_DATA *d, unsigned char *src, int srclen );
-int process_sb_ttype_is( DESCRIPTOR_DATA *d, unsigned char *src, int srclen );
-int process_sb_naws( DESCRIPTOR_DATA *d, unsigned char *src, int srclen );
-int process_will_new_environ( DESCRIPTOR_DATA *d, unsigned char *src, int srclen );
-int process_sb_new_environ( DESCRIPTOR_DATA *d, unsigned char *src, int srclen );
-int process_do_mssp( DESCRIPTOR_DATA *d, unsigned char *src, int srclen );
-int process_do_mccp( DESCRIPTOR_DATA *d, unsigned char *src, int srclen );
-int process_dont_mccp( DESCRIPTOR_DATA *d, unsigned char *src, int srclen );
-int skip_sb( DESCRIPTOR_DATA *d, unsigned char *src, int srclen );
-void announce_support( DESCRIPTOR_DATA *d );
-void descriptor_printf( DESCRIPTOR_DATA *d, const char *fmt, ...);
-int start_compress( DESCRIPTOR_DATA *d );
-void end_compress( DESCRIPTOR_DATA *d );
-void process_compressed( DESCRIPTOR_DATA *d );
-void write_compressed( DESCRIPTOR_DATA *d );
-void send_echo_on( DESCRIPTOR_DATA *d );
-void send_echo_off( DESCRIPTOR_DATA *d );
-void send_ga( DESCRIPTOR_DATA *d );
-void send_eor( DESCRIPTOR_DATA *d );
-
-#define ANNOUNCE_WILL   BV01
-#define ANNOUNCE_DO     BV02
-
-struct telnet_type
-{
-  const char      *name;
-  int       flags;
-};
-
-extern const char *telcmds[];
-extern struct telnet_type telnet_table[];
 
 /*
  * mudprograms stuff
