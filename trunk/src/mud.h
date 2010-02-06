@@ -1830,6 +1830,10 @@ struct killed_data
     char		count;
 };
 
+#ifdef SWR2_USE_IMC
+#include "imc.h"
+#endif
+
 /*
  * Data which only PC's have.
  */
@@ -1867,6 +1871,9 @@ struct	pc_data
   long bank;
   short num_skills;
   short adept_skills;
+#ifdef SWR2_USE_IMC
+  IMC_CHARDATA *imcchardata;
+#endif
 };
 
 

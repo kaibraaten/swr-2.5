@@ -2002,6 +2002,10 @@ void free_char( CHAR_DATA * ch )
     if( ch->pcdata->subprompt )
       STRFREE( ch->pcdata->subprompt );
 
+#ifdef SWR2_USE_IMC
+    imc_freechardata( ch );
+#endif
+
     DISPOSE( ch->pcdata );
   }
 

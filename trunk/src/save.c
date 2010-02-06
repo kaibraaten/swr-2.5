@@ -505,6 +505,10 @@ void fwrite_char( const CHAR_DATA * ch, FILE * fp )
 	ch->pcdata->killed[sn].vnum, ch->pcdata->killed[sn].count );
   }
 
+#ifdef SWR2_USE_IMC
+  imc_savechar( ch, fp );
+#endif
+
   fprintf( fp, "End\n\n" );
   return;
 }
@@ -732,9 +736,14 @@ bool load_char_obj( DESCRIPTOR_DATA * d, const char *name, bool preload )
   ch->guard_data = NULL;
   ch->was_sentinel = NULL;
   ch->plr_home = NULL;
+
+#ifdef SWR2_USE_IMC
+  imc_initchar( ch );
+#endif
+
   found = FALSE;
   sprintf( strsave, "%s%c/%s", PLAYER_DIR, tolower( ( int ) name[0] ),
-      capitalize( name ) );
+	   capitalize( name ) );
 
 #if !defined(AMIGA) && !defined(__MORPHOS__)
   if( stat( strsave, &fst ) != -1 )
@@ -1120,6 +1129,11 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
 
       case 'I':
 	KEY( "Immune", ch->immune, fread_number( fp ) );
+
+#ifdef SWR2_USE_IMC
+	if( ( fMatch = imc_loadchar( ch, fp, word ) ) )
+	  break;
+#endif
 	break;
 
       case 'K':
