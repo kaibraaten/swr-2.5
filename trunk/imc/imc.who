@@ -3,9 +3,9 @@ Head: <center>~R-=[ ~WPlayers on <%mudfullname%> ~R]=-
 
 Tail: ~Y[~WPlayers online: <%plrcount%>~Y] ~Y[~WHomepage: <%mudurl%>~Y]¢
 
-Plrline: <%charrank%>~z[<%charflags%>]~G <%charname%><%chartitle%>¢
+Plrline: <%charrank%>~z[<%charflags%>]~G <%chartitle%>¢
 
-Immline: <%charrank%>~z[<%charflags%>]~G <%charname%><%chartitle%>¢
+Immline: <%charrank%>~z[<%charflags%>]~G <%chartitle%>¢
 
 Plrheader: ~B-------------------------------=[ ~WPlayers ~B]=--------------------------------¢
 
