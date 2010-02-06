@@ -432,9 +432,4 @@ char *imc_nameof( const char *src );
 char *imc_mudof( const char *src );
 void imc_send_tell( const char *from, const char *to, const char *txt, int reply );
 
-#if defined(_DISKIO_H_)
-void imc_load_pfile( CHAR_DATA * ch, char *tag, int num, char *line );
-void imc_save_pfile( struct CHAR_DATA *ch, FBFILE * fp );
-#endif
-
 #endif
