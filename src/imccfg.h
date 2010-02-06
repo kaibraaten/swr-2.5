@@ -10,7 +10,6 @@
 #define CH_IMCNAME(ch)           ((ch)->name)
 #define CH_IMCSEX(ch)            ((ch)->sex)
 #define CH_IMCTITLE(ch)          ((ch)->pcdata->title)
-#define SMAUGSOCIAL
 #define SOCIAL_DATA SOCIALTYPE
 #define CH_IMCRANK(ch)           ((ch)->pcdata->rank)
 

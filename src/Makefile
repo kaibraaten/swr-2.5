@@ -28,7 +28,7 @@ OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
 
 ifdef IMC
 OBJ += $(ODIR)/imc.o
-CCFLAGS += -DSWR2_USE_IMC -DIMCSMAUG
+CCFLAGS += -DSWR2_USE_IMC
 endif
 
 all:		 libs $(BINARY)
