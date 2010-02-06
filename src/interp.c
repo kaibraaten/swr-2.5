@@ -232,7 +232,11 @@ void interpret( CHAR_DATA * ch, char *argument )
   if( !found )
   {
     if( !check_skill( ch, command, argument )
-	&& !check_social( ch, command, argument ) )
+	&& !check_social( ch, command, argument )
+#ifdef SWR2_USE_IMC
+	&& !imc_command_hook( ch, command, argument )
+#endif
+	)
     {
       EXIT_DATA *pexit = NULL;
 

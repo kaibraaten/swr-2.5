@@ -57,6 +57,7 @@ void do_copyover( CHAR_DATA * ch, char *argument )
 #else
   char buf2[100];
 #endif
+  char buf3[100];
 
   if( !fp )
   {
@@ -119,9 +120,20 @@ void do_copyover( CHAR_DATA * ch, char *argument )
   fprintf( fp, "-1\n" );
   fclose( fp );
 
+#ifdef SWR2_USE_IMC
+  imc_hotboot();
+#endif
+
+#ifdef SWR2_USE_IMC
+  if( this_imcmud )
+    sprintf( buf3, "%d", this_imcmud ? this_imcmud->desc : -1 );
+#else
+  sprintf( buf3, "%d", -1 );
+#endif
+
 #if defined(AMIGA) || defined(__MORPHOS__)
-  sprintf( buf, "run >NIL: %s %d copyover %d",
-      sysdata.exe_filename, port, coded_control );
+  sprintf( buf, "run >NIL: %s %d copyover %d %s",
+	   sysdata.exe_filename, port, coded_control, buf3 );
 
   error_code = System( (CONST_STRPTR) buf, NULL );
 
@@ -145,7 +157,7 @@ void do_copyover( CHAR_DATA * ch, char *argument )
   out_stream = NULL;
 
   execl( sysdata.exe_filename, sysdata.exe_filename,
-      buf, "copyover", buf2, ( char * ) NULL );
+	 buf, "copyover", buf2, buf3, ( char * ) NULL );
 
   /* Failed - sucessful exec will not return */
 

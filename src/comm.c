@@ -88,6 +88,10 @@ int main( int argc, char **argv )
   struct timeval now_time;
   bool fCopyOver = FALSE;
   const char *filename = NULL;
+#ifdef SWR2_USE_IMC
+  SOCKET imcsocket = INVALID_SOCKET;
+#endif
+
   allocate_string_literals();
   os_setup();
   CREATE( sysdata.mccp_buf, unsigned char, COMPRESS_BUF_SIZE );
@@ -148,7 +152,7 @@ int main( int argc, char **argv )
   new_boot_time = &new_boot_struct;
 
   /* Set reboot time string for do_time */
-  get_reboot_string(  );
+  get_reboot_string();
 
   /*
    * Get the port number.
@@ -180,8 +184,14 @@ int main( int argc, char **argv )
       fCopyOver = TRUE;
 #if defined(AMIGA) || defined(__MORPHOS__)
       control = ObtainSocket( atoi( argv[3] ), PF_INET, SOCK_STREAM, IPPROTO_TCP );
+#ifdef SWR2_USE_IMC
+      imcsocket = ObtainSocket( atoi( argv[4] ), PF_INET, SOCK_STREAM, IPPROTO_TCP );
+#endif /* imc */
 #else
       control = atoi( argv[3] );
+#ifdef SWR2_USE_IMC
+      imcsocket = atoi( argv[4] );
+#endif /* imc */
 #endif
     }
     else
@@ -193,6 +203,11 @@ int main( int argc, char **argv )
   /*
    * Run the game.
    */
+#ifdef SWR2_USE_IMC
+  log_string( "Starting IMC2" );
+  imc_startup( FALSE, imcsocket, fCopyOver );
+#endif
+
   log_string( "Booting Database" );
   boot_db( fCopyOver );
   log_string( "Initializing socket" );
@@ -204,8 +219,12 @@ int main( int argc, char **argv )
 
   sprintf( log_buf, "SWR 2.0 ready on port %d.", port );
   log_string( log_buf );
-  game_loop(  );
+  game_loop();
   closesocket( control );
+
+#ifdef SWR2_USE_IMC
+  imc_shutdown( FALSE );
+#endif
 
   /*
    * That's all, folks.
@@ -295,7 +314,7 @@ static void caught_alarm( int foo )
     FD_CLR( newdesc, &out_set );
     log_string( "clearing newdesc" );
   }
-  game_loop(  );
+  game_loop();
   closesocket( control );
 
   log_string( "Normal termination of game." );
@@ -379,7 +398,7 @@ static void flush_logfile( void )
   ++num;
 }
 
-void game_loop(  )
+void game_loop()
 {
   struct timeval last_time;
   char cmdline[MAX_INPUT_LENGTH];
@@ -508,10 +527,14 @@ void game_loop(  )
 	break;
     }
 
+#ifdef SWR2_USE_IMC
+    imc_loop();
+#endif
+
     /*
      * Autonomous game motion.
      */
-    update_handler(  );
+    update_handler();
 
     /*
      * Output.
@@ -614,7 +637,7 @@ void game_loop(  )
     gettimeofday( &last_time, NULL );
     current_time = ( time_t ) last_time.tv_sec;
 
-    flush_logfile(  );
+    flush_logfile();
   }
 }
 
@@ -753,7 +776,7 @@ void new_descriptor( SOCKET new_desc )
 	sysdata.alltimemax );
     log_string_plus( log_buf, LOG_COMM );
     to_channel( log_buf, CHANNEL_MONITOR, "Monitor", 2 );
-    save_sysdata(  );
+    save_sysdata();
   }
   set_alarm( 0 );
 }

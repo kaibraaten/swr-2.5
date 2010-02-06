@@ -4,6 +4,9 @@ WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wwrite-st
 #Comment out the next line if your system doesn't have dlsym functionality.
 USE_DLSYM = -DSWR2_USE_DLSYM
 
+#IMC2 - Comment out to dsable IMC2 support
+IMC = 1
+
 CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support $(USE_DLSYM)
 LDFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support -lz
 
@@ -22,6 +25,11 @@ _OBJ = act_comm.o act_info.o act_move.o act_obj.o act_wiz.o boards.o \
 	tables.o telopt.o track.o update.o vector3_aux.o vote.o
 
 OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+ifdef IMC
+OBJ += $(ODIR)/imc.o
+CCFLAGS += -DSWR2_USE_IMC -DIMCSMAUG
+endif
 
 all:		 libs $(BINARY)
 
