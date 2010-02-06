@@ -72,8 +72,7 @@ void do_copyover( CHAR_DATA * ch, char *argument )
   coded_control = ReleaseCopyOfSocket( control, ++sockID );
 #endif
 
-  strcpy( buf,
-      "\r\nA Blinding Flash of light starts heading towards you, before you can think it engulfs you!\r\n" );
+  sprintf( buf, "%s", "\r\nA Blinding Flash of light starts heading towards you, before you can think it engulfs you!\r\n" );
 
   /* For each playing descriptor, save its state */
   for( d = first_descriptor; d; d = d_next )
@@ -109,9 +108,11 @@ void do_copyover( CHAR_DATA * ch, char *argument )
       SOCKET cur_desc = d->descriptor;
 #endif
 
-      fprintf( fp, "%d %s %s\n", cur_desc, och->name, d->host );
+      fprintf( fp, "%d %d %s %s\n", cur_desc, d->mccp ? 1 : 0,
+	       och->name, d->host );
       save_char_obj( och );
       write_to_descriptor( d, buf, 0 );
+      end_compress( d );
     }
   }
 
@@ -162,6 +163,7 @@ void copyover_recover( void )
   char host[MAX_STRING_LENGTH];
   SOCKET desc = 0;
   bool fOld = FALSE;
+  int use_mccp = 0;
 
   log_string( "Copyover recovery initiated" );
 
@@ -178,9 +180,9 @@ void copyover_recover( void )
 				   - doesn't prevent reading */
   for( ;; )
   {
-    fscanf( fp, "%d %s %s\n", &desc, name, host );
+    fscanf( fp, "%d %d %s %s\n", &desc, &use_mccp, name, host );
 
-    if( desc == -1 )
+    if( desc == -1 || feof( fp ) )
       break;
 
 #if defined(AMIGA) || defined(__MORPHOS__)
@@ -200,13 +202,16 @@ void copyover_recover( void )
     /* Write something, and check if it goes error-free */
     if( !write_to_descriptor( d, "\r\nThe surge of Light passes leaving you unscathed and your world reshaped anew\r\n", 0 ) )
     {
-      free_desc( d );	/* nope */
+      /*closesocket( desc );*/
+      free_desc(d);
       continue;
     }
 
     LINK( d, first_descriptor, last_descriptor, next, prev );
-    d->connected = CON_COPYOVER_RECOVER;	/* negative so close_socket
-						   will cut them off */
+    d->connected = CON_COPYOVER_RECOVER; /* negative so close_socket will cut them off */
+
+    if( use_mccp )
+      start_compress( d );
 
     /* Now, find the pfile */
     fOld = load_char_obj( d, name, FALSE );
@@ -222,8 +227,7 @@ void copyover_recover( void )
     {
       char argument[MAX_INPUT_LENGTH];
       snprintf( argument, MAX_INPUT_LENGTH, "%s", "auto noprog" );
-      write_to_descriptor( d, "\r\nCopyover recovery complete.\r\n",
-	  0 );
+      write_to_descriptor( d, "\r\nCopyover recovery complete.\r\n", 0 );
 
       /* Just In Case,  Someone said this isn't necassary, but _why_
 	 do we want to dump someone in limbo? */
