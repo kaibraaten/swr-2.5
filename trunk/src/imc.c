@@ -15,12 +15,12 @@
 #include <ctype.h>
 #include <unistd.h>
 #include <errno.h>
-#include <time.h>
 #if defined(__OpenBSD__) || defined(__FreeBSD__)
 #include <sys/types.h>
 #endif
 #include "sha256.h"
 #include "mud.h"
+#include <time.h>
 
 #define IMCKEY( literal, field, value ) \
 if( !strcasecmp( (word), (literal) ) )  \
@@ -3252,7 +3252,11 @@ void imc_loop( void )
 
    null_time.tv_sec = null_time.tv_usec = 0;
 
+#ifdef AMIGA
+   if( WaitSelect( this_imcmud->desc + 1, &in_set, &out_set, NULL, &null_time, 0 ) == SOCKET_ERROR )
+#else
    if( select( this_imcmud->desc + 1, &in_set, &out_set, NULL, &null_time ) == SOCKET_ERROR )
+#endif
    {
       perror( "imc_loop: select: poll" );
       imc_shutdown( TRUE );
@@ -3591,7 +3595,7 @@ void imc_loadhistory( void )
             tempchan->history[x] = imcfread_line( tempfile );
       }
       IMCFCLOSE( tempfile );
-      unlink( filename );
+      remove( filename );
    }
 }
 
@@ -4730,7 +4734,7 @@ SOCKET ipv4_connect( void )
    memset( &sa, 0, sizeof( sa ) );
    sa.sin_family = AF_INET;
 
-#ifndef WIN32
+#if !defined(WIN32) && !defined(AMIGA) && !defined(__MORPHOS__)
    /*
     * warning: this blocks. It would be better to farm the query out to
     * * another process, but that is difficult to do without lots of changes
@@ -5015,7 +5019,7 @@ bool imc_startup_network( bool connected )
          imcbug( "%s: Unable to load IMC hotboot file.", __FUNCTION__ );
       else
       {
-         unlink( IMC_HOTBOOT_FILE );
+         remove( IMC_HOTBOOT_FILE );
 
          fscanf( fp, "%s %s\n", netname, server );
 
@@ -5024,6 +5028,7 @@ bool imc_startup_network( bool connected )
          IMCSTRFREE( this_imcmud->servername );
          this_imcmud->servername = IMCSTRALLOC( server );
          IMCFCLOSE( fp );
+	 remove(IMC_HOTBOOT_FILE);
       }
       this_imcmud->state = IMC_ONLINE;
       this_imcmud->inbuf[0] = '\0';
@@ -7218,11 +7223,10 @@ const char *imc_find_social( CHAR_DATA * ch, const char *sname, const char *pers
    static char socname[LGST];
    int i = 0;
    SOCIAL_DATA *social;
-
+   static char lcSocName[LGST];
    socname[0] = '\0';
 
    // lower-case the social name before asking the MUD
-   static char lcSocName[LGST];
    for (i = 0; i < LGST && sname[i] != '\0'; i++) {
        lcSocName[i] = tolower(sname[i]);
    }
