@@ -3393,8 +3393,9 @@ void do_whois( CHAR_DATA * ch, char *argument )
       strcat( buf2, "\r\n" );
       send_to_char( buf2, ch );
 
-      snprintf( buf2, MAX_STRING_LENGTH, "Terminal type: %s\r\n",
-		ch->desc->terminal_type );
+      snprintf( buf2, MAX_STRING_LENGTH, "Terminal type: %s  MCCP: %s\r\n",
+		victim->desc->terminal_type,
+		victim->desc->mccp ? "Yes" : "No" );
       send_to_char( buf2, ch );
     }
 

@@ -327,7 +327,7 @@ struct telnet_type telnet_table[] =
 
 void announce_support( DESCRIPTOR_DATA *d)
 {
-  int i;
+  int i = 0;
 
   for (i = 0 ; i < 255 ; i++)
     {
@@ -353,8 +353,8 @@ void announce_support( DESCRIPTOR_DATA *d)
 
 int translate_telopts(DESCRIPTOR_DATA *d, char *src, int srclen, char *out)
 {
-  int cnt, skip;
-  unsigned char *pti, *pto;
+  int cnt = 0, skip = 0;
+  unsigned char *pti = NULL, *pto = NULL;
 
   pti = (unsigned char*) src;
   pto = (unsigned char*) out;
@@ -546,15 +546,13 @@ int process_will_ttype( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
 int process_sb_ttype_is( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
 {
   char val[MAX_INPUT_LENGTH];
-  char *pto;
-  int i;
+  char *pto = val;
+  int i = 0;
 
   if (skip_sb(d, src, srclen) > srclen)
     {
       return srclen + 1;
     }
-
-  pto = val;
 
   for (i = 4 ; i < srclen && src[i] != SE ; i++)
     {
@@ -613,18 +611,21 @@ int process_sb_naws( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
 /*
   NEW ENVIRON, used here to discover Windows telnet.
 */
-int process_will_new_environ( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
+int process_will_new_environ( DESCRIPTOR_DATA *d, unsigned char *src,
+			      int srclen )
 {
-  descriptor_printf(d, "%c%c%c%c%c%s%c%c", IAC, SB, TELOPT_NEW_ENVIRON, ENV_SEND, ENV_VAR, "SYSTEMTYPE", IAC, SE);
+  descriptor_printf(d, "%c%c%c%c%c%s%c%c", IAC, SB, TELOPT_NEW_ENVIRON,
+		    ENV_SEND, ENV_VAR, "SYSTEMTYPE", IAC, SE);
 
   return 3;
 }
 
-int process_sb_new_environ( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
+int process_sb_new_environ( DESCRIPTOR_DATA *d, unsigned char *src,
+			    int srclen )
 {
   char var[MAX_INPUT_LENGTH], val[MAX_INPUT_LENGTH];
-  char *pto;
-  int i;
+  char *pto = NULL;
+  int i = 0;
 
   if (skip_sb(d, src, srclen) > srclen)
     {
@@ -632,7 +633,6 @@ int process_sb_new_environ( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
     }
 
   var[0] = val[0] = 0;
-
   i = 4;
 
   while (i < srclen && src[i] != SE)
@@ -708,7 +708,7 @@ int process_do_mssp( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
 	      MSSP_VAL, "2009");
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "ICON",
-              MSSP_VAL, "http://bubba.com/icon.gif");
+              MSSP_VAL, "");
 
   cat_sprintf(buffer, "%c%s%c%s", MSSP_VAR, "IP",
 	      MSSP_VAL, "97.107.139.29");
@@ -806,8 +806,8 @@ void zlib_free( void *opaque, void *address )
 
 int start_compress( DESCRIPTOR_DATA *d )
 {
-  char start_mccp[] = { IAC, SB, TELOPT_MCCP, IAC, SE, 0 };
-  z_stream *stream;
+  const char start_mccp[] = { IAC, SB, TELOPT_MCCP, IAC, SE, 0 };
+  z_stream *stream = NULL;
 
   if (d->mccp)
     {
@@ -868,10 +868,10 @@ void end_compress( DESCRIPTOR_DATA *d )
       log_printf("end_compress: failed to deflate D%d@%s", d->descriptor, d->host);
     }
 
-  if (!SET_BIT(d->comm_flags, COMM_FLAG_DISCONNECT))
-    {
+  /*if (!SET_BIT(d->comm_flags, COMM_FLAG_DISCONNECT))
+    {*/
       process_compressed(d);
-    }
+      /* }*/
 
   if (deflateEnd(d->mccp) != Z_OK)
     {
@@ -879,6 +879,7 @@ void end_compress( DESCRIPTOR_DATA *d )
     }
 
   DISPOSE(d->mccp);
+  d->mccp = NULL;
 }
 
 void write_compressed( DESCRIPTOR_DATA *d )
@@ -903,7 +904,7 @@ void process_compressed( DESCRIPTOR_DATA *d )
 {
   int length = COMPRESS_BUF_SIZE - d->mccp->avail_out;
 
-  if (write(d->descriptor, sysdata.mccp_buf, length) < 1)
+  if (send(d->descriptor, sysdata.mccp_buf, length, 0) < 1)
     {
       log_printf("process_compressed D%d@%s", d->descriptor, d->host);
       SET_BIT(d->comm_flags, COMM_FLAG_DISCONNECT);
@@ -950,7 +951,7 @@ int skip_sb( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
 void descriptor_printf( DESCRIPTOR_DATA *d, const char *fmt, ... )
 {
   char buf[MAX_STRING_LENGTH];
-  int size;
+  int size = 0;
   va_list args;
 
   va_start(args, fmt);
