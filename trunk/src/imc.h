@@ -367,7 +367,7 @@ struct imc_siteinfo
    char *versionid;  /* Transient version id for the imclist */
    unsigned long outsize;
    int outtop;
-   int desc;   /* descriptor */
+   SOCKET desc;   /* descriptor */
    unsigned short state;   /* connection state */
 };
 
@@ -414,7 +414,7 @@ struct who_template
 
 bool imc_command_hook( CHAR_DATA * ch, const char *command, const char *argument );
 void imc_hotboot( void );
-void imc_startup( bool force, int desc, bool connected );
+void imc_startup( bool force, SOCKET desc, bool connected );
 void imc_shutdown( bool reconnect );
 void imc_initchar( CHAR_DATA * ch );
 bool imc_loadchar( CHAR_DATA * ch, FILE * fp, const char *word );

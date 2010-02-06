@@ -1471,7 +1471,7 @@ void imc_write_buffer( const char *txt )
    /*
     * This should never happen 
     */
-   if( !this_imcmud || this_imcmud->desc < 1 )
+   if( !this_imcmud || this_imcmud->desc == INVALID_SOCKET )
    {
       imcbug( "%s: Configuration or socket is invalid!", __FUNCTION__ );
       return;
@@ -3067,7 +3067,7 @@ bool imc_write_socket( void )
 
    while( nleft > 0 )
    {
-      if( ( nwritten = send( this_imcmud->desc, ptr, nleft, 0 ) ) <= 0 )
+      if( ( nwritten = send( this_imcmud->desc, ptr, nleft, 0 ) ) == SOCKET_ERROR )
       {
          if( nwritten == -1 && errno == EAGAIN )
          {
@@ -3273,7 +3273,7 @@ bool imc_read_socket( void )
       }
       else if( iErr == EAGAIN || iErr == EWOULDBLOCK )
          break;
-      else if( nRead == -1 )
+      else if( nRead == SOCKET_ERROR )
       {
          imclog( "%s: Descriptor error on #%d: %s", __FUNCTION__, this_imcmud->desc, strerror( iErr ) );
          return FALSE;
@@ -3315,11 +3315,11 @@ void imc_loop( void )
             return;
          }
       }
-      imc_startup( TRUE, -1, FALSE );
+      imc_startup( TRUE, INVALID_SOCKET, FALSE );
       return;
    }
 
-   if( this_imcmud->state == IMC_OFFLINE || this_imcmud->desc == -1 )
+   if( this_imcmud->state == IMC_OFFLINE || this_imcmud->desc == INVALID_SOCKET )
       return;
 
    /*
@@ -3338,7 +3338,7 @@ void imc_loop( void )
 
    null_time.tv_sec = null_time.tv_usec = 0;
 
-   if( select( this_imcmud->desc + 1, &in_set, &out_set, NULL, &null_time ) < 0 )
+   if( select( this_imcmud->desc + 1, &in_set, &out_set, NULL, &null_time ) == SOCKET_ERROR )
    {
       perror( "imc_loop: select: poll" );
       imc_shutdown( TRUE );
@@ -3393,7 +3393,11 @@ void imc_loop( void )
       }
    }
 
-   if( this_imcmud->desc > 0 && this_imcmud->outtop > 0 && FD_ISSET( this_imcmud->desc, &out_set ) && !imc_write_socket(  ) )
+   /*if( this_imcmud->desc > 0*/
+   if( this_imcmud->desc != INVALID_SOCKET
+       && this_imcmud->outtop > 0
+       && FD_ISSET( this_imcmud->desc, &out_set )
+       && !imc_write_socket(  ) )
    {
       this_imcmud->outtop = 0;
       imc_shutdown( TRUE );
@@ -4669,7 +4673,7 @@ void imcfread_config_file( FILE * fin )
    }
 }
 
-bool imc_read_config( int desc )
+bool imc_read_config( SOCKET desc )
 {
    FILE *fin;
    char cbase[SMST];
@@ -4922,7 +4926,7 @@ void imc_load_templates( void )
    imc_load_who_template(  );
 }
 
-int ipv4_connect( void )
+SOCKET ipv4_connect( void )
 {
    struct sockaddr_in sa;
    struct hostent *hostp;
@@ -4931,7 +4935,7 @@ int ipv4_connect( void )
 #else
    int r;
 #endif
-   int desc = -1;
+   int desc = INVALID_SOCKET;
 
    memset( &sa, 0, sizeof( sa ) );
    sa.sin_family = AF_INET;
@@ -4950,7 +4954,7 @@ int ipv4_connect( void )
       {
          imclog( "%s", "imc_connect_to: Cannot resolve server hostname." );
          imc_shutdown( FALSE );
-         return -1;
+         return INVALID_SOCKET;
       }
       memcpy( &sa.sin_addr, hostp->h_addr, hostp->h_length );
    }
@@ -4961,10 +4965,10 @@ int ipv4_connect( void )
    sa.sin_port = htons( this_imcmud->rport );
 
    desc = socket( AF_INET, SOCK_STREAM, 0 );
-   if( desc < 0 )
+   if( desc == INVALID_SOCKET )
    {
       perror( "socket" );
-      return -1;
+      return INVALID_SOCKET;
    }
 
 #ifdef WIN32
@@ -4972,27 +4976,27 @@ int ipv4_connect( void )
    if( ioctlsocket( desc, FIONBIO, &r ) == SOCKET_ERROR )
    {
       perror( "imc_connect: ioctlsocket failed" );
-      close( desc );
-      return;
+      closesocket( desc );
+      return INVALID_SOCKET;
    }
 #else
    r = fcntl( desc, F_GETFL, 0 );
    if( r < 0 || fcntl( desc, F_SETFL, O_NONBLOCK | r ) < 0 )
    {
       perror( "imc_connect: fcntl" );
-      close( desc );
-      return -1;
+      closesocket( desc );
+      return INVALID_SOCKET;
    }
 #endif
 
-   if( connect( desc, ( struct sockaddr * )&sa, sizeof( sa ) ) == -1 )
+   if( connect( desc, ( struct sockaddr * )&sa, sizeof( sa ) ) == SOCKET_ERROR )
    {
       if( errno != EINPROGRESS )
       {
          imclog( "%s: Failed connect: Error %d: %s", __FUNCTION__, errno, strerror( errno ) );
          perror( "connect" );
-         close( desc );
-         return -1;
+         closesocket( desc );
+         return INVALID_SOCKET;
       }
    }
    return desc;
@@ -5006,7 +5010,7 @@ bool imc_server_connect( void )
    int n, r;
 #endif
    char buf[LGST];
-   int desc = 0;
+   SOCKET desc = INVALID_SOCKET;
 
    if( !this_imcmud )
    {
@@ -5020,7 +5024,7 @@ bool imc_server_connect( void )
       return FALSE;
    }
 
-   if( this_imcmud->desc > 0 )
+   if( this_imcmud->desc != INVALID_SOCKET )
    {
       imcbug( "%s", "Already connected" );
       return FALSE;
@@ -5043,12 +5047,12 @@ bool imc_server_connect( void )
    for( ai = ai_list; ai; ai = ai->ai_next )
    {
       desc = socket( ai->ai_family, ai->ai_socktype, ai->ai_protocol );
-      if( desc < 0 )
+      if( desc == INVALID_SOCKET )
          continue;
 
-      if( connect( desc, ai->ai_addr, ai->ai_addrlen ) == 0 )
+      if( connect( desc, ai->ai_addr, ai->ai_addrlen ) != SOCKET_ERROR )
          break;
-      close( desc );
+      closesocket( desc );
    }
    freeaddrinfo( ai_list );
    if( ai == NULL )
@@ -5062,12 +5066,12 @@ bool imc_server_connect( void )
    if( r < 0 || fcntl( desc, F_SETFL, O_NONBLOCK | r ) < 0 )
    {
       perror( "imc_connect: fcntl" );
-      close( desc );
+      closesocket( desc );
       return FALSE;
    }
 #else
    desc = ipv4_connect(  );
-   if( desc < 1 )
+   if( desc == SOCKET_ERROR )
       return FALSE;
 #endif
 
@@ -5248,9 +5252,9 @@ void imc_shutdown( bool reconnect )
 
    imclog( "%s", "Shutting down network." );
 
-   if( this_imcmud->desc > 0 )
-      close( this_imcmud->desc );
-   this_imcmud->desc = -1;
+   if( this_imcmud->desc != INVALID_SOCKET )
+      closesocket( this_imcmud->desc );
+   this_imcmud->desc = INVALID_SOCKET;
 
    imc_savehistory(  );
    free_imcdata( FALSE );
@@ -5310,7 +5314,7 @@ bool imc_startup_network( bool connected )
    return TRUE;
 }
 
-void imc_startup( bool force, int desc, bool connected )
+void imc_startup( bool force, SOCKET desc, bool connected )
 {
    imcwait = 0;
 
@@ -5364,7 +5368,7 @@ void imc_startup( bool force, int desc, bool connected )
    if( !whot )
       imc_load_templates(  );
 
-   if( ( !this_imcmud->autoconnect && !force && !connected ) || ( connected && this_imcmud->desc < 1 ) )
+   if( ( !this_imcmud->autoconnect && !force && !connected ) || ( connected && this_imcmud->desc == INVALID_SOCKET ) )
    {
       imclog( "%s", "IMC2 network data loaded. Autoconnect not set. IMC2 will need to be connected manually." );
       return;
