@@ -11,6 +11,10 @@
 
 #define STARTING_MONEY 1000
 
+/* telopt.c */
+void send_echo_on( DESCRIPTOR_DATA *d );
+void send_echo_off( DESCRIPTOR_DATA *d );
+
 /*
  * Local function prototypes.
  */
@@ -29,10 +33,7 @@ static void nanny_on_motd_state( DESCRIPTOR_DATA *d );
 static void nanny_invalid_constate( DESCRIPTOR_DATA * d, char *argument );
 static OBJ_DATA *rgObjNest[MAX_NEST];
 extern bool wizlock;
-#ifndef _WIN32
-const char echo_off_str[] = { IAC, WILL, TELOPT_ECHO, '\0' };
-const char echo_on_str[] = { IAC, WONT, TELOPT_ECHO, '\0' };
-#endif
+
 /*
  * External functions.
  */
@@ -292,9 +293,7 @@ static void nanny_get_name( DESCRIPTOR_DATA * d, char *argument )
 
     /* Old player */
     write_to_buffer( d, "Password: ", 0 );
-#ifndef _WIN32
-    write_to_buffer( d, echo_off_str, 0 );
-#endif
+    send_echo_off( d );
     d->connected = CON_GET_OLD_PASSWORD;
     return;
   }
@@ -326,9 +325,7 @@ static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
     return;
   }
 
-#ifndef _WIN32
-  write_to_buffer( d, echo_on_str, 0 );
-#endif
+  send_echo_on( d );
 
   if( check_playing( d, ch->name, TRUE ) )
     return;
@@ -377,13 +374,10 @@ static void nanny_confirm_new_name( DESCRIPTOR_DATA * d, char *argument )
     case 'Y':
       sprintf( buf,
 	  "\r\nMake sure to use a password that won't be easily guessed by someone else."
-	  "\r\nPick a good password for %s: %s", ch->name,
-#ifdef _WIN32
-	  "" );
-#else
-      echo_off_str );
-#endif
+	       "\r\nPick a good password for %s: ", ch->name );
+
       write_to_buffer( d, buf, 0 );
+      send_echo_off( d );
       d->connected = CON_GET_NEW_PASSWORD;
       break;
 
@@ -450,9 +444,7 @@ static void nanny_confirm_new_password( DESCRIPTOR_DATA * d, char *argument )
     return;
   }
 
-#ifndef _WIN32
-  write_to_buffer( d, echo_on_str, 0 );
-#endif
+  send_echo_on( d );
   write_to_buffer( d, "\r\nWhat is your sex (M/F/N)? ", 0 );
   d->connected = CON_GET_NEW_SEX;
 }

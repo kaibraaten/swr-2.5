@@ -30,6 +30,10 @@
 #include "mud.h"
 #include "os.h"
 
+/* telopt.c */
+int start_compress( DESCRIPTOR_DATA *d );
+void end_compress( DESCRIPTOR_DATA *d );
+
 /*
  * OS-dependent local functions.
  */

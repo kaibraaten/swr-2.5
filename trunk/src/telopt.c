@@ -8,6 +8,7 @@
 #include "mud.h"
 #include "telnet.h"
 
+/* Externals */
 bool write_to_descriptor( DESCRIPTOR_DATA *d, const char *txt, int length );
 size_t skill_package_table_size( void );
 extern int top_area;
@@ -17,6 +18,8 @@ extern int top_obj_index;
 extern int top_room;
 
 #define TELOPT_DEBUG 1
+#define ANNOUNCE_WILL   BV01
+#define ANNOUNCE_DO     BV02
 
 const char iac_will_ttype[]       = { IAC, WILL, TELOPT_TTYPE, 0 };
 const char iac_sb_ttype_is[]      = { IAC, SB,   TELOPT_TTYPE, ENV_IS, 0 };
@@ -27,6 +30,37 @@ const char iac_do_mssp[]          = { IAC, DO,   TELOPT_MSSP, 0 };
 const char iac_do_mccp[]          = { IAC, DO,   TELOPT_MCCP, 0 };
 const char iac_dont_mccp[]        = { IAC, DONT, TELOPT_MCCP, 0 };
 
+/* Exported functions */
+int translate_telopts( DESCRIPTOR_DATA *d, char *src, int srclen, char *out );
+void announce_support( DESCRIPTOR_DATA *d );
+int start_compress( DESCRIPTOR_DATA *d );
+void end_compress( DESCRIPTOR_DATA *d );
+void write_compressed( DESCRIPTOR_DATA *d );
+void send_echo_on( DESCRIPTOR_DATA *d );
+void send_echo_off( DESCRIPTOR_DATA *d );
+
+/* Private functions */
+static void debug_telopts( DESCRIPTOR_DATA *d, unsigned char *src,
+			   int srclen );
+static int process_will_ttype( DESCRIPTOR_DATA *d, unsigned char *src,
+			       int srclen );
+static int process_sb_ttype_is( DESCRIPTOR_DATA *d, unsigned char *src,
+				int srclen );
+static int process_sb_naws( DESCRIPTOR_DATA *d, unsigned char *src,
+			    int srclen );
+static int process_will_new_environ( DESCRIPTOR_DATA *d, unsigned char *src,
+				     int srclen );
+static int process_sb_new_environ( DESCRIPTOR_DATA *d, unsigned char *src,
+				   int srclen );
+static int process_do_mssp( DESCRIPTOR_DATA *d, unsigned char *src,
+			    int srclen );
+static int process_do_mccp( DESCRIPTOR_DATA *d, unsigned char *src,
+			    int srclen );
+static int process_dont_mccp( DESCRIPTOR_DATA *d, unsigned char *src,
+			      int srclen );
+static int skip_sb( DESCRIPTOR_DATA *d, unsigned char *src, int srclen );
+static void descriptor_printf( DESCRIPTOR_DATA *d, const char *fmt, ...);
+static void process_compressed( DESCRIPTOR_DATA *d );
 
 struct telopt_type
 {
@@ -60,6 +94,12 @@ const char *telcmds[] =
     "AYT",   "EC",    "EL",    "GA",    "SB",
     "WILL",  "WONT",  "DO",    "DONT",  "IAC"
   };
+
+struct telnet_type
+{
+  const char      *name;
+  int       flags;
+};
 
 struct telnet_type telnet_table[] =
   {
@@ -932,10 +972,7 @@ void end_compress( DESCRIPTOR_DATA *d )
       log_printf("end_compress: failed to deflate D%d@%s", d->descriptor, d->host);
     }
 
-  /*if (!SET_BIT(d->comm_flags, COMM_FLAG_DISCONNECT))
-    {*/
-      process_compressed(d);
-      /* }*/
+  process_compressed(d);
 
   if (deflateEnd(d->mccp) != Z_OK)
     {
@@ -971,8 +1008,6 @@ void process_compressed( DESCRIPTOR_DATA *d )
   if (send(d->descriptor, sysdata.mccp_buf, length, 0) < 1)
     {
       log_printf("process_compressed D%d@%s", d->descriptor, d->host);
-      SET_BIT(d->comm_flags, COMM_FLAG_DISCONNECT);
-
       return;
     }
 }
