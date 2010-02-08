@@ -22,6 +22,15 @@
 #include "mud.h"
 #include <time.h>
 
+#define IMC_BUFF_SIZE 16384
+
+#define IMC_VERSION_STRING "IMC2 Freedom CL-2.2 "
+#define IMC_VERSION 2
+
+/* Number of entries to keep in the channel histories */
+#define MAX_IMCHISTORY 20
+#define MAX_IMCTELLHISTORY 20
+
 /* Remcon: Ask and ye shall receive. */
 #define IMC_DIR          "imc/"
 
@@ -46,6 +55,9 @@ typedef enum
     IMCPERM_NOTSET, IMCPERM_NONE, IMCPERM_MORT, IMCPERM_IMM, IMCPERM_ADMIN,
    IMCPERM_IMP
   } imc_permissions;
+
+#define LGST 4096 /* Large String */
+#define SMST 1024 /* Small String */
 
 /* Flag macros */
 #define IMCIS_SET(var, bit)         ((var) & (bit))
@@ -86,6 +98,14 @@ typedef enum
 #define IMCTELLHISTORY(ch,x)  (CH_IMCDATA((ch))->imc_tellhistory[(x)])
 #define IMCISINVIS(ch)        ( IMCIS_SET( IMCFLAG((ch)), IMC_INVIS ) )
 #define IMCAFK(ch)            ( IMCIS_SET( IMCFLAG((ch)), IMC_AFK ) )
+
+#define CH_IMCDATA(ch)           ((ch)->pcdata->imcchardata)
+#define CH_IMCLEVEL(ch)          ((ch)->top_level)
+#define CH_IMCNAME(ch)           ((ch)->name)
+#define CH_IMCSEX(ch)            ((ch)->sex)
+#define CH_IMCTITLE(ch)          ((ch)->pcdata->title)
+#define SOCIAL_DATA SOCIALTYPE
+#define CH_IMCRANK(ch)           ((ch)->pcdata->rank)
 
 /* Macro taken from DOTD codebase. Fcloses a file, then nulls its pointer for safety. */
 #define IMCFCLOSE(fp)  fclose((fp)); (fp)=NULL;
@@ -199,6 +219,28 @@ bool default_packets_registered = FALSE; // Cheesy global for a stupid problem!
 time_t imcucache_clock; /* prune ucache stuff regularly */
 time_t imc_time;  /* Current clock time for the client */
 
+/* No real functional difference in alot of this, but double linked lists DO seem to handle better,
+* and they look alot neater too. Yes, readability IS important! - Samson */
+typedef struct imc_channel IMC_CHANNEL;   /* Channels, both local and non-local*/
+typedef struct imc_packet IMC_PACKET;  /* It's a packet! */
+typedef struct imc_packet_data IMC_PDATA; /* Extra data fields for packets */
+typedef struct imc_remoteinfo REMOTEINFO; /* Information on a mud connected to  IMC */
+typedef struct imc_ban_data IMC_BAN;   /* Mud level bans */
+typedef struct imc_ignore IMC_IGNORE;  /* Player level ignores */
+typedef struct imcucache_data IMCUCACHE_DATA;   /* User cache data for gender targetting socials */
+typedef struct imc_color_table IMC_COLOR; /* The Color config */
+typedef struct imc_command_table IMC_CMD_DATA;  /* Command table */
+typedef struct imc_help_table IMC_HELP_DATA; /* Help table */
+typedef struct imc_cmd_alias IMC_ALIAS;   /* Big, bad, bloated command alias thing */
+typedef struct imc_packet_handler IMC_PHANDLER; /* custom packet handlers added dynamically */
+typedef struct who_template WHO_TEMPLATE; /* The who templates */
+
+typedef void IMC_FUN( CHAR_DATA * ch, const char *argument );
+#define IMC_CMD( name ) void (name)( CHAR_DATA *ch, const char *argument )
+
+typedef void PACKET_FUN( IMC_PACKET * q, const char *packet );
+#define PFUN( name ) void (name)( IMC_PACKET *q, const char *packet )
+
 void imclog( const char *format, ... ) __attribute__ ( ( format( printf, 1, 2 ) ) );
 void imcbug( const char *format, ... ) __attribute__ ( ( format( printf, 1, 2 ) ) );
 void imc_printf( CHAR_DATA * ch, const char *fmt, ... ) __attribute__ ( ( format( printf, 2, 3 ) ) );
@@ -220,6 +262,199 @@ char *imc_nameof( const char *src );
 char *imc_mudof( const char *src );
 void imc_send_tell( const char *from, const char *to, const char *txt,
                     int reply );
+
+/* Oh yeah, baby, that raunchy looking Merc structure just got the
+ * facelift of the century.
+ * Thanks to Thoric and friends for the slick idea.
+ */
+struct imc_cmd_alias
+{
+  IMC_ALIAS *next;
+  IMC_ALIAS *prev;
+  char *name;
+};
+
+struct imc_command_table
+{
+  IMC_CMD_DATA *next;
+  IMC_CMD_DATA *prev;
+  IMC_ALIAS *first_alias;
+  IMC_ALIAS *last_alias;
+  IMC_FUN *function;
+  char *name;
+  int level;
+  bool connected;
+};
+
+struct imc_help_table
+{
+  IMC_HELP_DATA *next;
+  IMC_HELP_DATA *prev;
+  char *name;
+  char *text;
+  int level;
+};
+
+struct imc_color_table
+{
+  IMC_COLOR *next;
+  IMC_COLOR *prev;
+  char *name; /* the name of the color */
+  char *mudtag;  /* What the mud uses for the raw tag */
+  char *imctag;  /* The imc tilde code that represents the mudtag to the network */
+};
+
+struct imc_ignore
+{
+  IMC_IGNORE *next;
+  IMC_IGNORE *prev;
+  char *name;
+};
+
+struct imcucache_data
+{
+  IMCUCACHE_DATA *next;
+  IMCUCACHE_DATA *prev;
+  char *name;
+  time_t time;
+  int gender;
+};
+
+struct imc_channel
+{
+  IMC_CHANNEL *next;
+  IMC_CHANNEL *prev;
+  char *name; /* name of channel */
+  char *owner;   /* owner (singular) of channel */
+  char *operators;  /* current operators of channel */
+  char *invited;
+  char *excluded;
+  char *local_name; /* Operational localname */
+  char *regformat;
+  char *emoteformat;
+  char *socformat;
+  char *history[MAX_IMCHISTORY];
+  long flags;
+  short level;
+  bool open;
+  bool refreshed;
+};
+
+struct imc_packet_data
+{
+  IMC_PDATA *next;
+  IMC_PDATA *prev;
+  char field[IMC_BUFF_SIZE];
+};
+
+struct imc_packet
+{
+  IMC_PDATA *first_data;
+  IMC_PDATA *last_data;
+  char from[SMST];
+  char to[SMST];
+  char type[SMST];
+  char route[SMST]; /* This is only used internally and not sent */
+};
+
+/* The mud's connection data for the server */
+struct imc_siteinfo
+{
+  char *servername; /* name of server */
+  char *rhost;   /* DNS/IP of server */
+  char *network; /* Network name of the server, set at keepalive - Samson */
+  char *serverpw;   /* server password */
+  char *clientpw;   /* client password */
+  char *localname;  /* One word localname */
+  char *fullname;   /* FULL name of mud */
+  char *ihost;   /* host AND port of mud */
+  char *email;   /* contact address (email) */
+  char *www;  /* homepage */
+  char *base; /* The mud's codebase name */
+  char *details; /* BRIEF description of mud */
+  int iport;  /* The port the mud itself is on */
+  int minlevel;  /* Minimum player level */
+  int immlevel;  /* Immortal level */
+  int adminlevel;   /* Admin level */
+  int implevel;  /* Implementor level */
+  unsigned short rport;   /* remote port of server */
+  bool sha256;   /* Client will support SHA-256 authentication */
+  bool sha256pass;  /* Client is using SHA-256 authentication */
+  bool autoconnect; /* Do we autoconnect on bootup or not? - Samson */
+
+  /*
+   * Conection parameters - These don't save in the config file
+   */
+  char inbuf[IMC_BUFF_SIZE]; /* input buffer */
+  char incomm[IMC_BUFF_SIZE];
+  char *outbuf;  /* output buffer */
+  char *versionid;  /* Transient version id for the imclist */
+  unsigned long outsize;
+  int outtop;
+  SOCKET desc;   /* descriptor */
+  unsigned short state;   /* connection state */
+};
+
+struct imc_remoteinfo
+{
+  REMOTEINFO *next;
+  REMOTEINFO *prev;
+  char *name;
+  char *version;
+  char *network;
+  char *path;
+  char *url;
+  char *host;
+  char *port;
+  bool expired;
+};
+
+/* A mudwide ban */
+struct imc_ban_data
+{
+  IMC_BAN *next;
+  IMC_BAN *prev;
+  char *name;
+};
+
+struct imc_packet_handler
+{
+  IMC_PHANDLER *next;
+  IMC_PHANDLER *prev;
+  PACKET_FUN *func;
+  char *name;
+};
+
+struct who_template
+{
+  char *head;
+  char *plrheader;
+  char *immheader;
+  char *plrline;
+  char *immline;
+  char *tail;
+  char *master;
+};
+
+struct imcchar_data
+{
+  IMC_IGNORE *imcfirst_ignore;  /* List of ignored people */
+  IMC_IGNORE *imclast_ignore;
+  char *rreply;  /* IMC reply-to */
+  char *rreply_name;   /* IMC reply-to shown to char */
+  char *imc_listen; /* Channels the player is listening to */
+  char *imc_denied; /* Channels the player has been denied use of */
+  char *imc_tellhistory[MAX_IMCTELLHISTORY];   /* History of received imctells\ - Samson 1-21-04 */
+  char *email;   /* Person's email address - for imcfinger - Samson 3-21-04 */
+  char *homepage;   /* Person's homepage - Samson 3-21-04 */
+  char *aim;  /* Person's AOL Instant Messenger screenname - Samson 3-21-04 */
+  char *yahoo;   /* Person's Y! screenname - Samson 3-21-04 */
+  char *msn;  /* Person's MSN Messenger screenname - Samson 3-21-04 */
+  char *comment; /* Person's personal comment - Samson 3-21-04 */
+  long imcflag;  /* Flags set on the player */
+  int icq; /* Person's ICQ UIN Number - Samson 3-21-04 */
+  int imcperm;   /* Permission level for the player */
+};
 
 const char *const imcperm_names[] = {
    "Notset", "None", "Mort", "Imm", "Admin", "Imp"
@@ -7991,4 +8226,9 @@ bool imc_command_hook( CHAR_DATA * ch, const char *command, const char *argument
          break;
    }
    return TRUE;
+}
+
+SOCKET imc_getsocket( SITEINFO *site )
+{
+  return site ? site->desc : INVALID_SOCKET;
 }
