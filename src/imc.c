@@ -264,9 +264,7 @@ char *imcstrrep( const char *src, const char *sch, const char *rep )
 const char *imcone_argument( const char *argument, char *arg_first )
 {
    char cEnd;
-   int count;
-
-   count = 0;
+   int count = 0;
 
    if( arg_first )
       arg_first[0] = '\0';
@@ -274,7 +272,7 @@ const char *imcone_argument( const char *argument, char *arg_first )
    if( !argument || argument[0] == '\0' )
       return NULL;
 
-   while( isspace( *argument ) )
+   while( isspace( (int) *argument ) )
       argument++;
 
    cEnd = ' ';
@@ -298,7 +296,7 @@ const char *imcone_argument( const char *argument, char *arg_first )
    if( arg_first )
       *arg_first = '\0';
 
-   while( isspace( *argument ) )
+   while( isspace( (int) *argument ) )
       argument++;
 
    return argument;
@@ -440,9 +438,9 @@ char *imccapitalize( const char *str )
    int i;
 
    for( i = 0; str[i] != '\0'; i++ )
-      strcap[i] = tolower( str[i] );
+     strcap[i] = tolower( (int) str[i] );
    strcap[i] = '\0';
-   strcap[0] = toupper( strcap[0] );
+   strcap[0] = toupper( (int) strcap[0] );
    return strcap;
 }
 
@@ -1035,7 +1033,7 @@ int imcfread_number( FILE * fp )
       }
       c = getc( fp );
    }
-   while( isspace( c ) );
+   while( isspace( (int) c ) );
 
    number = 0;
 
@@ -1048,13 +1046,13 @@ int imcfread_number( FILE * fp )
       c = getc( fp );
    }
 
-   if( !isdigit( c ) )
+   if( !isdigit( (int) c ) )
    {
       imclog( "imcfread_number: bad format. (%c)", c );
       return 0;
    }
 
-   while( isdigit( c ) )
+   while( isdigit( (int) c ) )
    {
       if( feof( fp ) )
       {
@@ -1104,7 +1102,7 @@ char *imcfread_line( FILE * fp )
       }
       c = getc( fp );
    }
-   while( isspace( c ) );
+   while( isspace( (int) c ) );
 
    ungetc( c, fp );
 
@@ -1164,7 +1162,7 @@ char *imcfread_word( FILE * fp )
       }
       cEnd = getc( fp );
    }
-   while( isspace( cEnd ) );
+   while( isspace( (int) cEnd ) );
 
    if( cEnd == '\'' || cEnd == '"' )
    {
@@ -1186,7 +1184,7 @@ char *imcfread_word( FILE * fp )
          return word;
       }
       *pword = getc( fp );
-      if( cEnd == ' ' ? isspace( *pword ) : *pword == cEnd )
+      if( cEnd == ' ' ? isspace( (int) *pword ) : *pword == cEnd )
       {
          if( cEnd == ' ' )
             ungetc( *pword, fp );
@@ -1241,7 +1239,7 @@ char imcfread_letter( FILE * fp )
       }
       c = getc( fp );
    }
-   while( isspace( c ) );
+   while( isspace( (int) c ) );
 
    return c;
 }
@@ -2018,7 +2016,7 @@ char *break_newlines( char *argument, char *arg_first )
    if( !argument || argument[0] == '\0' )
       return NULL;
 
-   while( isspace( *argument ) )
+   while( isspace( (int) *argument ) )
       argument++;
 
    cEnd = '\n';
@@ -2042,7 +2040,7 @@ char *break_newlines( char *argument, char *arg_first )
    if( arg_first )
       *arg_first = '\0';
 
-   while( isspace( *argument ) )
+   while( isspace( (int) *argument ) )
       argument++;
 
    return argument;
@@ -5660,7 +5658,7 @@ IMC_CMD( imctell )
       char buf2[SMST];
 
       argument++;
-      while( isspace( *argument ) )
+      while( isspace( (int) *argument ) )
          argument++;
       imcstrlcpy( buf2, argument, SMST );
       p = imc_send_social( ch, argument, 1 );
@@ -5676,7 +5674,7 @@ IMC_CMD( imctell )
    else if( argument[0] == ',' )
    {
       argument++;
-      while( isspace( *argument ) )
+      while( isspace( (int) *argument ) )
          argument++;
       imc_send_tell( CH_IMCNAME( ch ), buf, color_mtoi( argument ), 1 );
       snprintf( buf1, LGST, "~WImctell: ~c%s %s\r\n", buf, argument );
@@ -5739,7 +5737,7 @@ IMC_CMD( imcreply )
       char buf2[SMST];
 
       argument++;
-      while( isspace( *argument ) )
+      while( isspace( (int) *argument ) )
          argument++;
       imcstrlcpy( buf2, argument, SMST );
       p = imc_send_social( ch, argument, 1 );
@@ -5755,7 +5753,7 @@ IMC_CMD( imcreply )
    else if( argument[0] == ',' )
    {
       argument++;
-      while( isspace( *argument ) )
+      while( isspace( (int) *argument ) )
          argument++;
       imc_send_tell( CH_IMCNAME( ch ), IMC_RREPLY( ch ), color_mtoi( argument ), 1 );
       snprintf( buf1, LGST, "~WImctell: ~c%s %s\r\n", IMC_RREPLY( ch ), argument );
@@ -7228,7 +7226,7 @@ const char *imc_find_social( CHAR_DATA * ch, const char *sname, const char *pers
 
    // lower-case the social name before asking the MUD
    for (i = 0; i < LGST && sname[i] != '\0'; i++) {
-       lcSocName[i] = tolower(sname[i]);
+     lcSocName[i] = tolower( (int) sname[i]);
    }
 
    if( ( social = find_social( lcSocName ) ) == NULL )
@@ -7326,7 +7324,7 @@ char *imc_act_string( const char *format, CHAR_DATA * ch, CHAR_DATA * vic )
    {
       if( *format == '.' || *format == '?' || *format == '!' )
          should_upper = TRUE;
-      else if( should_upper == TRUE && !isspace( *format ) && *format != '$' )
+      else if( should_upper == TRUE && !isspace( (int) *format ) && *format != '$' )
          should_upper = FALSE;
 
       if( *format != '$' )
@@ -7799,7 +7797,7 @@ bool imc_command_hook( CHAR_DATA * ch, const char *command, const char *argument
           * Strip the , and then extra spaces - Remcon 6-28-03 
           */
          argument++;
-         while( isspace( *argument ) )
+         while( isspace( (int) *argument ) )
             argument++;
          imc_sendmessage( c, CH_IMCNAME( ch ), color_mtoi( argument ), 1 );
          break;
@@ -7808,7 +7806,7 @@ bool imc_command_hook( CHAR_DATA * ch, const char *command, const char *argument
           * Strip the @ and then extra spaces - Remcon 6-28-03 
           */
          argument++;
-         while( isspace( *argument ) )
+         while( isspace( (int) *argument ) )
             argument++;
          p = imc_send_social( ch, argument, 0 );
          if( !p || p[0] == '\0' )
