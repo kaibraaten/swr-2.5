@@ -133,11 +133,11 @@ do                                                              \
 #endif
 
 #define KEY( literal, field, value )                                    \
-  if ( !str_cmp( word, literal ) )        \
+  if ( !str_cmp( (word), (literal) ) )					\
     {                                       \
-  field  = value;                     \
-  fMatch = TRUE;                      \
-  break;                              \
+      (field) = (value);		    \
+      fMatch = TRUE;			    \
+      break;				    \
     }
 
 /* double-linked list handling macros -Thoric */
