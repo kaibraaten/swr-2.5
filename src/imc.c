@@ -722,43 +722,6 @@ void imcpager_printf( CHAR_DATA * ch, const char *fmt, ... )
  * Low level utility functions. *
  ********************************/
 
-bool imcstr_prefix( const char *astr, const char *bstr )
-{
-   if( !astr )
-   {
-      imcbug( "Strn_cmp: null astr." );
-      return TRUE;
-   }
-
-   if( !bstr )
-   {
-      imcbug( "Strn_cmp: null bstr." );
-      return TRUE;
-   }
-
-   for( ; *astr; astr++, bstr++ )
-   {
-      if( LOWER( *astr ) != LOWER( *bstr ) )
-         return TRUE;
-   }
-   return FALSE;
-}
-
-/*
- * Returns an initial-capped string.
- */
-char *imccapitalize( const char *str )
-{
-   static char strcap[LGST];
-   int i;
-
-   for( i = 0; str[i] != '\0'; i++ )
-     strcap[i] = tolower( (int) str[i] );
-   strcap[i] = '\0';
-   strcap[0] = toupper( (int) strcap[0] );
-   return strcap;
-}
-
 /* Does the list have the member in it? */
 bool imc_hasname( const char *list, const char *member )
 {
@@ -1331,119 +1294,64 @@ void imc_new_channel( const char *chan, const char *owner, const char *ops, cons
 }
 
 /*
- * Read a number from a file. [Taken from Smaug's fread_number]
- */
-int imcfread_number( FILE * fp )
-{
-   int number;
-   bool sign;
-   char c;
-
-   do
-   {
-      if( feof( fp ) )
-      {
-         imclog( "%s", "imcfread_number: EOF encountered on read." );
-         return 0;
-      }
-      c = getc( fp );
-   }
-   while( isspace( (int) c ) );
-
-   number = 0;
-
-   sign = FALSE;
-   if( c == '+' )
-      c = getc( fp );
-   else if( c == '-' )
-   {
-      sign = TRUE;
-      c = getc( fp );
-   }
-
-   if( !isdigit( (int) c ) )
-   {
-      imclog( "imcfread_number: bad format. (%c)", c );
-      return 0;
-   }
-
-   while( isdigit( (int) c ) )
-   {
-      if( feof( fp ) )
-      {
-         imclog( "%s", "imcfread_number: EOF encountered on read." );
-         return number;
-      }
-      number = number * 10 + c - '0';
-      c = getc( fp );
-   }
-
-   if( sign )
-      number = 0 - number;
-
-   if( c == '|' )
-      number += imcfread_number( fp );
-   else if( c != ' ' )
-      ungetc( c, fp );
-
-   return number;
-}
-
-/*
  * Read to end of line into static buffer [Taken from Smaug's fread_line]
+ */
+/*
+ * Standard fread_line returns static buffer, while this one returns
+ * dynamically allocated, which is why this must stay.
  */
 char *imcfread_line( FILE * fp )
 {
-   char line[LGST];
-   char *pline;
-   char c;
-   int ln;
+  char line[LGST];
+  char *pline;
+  char c;
+  int ln;
 
-   pline = line;
-   line[0] = '\0';
-   ln = 0;
+  pline = line;
+  line[0] = '\0';
+  ln = 0;
 
-   /*
-    * Skip blanks.
-    * Read first char.
-    */
+  /*
+   * Skip blanks.
+   * Read first char.
+   */
    do
-   {
-      if( feof( fp ) )
-      {
-         imcbug( "%s", "imcfread_line: EOF encountered on read." );
-         strncpy( line, "", LGST );
-         return IMCSTRALLOC( line );
-      }
-      c = getc( fp );
-   }
+     {
+       if( feof( fp ) )
+	 {
+	   imcbug( "%s", "imcfread_line: EOF encountered on read." );
+	   strncpy( line, "", LGST );
+	   return IMCSTRALLOC( line );
+	 }
+       c = getc( fp );
+     }
    while( isspace( (int) c ) );
 
    ungetc( c, fp );
 
-   do
+ do
    {
-      if( feof( fp ) )
-      {
+     if( feof( fp ) )
+       {
          imcbug( "%s", "imcfread_line: EOF encountered on read." );
          *pline = '\0';
          return IMCSTRALLOC( line );
-      }
-      c = getc( fp );
-      *pline++ = c;
-      ln++;
-      if( ln >= ( LGST - 1 ) )
-      {
+       }
+     c = getc( fp );
+     *pline++ = c;
+     ln++;
+     if( ln >= ( LGST - 1 ) )
+       {
          imcbug( "%s", "imcfread_line: line too long" );
          break;
-      }
+       }
    }
-   while( c != '\n' && c != '\r' );
+ while( c != '\n' && c != '\r' );
 
    do
-   {
-      c = getc( fp );
-   }
+     {
+       c = getc( fp );
+     }
    while( c == '\n' || c == '\r' );
 
    ungetc( c, fp );
@@ -1451,112 +1359,11 @@ char *imcfread_line( FILE * fp )
    *pline = '\0';
 
    /*
-    * Since tildes generally aren't found at the end of lines, this seems workable. Will enable reading old configs. 
+    * Since tildes generally aren't found at the end of lines, this seems workable. Will enable reading old configs.
     */
    if( line[strlen( line ) - 1] == '~' )
-      line[strlen( line ) - 1] = '\0';
+     line[strlen( line ) - 1] = '\0';
    return IMCSTRALLOC( line );
-}
-
-/*
- * Read one word (into static buffer). [Taken from Smaug's fread_word]
- */
-char *imcfread_word( FILE * fp )
-{
-   static char word[SMST];
-   char *pword;
-   char cEnd;
-
-   do
-   {
-      if( feof( fp ) )
-      {
-         imclog( "%s: EOF encountered on read.", __FUNCTION__ );
-         word[0] = '\0';
-         return word;
-      }
-      cEnd = getc( fp );
-   }
-   while( isspace( (int) cEnd ) );
-
-   if( cEnd == '\'' || cEnd == '"' )
-   {
-      pword = word;
-   }
-   else
-   {
-      word[0] = cEnd;
-      pword = word + 1;
-      cEnd = ' ';
-   }
-
-   for( ; pword < word + SMST; pword++ )
-   {
-      if( feof( fp ) )
-      {
-         imclog( "%s: EOF encountered on read.", __FUNCTION__ );
-         *pword = '\0';
-         return word;
-      }
-      *pword = getc( fp );
-      if( cEnd == ' ' ? isspace( (int) *pword ) : *pword == cEnd )
-      {
-         if( cEnd == ' ' )
-            ungetc( *pword, fp );
-         *pword = '\0';
-         return word;
-      }
-   }
-   imclog( "%s: word too long", __FUNCTION__ );
-   return NULL;
-}
-
-/*
- * Read to end of line (for comments). [Taken from Smaug's fread_to_eol]
- */
-void imcfread_to_eol( FILE * fp )
-{
-   char c;
-
-   do
-   {
-      if( feof( fp ) )
-      {
-         imclog( "%s", "imcfread_to_eol: EOF encountered on read." );
-         return;
-      }
-      c = getc( fp );
-   }
-   while( c != '\n' && c != '\r' );
-
-   do
-   {
-      c = getc( fp );
-   }
-   while( c == '\n' || c == '\r' );
-
-   ungetc( c, fp );
-}
-
-/*
- * Read a letter from a file. [Taken from Smaug's fread_letter]
- */
-char imcfread_letter( FILE * fp )
-{
-   char c;
-
-   do
-   {
-      if( feof( fp ) )
-      {
-         imclog( "%s", "imcfread_letter: EOF encountered on read." );
-         return '\0';
-      }
-      c = getc( fp );
-   }
-   while( isspace( (int) c ) );
-
-   return c;
 }
 
 /******************************************
@@ -3711,17 +3518,17 @@ bool imc_loadchar( CHAR_DATA * ch, FILE * fp, const char *word )
    switch ( word[0] )
    {
       case 'I':
-         KEY( "IMCPerm", IMCPERM( ch ), imcfread_number( fp ) );
+         KEY( "IMCPerm", IMCPERM( ch ), fread_number( fp ) );
          KEY( "IMCEmail", IMC_EMAIL( ch ), imcfread_line( fp ) );
          KEY( "IMCAIM", IMC_AIM( ch ), imcfread_line( fp ) );
-         KEY( "IMCICQ", IMC_ICQ( ch ), imcfread_number( fp ) );
+         KEY( "IMCICQ", IMC_ICQ( ch ), fread_number( fp ) );
          KEY( "IMCYahoo", IMC_YAHOO( ch ), imcfread_line( fp ) );
          KEY( "IMCMSN", IMC_MSN( ch ), imcfread_line( fp ) );
          KEY( "IMCHomepage", IMC_HOMEPAGE( ch ), imcfread_line( fp ) );
          KEY( "IMCComment", IMC_COMMENT( ch ), imcfread_line( fp ) );
          if( !strcasecmp( word, "IMCFlags" ) )
          {
-            IMCFLAG( ch ) = imcfread_number( fp );
+            IMCFLAG( ch ) = fread_number( fp );
             imc_char_login( ch );
             fMatch = TRUE;
             break;
@@ -3977,14 +3784,14 @@ void imc_readchannel( IMC_CHANNEL * channel, FILE * fp )
 
    for( ;; )
    {
-      word = feof( fp ) ? "End" : imcfread_word( fp );
+      word = feof( fp ) ? "End" : fread_word( fp );
       fMatch = FALSE;
 
       switch ( word[0] )
       {
          case '*':
             fMatch = TRUE;
-            imcfread_to_eol( fp );
+            fread_to_eol( fp );
             break;
 
          case 'C':
@@ -3993,7 +3800,7 @@ void imc_readchannel( IMC_CHANNEL * channel, FILE * fp )
             KEY( "ChanRegF", channel->regformat, imcfread_line( fp ) );
             KEY( "ChanEmoF", channel->emoteformat, imcfread_line( fp ) );
             KEY( "ChanSocF", channel->socformat, imcfread_line( fp ) );
-            KEY( "ChanLevel", channel->level, imcfread_number( fp ) );
+            KEY( "ChanLevel", channel->level, fread_number( fp ) );
             break;
 
          case 'E':
@@ -4049,10 +3856,10 @@ void imc_loadchannels( void )
       char letter;
       char *word;
 
-      letter = imcfread_letter( fp );
+      letter = fread_letter( fp );
       if( letter == '*' )
       {
-         imcfread_to_eol( fp );
+         fread_to_eol( fp );
          continue;
       }
 
@@ -4062,7 +3869,7 @@ void imc_loadchannels( void )
          break;
       }
 
-      word = imcfread_word( fp );
+      word = fread_word( fp );
       if( !strcasecmp( word, "IMCCHAN" ) )
       {
          int x;
@@ -4125,7 +3932,7 @@ void imc_readbans( void )
       return;
    }
 
-   word = imcfread_word( inf );
+   word = fread_word( inf );
    if( strcasecmp( word, "#IGNORES" ) )
    {
       imcbug( "%s", "imc_readbans: Corrupt file" );
@@ -4135,7 +3942,7 @@ void imc_readbans( void )
 
    while( !feof( inf ) && !ferror( inf ) )
    {
-      strncpy( temp, imcfread_word( inf ), SMST );
+      strncpy( temp, fread_word( inf ), SMST );
       if( !strcasecmp( temp, "#END" ) )
       {
          IMCFCLOSE( inf );
@@ -4184,14 +3991,14 @@ void imc_readcolor( IMC_COLOR * color, FILE * fp )
 
    for( ;; )
    {
-      word = feof( fp ) ? "End" : imcfread_word( fp );
+      word = feof( fp ) ? "End" : fread_word( fp );
       fMatch = FALSE;
 
       switch ( word[0] )
       {
          case '*':
             fMatch = TRUE;
-            imcfread_to_eol( fp );
+            fread_to_eol( fp );
             break;
 
          case 'E':
@@ -4236,10 +4043,10 @@ void imc_load_color_table( void )
       char letter;
       char *word;
 
-      letter = imcfread_letter( fp );
+      letter = fread_letter( fp );
       if( letter == '*' )
       {
-         imcfread_to_eol( fp );
+         fread_to_eol( fp );
          continue;
       }
 
@@ -4249,7 +4056,7 @@ void imc_load_color_table( void )
          break;
       }
 
-      word = imcfread_word( fp );
+      word = fread_word( fp );
       if( !strcasecmp( word, "COLOR" ) )
       {
          IMCCREATE( color, IMC_COLOR, 1 );
@@ -4300,14 +4107,14 @@ void imc_readhelp( IMC_HELP_DATA * help, FILE * fp )
 
    for( ;; )
    {
-      word = feof( fp ) ? "End" : imcfread_word( fp );
+      word = feof( fp ) ? "End" : fread_word( fp );
       fMatch = FALSE;
 
       switch ( word[0] )
       {
          case '*':
             fMatch = TRUE;
-            imcfread_to_eol( fp );
+            fread_to_eol( fp );
             break;
 
          case 'E':
@@ -4322,7 +4129,7 @@ void imc_readhelp( IMC_HELP_DATA * help, FILE * fp )
          case 'P':
             if( !strcasecmp( word, "Perm" ) )
             {
-               word = imcfread_word( fp );
+               word = fread_word( fp );
                permvalue = get_imcpermvalue( word );
 
                if( permvalue < 0 || permvalue > IMCPERM_IMP )
@@ -4376,10 +4183,10 @@ void imc_load_helps( void )
       char letter;
       char *word;
 
-      letter = imcfread_letter( fp );
+      letter = fread_letter( fp );
       if( letter == '*' )
       {
-         imcfread_to_eol( fp );
+         fread_to_eol( fp );
          continue;
       }
 
@@ -4389,7 +4196,7 @@ void imc_load_helps( void )
          break;
       }
 
-      word = imcfread_word( fp );
+      word = fread_word( fp );
       if( !strcasecmp( word, "HELP" ) )
       {
          IMCCREATE( help, IMC_HELP_DATA, 1 );
@@ -4447,14 +4254,14 @@ void imc_readcommand( IMC_CMD_DATA * cmd, FILE * fp )
 
    for( ;; )
    {
-      word = feof( fp ) ? "End" : imcfread_word( fp );
+      word = feof( fp ) ? "End" : fread_word( fp );
       fMatch = FALSE;
 
       switch ( word[0] )
       {
          case '*':
             fMatch = TRUE;
-            imcfread_to_eol( fp );
+            fread_to_eol( fp );
             break;
 
          case 'E':
@@ -4474,10 +4281,10 @@ void imc_readcommand( IMC_CMD_DATA * cmd, FILE * fp )
             break;
 
          case 'C':
-            KEY( "Connected", cmd->connected, imcfread_number( fp ) );
+            KEY( "Connected", cmd->connected, fread_number( fp ) );
             if( !strcasecmp( word, "Code" ) )
             {
-               word = imcfread_word( fp );
+               word = fread_word( fp );
                cmd->function = imc_function( word );
                if( cmd->function == NULL )
                   imcbug( "imc_readcommand: Command %s loaded with invalid function. Set to NULL.", cmd->name );
@@ -4493,7 +4300,7 @@ void imc_readcommand( IMC_CMD_DATA * cmd, FILE * fp )
          case 'P':
             if( !strcasecmp( word, "Perm" ) )
             {
-               word = imcfread_word( fp );
+               word = fread_word( fp );
                permvalue = get_imcpermvalue( word );
 
                if( permvalue < 0 || permvalue > IMCPERM_IMP )
@@ -4533,10 +4340,10 @@ bool imc_load_commands( void )
       char letter;
       char *word;
 
-      letter = imcfread_letter( fp );
+      letter = fread_letter( fp );
       if( letter == '*' )
       {
-         imcfread_to_eol( fp );
+         fread_to_eol( fp );
          continue;
       }
 
@@ -4546,7 +4353,7 @@ bool imc_load_commands( void )
          break;
       }
 
-      word = imcfread_word( fp );
+      word = fread_word( fp );
       if( !strcasecmp( word, "COMMAND" ) )
       {
          IMCCREATE( cmd, IMC_CMD_DATA, 1 );
@@ -4573,14 +4380,14 @@ void imc_readucache( IMCUCACHE_DATA * user, FILE * fp )
 
    for( ;; )
    {
-      word = feof( fp ) ? "End" : imcfread_word( fp );
+      word = feof( fp ) ? "End" : fread_word( fp );
       fMatch = FALSE;
 
       switch ( word[0] )
       {
          case '*':
             fMatch = TRUE;
-            imcfread_to_eol( fp );
+            fread_to_eol( fp );
             break;
 
          case 'N':
@@ -4588,11 +4395,11 @@ void imc_readucache( IMCUCACHE_DATA * user, FILE * fp )
             break;
 
          case 'S':
-            KEY( "Sex", user->gender, imcfread_number( fp ) );
+            KEY( "Sex", user->gender, fread_number( fp ) );
             break;
 
          case 'T':
-            KEY( "Time", user->time, imcfread_number( fp ) );
+            KEY( "Time", user->time, fread_number( fp ) );
             break;
 
          case 'E':
@@ -4623,10 +4430,10 @@ void imc_load_ucache( void )
       char letter;
       char *word;
 
-      letter = imcfread_letter( fp );
+      letter = fread_letter( fp );
       if( letter == '*' )
       {
-         imcfread_to_eol( fp );
+         fread_to_eol( fp );
          continue;
       }
 
@@ -4636,7 +4443,7 @@ void imc_load_ucache( void )
          break;
       }
 
-      word = imcfread_word( fp );
+      word = fread_word( fp );
       if( !strcasecmp( word, "UCACHE" ) )
       {
          IMCCREATE( user, IMCUCACHE_DATA, 1 );
@@ -4710,19 +4517,19 @@ void imcfread_config_file( FILE * fin )
 
    for( ;; )
    {
-      word = feof( fin ) ? "end" : imcfread_word( fin );
+      word = feof( fin ) ? "end" : fread_word( fin );
       fMatch = FALSE;
 
       switch ( word[0] )
       {
          case '#':
             fMatch = TRUE;
-            imcfread_to_eol( fin );
+            fread_to_eol( fin );
             break;
 
          case 'A':
-            KEY( "Autoconnect", this_imcmud->autoconnect, imcfread_number( fin ) );
-            KEY( "AdminLevel", this_imcmud->adminlevel, imcfread_number( fin ) );
+            KEY( "Autoconnect", this_imcmud->autoconnect, fread_number( fin ) );
+            KEY( "AdminLevel", this_imcmud->adminlevel, fread_number( fin ) );
             break;
 
          case 'C':
@@ -4748,10 +4555,10 @@ void imcfread_config_file( FILE * fin )
             break;
 
          case 'I':
-            KEY( "Implevel", this_imcmud->implevel, imcfread_number( fin ) );
+            KEY( "Implevel", this_imcmud->implevel, fread_number( fin ) );
             KEY( "InfoName", this_imcmud->fullname, imcfread_line( fin ) );
             KEY( "InfoHost", this_imcmud->ihost, imcfread_line( fin ) );
-            KEY( "InfoPort", this_imcmud->iport, imcfread_number( fin ) );
+            KEY( "InfoPort", this_imcmud->iport, fread_number( fin ) );
             KEY( "InfoEmail", this_imcmud->email, imcfread_line( fin ) );
             KEY( "InfoWWW", this_imcmud->www, imcfread_line( fin ) );
             KEY( "InfoBase", this_imcmud->base, imcfread_line( fin ) );
@@ -4763,21 +4570,21 @@ void imcfread_config_file( FILE * fin )
             break;
 
          case 'M':
-            KEY( "MinImmLevel", this_imcmud->immlevel, imcfread_number( fin ) );
-            KEY( "MinPlayerLevel", this_imcmud->minlevel, imcfread_number( fin ) );
+            KEY( "MinImmLevel", this_imcmud->immlevel, fread_number( fin ) );
+            KEY( "MinPlayerLevel", this_imcmud->minlevel, fread_number( fin ) );
             break;
 
          case 'R':
             KEY( "RouterAddr", this_imcmud->rhost, imcfread_line( fin ) );
-            KEY( "RouterPort", this_imcmud->rport, imcfread_number( fin ) );
+            KEY( "RouterPort", this_imcmud->rport, fread_number( fin ) );
             break;
 
          case 'S':
             KEY( "ServerPwd", this_imcmud->serverpw, imcfread_line( fin ) );
             KEY( "ServerAddr", this_imcmud->rhost, imcfread_line( fin ) );
-            KEY( "ServerPort", this_imcmud->rport, imcfread_number( fin ) );
-            KEY( "SHA256", this_imcmud->sha256, imcfread_number( fin ) );
-            KEY( "SHA256Pwd", this_imcmud->sha256pass, imcfread_number( fin ) );
+            KEY( "ServerPort", this_imcmud->rport, fread_number( fin ) );
+            KEY( "SHA256", this_imcmud->sha256, fread_number( fin ) );
+            KEY( "SHA256Pwd", this_imcmud->sha256pass, fread_number( fin ) );
             break;
       }
       if( !fMatch )
@@ -4808,11 +4615,11 @@ bool imc_read_config( SOCKET desc )
       char letter;
       char *word;
 
-      letter = imcfread_letter( fin );
+      letter = fread_letter( fin );
 
       if( letter == '#' )
       {
-         imcfread_to_eol( fin );
+         fread_to_eol( fin );
          continue;
       }
 
@@ -4822,7 +4629,7 @@ bool imc_read_config( SOCKET desc )
          break;
       }
 
-      word = imcfread_word( fin );
+      word = fread_word( fin );
       if( !strcasecmp( word, "IMCCONFIG" ) && this_imcmud == NULL )
       {
          IMCCREATE( this_imcmud, SITEINFO, 1 );
@@ -4975,7 +4782,7 @@ void imc_load_who_template( void )
 
    do
    {
-      word = imcfread_word( fp );
+      word = fread_word( fp );
       hbuf[0] = '\0';
       num = 0;
 
@@ -7667,32 +7474,32 @@ char *imc_act_string( const char *format, CHAR_DATA * ch, CHAR_DATA * vic )
 
             case 'e':
                i = should_upper ?
-                  imccapitalize( he_she[URANGE( 0, CH_IMCSEX( ch ), 2 )] ) : he_she[URANGE( 0, CH_IMCSEX( ch ), 2 )];
+                  capitalize( he_she[URANGE( 0, CH_IMCSEX( ch ), 2 )] ) : he_she[URANGE( 0, CH_IMCSEX( ch ), 2 )];
                break;
 
             case 'E':
                i = should_upper ?
-                  imccapitalize( he_she[URANGE( 0, CH_IMCSEX( vic ), 2 )] ) : he_she[URANGE( 0, CH_IMCSEX( vic ), 2 )];
+                  capitalize( he_she[URANGE( 0, CH_IMCSEX( vic ), 2 )] ) : he_she[URANGE( 0, CH_IMCSEX( vic ), 2 )];
                break;
 
             case 'm':
                i = should_upper ?
-                  imccapitalize( him_her[URANGE( 0, CH_IMCSEX( ch ), 2 )] ) : him_her[URANGE( 0, CH_IMCSEX( ch ), 2 )];
+                  capitalize( him_her[URANGE( 0, CH_IMCSEX( ch ), 2 )] ) : him_her[URANGE( 0, CH_IMCSEX( ch ), 2 )];
                break;
 
             case 'M':
                i = should_upper ?
-                  imccapitalize( him_her[URANGE( 0, CH_IMCSEX( vic ), 2 )] ) : him_her[URANGE( 0, CH_IMCSEX( vic ), 2 )];
+                  capitalize( him_her[URANGE( 0, CH_IMCSEX( vic ), 2 )] ) : him_her[URANGE( 0, CH_IMCSEX( vic ), 2 )];
                break;
 
             case 's':
                i = should_upper ?
-                  imccapitalize( his_her[URANGE( 0, CH_IMCSEX( ch ), 2 )] ) : his_her[URANGE( 0, CH_IMCSEX( ch ), 2 )];
+                  capitalize( his_her[URANGE( 0, CH_IMCSEX( ch ), 2 )] ) : his_her[URANGE( 0, CH_IMCSEX( ch ), 2 )];
                break;
 
             case 'S':
                i = should_upper ?
-                  imccapitalize( his_her[URANGE( 0, CH_IMCSEX( vic ), 2 )] ) : his_her[URANGE( 0, CH_IMCSEX( vic ), 2 )];
+                  capitalize( his_her[URANGE( 0, CH_IMCSEX( vic ), 2 )] ) : his_her[URANGE( 0, CH_IMCSEX( vic ), 2 )];
                break;
 
             case 'k':
