@@ -1,9 +1,9 @@
 /* IMC2 Freedom Client - Developed by Mud Domain.
  *
- * Copyright ©2004-2008 by Roger Libiez ( Samson )
- * Contributions by Johnathan Walker ( Xorith ), Copyright ©2004
- * Additional contributions by Jesse Defer ( Garil ), Copyright ©2004
- * Additional contributions by Rogel, Copyright ©2004
+ * Copyright 2004-2008 by Roger Libiez ( Samson )
+ * Contributions by Johnathan Walker ( Xorith ), Copyright 2004
+ * Additional contributions by Jesse Defer ( Garil ), Copyright 2004
+ * Additional contributions by Rogel, Copyright 2004
  * Comments and suggestions welcome: http://www.mudbytes.net/imc2-support-forum
  * License terms are available in the imc2freedom.license file.
  */
@@ -22,6 +22,107 @@
 #include "mud.h"
 #include <time.h>
 
+/* Remcon: Ask and ye shall receive. */
+#define IMC_DIR          "imc/"
+
+#define IMC_CHANNEL_FILE IMC_DIR "imc.channels"
+#define IMC_CONFIG_FILE  IMC_DIR "imc.config"
+#define IMC_BAN_FILE     IMC_DIR "imc.ignores"
+#define IMC_UCACHE_FILE  IMC_DIR "imc.ucache"
+#define IMC_COLOR_FILE   IMC_DIR "imc.color"
+#define IMC_HELP_FILE    IMC_DIR "imc.help"
+#define IMC_CMD_FILE     IMC_DIR "imc.commands"
+#define IMC_HOTBOOT_FILE IMC_DIR "imc.hotboot"
+#define IMC_WHO_FILE     IMC_DIR "imc.who"
+
+/* Connection states stuff */
+enum imc_constates
+  {
+    IMC_OFFLINE, IMC_AUTH1, IMC_AUTH2, IMC_ONLINE
+  };
+
+typedef enum
+  {
+    IMCPERM_NOTSET, IMCPERM_NONE, IMCPERM_MORT, IMCPERM_IMM, IMCPERM_ADMIN,
+   IMCPERM_IMP
+  } imc_permissions;
+
+/* Flag macros */
+#define IMCIS_SET(var, bit)         ((var) & (bit))
+#define IMCSET_BIT(var, bit)        ((var) |= (bit))
+#define IMCREMOVE_BIT(var, bit)     ((var) &= ~(bit))
+
+/* Channel flags, only one so far, but you never know when more might be useful
+ */
+#define IMCCHAN_LOG      (1 <<  0)
+
+/* Player flags */
+#define IMC_TELL         (1 <<  0)
+#define IMC_DENYTELL     (1 <<  1)
+#define IMC_BEEP         (1 <<  2)
+#define IMC_DENYBEEP     (1 <<  3)
+#define IMC_INVIS        (1 <<  4)
+#define IMC_PRIVACY      (1 <<  5)
+#define IMC_DENYFINGER   (1 <<  6)
+#define IMC_AFK          (1 <<  7)
+#define IMC_COLORFLAG    (1 <<  8)
+#define IMC_PERMOVERRIDE (1 <<  9)
+
+#define IMCPERM(ch)           (CH_IMCDATA((ch))->imcperm)
+#define IMCFLAG(ch)           (CH_IMCDATA((ch))->imcflag)
+#define FIRST_IMCIGNORE(ch)   (CH_IMCDATA((ch))->imcfirst_ignore)
+#define LAST_IMCIGNORE(ch)    (CH_IMCDATA((ch))->imclast_ignore)
+#define IMC_LISTEN(ch)        (CH_IMCDATA((ch))->imc_listen)
+#define IMC_DENY(ch)          (CH_IMCDATA((ch))->imc_denied)
+#define IMC_RREPLY(ch)        (CH_IMCDATA((ch))->rreply)
+#define IMC_RREPLY_NAME(ch)   (CH_IMCDATA((ch))->rreply_name)
+#define IMC_EMAIL(ch)         (CH_IMCDATA((ch))->email)
+#define IMC_HOMEPAGE(ch)      (CH_IMCDATA((ch))->homepage)
+#define IMC_AIM(ch)           (CH_IMCDATA((ch))->aim)
+#define IMC_ICQ(ch)           (CH_IMCDATA((ch))->icq)
+#define IMC_YAHOO(ch)         (CH_IMCDATA((ch))->yahoo)
+#define IMC_MSN(ch)           (CH_IMCDATA((ch))->msn)
+#define IMC_COMMENT(ch)       (CH_IMCDATA((ch))->comment)
+#define IMCTELLHISTORY(ch,x)  (CH_IMCDATA((ch))->imc_tellhistory[(x)])
+#define IMCISINVIS(ch)        ( IMCIS_SET( IMCFLAG((ch)), IMC_INVIS ) )
+#define IMCAFK(ch)            ( IMCIS_SET( IMCFLAG((ch)), IMC_AFK ) )
+
+/* Macro taken from DOTD codebase. Fcloses a file, then nulls its pointer for safety. */
+#define IMCFCLOSE(fp)  fclose((fp)); (fp)=NULL;
+
+/*
+ * Memory allocation macros.
+ */
+#define IMCCREATE(result, type, number)                           \
+do                                                                \
+  {                                                                 \
+    if (!((result) = (type *) calloc ((number), sizeof(type))))   \
+      {                                                             \
+        imclog( "Malloc failure @ %s:%d\n", __FILE__, __LINE__ );   \
+        abort();                                                    \
+      }                                                             \
+  } while(0)
+
+#define IMCRECREATE(result, type, number)                               \
+do                                                                      \
+  {                                                                       \
+    if(!((result) = (type *)realloc((result), sizeof(type) * (number)))) \
+      {                                                                    \
+	imclog( "Realloc failure @ %s:%d\n", __FILE__, __LINE__ );        \
+	abort();                                                          \
+      }                                                                    \
+  } while(0)
+
+#define IMCDISPOSE(point)     \
+do                            \
+  {                             \
+    if((point))                \
+      {                          \
+	free((point));          \
+	(point) = NULL;         \
+      }                          \
+  } while(0)
+
 #define IMCKEY( literal, field, value ) \
 if( !strcasecmp( (word), (literal) ) )  \
 {                                       \
@@ -29,6 +130,66 @@ if( !strcasecmp( (word), (literal) ) )  \
    fMatch = TRUE;                       \
    break;                               \
 }
+
+#define IMCSTRALLOC strdup
+#define IMCSTRFREE IMCDISPOSE
+
+/* double-linked list handling macros -Thoric ( From the Smaug codebase ) */
+/* Updated by Scion 8/6/1999 */
+#define IMCLINK(link, first, last, next, prev)  \
+do                                              \
+  {                                               \
+    if ( !(first) )                              \
+      {                                            \
+	(first) = (link);                         \
+	(last) = (link);                          \
+      }                                            \
+    else                                         \
+      (last)->next = (link);                    \
+    (link)->next = NULL;                         \
+    if ((first) == (link))                       \
+      (link)->prev = NULL;                      \
+    else                                         \
+      (link)->prev = (last);                    \
+    (last) = (link);                             \
+  } while(0)
+
+#define IMCINSERT(link, insert, first, next, prev)    \
+do                                                    \
+  {                                                     \
+    (link)->prev = (insert)->prev;                     \
+    if ( !(insert)->prev )                             \
+      (first) = (link);                               \
+    else                                               \
+      (insert)->prev->next = (link);                  \
+    (insert)->prev = (link);                           \
+    (link)->next = (insert);                           \
+  } while(0)
+
+#define IMCUNLINK(link, first, last, next, prev) \
+do                                               \
+  {                                                \
+    if ( !(link)->prev )                          \
+      {                                             \
+	(first) = (link)->next;                    \
+        if((first))                                \
+	  (first)->prev = NULL;                   \
+      }                                             \
+    else                                          \
+      {                                             \
+	(link)->prev->next = (link)->next;         \
+      }                                             \
+    if( !(link)->next )                           \
+      {                                             \
+	(last) = (link)->prev;                     \
+        if((last))                                 \
+	  (last)->next = NULL;                    \
+      }                                             \
+    else                                          \
+      {                                             \
+	(link)->next->prev = (link)->prev;         \
+      }                                             \
+  } while(0)
 
 int imcwait;   /* Reconnect timer */
 int imcconnect_attempts;   /* How many times have we tried to reconnect? */
@@ -47,6 +208,18 @@ IMC_FUN *imc_function( const char *func );
 const char *imc_send_social( CHAR_DATA * ch, const char *argument, int telloption );
 void imc_save_config( void );
 void imc_save_channels( void );
+
+IMC_CHANNEL *imc_findchannel( const char *name );
+void imc_register_packet_handler( const char *name, PACKET_FUN * func );
+IMC_PACKET *imc_newpacket( const char *from, const char *type, const char *to);
+void imc_addtopacket( IMC_PACKET * p, const char *fmt, ... );
+void imc_write_packet( IMC_PACKET * p );
+char *imc_getData( char *output, const char *key, const char *packet );
+CHAR_DATA *imc_find_user( const char *name );
+char *imc_nameof( const char *src );
+char *imc_mudof( const char *src );
+void imc_send_tell( const char *from, const char *to, const char *txt,
+                    int reply );
 
 const char *const imcperm_names[] = {
    "Notset", "None", "Mort", "Imm", "Admin", "Imp"
