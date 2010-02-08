@@ -129,8 +129,7 @@ void do_copyover( CHAR_DATA * ch, char *argument )
 #endif
 
 #ifdef SWR2_USE_IMC
-  if( this_imcmud )
-    sprintf( buf3, "%d", this_imcmud ? this_imcmud->desc : -1 );
+  sprintf( buf3, "%d", imc_getsocket( this_imcmud ) );
 #else
   sprintf( buf3, "%d", -1 );
 #endif
