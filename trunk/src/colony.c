@@ -898,7 +898,7 @@ void do_bridge( CHAR_DATA * ch, char *argument )
 	  echo_to_room( AT_WHITE, ch->in_room, buf );
 	  SET_BIT( xit->exit_info, EX_ISDOOR );
 
-	  if( get_exit_to( xit->to_room, rev_dir[edir], ch->in_room->vnum ) )
+	  if( ( texit = get_exit_to( xit->to_room, rev_dir[edir], ch->in_room->vnum ) ) )
 	    {
 	      sprintf( buf, "A construction crew builds a door to the %s.",
 		       dir_name[rev_dir[edir]] );
@@ -913,7 +913,7 @@ void do_bridge( CHAR_DATA * ch, char *argument )
 	  echo_to_room( AT_WHITE, ch->in_room, buf );
 	  REMOVE_BIT( xit->exit_info, EX_ISDOOR );
 
-	  if( get_exit_to( xit->to_room, rev_dir[edir], ch->in_room->vnum ) )
+	  if( ( texit = get_exit_to( xit->to_room, rev_dir[edir], ch->in_room->vnum ) ) )
 	    {
 	      sprintf( buf, "A construction crew removes the door to the %s.",
 		       dir_name[rev_dir[edir]] );
