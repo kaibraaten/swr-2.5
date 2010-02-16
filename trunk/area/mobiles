@@ -6,7 +6,7 @@ Puff the Fractal Dragon is here, contemplating a higher reality.
 ~
 ~
 3 4194856 1000 Z
-50 20 -30 5d10+30550 4d10+200
+0 0 -30 5d10+30550 4d10+200
 10000 0
 8 8 2
 13 13 13 13 13 13 13
@@ -14,18 +14,6 @@ Puff the Fractal Dragon is here, contemplating a higher reality.
 0 0 0 0 0 0 0
 0 0 0 0 3156992 0 2 3
 0 0 0 0 0 0 0 0
-> speech_prog test~
-say triggered by (name):	$n
-say triggered by (name&title): 	$N
-say triggerer is (he,she,it):	$e
-say triggerer is (him,her,it):	$m
-say triggerer is (his,hers,its):$s
-say random char (name):		$r
-say random char (name&title or short): 	$R
-say random char  (he,she,it):	$J
-say random char (him,her,it):	$L
-say random char (his,hers,its):	$K
-~
 > speech_prog test2~
 say firstname of obj:	 	$i
 say short_desc/title of obj: 	$I
@@ -38,6 +26,18 @@ say he/she/it of victim: 	$E
 say him/her/it of victim: 	$M
 say his/hers/its of victim:	$S
 ~
+> speech_prog test~
+say triggered by (name):	$n
+say triggered by (name&title): 	$N
+say triggerer is (he,she,it):	$e
+say triggerer is (him,her,it):	$m
+say triggerer is (his,hers,its):$s
+say random char (name):		$r
+say random char (name&title or short): 	$R
+say random char  (he,she,it):	$J
+say random char (him,her,it):	$L
+say random char (his,hers,its):	$K
+~
 |
 #2
 supermob~
@@ -47,7 +47,7 @@ The supermob is here.  He looks busy as hell.
 How clever he looks!
 ~
 2105345 4259882 -1000 Z
-105 1 -162 21d10+1050 10d4+2
+0 0 -162 21d10+1050 10d4+2
 10000 0
 8 8 0
 10 10 10 10 10 10 10
@@ -66,7 +66,7 @@ A mercinary stands here ready for battle.
 ~
 ~
 1 0 0 Z
-1 0 0 0d0+0 1d10+0
+0 0 0 0d0+0 1d10+0
 0 0
 8 8 0
 13 13 13 13 13 13 13
@@ -81,7 +81,7 @@ An alert guard stands at attention.
 ~
 ~
 3 0 0 Z
-1 0 0 0d0+0 1d10+0
+0 0 0 0d0+0 1d10+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -96,7 +96,7 @@ A mercinary patrols the area.
 ~
 ~
 1 0 0 Z
-1 0 0 0d0+0 1d10+0
+0 0 0 0d0+0 1d10+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -111,7 +111,7 @@ This clerk will buy resources that have been gathered or mined.
 ~
 ~
 1048579 0 0 Z
-1 0 0 0d0+0 0d0+0
+0 0 0 0d0+0 0d0+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -126,7 +126,7 @@ A spaceport security guard watches over the platform.
 ~
 ~
 1073741827 0 0 Z
-1 0 0 0d0+0 0d0+0
+0 0 0 0d0+0 0d0+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -141,7 +141,7 @@ A bird flies around nearby.
 ~
 ~
 16777345 524288 0 Z
-1 0 98 0d10+2 0d4+2
+0 0 98 0d10+2 0d4+2
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -156,7 +156,7 @@ A scavenger looks around for something to eat.
 ~
 ~
 16777345 0 0 Z
-1 0 98 0d10+2 0d4+2
+0 0 98 0d10+2 0d4+2
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -171,7 +171,7 @@ An insect buzzes around your head.
 ~
 ~
 16777249 524288 0 Z
-1 0 100 1d1+0 1d1+0
+0 0 100 1d1+0 1d1+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -186,7 +186,7 @@ A large predator looks hungry.
 ~
 ~
 33 0 0 Z
-10 0 85 2d10+20 1d4+2
+0 0 85 2d10+20 1d4+2
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -201,7 +201,7 @@ A small animal pokes around the ground.
 ~
 ~
 16777345 0 0 Z
-1 0 98 0d10+2 0d4+2
+0 0 98 0d10+2 0d4+2
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -216,7 +216,7 @@ A fish swims by.
 ~
 ~
 16777345 0 0 Z
-1 0 98 0d10+2 0d4+2
+0 0 98 0d10+2 0d4+2
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -231,7 +231,7 @@ A colonist is going about his daily business.
 ~
 ~
 129 0 0 Z
-1 0 98 1d1+99 0d4+2
+0 0 98 1d1+99 0d4+2
 5 0
 8 8 0
 10 10 10 10 10 10 10
@@ -246,7 +246,7 @@ A shopkeeper sells a variety of supplies.
 ~
 ~
 1048579 0 0 Z
-1 0 0 0d0+0 0d0+0
+0 0 0 0d0+0 0d0+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -261,7 +261,7 @@ A waiter is waiting to take your order.
 ~
 ~
 1048579 0 0 Z
-1 0 0 0d0+0 0d0+0
+0 0 0 0d0+0 0d0+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -276,7 +276,7 @@ A flight control officer monitors the orbiting fleet.
 ~
 ~
 1048579 0 0 Z
-1 0 0 0d0+0 0d0+0
+0 0 0 0d0+0 0d0+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -291,7 +291,7 @@ A bartender is waiting to take your order.
 ~
 ~
 1048579 0 0 Z
-1 0 0 0d0+0 0d0+0
+0 0 0 0d0+0 0d0+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -306,7 +306,7 @@ A mechanic runs this garage.
 ~
 ~
 1048579 0 0 Z
-1 0 100 0d0+0 0d0+0
+0 0 100 0d0+0 0d0+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -321,7 +321,7 @@ This shopkeeper will pay a fair price for useful equipment.
 ~
 ~
 1048579 0 0 Z
-1 0 0 0d0+0 0d0+0
+0 0 0 0d0+0 0d0+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -336,7 +336,7 @@ A technician works in the shipyard.
 ~
 ~
 1048579 0 0 Z
-1 0 100 0d0+0 0d0+0
+0 0 100 0d0+0 0d0+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -351,7 +351,7 @@ A young man dressed in a hooded robe looks around nervously...
 ~
 ~
 1048705 0 0 Z
-1 0 98 1d1+99 0d4+2
+0 0 98 1d1+99 0d4+2
 5 0
 8 8 1
 10 10 10 10 10 10 10
@@ -366,7 +366,7 @@ A street vendor has set up shop here.
 ~
 ~
 131 0 0 Z
-1 0 98 1d1+99 0d4+2
+0 0 98 1d1+99 0d4+2
 5 0
 8 8 0
 10 10 10 10 10 10 10
@@ -381,7 +381,7 @@ A Crystal Dragon is guarding its nest.
 ~
 ~
 1048611 552 0 Z
-105 0 0 21d10+5000 10d4+2
+0 0 0 21d10+5000 10d4+2
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -402,7 +402,7 @@ This person is trying very hard not to be noticed.
 ~
 ~
 131 0 0 Z
-1 0 98 1d1+99 0d4+2
+0 0 98 1d1+99 0d4+2
 5 0
 8 8 0
 10 10 10 10 10 10 10
@@ -417,7 +417,7 @@ This thug walks down the street shoving people out of his way.
 ~
 ~
 131 0 0 Z
-1 0 98 1d1+99 0d4+2
+0 0 98 1d1+99 0d4+2
 5 0
 8 8 0
 10 10 10 10 10 10 10
@@ -432,7 +432,7 @@ A street person survives off of the trash he finds.
 ~
 ~
 131 0 0 Z
-1 0 98 1d1+99 0d4+2
+0 0 98 1d1+99 0d4+2
 5 0
 8 8 0
 10 10 10 10 10 10 10
@@ -447,7 +447,7 @@ An alert guard stands at attention.
 ~
 ~
 3 0 0 Z
-1 0 0 0d0+0 1d10+0
+0 0 0 0d0+0 1d10+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -462,7 +462,7 @@ A grotesque creature dressed in battle armor is randomly blasting citizens.
 ~
 ~
 33 0 0 Z
-1 0 0 0d0+0 0d0+0
+0 0 0 0d0+0 0d0+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -470,13 +470,13 @@ A grotesque creature dressed in battle armor is randomly blasting citizens.
 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0
-> greet_prog 100~
+> entry_prog 100~
 mpkill $n 
 ~
 > all_greet_prog 100~
 mpkill $n 
 ~
-> entry_prog 100~
+> greet_prog 100~
 mpkill $n 
 ~
 |
@@ -486,8 +486,8 @@ an employment clerk~
 An employment services clerk is smiling at you.
 ~
 ~
-1048577 0 0 Z
-1 0 50 1d1+100 0d0+0
+1048579 0 0 Z
+0 0 50 1d1+100 0d0+0
 0 0
 8 8 0
 10 10 10 10 10 10 10
@@ -495,14 +495,14 @@ An employment services clerk is smiling at you.
 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0
 0 0 0 0 0 0 0 0
-> all_greet_prog 100~
-say Looking for work, $n? 
+> speech_prog yes. yes, job?~
+mp_offer_job $n 
 ~
 > speech_prog yes job~
 mp_offer_job $n 
 ~
-> speech_prog yes. yes, job?~
-mp_offer_job $n 
+> all_greet_prog 100~
+say Looking for work, $n? 
 ~
 |
 #0
