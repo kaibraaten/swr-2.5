@@ -546,7 +546,7 @@ void do_landscape( CHAR_DATA * ch, char *argument )
       echo_to_room( AT_WHITE, location,
 		    "The construction crew finishes its work." );
       sprintf( filename, "%s%s", AREA_DIR, location->area->filename );
-      fold_area( location->area, filename, TRUE );
+      fold_area( location->area, filename, FALSE );
       return;
     }
 
