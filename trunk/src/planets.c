@@ -45,7 +45,7 @@ PLANET_DATA *get_planet( const char *name )
   return NULL;
 }
 
-void write_planet_list(  )
+void write_planet_list()
 {
   PLANET_DATA *tplanet;
   FILE *fpout;
@@ -252,7 +252,7 @@ bool load_planet_file( const char *planetfile )
 {
   char filename[256];
   FILE *fp;
-  PLANET_DATA *planet = planet_create(  );
+  PLANET_DATA *planet = planet_create();
   bool found = FALSE;
   sprintf( filename, "%s%s", PLANET_DIR, planetfile );
 
@@ -305,7 +305,7 @@ bool load_planet_file( const char *planetfile )
   return found;
 }
 
-void load_planets(  )
+void load_planets()
 {
   FILE *fpList;
   const char *filename;
@@ -447,7 +447,7 @@ void do_setplanet( CHAR_DATA * ch, char *argument )
     planet->filename = str_dup( argument );
     send_to_char( "Done.\r\n", ch );
     save_planet( planet );
-    write_planet_list(  );
+    write_planet_list();
     return;
   }
 
@@ -606,11 +606,11 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
       save_planet( planet );
       sprintf( filename, "%s%s", AREA_DIR, pArea->filename );
       fold_area( pArea, filename, FALSE );
-      write_area_list(  );
-      write_planet_list(  );
+      write_area_list();
+      write_planet_list();
       sprintf( buf, "%d", top_r_vnum - 17 );
       ch_printf( ch, "You may now travel to your new colony.\r\n" );
-      reset_all(  );
+      reset_all();
 
       return;
   }
@@ -676,8 +676,8 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
 
   sector = 0;
   while( sector == 0 || sector == SECT_WATER_SWIM
-      || sector == SECT_WATER_NOSWIM || sector == SECT_UNDERWATER
-      || sector == SECT_FARMLAND )
+	 || sector == SECT_WATER_NOSWIM || sector == SECT_UNDERWATER
+	 || sector == SECT_FARMLAND || sector == SECT_DUNNO )
     sector = number_range( SECT_FIELD, SECT_MAX - 1 );
 
   strcpy( pname, argument );
@@ -708,7 +708,7 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
   echo_to_room( AT_WHITE, ch->in_room,
       "A small probe lifts off into space." );
 
-  if( number_percent(  ) < 20 )
+  if( number_percent() < 20 )
     return;
 
   sector = 0;
@@ -720,7 +720,7 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
   pArea = NULL;
   planet = NULL;
 
-  planet = planet_create(  );
+  planet = planet_create();
   LINK( planet, first_planet, last_planet, next, prev );
   planet->name = STRALLOC( pname );
   planet->sector = sector;
@@ -735,7 +735,7 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
   }
   else
   {
-    starsystem = starsystem_create(  );
+    starsystem = starsystem_create();
     LINK( starsystem, first_starsystem, last_starsystem, next, prev );
     starsystem->name = STRALLOC( arg1 );
     starsystem->star1 = STRALLOC( arg1 );
@@ -746,7 +746,7 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
     replace_char( filename, ' ', '_' );
     starsystem->filename = str_dup( filename );
     save_starsystem( starsystem );
-    write_starsystem_list(  );
+    write_starsystem_list();
     planet->starsystem = starsystem;
   }
 
@@ -785,8 +785,8 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
   save_planet( planet );
   sprintf( filename, "%s%s", AREA_DIR, pArea->filename );
   fold_area( pArea, filename, FALSE );
-  write_area_list(  );
-  write_planet_list(  );
+  write_area_list();
+  write_planet_list();
 
   ch->tempnum = SUB_NONE;
   ch->substate = SUB_ROOM_DESC;
