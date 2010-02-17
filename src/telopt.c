@@ -514,6 +514,7 @@ int translate_telopts(DESCRIPTOR_DATA *d, char *src, int srclen, char *out)
 
 void debug_telopts( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
 {
+#if SWR2_DEBUG_TELNET == 1
   if (srclen > 1 && TELOPT_DEBUG)
     {
       switch(src[1])
@@ -553,6 +554,7 @@ void debug_telopts( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )
     {
       log_printf("D%d@%s RCVD IAC ?", d->descriptor, d->host);
     }
+#endif
 }
 
 /*

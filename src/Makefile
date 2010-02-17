@@ -7,7 +7,10 @@ USE_DLSYM = -DSWR2_USE_DLSYM
 #IMC2 - Comment out to dsable IMC2 support
 IMC = 1
 
-CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support $(USE_DLSYM)
+#Change from 0 to 1 to enable telnet debug logging.
+DEBUG_TELNET = -DSWR2_DEBUG_TELNET=0
+
+CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support $(USE_DLSYM) $(DEBUG_TELNET)
 LDFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support -lz
 
 #On some systems (e.g. FreeBSD) you may need to remove -ldl
