@@ -1,6 +1,19 @@
 #include <stdio.h>
 #include "mud.h"
 
+static int get_in_array( const char *name, const char * const * array,
+			 size_t sz,
+			 bool (*compare_string)( const char*, const char* ) )
+{
+  size_t x = 0;
+
+  for( x = 0; x < sz; ++x )
+    if( !compare_string( name, array[x] ) )
+      return x;
+
+  return -1;
+}
+
 /*
  * Attribute bonus tables.
  */
@@ -33,8 +46,6 @@ const struct str_app_type str_app[26] = {
   {10, 12, 999, 50}		/* 25   */
 };
 
-
-
 const struct int_app_type int_app[26] = {
   {3},				/*  0 */
   {5},				/*  1 */
@@ -63,8 +74,6 @@ const struct int_app_type int_app[26] = {
   {85},
   {99}				/* 25 */
 };
-
-
 
 const struct wis_app_type wis_app[26] = {
   {0},				/*  0 */
@@ -95,8 +104,6 @@ const struct wis_app_type wis_app[26] = {
   {7}				/* 25 */
 };
 
-
-
 const struct dex_app_type dex_app[26] = {
   {60},				/* 0 */
   {50},				/* 1 */
@@ -126,8 +133,6 @@ const struct dex_app_type dex_app[26] = {
   {-120}			/* 25 */
 };
 
-
-
 const struct con_app_type con_app[26] = {
   {-4, 20, 95},			/*  0 */
   {-3, 25, 95},			/*  1 */
@@ -156,7 +161,6 @@ const struct con_app_type con_app[26] = {
   {7, 99, 5},
   {8, 99, 5}			/* 25 */
 };
-
 
 const struct cha_app_type cha_app[26] = {
   {-60},			/* 0 */
@@ -246,8 +250,6 @@ const struct frc_app_type frc_app[26] = {
   {0}				/* 25 */
 };
 
-
-
 /*
  * Liquid properties.
  * Used in #OBJECT section of area file.
@@ -283,6 +285,11 @@ const char *const attack_table[] = {
   "blast", "pound", "crush", "shot", "bite",
   "pierce", "suction"
 };
+
+size_t attack_table_size( void )
+{
+  return sizeof( attack_table ) / sizeof( attack_table[0] );
+}
 
 const char *const where_name[] = {
   "<used as light>     ",
@@ -438,13 +445,7 @@ const char *get_sector_name( int sect )
 
 int get_sector_type( const char *sect )
 {
-  int x = 0;
-
-  for( x = 0; x < (int) sector_names_size(); ++x )
-    if( !str_prefix( sect, sect_names[x] ) )
-      return x;
-
-  return -1;
+  return get_in_array( sect, sect_names, sector_names_size(), str_prefix );
 }
 
 const char *const save_flag[] = {
@@ -454,12 +455,17 @@ const char *const save_flag[] = {
   "r27", "r28", "r29", "r30", "r31"
 };
 
-const char *const weapon_table[13] = {
+const char *const weapon_table[] = {
   "none",
   "w1", "vibro-blade", "lightsaber", "w4", "w5",
   "blaster", "w7", "w8", "w9", "w10",
   "w11", "w12"
 };
+
+size_t weapon_table_size( void )
+{
+  return sizeof( weapon_table ) / sizeof( weapon_table[0] );
+}
 
 const char *const ex_flags[] = {
   "isdoor", "closed", "locked", "secret", "swim", "pickproof", "fly", "climb",
@@ -639,181 +645,109 @@ const char *const mprog_flags[] = {
 
 int get_otype( const char *type )
 {
-  size_t x;
-
-  for( x = 0; x < ( sizeof( o_types ) / sizeof( o_types[0] ) ); x++ )
-    if( !str_cmp( type, o_types[x] ) )
-      return x;
-  return -1;
+  return get_in_array( type, o_types,
+		       sizeof( o_types ) / sizeof( *o_types ), str_cmp );
 }
 
 int get_aflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, a_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, a_flags,
+		       sizeof( a_flags ) / sizeof( *a_flags ), str_cmp );
 }
 
 int get_trapflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, trap_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, trap_flags,
+		       sizeof( trap_flags ) / sizeof( *trap_flags ), str_cmp );
 }
 
 int get_atype( const char *type )
 {
-  size_t x;
-
-  for( x = 0; x < MAX_APPLY_TYPE; x++ )
-    if( !str_cmp( type, a_types[x] ) )
-      return x;
-  return -1;
+  return get_in_array( type, a_types, MAX_APPLY_TYPE, str_cmp );
 }
 
 int get_wearloc( const char *type )
 {
-  size_t x;
-
-  for( x = 0; x < MAX_WEAR; x++ )
-    if( !str_cmp( type, wear_locs[x] ) )
-      return x;
-  return -1;
+  return get_in_array( type, wear_locs, MAX_WEAR, str_cmp );
 }
 
 int get_exflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x <= MAX_EXFLAG; x++ )
-    if( !str_cmp( flag, ex_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, ex_flags, MAX_EXFLAG, str_cmp );
 }
 
 int get_rflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, r_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, r_flags,
+		       sizeof( r_flags ) / sizeof( *r_flags ), str_cmp );
 }
 
 int get_mpflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, mprog_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, mprog_flags,
+		       sizeof( mprog_flags ) / sizeof( *mprog_flags ),
+		       str_cmp );
 }
 
 int get_oflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, o_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, o_flags,
+		       sizeof( o_flags ) / sizeof( *o_flags ), str_cmp );
 }
 
 int get_areaflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, area_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, area_flags,
+		       sizeof( area_flags ) / sizeof( *area_flags ), str_cmp );
 }
 
 int get_wflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, w_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, w_flags,
+		       sizeof( w_flags ) / sizeof( *w_flags ), str_cmp );
 }
 
 int get_actflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, act_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, act_flags,
+		       sizeof( act_flags ) / sizeof( *act_flags ), str_cmp );
 }
 
 int get_pcflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, pc_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, pc_flags,
+		       sizeof( pc_flags ) / sizeof( *pc_flags ), str_cmp );
 }
 int get_plrflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, plr_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, plr_flags,
+		       sizeof( plr_flags ) / sizeof( *plr_flags ), str_cmp );
 }
 
 int get_risflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, ris_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, ris_flags,
+		       sizeof( ris_flags ) / sizeof( *ris_flags ), str_cmp );
 }
 
 int get_trigflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, trig_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, trig_flags,
+		       sizeof( trig_flags ) / sizeof( *trig_flags ), str_cmp );
 }
 
 int get_attackflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, attack_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, attack_flags,
+		       sizeof( attack_flags ) / sizeof( *attack_flags ),
+		       str_cmp );
 }
 
 int get_defenseflag( const char *flag )
 {
-  size_t x;
-
-  for( x = 0; x < 32; x++ )
-    if( !str_cmp( flag, defense_flags[x] ) )
-      return x;
-  return -1;
+  return get_in_array( flag, defense_flags,
+		       sizeof( defense_flags ) / sizeof( *defense_flags ),
+		       str_cmp );
 }
 
 const char *const spell_flag[] =
@@ -845,72 +779,51 @@ const char *const target_type[] =
 
 int get_ssave( const char *name )
 {
-  size_t x;
-
-  for( x = 0; x < sizeof( spell_saves ) / sizeof( spell_saves[0] ); x++ )
-    if( !str_cmp( name, spell_saves[x] ) )
-      return x;
-  return -1;
+  return get_in_array( name, spell_saves,
+		       sizeof( spell_saves ) / sizeof( spell_saves[0] ),
+		       str_cmp );
 }
 
 int get_starget( const char *name )
 {
-  size_t x;
-
-  for( x = 0; x < sizeof( target_type ) / sizeof( target_type[0] ); x++ )
-    if( !str_cmp( name, target_type[x] ) )
-      return x;
-  return -1;
+  return get_in_array( name, target_type,
+		       sizeof( target_type ) / sizeof( target_type[0] ),
+		       str_cmp );
 }
 
 int get_sflag( const char *name )
 {
-  size_t x;
-
-  for( x = 0; x < sizeof( spell_flag ) / sizeof( spell_flag[0] ); x++ )
-    if( !str_cmp( name, spell_flag[x] ) )
-      return x;
-  return -1;
+  return get_in_array( name, spell_flag,
+		       sizeof( spell_flag ) / sizeof( spell_flag[0] ),
+		       str_cmp );
 }
 
 int get_sdamage( const char *name )
 {
-  size_t x;
-
-  for( x = 0; x < sizeof( spell_damage ) / sizeof( spell_damage[0] ); x++ )
-    if( !str_cmp( name, spell_damage[x] ) )
-      return x;
-  return -1;
+  return get_in_array( name, spell_damage,
+		       sizeof( spell_damage ) / sizeof( spell_damage[0] ),
+		       str_cmp );
 }
 
 int get_saction( const char *name )
 {
-  size_t x;
-
-  for( x = 0; x < sizeof( spell_action ) / sizeof( spell_action[0] ); x++ )
-    if( !str_cmp( name, spell_action[x] ) )
-      return x;
-  return -1;
+  return get_in_array( name, spell_action,
+		       sizeof( spell_action ) / sizeof( spell_action[0] ),
+		       str_cmp );
 }
 
 int get_spower( const char *name )
 {
-  size_t x;
-
-  for( x = 0; x < sizeof( spell_power ) / sizeof( spell_power[0] ); x++ )
-    if( !str_cmp( name, spell_power[x] ) )
-      return x;
-  return -1;
+  return get_in_array( name, spell_power,
+		       sizeof( spell_power ) / sizeof( spell_power[0] ),
+		       str_cmp );
 }
 
 int get_sclass( const char *name )
 {
-  size_t x;
-
-  for( x = 0; x < sizeof( spell_class ) / sizeof( spell_class[0] ); x++ )
-    if( !str_cmp( name, spell_class[x] ) )
-      return x;
-  return -1;
+  return get_in_array( name, spell_class,
+		       sizeof( spell_class ) / sizeof( spell_class[0] ),
+		       str_cmp );
 }
 
 const char *const corpse_descs[] = {
@@ -950,13 +863,7 @@ size_t position_name_size( void )
 
 int get_position( const char *pos )
 {
-  int x = 0;
-
-  for( x = 0; x < (int) position_name_size(); ++x )
-    if( !str_prefix( pos, position_name[x] ) )
-      return x;
-
-  return -1;
+  return get_in_array( pos, position_name, position_name_size(), str_prefix );
 }
 
 const char *get_position_name( int pos )

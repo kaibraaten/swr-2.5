@@ -3228,6 +3228,8 @@ void act( short AType, const char *format, CHAR_DATA *ch,
 void reset_all( void );
 
 /* const.c */
+size_t weapon_table_size( void );
+size_t attack_table_size( void );
 size_t sector_names_size( void );
 const char *get_sector_name( int sect );
 int get_sector_type( const char *sect );

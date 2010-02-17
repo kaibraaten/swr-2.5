@@ -2183,9 +2183,7 @@ void dam_message( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
   }
   else if( dt > TYPE_HIT && is_wielding_poisoned( ch ) )
   {
-    if( dt <
-	( int ) ( TYPE_HIT +
-		  sizeof( attack_table ) / sizeof( attack_table[0] ) ) )
+    if( dt < ( int ) ( TYPE_HIT + attack_table_size() ) )
     {
       attack = attack_table[dt - TYPE_HIT];
     }
@@ -2241,10 +2239,7 @@ void dam_message( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
       }
     }
     else if( dt >= TYPE_HIT
-	&& dt <
-	( int ) ( TYPE_HIT +
-		  sizeof( attack_table ) /
-		  sizeof( attack_table[0] ) ) )
+	     && dt < ( int ) ( TYPE_HIT + attack_table_size() ) )
       attack = attack_table[dt - TYPE_HIT];
     else
     {
