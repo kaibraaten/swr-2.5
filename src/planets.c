@@ -675,9 +675,14 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
   }
 
   sector = 0;
-  while( sector == 0 || sector == SECT_WATER_SWIM
-	 || sector == SECT_WATER_NOSWIM || sector == SECT_UNDERWATER
-	 || sector == SECT_FARMLAND || sector == SECT_DUNNO )
+  while( sector == 0
+	 || sector == SECT_WATER_SWIM
+	 || sector == SECT_WATER_NOSWIM
+	 || sector == SECT_UNDERWATER
+	 || sector == SECT_FARMLAND
+	 || sector == SECT_AIR
+	 || sector == SECT_OCEANFLOOR
+	 || sector == SECT_DUNNO )
     sector = number_range( SECT_FIELD, SECT_MAX - 1 );
 
   strcpy( pname, argument );
