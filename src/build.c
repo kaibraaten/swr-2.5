@@ -2354,8 +2354,7 @@ void do_oset( CHAR_DATA * ch, char *argument )
 	size_t x;
 
 	value = -1;
-	for( x = 0; x < sizeof( weapon_table ) / sizeof( weapon_table[0] );
-	    x++ )
+	for( x = 0; x < weapon_table_size(); x++ )
 	  if( !str_cmp( arg3, weapon_table[x] ) )
 	    value = ( int ) x;
 	if( value < 0 )
