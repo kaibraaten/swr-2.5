@@ -83,7 +83,7 @@ static void bfs_dequeue( void )
 static void bfs_clear_queue( void )
 {
   while( queue_head )
-    bfs_dequeue(  );
+    bfs_dequeue();
 }
 
 static void room_enqueue( ROOM_INDEX_DATA * room )
@@ -146,16 +146,16 @@ static int find_first_step( ROOM_INDEX_DATA * src,
   {
     if( ++count > maxdist )
     {
-      bfs_clear_queue(  );
-      clean_room_queue(  );
+      bfs_clear_queue();
+      clean_room_queue();
       return BFS_NO_PATH;
     }
 
     if( queue_head->room == target )
     {
       curr_dir = queue_head->dir;
-      bfs_clear_queue(  );
-      clean_room_queue(  );
+      bfs_clear_queue();
+      clean_room_queue();
       return curr_dir;
     }
     else
@@ -168,10 +168,10 @@ static int find_first_step( ROOM_INDEX_DATA * src,
 	  bfs_enqueue( toroom( queue_head->room, curr_dir ),
 	      queue_head->dir );
 	}
-      bfs_dequeue(  );
+      bfs_dequeue();
     }
   }
-  clean_room_queue(  );
+  clean_room_queue();
 
   return BFS_NO_PATH;
 }
@@ -261,7 +261,7 @@ void found_prey( CHAR_DATA * ch, CHAR_DATA * victim )
 
   if( !can_see( ch, victim ) )
   {
-    if( number_percent(  ) < 90 )
+    if( number_percent() < 90 )
       return;
     switch ( number_bits( 2 ) )
     {
@@ -296,7 +296,7 @@ void found_prey( CHAR_DATA * ch, CHAR_DATA * victim )
 
   if( IS_SET( ch->in_room->room_flags, ROOM_SAFE ) )
   {
-    if( number_percent(  ) < 90 )
+    if( number_percent() < 90 )
       return;
     switch ( number_bits( 2 ) )
     {
@@ -394,7 +394,7 @@ void hunt_victim( CHAR_DATA * ch )
 
     for( attempt = 0; attempt < 25; attempt++ )
     {
-      ret = number_door(  );
+      ret = number_door();
       if( ( pexit = get_exit( ch->in_room, ret ) ) == NULL
 	  || !pexit->to_room
 	  || IS_SET( pexit->exit_info, EX_CLOSED )

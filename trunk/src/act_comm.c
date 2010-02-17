@@ -160,7 +160,7 @@ const char *drunk_speech( const char *argument, CHAR_DATA * ch )
   {
     if( toupper( ( int ) *arg ) == 'S' )
     {
-      if( number_percent(  ) < ( drunk * 2 ) )	/* add 'h' after an 's' */
+      if( number_percent() < ( drunk * 2 ) )	/* add 'h' after an 's' */
       {
 	*txt++ = *arg;
 	*txt++ = 'h';
@@ -172,7 +172,7 @@ const char *drunk_speech( const char *argument, CHAR_DATA * ch )
     }
     else if( toupper( ( int ) *arg ) == 'X' )
     {
-      if( number_percent(  ) < ( drunk * 2 / 2 ) )
+      if( number_percent() < ( drunk * 2 / 2 ) )
       {
 	*txt++ = 'c', *txt++ = 's', *txt++ = 'h';
       }
@@ -181,7 +181,7 @@ const char *drunk_speech( const char *argument, CHAR_DATA * ch )
 	*txt++ = *arg;
       }
     }
-    else if( number_percent(  ) < ( drunk * 2 / 5 ) )	/* slurred letters */
+    else if( number_percent() < ( drunk * 2 / 5 ) )	/* slurred letters */
     {
       int slurn = number_range( 1, 2 );
       short currslur = 0;
@@ -203,7 +203,7 @@ const char *drunk_speech( const char *argument, CHAR_DATA * ch )
 
   while( *txt != '\0' )		/* Let's mess with the string's caps */
   {
-    if( number_percent(  ) < ( 2 * drunk / 2.5 ) )
+    if( number_percent() < ( 2 * drunk / 2.5 ) )
     {
       if( isupper( ( int ) *txt ) )
 	*txt1 = ( char ) tolower( ( int ) *txt );
@@ -232,7 +232,7 @@ const char *drunk_speech( const char *argument, CHAR_DATA * ch )
       while( *txt1 == ' ' )	/* Don't stutter on spaces */
 	*txt++ = *txt1++;
 
-      if( ( number_percent(  ) < ( 2 * drunk / 4 ) ) && *txt1 != '\0' )
+      if( ( number_percent() < ( 2 * drunk / 4 ) ) && *txt1 != '\0' )
       {
 	int offset = number_range( 0, 2 );
 	short pos = 0;

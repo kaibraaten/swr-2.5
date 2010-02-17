@@ -525,7 +525,7 @@ int skill_comp( const SKILLTYPE ** sk1, const SKILLTYPE ** sk2 )
 /*
  * Sort the skill table with qsort
  */
-void sort_skill_table(  )
+void sort_skill_table()
 {
   log_string( "Sorting skill table..." );
   qsort( &skill_table[1], top_sn - 1, sizeof( SKILLTYPE * ),
@@ -636,7 +636,7 @@ void fwrite_skill( FILE * fpout, SKILLTYPE * skill )
 /*
  * Save the skill table to disk
  */
-void save_skill_table(  )
+void save_skill_table()
 {
   int x = 0;
   FILE *fpout = NULL;
@@ -663,7 +663,7 @@ void save_skill_table(  )
 /*
  * Save the socials to disk
  */
-void save_socials(  )
+void save_socials()
 {
   FILE *fpout = NULL;
   SOCIALTYPE *social = NULL;
@@ -724,7 +724,7 @@ int get_skill( const char *skilltype )
 /*
  * Save the commands to disk
  */
-void save_commands(  )
+void save_commands()
 {
   FILE *fpout = NULL;
   CMDTYPE *command = NULL;
@@ -902,7 +902,7 @@ SKILLTYPE *fread_skill( FILE * fp )
   }
 }
 
-void load_skill_table(  )
+void load_skill_table()
 {
   FILE *fp = NULL;
 
@@ -1030,7 +1030,7 @@ void fread_social( FILE * fp )
   }
 }
 
-void load_socials(  )
+void load_socials()
 {
   FILE *fp = NULL;
 
@@ -1159,7 +1159,7 @@ void fread_command( FILE * fp )
   }
 }
 
-void load_commands(  )
+void load_commands()
 {
   FILE *fp = NULL;
 

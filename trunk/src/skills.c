@@ -542,7 +542,7 @@ void do_sset( CHAR_DATA * ch, char *argument )
     if( !str_cmp( arg2, "skill" ) )
     {
       send_to_char( "Saving skill table...\r\n", ch );
-      save_skill_table(  );
+      save_skill_table();
       return;
     }
   }
@@ -1171,7 +1171,7 @@ void do_gouge( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  percent = number_percent(  ) - ( get_curr_lck( ch ) - 13 );
+  percent = number_percent() - ( get_curr_lck( ch ) - 13 );
 
   if( IS_NPC( ch ) || percent < character_skill_level( ch, gsn_gouge ) )
   {
@@ -1272,7 +1272,7 @@ void do_steal( CHAR_DATA * ch, char *argument )
   }
 
   WAIT_STATE( ch, skill_table[gsn_steal]->beats );
-  percent = number_percent(  ) + ( IS_AWAKE( victim ) ? 10 : -50 )
+  percent = number_percent() + ( IS_AWAKE( victim ) ? 10 : -50 )
     - ( get_curr_lck( ch ) - 15 ) + ( get_curr_lck( victim ) - 13 )
     + times_killed( ch, victim ) * 7;
 
@@ -1461,7 +1461,7 @@ void do_backstab( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  percent = number_percent(  ) - ( get_curr_lck( ch ) - 14 )
+  percent = number_percent() - ( get_curr_lck( ch ) - 14 )
     + ( get_curr_lck( victim ) - 13 );
 
   WAIT_STATE( ch, skill_table[gsn_backstab]->beats );
@@ -1540,7 +1540,7 @@ void do_rescue( CHAR_DATA * ch, char *argument )
   ch->alignment = ch->alignment + 5;
   ch->alignment = URANGE( -1000, ch->alignment, 1000 );
 
-  percent = number_percent(  ) - ( get_curr_lck( ch ) - 14 )
+  percent = number_percent() - ( get_curr_lck( ch ) - 14 )
     - ( get_curr_lck( victim ) - 16 );
 
   WAIT_STATE( ch, skill_table[gsn_rescue]->beats );
@@ -1590,7 +1590,7 @@ void do_kick( CHAR_DATA * ch, char *argument )
 
   WAIT_STATE( ch, skill_table[gsn_kick]->beats );
   if( IS_NPC( ch )
-      || number_percent(  ) < character_skill_level( ch, gsn_kick ) )
+      || number_percent() < character_skill_level( ch, gsn_kick ) )
   {
     learn_from_success( ch, gsn_kick );
     global_retcode =
@@ -1693,7 +1693,7 @@ void do_disarm( CHAR_DATA * ch, char *argument )
   }
 
   WAIT_STATE( ch, skill_table[gsn_disarm]->beats );
-  percent = number_percent(  )
+  percent = number_percent()
     - ( get_curr_lck( ch ) - 15 ) + ( get_curr_lck( victim ) - 15 );
   if( !can_see_obj( ch, obj ) )
     percent += 10;
@@ -1828,7 +1828,7 @@ void do_pick( CHAR_DATA * ch, char *argument )
     }
 
     if( !IS_NPC( ch )
-	&& number_percent(  ) > character_skill_level( ch, gsn_pick_lock ) )
+	&& number_percent() > character_skill_level( ch, gsn_pick_lock ) )
     {
       send_to_char( "You failed.\r\n", ch );
       learn_from_failure( ch, gsn_pick_lock );
@@ -1878,7 +1878,7 @@ void do_pick( CHAR_DATA * ch, char *argument )
     }
 
     if( !IS_NPC( ch )
-	&& number_percent(  ) > character_skill_level( ch, gsn_pick_lock ) )
+	&& number_percent() > character_skill_level( ch, gsn_pick_lock ) )
     {
       send_to_char( "You failed.\r\n", ch );
       learn_from_failure( ch, gsn_pick_lock );
@@ -1915,7 +1915,7 @@ void do_pick( CHAR_DATA * ch, char *argument )
 
     chance = URANGE( 0, character_skill_level( ch, gsn_pickshiplock ), 95 );
 
-    if( IS_NPC( ch ) || !ch->pcdata || number_percent(  ) > chance )
+    if( IS_NPC( ch ) || !ch->pcdata || number_percent() > chance )
     {
       CHAR_DATA *wch;
 
@@ -1969,7 +1969,7 @@ void do_sneak( CHAR_DATA * ch, char *argument )
   affect_strip( ch, gsn_sneak );
 
   if( IS_NPC( ch )
-      || number_percent(  ) < character_skill_level( ch, gsn_sneak ) )
+      || number_percent() < character_skill_level( ch, gsn_sneak ) )
   {
     af.type = gsn_sneak;
     af.duration =
@@ -2010,7 +2010,7 @@ void do_hide( CHAR_DATA * ch, char *argument )
     REMOVE_BIT( ch->affected_by, AFF_HIDE );
 
   if( IS_NPC( ch )
-      || number_percent(  ) < character_skill_level( ch, gsn_hide ) )
+      || number_percent() < character_skill_level( ch, gsn_hide ) )
   {
     SET_BIT( ch->affected_by, AFF_HIDE );
     learn_from_success( ch, gsn_hide );
@@ -2146,7 +2146,7 @@ void do_aid( CHAR_DATA * ch, char *argument )
   ch->alignment = ch->alignment + 20;
   ch->alignment = URANGE( -1000, ch->alignment, 1000 );
 
-  percent = number_percent(  ) - ( get_curr_lck( ch ) - 13 );
+  percent = number_percent() - ( get_curr_lck( ch ) - 13 );
   WAIT_STATE( ch, skill_table[gsn_aid]->beats );
   if( !IS_NPC( ch ) && percent > character_skill_level( ch, gsn_aid ) )
   {
@@ -2218,7 +2218,7 @@ void do_mount( CHAR_DATA * ch, char *argument )
 
   WAIT_STATE( ch, skill_table[gsn_mount]->beats );
   if( IS_NPC( ch )
-      || number_percent(  ) < character_skill_level( ch, gsn_mount ) )
+      || number_percent() < character_skill_level( ch, gsn_mount ) )
   {
     SET_BIT( victim->act, ACT_MOUNTED );
     ch->mount = victim;
@@ -2254,7 +2254,7 @@ void do_dismount( CHAR_DATA * ch, char *argument )
 
   WAIT_STATE( ch, skill_table[gsn_mount]->beats );
   if( IS_NPC( ch )
-      || number_percent(  ) < character_skill_level( ch, gsn_mount ) )
+      || number_percent() < character_skill_level( ch, gsn_mount ) )
   {
     act( AT_SKILL, "You dismount $N.", ch, NULL, victim, TO_CHAR );
     act( AT_SKILL, "$n skillfully dismounts $N.", ch, NULL, victim,
@@ -2447,7 +2447,7 @@ void do_poison_weapon( CHAR_DATA * ch, char *argument )
   }
   WAIT_STATE( ch, skill_table[gsn_poison_weapon]->beats );
 
-  percent = ( number_percent(  ) - get_curr_lck( ch ) - 14 );
+  percent = ( number_percent() - get_curr_lck( ch ) - 14 );
 
   /* Check the skill percentage */
   separate_obj( pobj );
@@ -2517,7 +2517,7 @@ bool check_grip( CHAR_DATA * ch, CHAR_DATA * victim )
   /* Consider luck as a factor */
   chance += ( 2 * ( get_curr_lck( victim ) - 13 ) );
 
-  if( number_percent(  ) >= chance + victim->top_level - ch->top_level )
+  if( number_percent() >= chance + victim->top_level - ch->top_level )
   {
     learn_from_failure( victim, gsn_grip );
     return FALSE;
@@ -2601,7 +2601,7 @@ void do_circle( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  percent = number_percent(  ) - ( get_curr_lck( ch ) - 16 )
+  percent = number_percent() - ( get_curr_lck( ch ) - 16 )
     + ( get_curr_lck( victim ) - 13 );
 
   WAIT_STATE( ch, skill_table[gsn_circle]->beats );
@@ -2796,7 +2796,7 @@ void do_scan( CHAR_DATA * ch, char *argument )
 	dist++;
 	break;
       case SECT_AIR:
-	if( number_percent(  ) < 80 )
+	if( number_percent() < 80 )
 	  dist++;
 	break;
       case SECT_INSIDE:

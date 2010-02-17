@@ -2226,7 +2226,7 @@ void obj_fall( OBJ_DATA * obj, bool through )
       */ int dam = fall_count * obj->weight /
       2;
       /* Damage players */
-      if( obj->in_room->first_person && number_percent(  ) > 15 )
+      if( obj->in_room->first_person && number_percent() > 15 )
       {
 	CHAR_DATA *rch = NULL;
 	CHAR_DATA *vch = NULL;

@@ -441,7 +441,7 @@ void boot_db( bool fCopyOver )
   boot_log( "---------------------[ Boot Log ]--------------------" );
 
   log_string( "Loading commands" );
-  load_commands(  );
+  load_commands();
 
   log_string( "Loading sysdata configuration..." );
 
@@ -456,11 +456,11 @@ void boot_db( bool fCopyOver )
   }
 
   log_string( "Loading socials" );
-  load_socials(  );
+  load_socials();
 
   log_string( "Loading skill table" );
-  load_skill_table(  );
-  sort_skill_table(  );
+  load_skill_table();
+  sort_skill_table();
 
   gsn_first_spell = 0;
   gsn_first_skill = 0;
@@ -485,25 +485,25 @@ void boot_db( bool fCopyOver )
 
   fBootDb = TRUE;
 
-  boot_init_globals(  );
+  boot_init_globals();
 
   /*
    * Init random number generator.
    */
   log_string( "Initializing random number generator" );
-  init_mm(  );
+  init_mm();
 
   /*
    * Set time and weather.
    */
   log_string( "Setting time and weather" );
-  boot_set_time_weather(  );
+  boot_set_time_weather();
 
   /*
    * Assign gsn's for skills which need them.
    */
   log_string( "Assigning gsn's" );
-  boot_assign_global_skillnumbers(  );
+  boot_assign_global_skillnumbers();
 
   /*
    * Read help file.
@@ -515,9 +515,9 @@ void boot_db( bool fCopyOver )
    * Read in all the area files.
    */
   log_string( "Reading in area files..." );
-  boot_read_area_files(  );
+  boot_read_area_files();
 
-  init_supermob(  );
+  init_supermob();
 
 
   /*
@@ -527,33 +527,33 @@ void boot_db( bool fCopyOver )
    * Load up the notes file.
    */
   log_string( "Fixing exits" );
-  fix_exits(  );
+  fix_exits();
   fBootDb = FALSE;
   log_string( "Loading boards" );
-  load_boards(  );
+  load_boards();
   log_string( "Loading clans" );
-  load_clans(  );
+  load_clans();
   log_string( "Loading bans" );
-  load_banlist(  );
+  load_banlist();
   log_string( "Loading corpses" );
-  load_corpses(  );
+  load_corpses();
   log_string( "Loading space" );
-  load_space(  );
+  load_space();
   log_string( "Loading ship prototypes" );
-  load_prototypes(  );
+  load_prototypes();
   log_string( "Loading ships" );
-  load_ships(  );
+  load_ships();
   log_string( "Loading planet data" );
-  load_planets(  );
+  load_planets();
   log_string( "Resetting areas" );
-  reset_all(  );
+  reset_all();
 
   MOBtrigger = TRUE;
 
   if( fCopyOver )
   {
     log_string( "Running copyover_recover." );
-    copyover_recover(  );
+    copyover_recover();
   }
 }
 
@@ -2148,7 +2148,7 @@ void do_memory( CHAR_DATA * ch, char *argument )
   if( !str_cmp( arg, "hash" ) )
   {
 #ifdef HASHSTR
-    ch_printf( ch, "Hash statistics:\r\n%s", hash_stats(  ) );
+    ch_printf( ch, "Hash statistics:\r\n%s", hash_stats() );
     if( hash != -1 )
       hash_dump( hash );
 #else
@@ -4110,7 +4110,7 @@ static void free_character_list( void )
     free_char( ch );
   }
 
-  clean_char_queue(  );
+  clean_char_queue();
 }
 
 void dispose_area( AREA_DATA * area )
@@ -4144,7 +4144,7 @@ static void free_obj_list( void )
     extract_obj( obj );
   }
 
-  clean_obj_queue(  );
+  clean_obj_queue();
 }
 
 void free_obj_index( OBJ_INDEX_DATA * obj )
@@ -4288,29 +4288,29 @@ static void free_string_literals( void );
 
 void free_memory( void )
 {
-  free_ban_list(  );
-  free_help_list(  );
-  free_space_data_list(  );
-  free_command_list(  );
-  free_social_list(  );
-  free_skill_list(  );
-  free_ship_list(  );
-  free_ship_prototype_list(  );
-  free_clan_list(  );
-  free_planet_list(  );
-  free_all_descriptors(  );
-  free_obj_list(  );
-  free_character_list(  );
-  free_obj_index_list(  );
-  free_mob_index_list(  );
-  free_area_list(  );
-  free_shop_list(  );
-  free_board_list(  );
+  free_ban_list();
+  free_help_list();
+  free_space_data_list();
+  free_command_list();
+  free_social_list();
+  free_skill_list();
+  free_ship_list();
+  free_ship_prototype_list();
+  free_clan_list();
+  free_planet_list();
+  free_all_descriptors();
+  free_obj_list();
+  free_character_list();
+  free_obj_index_list();
+  free_mob_index_list();
+  free_area_list();
+  free_shop_list();
+  free_board_list();
 
   if( auction )
     DISPOSE( auction );
 
-  free_sysdata(  );
+  free_sysdata();
   free_string_literals();
 }
 

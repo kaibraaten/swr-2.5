@@ -1663,7 +1663,7 @@ bool ms_find_obj( const CHAR_DATA * ch )
   drunk = UMAX( 1, drunk );
   if( abs( ms ) + ( drunk / 3 ) < 30 )
     return FALSE;
-  if( ( number_percent(  ) + ( ms < 0 ? 15 : 5 ) ) >
+  if( ( number_percent() + ( ms < 0 ? 15 : 5 ) ) >
       abs( ms ) / 2 + drunk / 4 )
     return FALSE;
   if( ms > 15 )			/* range 1 to 20 */
@@ -2793,7 +2793,7 @@ void queue_extracted_char( CHAR_DATA * ch, bool extract )
 /*
  * clean out the extracted character queue
  */
-void clean_char_queue(  )
+void clean_char_queue()
 {
   EXTRACT_CHAR_DATA *ccd;
 
@@ -2921,7 +2921,7 @@ bool luck_check( const CHAR_DATA * ch, short percent )
 
   ms = 10 - abs( ch->mental_state );
 
-  if( ( number_percent(  ) - get_curr_lck( ch ) + 13 - ms ) + deity_factor <=
+  if( ( number_percent() - get_curr_lck( ch ) + 13 - ms ) + deity_factor <=
       percent )
     return TRUE;
   else
@@ -3146,7 +3146,7 @@ void better_mental_state( CHAR_DATA * ch, int mod )
   int c = URANGE( 0, abs( mod ), 20 );
   int con = get_curr_con( ch );
 
-  c += number_percent(  ) < con ? 1 : 0;
+  c += number_percent() < con ? 1 : 0;
 
   if( ch->mental_state < 0 )
     ch->mental_state = URANGE( -100, ch->mental_state + c, 0 );
@@ -3163,7 +3163,7 @@ void worsen_mental_state( CHAR_DATA * ch, int mod )
   int con = get_curr_con( ch );
 
 
-  c -= number_percent(  ) < con ? 1 : 0;
+  c -= number_percent() < con ? 1 : 0;
   if( c < 1 )
     return;
 
