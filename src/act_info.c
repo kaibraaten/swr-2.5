@@ -61,7 +61,7 @@ char *format_obj_to_char( const OBJ_DATA * obj, CHAR_DATA * ch, bool fShort )
  */
 const char *halucinated_object( int ms, bool fShort )
 {
-  int sms = URANGE( 1, ( ms + 10 ) / 5, halucinated_object_short_size(  ) );
+  int sms = URANGE( 1, ( ms + 10 ) / 5, halucinated_object_short_size() );
 
   if( fShort )
   {
@@ -667,7 +667,7 @@ void show_char_to_char_1( CHAR_DATA * victim, CHAR_DATA * ch )
       || ( IS_IMMORTAL( victim ) && ( victim->top_level > ch->top_level ) ) )
     return;
 
-  if( number_percent(  ) < character_skill_level( ch, gsn_peek ) )
+  if( number_percent() < character_skill_level( ch, gsn_peek ) )
   {
     send_to_char( "\r\nYou peek at the inventory:\r\n", ch );
     show_list_to_char( victim->first_carrying, ch, TRUE, TRUE );

@@ -95,7 +95,7 @@ int hit_gain( CHAR_DATA * ch )
     gain /= 2;
 
   if( gain > 0 && ( ch->hit + gain ) == ch->max_hit
-      && number_percent(  ) == 23 )
+      && number_percent() == 23 )
   {
     send_to_char
       ( "You feel a little bit healthier and a little bit tougher...\r\n",
@@ -1067,7 +1067,7 @@ void char_update( void )
 	    {
 	      if( ( ch->position == POS_STANDING
 		    || ch->position < POS_FIGHTING )
-		  && number_percent(  ) + 10 < abs( ch->mental_state ) )
+		  && number_percent() + 10 < abs( ch->mental_state ) )
 		do_sleep( ch, STRLIT_EMPTY );
 	      else
 		send_to_char( "You're barely conscious.\r\n", ch );
@@ -1078,7 +1078,7 @@ void char_update( void )
 	    {
 	      if( ( ch->position == POS_STANDING
 		    || ch->position < POS_FIGHTING )
-		  && ( number_percent(  ) + 20 ) <
+		  && ( number_percent() + 20 ) <
 		  abs( ch->mental_state ) )
 		do_sleep( ch, STRLIT_EMPTY );
 	      else
@@ -1090,7 +1090,7 @@ void char_update( void )
 	    if( ch->position > POS_SLEEPING )
 	    {
 	      if( ch->position < POS_SITTING
-		  && ( number_percent(  ) + 30 ) <
+		  && ( number_percent() + 30 ) <
 		  abs( ch->mental_state ) )
 		do_sleep( ch, STRLIT_EMPTY );
 	      else
@@ -1595,7 +1595,7 @@ void aggr_update( void )
 	  WAIT_STATE( ch, skill_table[gsn_backstab]->beats );
 
 	  if( !IS_AWAKE( victim )
-	      || number_percent(  ) + 5 < ch->top_level )
+	      || number_percent() + 5 < ch->top_level )
 	  {
 	    global_retcode = multi_hit( ch, victim, gsn_backstab );
 	    continue;
@@ -1630,27 +1630,27 @@ void drunk_randoms( CHAR_DATA * ch )
   if( IS_NPC( ch ) || ch->pcdata->condition[COND_DRUNK] <= 0 )
     return;
 
-  if( number_percent(  ) < 30 )
+  if( number_percent() < 30 )
     return;
 
   drunk = ch->pcdata->condition[COND_DRUNK];
   position = ch->position;
   ch->position = POS_STANDING;
 
-  if( number_percent(  ) < ( 2 * drunk / 20 ) )
+  if( number_percent() < ( 2 * drunk / 20 ) )
     check_social( ch, "burp", STRLIT_EMPTY );
-  else if( number_percent(  ) < ( 2 * drunk / 20 ) )
+  else if( number_percent() < ( 2 * drunk / 20 ) )
     check_social( ch, "hiccup", STRLIT_EMPTY );
-  else if( number_percent(  ) < ( 2 * drunk / 20 ) )
+  else if( number_percent() < ( 2 * drunk / 20 ) )
     check_social( ch, "drool", STRLIT_EMPTY );
-  else if( number_percent(  ) < ( 2 * drunk / 20 ) )
+  else if( number_percent() < ( 2 * drunk / 20 ) )
     check_social( ch, "fart", STRLIT_EMPTY );
   else
     if( drunk > ( 10 + ( get_curr_con( ch ) / 5 ) )
-	&& number_percent(  ) < ( 2 * drunk / 18 ) )
+	&& number_percent() < ( 2 * drunk / 18 ) )
     {
       for( vch = ch->in_room->first_person; vch; vch = vch->next_in_room )
-	if( number_percent(  ) < 10 )
+	if( number_percent() < 10 )
 	  rvch = vch;
       check_social( ch, "puke", ( rvch ? rvch->name : STRLIT_EMPTY ) );
     }
@@ -1793,50 +1793,50 @@ void update_handler( void )
   if( --pulse_area <= 0 )
   {
     pulse_area = number_range( PULSE_AREA / 2, 3 * PULSE_AREA / 2 );
-    reset_all(  );
+    reset_all();
   }
 
   if( --pulse_savearea <= 0 )
   {
     pulse_savearea = 10 * PULSE_MINUTE;
-    save_some_areas(  );
+    save_some_areas();
   }
 
   if( --pulse_taxes <= 0 )
   {
     pulse_taxes = PULSE_TAXES;
-    update_taxes(  );
+    update_taxes();
   }
 
   if( --pulse_mobile <= 0 )
   {
     pulse_mobile = PULSE_MOBILE;
-    mobile_update(  );
+    mobile_update();
   }
 
   if( --pulse_space <= 0 )
   {
     pulse_space = PULSE_SPACE;
-    update_space(  );
+    update_space();
   }
 
   if( --pulse_recharge <= 0 )
   {
     pulse_recharge = PULSE_SPACE / 3;
-    recharge_ships(  );
+    recharge_ships();
   }
 
   if( --pulse_ship <= 0 )
   {
     pulse_ship = PULSE_SPACE / 10;
-    move_missiles(  );
-    move_ships(  );
+    move_missiles();
+    move_ships();
   }
 
   if( --pulse_violence <= 0 )
   {
     pulse_violence = PULSE_VIOLENCE;
-    violence_update(  );
+    violence_update();
   }
 
   if( --pulse_point <= 0 )
@@ -1844,16 +1844,16 @@ void update_handler( void )
     pulse_point = number_range( ( int ) ( PULSE_TICK * 0.75 ),
 	( int ) ( PULSE_TICK * 1.25 ) );
 
-    weather_update(  );
-    char_update(  );
-    obj_update(  );
-    clear_vrooms(  );		/* remove virtual rooms */
+    weather_update();
+    char_update();
+    obj_update();
+    clear_vrooms();		/* remove virtual rooms */
   }
 
   if( --pulse_second <= 0 )
   {
     pulse_second = PULSE_PER_SECOND;
-    char_check(  );
+    char_check();
     /*reboot_check( "" ); Disabled to check if its lagging a lot - Scryn */
     /* Much faster version enabled by Altrag..
        although I dunno how it could lag too much, it was just a bunch
@@ -1864,15 +1864,15 @@ void update_handler( void )
   if( auction->item && --auction->pulse <= 0 )
   {
     auction->pulse = PULSE_AUCTION;
-    auction_update(  );
+    auction_update();
   }
 
-  tele_update(  );
-  aggr_update(  );
-  obj_act_update(  );
-  room_act_update(  );
-  clean_obj_queue(  );		/* dispose of extracted objects */
-  clean_char_queue(  );		/* dispose of dead mobs/quitting chars */
+  tele_update();
+  aggr_update();
+  obj_act_update();
+  room_act_update();
+  clean_obj_queue();		/* dispose of extracted objects */
+  clean_char_queue();		/* dispose of dead mobs/quitting chars */
 
   if( timechar )
   {
@@ -1992,7 +1992,7 @@ void reboot_check( time_t reset )
     }
     echo_to_all( AT_YELLOW, "Rebooting... see you soon.", ECHOTAR_ALL );
 
-    save_some_areas(  );
+    save_some_areas();
 
     for( vch = first_char; vch; vch = vch->next )
       if( !IS_NPC( vch ) )

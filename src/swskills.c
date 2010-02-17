@@ -243,7 +243,7 @@ void do_makeblaster( CHAR_DATA * ch, char *argument )
       }
 
       chance = character_skill_level( ch, gsn_makeblaster );
-      if( number_percent(  ) < chance )
+      if( number_percent() < chance )
       {
 	send_to_char
 	  ( "&GYou begin the long process of making a blaster.\r\n", ch );
@@ -518,7 +518,7 @@ void do_makelightsaber( CHAR_DATA * ch, char *argument )
 
       chance = character_skill_level( ch, gsn_lightsaber_crafting );
 
-      if( number_percent(  ) < chance )
+      if( number_percent() < chance )
       {
 	send_to_char
 	  ( "&GYou begin the long process of crafting a lightsaber.\r\n",
@@ -777,7 +777,7 @@ void do_makejewelry( CHAR_DATA * ch, char *argument )
 
       chance = character_skill_level( ch, gsn_makejewelry );
 
-      if( number_percent(  ) < chance )
+      if( number_percent() < chance )
       {
 	send_to_char
 	  ( "&GYou begin the long process of creating some jewelry.\r\n",
@@ -950,7 +950,7 @@ void do_makearmor( CHAR_DATA * ch, char *argument )
 
       chance = character_skill_level( ch, gsn_makearmor );
 
-      if( number_percent(  ) < chance )
+      if( number_percent() < chance )
       {
 	send_to_char
 	  ( "&GYou begin the long process of creating some armor.\r\n",
@@ -1112,7 +1112,7 @@ void do_makeshield( CHAR_DATA * ch, char *argument )
       }
 
       chance = character_skill_level( ch, gsn_makeshield );
-      if( number_percent(  ) < chance )
+      if( number_percent() < chance )
       {
 	send_to_char
 	  ( "&GYou begin the long process of crafting an energy shield.\r\n",
@@ -1302,7 +1302,7 @@ void do_makecontainer( CHAR_DATA * ch, char *argument )
 
       chance = character_skill_level( ch, gsn_makecontainer );
 
-      if( number_percent(  ) < chance )
+      if( number_percent() < chance )
       {
 	send_to_char( "&GYou begin the long process of creating a bag.\r\n",
 	    ch );
@@ -1445,7 +1445,7 @@ void do_reinforcements( CHAR_DATA * ch, char *argument )
 
       chance = character_skill_level( ch, gsn_reinforcements );
 
-      if( number_percent(  ) < chance )
+      if( number_percent() < chance )
       {
 	send_to_char( "&GYou begin making the call for reinforcements.\r\n",
 	    ch );
@@ -1535,7 +1535,7 @@ void do_postguard( CHAR_DATA * ch, char *argument )
 
       chance = character_skill_level( ch, gsn_postguard );
 
-      if( number_percent(  ) < chance )
+      if( number_percent() < chance )
       {
 	send_to_char( "&GYou begin making the call for reinforcements.\r\n",
 	    ch );
@@ -1751,7 +1751,7 @@ void do_torture( CHAR_DATA * ch, char *argument )
   chance = 5;
   if( !fail
       && ( IS_NPC( ch )
-	|| ( number_percent(  ) + chance ) < character_skill_level( ch,
+	|| ( number_percent() + chance ) < character_skill_level( ch,
 	  gsn_torture ) ) )
   {
     learn_from_success( ch, gsn_torture );
@@ -1808,7 +1808,7 @@ void do_disguise( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_disguise );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "You try to disguise yourself but fail.\r\n", ch );
     return;
@@ -2329,7 +2329,7 @@ void do_throw( CHAR_DATA * ch, char *argument )
 
     WAIT_STATE( ch, skill_table[gsn_throw]->beats );
     if( IS_NPC( ch )
-	|| number_percent(  ) < character_skill_level( ch, gsn_throw ) )
+	|| number_percent() < character_skill_level( ch, gsn_throw ) )
     {
       learn_from_success( ch, gsn_throw );
       global_retcode =
@@ -2446,7 +2446,7 @@ void do_hijack( CHAR_DATA * ch, char *argument )
 
   chance = IS_NPC( ch ) ? 0 : character_skill_level( ch, gsn_hijack );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "You fail to figure out the correct launch code.\r\n",
 	ch );
@@ -2454,7 +2454,7 @@ void do_hijack( CHAR_DATA * ch, char *argument )
   }
 
   chance = IS_NPC( ch ) ? 0 : character_skill_level( ch, gsn_spacecraft );
-  if( number_percent(  ) < chance )
+  if( number_percent() < chance )
   {
     if( ship->hatchopen )
     {
@@ -2607,7 +2607,7 @@ void do_propeganda( CHAR_DATA * ch, char *argument )
       ( "Popular support for the current government decreases.\r\n", ch );
   }
 
-  if( number_percent(  ) == 23 )
+  if( number_percent() == 23 )
   {
     send_to_char( "You feel a bit more charming than you used to...\r\n",
 	ch );
@@ -2643,7 +2643,7 @@ void do_quicktalk( CHAR_DATA * ch, char *argument )
   chance = character_skill_level( ch, gsn_quicktalk );
   chance = UMIN( chance, 95 );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "You fail to calm your attackers.\r\n", ch );
     return;

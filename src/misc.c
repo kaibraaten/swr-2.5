@@ -1581,7 +1581,7 @@ void do_dig( CHAR_DATA * ch, char *argument )
 
   ch->substate = SUB_NONE;
 
-  if( number_percent(  ) == 23 )
+  if( number_percent() == 23 )
   {
     send_to_char( "You feel a little bit stronger...\r\n", ch );
     ch->perm_str++;
@@ -1599,7 +1599,7 @@ void do_dig( CHAR_DATA * ch, char *argument )
 	&& IS_SET( pexit->exit_info, EX_CLOSED ) )
     {
       /* 4 times harder to dig open a passage without a shovel */
-      if( ( number_percent(  ) * ( shovel ? 1 : 4 ) ) < 80 )
+      if( ( number_percent() * ( shovel ? 1 : 4 ) ) < 80 )
       {
 	REMOVE_BIT( pexit->exit_info, EX_CLOSED );
 	send_to_char( "You dig open a passageway!\r\n", ch );
@@ -1621,7 +1621,7 @@ void do_dig( CHAR_DATA * ch, char *argument )
   {
     /* twice as hard to find something without a shovel */
     if( IS_OBJ_STAT( obj, ITEM_BURRIED )
-	&& ( number_percent(  ) * ( shovel ? 1 : 2 ) ) < 80 )
+	&& ( number_percent() * ( shovel ? 1 : 2 ) ) < 80 )
     {
       found = TRUE;
       break;
@@ -1709,7 +1709,7 @@ void do_search( CHAR_DATA * ch, char *argument )
       return;
   }
 
-  if( number_percent(  ) == 23 )
+  if( number_percent() == 23 )
   {
     send_to_char( "You feel a little bit wiser...\r\n", ch );
     ch->perm_wis++;
@@ -1746,7 +1746,7 @@ void do_search( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  percent = number_percent(  );
+  percent = number_percent();
 
   if( door != -1 )
   {
@@ -1879,7 +1879,7 @@ void do_shove( CHAR_DATA * ch, char *argument )
      act( AT_ACTION, buf, ch, NULL, NULL, TO_ROOM );
   */
 
-  if( chance < number_percent(  ) )
+  if( chance < number_percent() )
     {
       send_to_char( "You failed.\r\n", ch );
       victim->position = POS_STANDING;
@@ -1984,7 +1984,7 @@ void do_drag( CHAR_DATA * ch, char *argument )
      sprintf(buf, "Drag percentage of %s = %d", ch->name, chance);
      act( AT_ACTION, buf, ch, NULL, NULL, TO_ROOM );
   */
-  if( chance < number_percent(  ) )
+  if( chance < number_percent() )
     {
       send_to_char( "You failed.\r\n", ch );
       victim->position = POS_STANDING;

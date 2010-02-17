@@ -1477,8 +1477,8 @@ void do_reboot( CHAR_DATA * ch, char *argument )
 
   if( !str_cmp( argument, "and sort skill table" ) )
   {
-    sort_skill_table(  );
-    save_skill_table(  );
+    sort_skill_table();
+    save_skill_table();
   }
 
   /* Save all characters before booting. */
@@ -1488,7 +1488,7 @@ void do_reboot( CHAR_DATA * ch, char *argument )
 	save_char_obj( vch );
 
   if( str_cmp( argument, "nosave" ) )
-    save_some_areas(  );
+    save_some_areas();
 
   mud_down = TRUE;
 }
@@ -2626,7 +2626,7 @@ void do_ban( CHAR_DATA * ch, char *argument )
       return;
     }
 
-    save_banlist(  );
+    save_banlist();
     return;
   }
 
@@ -2653,7 +2653,7 @@ void do_ban( CHAR_DATA * ch, char *argument )
   pban->level = 2;
   sprintf( buf, "%24.24s", ctime( &current_time ) );
   pban->ban_time = str_dup( buf );
-  save_banlist(  );
+  save_banlist();
   send_to_char( "Ban created.  Mortals banned from site.\r\n", ch );
 }
 
@@ -2676,7 +2676,7 @@ void do_allow( CHAR_DATA * ch, char *argument )
     {
       UNLINK( pban, first_ban, last_ban, next, prev );
       free_ban( pban );
-      save_banlist(  );
+      save_banlist();
       send_to_char( "Site no longer banned.\r\n", ch );
       return;
     }
@@ -3206,7 +3206,7 @@ void do_set_boot_time( CHAR_DATA * ch, char *argument )
     new_boot_struct = *new_boot_time;
     new_boot_time = &new_boot_struct;
     reboot_check( mktime( new_boot_time ) );
-    get_reboot_string(  );
+    get_reboot_string();
 
     ch_printf( ch, "Boot time set to %s\r\n", reboot_time );
     check = TRUE;
@@ -3238,7 +3238,7 @@ void do_set_boot_time( CHAR_DATA * ch, char *argument )
     set_boot_time->manual = atoi( arg1 );
     ch_printf( ch, "Manual bit set to %s\r\n", arg1 );
     check = TRUE;
-    get_reboot_string(  );
+    get_reboot_string();
     return;
   }
 
@@ -3268,7 +3268,7 @@ void do_set_boot_time( CHAR_DATA * ch, char *argument )
   }
   else
   {
-    get_reboot_string(  );
+    get_reboot_string();
     new_boot_time_t = mktime( new_boot_time );
   }
 }
@@ -3590,7 +3590,7 @@ void do_for( CHAR_DATA * ch, char *argument )
 
 void do_cset( CHAR_DATA * ch, char *argument )
 {
-  save_sysdata(  );
+  save_sysdata();
   ch_printf( ch, "System data saved.\r\n" );
 }
 
@@ -3850,7 +3850,7 @@ void do_sedit( CHAR_DATA * ch, char *argument )
 
   if( !str_cmp( arg1, "save" ) )
   {
-    save_socials(  );
+    save_socials();
     send_to_char( "Saved.\r\n", ch );
     return;
   }
@@ -4141,7 +4141,7 @@ void do_cedit( CHAR_DATA * ch, char *argument )
 
   if( !str_cmp( arg1, "save" ) )
   {
-    save_commands(  );
+    save_commands();
     send_to_char( "Saved.\r\n", ch );
     return;
   }

@@ -218,7 +218,7 @@ long int get_design_value( int hull, int energy, int shield, int speed,
   return price;
 }
 
-void write_prototype_list(  )
+void write_prototype_list()
 {
   SHIP_PROTOTYPE *prototype = NULL;
   FILE *fpout = NULL;
@@ -429,7 +429,7 @@ bool load_ship_prototype( const char *prototypefile )
 {
   FILE *fp = NULL;
   char filename[256];
-  SHIP_PROTOTYPE *prototype = ship_prototype_create(  );
+  SHIP_PROTOTYPE *prototype = ship_prototype_create();
   bool found = FALSE;
   sprintf( filename, "%s%s", PROTOTYPE_DIR, prototypefile );
 
@@ -494,7 +494,7 @@ bool load_ship_prototype( const char *prototypefile )
 /*
  * Load in all the prototype files.
  */
-void load_prototypes(  )
+void load_prototypes()
 {
   FILE *fpList = NULL;
   char prototypelist[256];
@@ -613,7 +613,7 @@ void do_setprototype( CHAR_DATA * ch, char *argument )
     prototype->filename = str_dup( argument );
     send_to_char( "Done.\r\n", ch );
     save_ship_prototype( prototype );
-    write_prototype_list(  );
+    write_prototype_list();
     return;
   }
 
@@ -807,7 +807,7 @@ void do_makeship( CHAR_DATA * ch, char *argument )
     return;
   }
 
-  prototype = ship_prototype_create(  );
+  prototype = ship_prototype_create();
 
   LINK( prototype, first_ship_prototype, last_ship_prototype, next, prev );
 
@@ -816,7 +816,7 @@ void do_makeship( CHAR_DATA * ch, char *argument )
 
   prototype->filename = str_dup( arg );
   save_ship_prototype( prototype );
-  write_prototype_list(  );
+  write_prototype_list();
 }
 
 SHIP_DATA *make_ship( const SHIP_PROTOTYPE * prototype )
@@ -837,7 +837,7 @@ SHIP_DATA *make_ship( const SHIP_PROTOTYPE * prototype )
   sprintf( filename, "%d", shipreg );
   sprintf( shipname, "%s %d", prototype->name, shipreg );
 
-  ship = ship_create(  );
+  ship = ship_create();
 
   LINK( ship, first_ship, last_ship, next, prev );
 
@@ -872,7 +872,7 @@ SHIP_DATA *make_ship( const SHIP_PROTOTYPE * prototype )
   create_ship_rooms( ship );
 
   save_ship( ship );
-  write_ship_list(  );
+  write_ship_list();
 
   return ship;
 }
@@ -1835,7 +1835,7 @@ void do_designship( CHAR_DATA * ch, char *argument )
     shipreg++;
     sprintf( filename, "%d", shipreg );
     sprintf( shipname, "%s %d", argument, shipreg );
-    ship = ship_create(  );
+    ship = ship_create();
 
     LINK( ship, first_ship, last_ship, next, prev );
     ship->filename = str_dup( filename );
@@ -1889,7 +1889,7 @@ void do_designship( CHAR_DATA * ch, char *argument )
     ship->location = ch->in_room->vnum;
     ship->lastdoc = ch->in_room->vnum;
     save_ship( ship );
-    write_ship_list(  );
+    write_ship_list();
 
     learn_from_success( ch, gsn_shipdesign );
     learn_from_success( ch, gsn_shipdesign );

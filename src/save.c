@@ -127,7 +127,7 @@ void load_home( CHAR_DATA * ch )
       obj_to_room( tobj, storeroom );
     }
 
-    release_supermob(  );
+    release_supermob();
   }
 }
 
@@ -1868,7 +1868,7 @@ void load_corpses( void )
     exmore = ExAll( sourcelock, &buffer, sizeof( buffer ),
 	ED_NAME, excontrol );
 
-    if( !exmore && IoErr(  ) != ERROR_NO_MORE_ENTRIES )
+    if( !exmore && IoErr() != ERROR_NO_MORE_ENTRIES )
       continue;
 
     ead = &buffer;

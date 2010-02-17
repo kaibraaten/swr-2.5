@@ -51,7 +51,7 @@ void write_planet_list()
   FILE *fpout;
   char filename[256];
 
-  sprintf( filename, "%s%s", PLANET_DIR, PLANET_LIST );
+  snprintf( filename, 256, "%s%s", PLANET_DIR, PLANET_LIST );
   fpout = fopen( filename, "w" );
   if( !fpout )
   {
@@ -66,9 +66,8 @@ void write_planet_list()
 
 void save_planet( const PLANET_DATA * planet )
 {
-  FILE *fp;
+  FILE *fp = NULL;
   char filename[256];
-  char buf[MAX_STRING_LENGTH];
 
   if( !planet )
   {
@@ -78,12 +77,11 @@ void save_planet( const PLANET_DATA * planet )
 
   if( !planet->filename || planet->filename[0] == '\0' )
   {
-    sprintf( buf, "save_planet: %s has no filename", planet->name );
-    bug( buf, 0 );
+    bug( "save_planet: %s has no filename", planet->name );
     return;
   }
 
-  sprintf( filename, "%s%s", PLANET_DIR, planet->filename );
+  snprintf( filename, 256, "%s%s", PLANET_DIR, planet->filename );
 
   if( ( fp = fopen( filename, "w" ) ) == NULL )
   {
@@ -122,14 +120,10 @@ void save_planet( const PLANET_DATA * planet )
 
 void fread_planet( PLANET_DATA * planet, FILE * fp )
 {
-  char buf[MAX_STRING_LENGTH];
-  const char *word;
-  bool fMatch;
-
   for( ;; )
   {
-    word = feof( fp ) ? "End" : fread_word( fp );
-    fMatch = FALSE;
+    const char *word = feof( fp ) ? "End" : fread_word( fp );
+    bool fMatch = FALSE;
 
     switch ( UPPER( word[0] ) )
     {
@@ -242,8 +236,7 @@ void fread_planet( PLANET_DATA * planet, FILE * fp )
 
     if( !fMatch )
     {
-      sprintf( buf, "Fread_planet: no match: %s", word );
-      bug( buf, 0 );
+      bug( "Fread_planet: no match: %s", word );
     }
   }
 }
@@ -254,7 +247,7 @@ bool load_planet_file( const char *planetfile )
   FILE *fp;
   PLANET_DATA *planet = planet_create();
   bool found = FALSE;
-  sprintf( filename, "%s%s", PLANET_DIR, planetfile );
+  snprintf( filename, 256, "%s%s", PLANET_DIR, planetfile );
 
   if( ( fp = fopen( filename, "r" ) ) != NULL )
   {
@@ -278,21 +271,21 @@ bool load_planet_file( const char *planetfile )
       }
 
       word = fread_word( fp );
-      if( !str_cmp( word, "PLANET" ) )
-      {
-	fread_planet( planet, fp );
-	break;
-      }
-      else if( !str_cmp( word, "END" ) )
-	break;
-      else
-      {
-	char buf[MAX_STRING_LENGTH];
 
-	sprintf( buf, "Load_planet_file: bad section: %s.", word );
-	bug( buf, 0 );
-	break;
-      }
+      if( !str_cmp( word, "PLANET" ) )
+	{
+	  fread_planet( planet, fp );
+	  break;
+	}
+      else if( !str_cmp( word, "END" ) )
+	{
+	  break;
+	}
+      else
+	{
+	  bug( "Load_planet_file: bad section: %s.", word );
+	  break;
+	}
     }
     fclose( fp );
   }
@@ -307,15 +300,13 @@ bool load_planet_file( const char *planetfile )
 
 void load_planets()
 {
-  FILE *fpList;
-  const char *filename;
+  FILE *fpList = NULL;
   char planetlist[256];
-  char buf[MAX_STRING_LENGTH];
 
   first_planet = NULL;
   last_planet = NULL;
 
-  sprintf( planetlist, "%s%s", PLANET_DIR, PLANET_LIST );
+  snprintf( planetlist, 256, "%s%s", PLANET_DIR, PLANET_LIST );
 
   if( ( fpList = fopen( planetlist, "r" ) ) == NULL )
   {
@@ -325,15 +316,14 @@ void load_planets()
 
   for( ;; )
   {
-    filename = feof( fpList ) ? "$" : fread_word( fpList );
+    const char *filename = feof( fpList ) ? "$" : fread_word( fpList );
 
     if( filename[0] == '$' )
       break;
 
     if( !load_planet_file( filename ) )
     {
-      sprintf( buf, "Cannot load planet file: %s", filename );
-      bug( buf, 0 );
+      bug( "Cannot load planet file: %s", filename );
     }
   }
   fclose( fpList );
@@ -441,7 +431,7 @@ void do_setplanet( CHAR_DATA * ch, char *argument )
     if( !is_valid_filename( ch, PLANET_DIR, argument ) )
       return;
 
-    sprintf( filename, "%s%s", PLANET_DIR, planet->filename );
+    snprintf( filename, 256, "%s%s", PLANET_DIR, planet->filename );
     remove( filename );
     DISPOSE( planet->filename );
     planet->filename = str_dup( argument );
@@ -535,7 +525,7 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
   char arg1[MAX_STRING_LENGTH];
   char arg3[MAX_STRING_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  char filename[MAX_STRING_LENGTH];
+  char filename[256];
   char pname[MAX_STRING_LENGTH];
   char *description = NULL;
   bool destok = TRUE;
@@ -604,11 +594,11 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
       }
 
       save_planet( planet );
-      sprintf( filename, "%s%s", AREA_DIR, pArea->filename );
+      snprintf( filename, 256, "%s%s", AREA_DIR, pArea->filename );
       fold_area( pArea, filename, FALSE );
       write_area_list();
       write_planet_list();
-      sprintf( buf, "%d", top_r_vnum - 17 );
+      snprintf( buf, 256, "%d", top_r_vnum - 17 );
       ch_printf( ch, "You may now travel to your new colony.\r\n" );
       reset_all();
 
@@ -685,7 +675,7 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
 	 || sector == SECT_DUNNO )
     sector = number_range( SECT_FIELD, SECT_MAX - 1 );
 
-  strcpy( pname, argument );
+  strncpy( pname, argument, MAX_STRING_LENGTH );
   argument = one_argument( argument, arg3 );
 
   snprintf( buf, MAX_STRING_LENGTH, "%s.planet", strlower( arg3 ) );
@@ -747,7 +737,7 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
     starsystem->star2 = STRALLOC( "" );
     starsystem->first_planet = planet;
     starsystem->last_planet = planet;
-    sprintf( filename, "%s.system", strlower( arg1 ) );
+    snprintf( filename, 256, "%s.system", strlower( arg1 ) );
     replace_char( filename, ' ', '_' );
     starsystem->filename = str_dup( filename );
     save_starsystem( starsystem );
@@ -768,7 +758,7 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
   top_area++;
 
   pArea->filename = str_dup( arg3 );
-  sprintf( filename, "%s.planet", strlower( arg3 ) );
+  snprintf( filename, 256, "%s.planet", strlower( arg3 ) );
   replace_char( filename, ' ', '-' );
   planet->filename = str_dup( filename );
 
@@ -788,7 +778,7 @@ void do_makeplanet( CHAR_DATA * ch, char *argument )
   /* save them now just in case... */
 
   save_planet( planet );
-  sprintf( filename, "%s%s", AREA_DIR, pArea->filename );
+  snprintf( filename, 256, "%s%s", AREA_DIR, pArea->filename );
   fold_area( pArea, filename, FALSE );
   write_area_list();
   write_planet_list();
@@ -953,12 +943,10 @@ void do_capture( CHAR_DATA * ch, char *argument )
   planet->governed_by = clan;
   planet->pop_support = 50;
 
-  sprintf( buf, "%s has been captured by %s!", planet->name, clan->name );
+  snprintf( buf, MAX_STRING_LENGTH,
+	    "%s has been captured by %s!", planet->name, clan->name );
   echo_to_all( AT_RED, buf, 0 );
-
   save_planet( planet );
-
-  return;
 }
 
 const long TAX_PER_POPULATION = 500;

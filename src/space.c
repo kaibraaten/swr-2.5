@@ -58,7 +58,7 @@ bool laserfire_hits( SHIP_DATA * ship, SHIP_DATA * target, int chance )
 {
   char buf[MAX_STRING_LENGTH];
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     sprintf( buf, "Lasers fire from %s at you but miss.", ship->name );
     echo_to_cockpit( AT_ORANGE, target, buf );
@@ -395,7 +395,7 @@ void move_ships( void )
     }
   }
 
-  handle_ship_collision(  );
+  handle_ship_collision();
 }
 
 void handle_ship_collision( void )
@@ -926,7 +926,7 @@ void ship_handle_autoflying_has_target( SHIP_DATA * ship )
     {
       int chance = 100 + missile_hit_modifier( ship, target );
 
-      if( number_percent(  ) > chance )
+      if( number_percent() > chance )
       {
 
       }
@@ -1233,7 +1233,7 @@ bool load_starsystem( const char *starsystemfile )
 
   if( ( fp = fopen( filename, "r" ) ) != NULL )
   {
-    SPACE_DATA *starsystem = starsystem_create(  );
+    SPACE_DATA *starsystem = starsystem_create();
     LINK( starsystem, first_starsystem, last_starsystem, next, prev );
     found = TRUE;
 
@@ -1532,7 +1532,7 @@ void echo_to_system( int color, const SHIP_DATA * ship,
   }
 }
 
-void write_ship_list(  )
+void write_ship_list()
 {
   SHIP_DATA *tship = NULL;
   FILE *fpout = NULL;
@@ -2000,7 +2000,7 @@ void fread_ship( SHIP_DATA * ship, FILE * fp )
 bool load_ship_file( const char *shipfile )
 {
   char filename[256];
-  SHIP_DATA *ship = ship_create(  );
+  SHIP_DATA *ship = ship_create();
   FILE *fp = NULL;
   bool found = FALSE;
   CLAN_DATA *clan = NULL;
@@ -2099,7 +2099,7 @@ bool load_ship_file( const char *shipfile )
 /*
  * Load in all the ship files.
  */
-void load_ships(  )
+void load_ships()
 {
   FILE *fpList = NULL;
   char shiplist[256];
@@ -3035,7 +3035,7 @@ void destroy_ship( SHIP_DATA * ship, CHAR_DATA * killer )
   ship_untarget_by_attackers( ship );
   ship_untarget_by_missiles( ship );
 
-  write_ship_list(  );
+  write_ship_list();
 }
 
 bool ship_to_room( SHIP_DATA * ship, long vnum )
@@ -3225,7 +3225,7 @@ void do_launch( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_spacecraft );
 
-  if( number_percent(  ) < chance )
+  if( number_percent() < chance )
   {
     price = 20;
     price += ( ship->maxhull - ship->hull );
@@ -3562,7 +3562,7 @@ void do_land( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_spacecraft );
 
-  if( number_percent(  ) < chance )
+  if( number_percent() < chance )
   {
     set_char_color( AT_GREEN, ch );
     send_to_char( "Landing sequence initiated.\r\n", ch );
@@ -3573,7 +3573,7 @@ void do_land( CHAR_DATA * ch, char *argument )
     ship->dest = STRALLOC( arg );
     ship->shipstate = SHIP_LAND;
     ship->currspeed = 0;
-    if( number_percent(  ) == 23 )
+    if( number_percent() == 23 )
     {
       send_to_char
 	( "Your experience makes you feel more coordinated than before.\r\n",
@@ -3724,7 +3724,7 @@ void do_accelerate( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_spacecraft );
 
-  if( number_percent(  ) >= chance )
+  if( number_percent() >= chance )
   {
     send_to_char( "&RYou fail to work the controls properly.\r\n", ch );
     return;
@@ -3827,7 +3827,7 @@ void do_trajectory( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_spacecraft );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "&RYou fail to work the controls properly.\r\n", ch );
     return;
@@ -4185,7 +4185,7 @@ void do_autorecharge( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_spacecraft );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "&RYou fail to work the controls properly.\r\n", ch );
     return;
@@ -4479,7 +4479,7 @@ void do_status( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_spacecraft );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "&RYou cant figure out what the readout means.\r\n", ch );
     return;
@@ -4609,7 +4609,7 @@ void do_hyperspace( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_spacecraft );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "&RYou can't figure out which lever to use.\r\n", ch );
     return;
@@ -4719,7 +4719,7 @@ void do_target( CHAR_DATA * ch, char *argument )
 
       chance = character_skill_level( ch, gsn_weaponsystems );
 
-      if( number_percent(  ) < chance )
+      if( number_percent() < chance )
       {
 	send_to_char( "&GTracking target.\r\n", ch );
 	act( AT_PLAIN,
@@ -4967,7 +4967,7 @@ void do_fire( CHAR_DATA * ch, char *argument )
     act( AT_PLAIN, "$n presses the fire button.", ch,
 	NULL, argument, TO_ROOM );
 
-    if( number_percent(  ) > chance )
+    if( number_percent() > chance )
     {
       send_to_char( "&RYou fail to lock onto your target!", ch );
       ship->missilestate = MISSILE_RELOAD_2;
@@ -5076,7 +5076,7 @@ void do_calculate( CHAR_DATA * ch, char *argument )
   }
   chance = character_skill_level( ch, gsn_spacecraft );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "&RYou cant seem to figure the charts out today.\r\n",
 	ch );
@@ -5179,7 +5179,7 @@ void do_recharge( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_spacecraft );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "&RYou fail to work the controls properly.\r\n", ch );
     return;
@@ -5228,7 +5228,7 @@ void do_repairship( CHAR_DATA * ch, char *argument )
 
       chance = character_skill_level( ch, gsn_shipmaintenance );
 
-      if( number_percent(  ) < chance )
+      if( number_percent() < chance )
       {
 	send_to_char( "&GYou begin your repairs\r\n", ch );
 	act( AT_PLAIN, "$n begins repairing the ships $T.", ch,
@@ -5487,7 +5487,7 @@ void do_radar( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_spacecraft );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "&RYou fail to work the controls properly.\r\n", ch );
     return;
@@ -5585,7 +5585,7 @@ void do_autotrack( CHAR_DATA * ch, char *argument )
   }
 
   chance = character_skill_level( ch, gsn_spacecraft );
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "&RYour notsure which switch to flip.\r\n", ch );
     return;
@@ -5689,7 +5689,7 @@ ch_ret drive_ship( CHAR_DATA * ch, SHIP_DATA * ship, EXIT_DATA * pexit,
 
   if( drunk && !fall )
   {
-    door = number_door(  );
+    door = number_door();
     pexit = get_exit( get_room_index( ship->location ), door );
   }
 
@@ -5994,7 +5994,7 @@ void do_chaff( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_weaponsystems );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
   {
     send_to_char( "&RYou can't figure out which switch it is.\r\n", ch );
     return;

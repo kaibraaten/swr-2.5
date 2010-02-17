@@ -394,7 +394,7 @@ ch_ret multi_hit( CHAR_DATA * ch, CHAR_DATA * victim, int dt )
   /* -- Altrag */
   chance =
     IS_NPC( ch ) ? 100 : character_skill_level( ch, gsn_berserk ) * 5 / 2;
-  if( IS_AFFECTED( ch, AFF_BERSERK ) && number_percent(  ) < chance )
+  if( IS_AFFECTED( ch, AFF_BERSERK ) && number_percent() < chance )
     if( ( retcode = one_hit( ch, victim, dt ) ) != rNONE ||
 	who_fighting( ch ) != victim )
       return retcode;
@@ -404,7 +404,7 @@ ch_ret multi_hit( CHAR_DATA * ch, CHAR_DATA * victim, int dt )
     dual_bonus = character_skill_level( ch, gsn_dual_wield ) / 10;
     chance = character_skill_level( ch, gsn_dual_wield );
 
-    if( number_percent(  ) < chance )
+    if( number_percent() < chance )
     {
       learn_from_success( ch, gsn_dual_wield );
       retcode = one_hit( ch, victim, dt );
@@ -440,7 +440,7 @@ ch_ret multi_hit( CHAR_DATA * ch, CHAR_DATA * victim, int dt )
     IS_NPC( ch ) ? 0 : ( character_skill_level( ch, gsn_second_attack ) +
 	( int ) ( dual_bonus / 1.5 ) );
 
-  if( number_percent(  ) < chance )
+  if( number_percent() < chance )
   {
     learn_from_success( ch, gsn_second_attack );
     retcode = one_hit( ch, victim, dt );
@@ -453,7 +453,7 @@ ch_ret multi_hit( CHAR_DATA * ch, CHAR_DATA * victim, int dt )
   chance =
     IS_NPC( ch ) ? 0 : ( character_skill_level( ch, gsn_third_attack ) +
 	( int ) ( dual_bonus * 1.5 ) ) / 2;
-  if( number_percent(  ) < chance )
+  if( number_percent() < chance )
   {
     learn_from_success( ch, gsn_third_attack );
     retcode = one_hit( ch, victim, dt );
@@ -640,7 +640,7 @@ ch_ret one_hit( CHAR_DATA * ch, CHAR_DATA * victim, int dt )
     }
     if( attacktype == ATCK_BACKSTAB )
       attacktype = 0;
-    if( wield && number_percent(  ) > 25 )
+    if( wield && number_percent() > 25 )
       attacktype = 0;
     switch ( attacktype )
     {
@@ -855,7 +855,7 @@ ch_ret one_hit( CHAR_DATA * ch, CHAR_DATA * victim, int dt )
 	victim->was_stunned--;
       }
       chance = con_app[get_curr_con( ch )].stun;
-      if( !fail && number_percent(  ) < chance )
+      if( !fail && number_percent() < chance )
       {
 	WAIT_STATE( victim, PULSE_VIOLENCE );
 	act( AT_BLUE,
@@ -1290,12 +1290,12 @@ ch_ret damage( CHAR_DATA * ch, CHAR_DATA * victim, int dam, int dt )
     {
       if( IS_NPC( ch )
 	  && IS_SET( ch->attacks, DFND_DISARM )
-	  && number_percent(  ) < ch->top_level / 2 )
+	  && number_percent() < ch->top_level / 2 )
 	disarm( ch, victim );
 
       if( IS_NPC( ch )
 	  && IS_SET( ch->attacks, ATCK_TRIP )
-	  && number_percent(  ) < ch->top_level )
+	  && number_percent() < ch->top_level )
 	trip( ch, victim );
 
       if( check_parry( ch, victim ) )
@@ -1947,7 +1947,7 @@ void raw_kill( CHAR_DATA * ch, CHAR_DATA * victim )
       ship->copilot = STRALLOC( "" );
 
       save_ship( ship );
-      write_ship_list(  );
+      write_ship_list();
     }
 
   }
@@ -2413,7 +2413,7 @@ void do_flee( CHAR_DATA * ch, char *argument )
   for( attempt = 0; attempt < 8; attempt++ )
   {
 
-    door = number_door(  );
+    door = number_door();
     if( ( pexit = get_exit( was_in, door ) ) == NULL
 	|| !pexit->to_room
 	|| ( IS_SET( pexit->exit_info, EX_CLOSED )
@@ -2465,7 +2465,7 @@ bool get_cover( CHAR_DATA * ch )
   for( attempt = 0; attempt < 10; attempt++ )
   {
 
-    door = number_door(  );
+    door = number_door();
     if( ( pexit = get_exit( was_in, door ) ) == NULL
 	|| !pexit->to_room
 	|| ( IS_SET( pexit->exit_info, EX_CLOSED )

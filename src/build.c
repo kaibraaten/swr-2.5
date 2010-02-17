@@ -4401,7 +4401,7 @@ void do_aset( CHAR_DATA * ch, char *argument )
     DISPOSE( tarea->filename );
     tarea->filename = str_dup( argument );
     rename( filename, new_fullname );
-    write_area_list(  );
+    write_area_list();
     send_to_char( "Done.\r\n", ch );
     return;
   }
@@ -5397,12 +5397,12 @@ void do_rpedit( CHAR_DATA * ch, char *argument )
 
 void do_allsave( CHAR_DATA * ch, char *argument )
 {
-  save_mobs(  );
-  save_objects(  );
-  write_area_list(  );
+  save_mobs();
+  save_objects();
+  write_area_list();
 }
 
-void save_mobs(  )
+void save_mobs()
 {
   MOB_INDEX_DATA *pMobIndex;
   MPROG_DATA *mprog;
@@ -5593,7 +5593,7 @@ void save_mobs(  )
   fclose( fpout );
 }
 
-void save_objects(  )
+void save_objects()
 {
   OBJ_INDEX_DATA *pObjIndex;
   EXTRA_DESCR_DATA *ed;
@@ -5710,7 +5710,7 @@ void save_objects(  )
   fclose( fpout );
 }
 
-void save_some_areas(  )
+void save_some_areas()
 {
   AREA_DATA *area;
   char filename[256];

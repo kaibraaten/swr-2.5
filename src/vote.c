@@ -190,7 +190,7 @@ bool load_poll_file( const char *pollfile )
 /*
  * Load in all the poll files.
  */
-void load_polls(  )
+void load_polls( void )
 {
   FILE *fpList;
   const char *player;

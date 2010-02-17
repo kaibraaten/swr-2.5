@@ -247,7 +247,7 @@ void decorate_room( ROOM_INDEX_DATA * room )
   room->description = STRALLOC( buf2 );
 }
 
-void clear_vrooms(  )
+void clear_vrooms()
 {
 }
 
@@ -385,7 +385,7 @@ ch_ret move_char( CHAR_DATA * ch, EXIT_DATA * pexit, int fall )
 
   if( drunk && !fall )
   {
-    door = number_door(  );
+    door = number_door();
     pexit = get_exit( ch->in_room, door );
   }
 
@@ -536,7 +536,7 @@ ch_ret move_char( CHAR_DATA * ch, EXIT_DATA * pexit, int fall )
       if( !found && !ch->mount )
       {
 	if( ( !IS_NPC( ch )
-	      && number_percent(  ) > character_skill_level( ch,
+	      && number_percent() > character_skill_level( ch,
 		gsn_climb ) )
 	    || drunk || ch->mental_state < -90 )
 	{
@@ -1484,7 +1484,7 @@ void do_bashdoor( CHAR_DATA * ch, char *argument )
 
     if( !IS_SET( pexit->exit_info, EX_BASHPROOF )
 	&& ch->move >= 15
-	&& number_percent(  ) <
+	&& number_percent() <
 	( chance + 4 * ( get_curr_str( ch ) - 19 ) ) )
     {
       REMOVE_BIT( pexit->exit_info, EX_CLOSED );
@@ -1678,7 +1678,7 @@ void do_sleep( CHAR_DATA * ch, char *argument )
 
     case POS_RESTING:
       if( ch->mental_state > 30
-	  && ( number_percent(  ) + 10 ) < ch->mental_state )
+	  && ( number_percent() + 10 ) < ch->mental_state )
       {
 	send_to_char
 	  ( "You just can't seem to calm yourself down enough to sleep.\r\n",
@@ -1696,7 +1696,7 @@ void do_sleep( CHAR_DATA * ch, char *argument )
 
     case POS_SITTING:
       if( ch->mental_state > 30
-	  && ( number_percent(  ) + 5 ) < ch->mental_state )
+	  && ( number_percent() + 5 ) < ch->mental_state )
       {
 	send_to_char
 	  ( "You just can't seem to calm yourself down enough to sleep.\r\n",
@@ -1713,7 +1713,7 @@ void do_sleep( CHAR_DATA * ch, char *argument )
       break;
 
     case POS_STANDING:
-      if( ch->mental_state > 30 && number_percent(  ) < ch->mental_state )
+      if( ch->mental_state > 30 && number_percent() < ch->mental_state )
       {
 	send_to_char
 	  ( "You just can't seem to calm yourself down enough to sleep.\r\n",

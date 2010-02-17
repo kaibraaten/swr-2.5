@@ -1321,7 +1321,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
       return;
     }
     board->board_obj = value;
-    write_boards_txt(  );
+    write_boards_txt();
     send_to_char( "Done.\r\n", ch );
     return;
   }
@@ -1334,7 +1334,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
       return;
     }
     board->min_read_level = value;
-    write_boards_txt(  );
+    write_boards_txt();
     send_to_char( "Done.\r\n", ch );
     return;
   }
@@ -1351,7 +1351,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
       board->read_group = str_dup( "" );
     else
       board->read_group = str_dup( argument );
-    write_boards_txt(  );
+    write_boards_txt();
     send_to_char( "Done.\r\n", ch );
     return;
   }
@@ -1368,7 +1368,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
       board->post_group = str_dup( "" );
     else
       board->post_group = str_dup( argument );
-    write_boards_txt(  );
+    write_boards_txt();
     send_to_char( "Done.\r\n", ch );
     return;
   }
@@ -1386,7 +1386,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
       sprintf( buf, "%s %s", board->extra_removers, argument );
     DISPOSE( board->extra_removers );
     board->extra_removers = str_dup( buf );
-    write_boards_txt(  );
+    write_boards_txt();
     send_to_char( "Done.\r\n", ch );
     return;
   }
@@ -1404,7 +1404,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
       sprintf( buf, "%s %s", board->extra_readers, argument );
     DISPOSE( board->extra_readers );
     board->extra_readers = str_dup( buf );
-    write_boards_txt(  );
+    write_boards_txt();
     send_to_char( "Done.\r\n", ch );
     return;
   }
@@ -1422,7 +1422,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
 
     DISPOSE( board->note_file );
     board->note_file = str_dup( argument );
-    write_boards_txt(  );
+    write_boards_txt();
     send_to_char( "Done.  (board's filename set)\r\n", ch );
     return;
   }
@@ -1435,7 +1435,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
       return;
     }
     board->min_post_level = value;
-    write_boards_txt(  );
+    write_boards_txt();
     send_to_char( "Done.\r\n", ch );
     return;
   }
@@ -1448,7 +1448,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
       return;
     }
     board->min_remove_level = value;
-    write_boards_txt(  );
+    write_boards_txt();
     send_to_char( "Done.\r\n", ch );
     return;
   }
@@ -1461,7 +1461,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
       return;
     }
     board->max_posts = value;
-    write_boards_txt(  );
+    write_boards_txt();
     send_to_char( "Done.\r\n", ch );
     return;
   }
@@ -1473,7 +1473,7 @@ void do_bset( CHAR_DATA * ch, char *argument )
       return;
     }
     board->type = value;
-    write_boards_txt(  );
+    write_boards_txt();
     send_to_char( "Done.\r\n", ch );
     return;
   }

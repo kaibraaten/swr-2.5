@@ -637,7 +637,7 @@ static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument )
       STRFREE( ship->name );
       ship->name = STRALLOC( shipname );
       save_ship( ship );
-      write_ship_list(  );
+      write_ship_list();
     }
 
     ch->perm_lck = number_range( 6, 18 );
@@ -762,7 +762,7 @@ static void nanny_done_motd( DESCRIPTOR_DATA * d, char *argument )
 	obj_to_room( tobj, storeroom );
       }
 
-      release_supermob(  );
+      release_supermob();
     }
   }
 

@@ -275,7 +275,7 @@ bool spec_poison( CHAR_DATA * ch )
 
   if( ch->position != POS_FIGHTING
       || ( victim = who_fighting( ch ) ) == NULL
-      || number_percent(  ) > 2 * ch->top_level )
+      || number_percent() > 2 * ch->top_level )
     return FALSE;
 
   act( AT_HIT, "You bite $N!", ch, NULL, victim, TO_CHAR );

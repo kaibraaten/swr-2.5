@@ -557,7 +557,7 @@ void do_setclan( CHAR_DATA * ch, char *argument )
     clan->filename = str_dup( argument );
     send_to_char( "Done.\r\n", ch );
     save_clan( clan );
-    write_clan_list(  );
+    write_clan_list();
     return;
   }
 

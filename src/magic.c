@@ -1103,7 +1103,7 @@ void do_cast( CHAR_DATA * ch, char *argument )
     }
   }
   if( !IS_NPC( ch )
-      && ( number_percent(  ) + skill->difficulty * 5 ) >
+      && ( number_percent() + skill->difficulty * 5 ) >
       character_skill_level( ch, sn ) )
   {
     /* Some more interesting loss of concentration messages  -Thoric */
