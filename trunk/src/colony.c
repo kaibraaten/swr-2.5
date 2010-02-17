@@ -437,7 +437,7 @@ const char *get_room_type_name( int room_type )
 const char *get_room_type_description( int room_type )
 {
   if( room_type < COLONY_ROOM_FIRST || room_type > COLONY_ROOM_LAST )
-    return "*out of bounds*";
+    return "_out of bounds_";
 
   return room_type_table[room_type].description;
 }
@@ -567,8 +567,7 @@ void do_landscape( CHAR_DATA * ch, char *argument )
       return;
     }
 
-  if( !location->area->planet ||
-      clan != location->area->planet->governed_by )
+  if( !location->area->planet || clan != location->area->planet->governed_by )
     {
       send_to_char( "You may only landscape areas on planets that your organization controls!\r\n", ch );
       return;
@@ -589,7 +588,7 @@ void do_landscape( CHAR_DATA * ch, char *argument )
 		    ch );
       send_to_char( "<Room Type> may be one of the following:\r\n\r\n", ch );
 
-      for( n = 0; n < room_type_table_size(); ++n )
+      for( n = 0; n < COLONY_ROOM_LAST; ++n )
 	{
 	  if( room_type_in_use( n ) )
 	    {
@@ -604,7 +603,7 @@ void do_landscape( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_landscape );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
     {
       send_to_char( "You can't quite get the desired affect.\r\n", ch );
       return;
@@ -612,7 +611,7 @@ void do_landscape( CHAR_DATA * ch, char *argument )
 
   room_type_id = get_room_type_id( arg );
 
-  if( !room_type_in_use( room_type_id ) )
+  if( room_type_id < 0 || !room_type_in_use( room_type_id ) )
     {
       ch_printf( ch, "That's not a valid room type.\r\n" );
       return;
@@ -713,7 +712,7 @@ void do_construction( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_construction );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
     {
       send_to_char( "You can't quite get the desired affect.\r\n", ch );
       ch->gold -= CONSTRUCTION_COST / 100;
@@ -808,7 +807,7 @@ void do_bridge( CHAR_DATA * ch, char *argument )
 
   chance = character_skill_level( ch, gsn_bridge );
 
-  if( number_percent(  ) > chance )
+  if( number_percent() > chance )
     {
       send_to_char( "You can't quite get the desired affect.\r\n", ch );
       ch->gold -= 10;
