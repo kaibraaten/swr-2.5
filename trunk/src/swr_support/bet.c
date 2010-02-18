@@ -28,7 +28,6 @@
  * Completely cleaned up by Thoric
  */
 
-
 /*
    util function, converts an 'advanced' ASCII-number-string into a number.
    Used by parsebet() but could also be used by do_give or do_wimpy.
@@ -60,7 +59,7 @@
    once.
    */
 
-int advatoi (const char *s)
+static int advatoi (const char *s)
 {
   int number = 0;	/* number to be returned */
   int multiplier = 0;	/* multiplier used to get the extra digits right */
@@ -95,7 +94,6 @@ int advatoi (const char *s)
 
   return number;
 }
-
 
 /*
    This function allows the following kinds of bets to be made:

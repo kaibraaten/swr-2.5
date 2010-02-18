@@ -2257,8 +2257,6 @@ void do_oset( CHAR_DATA * ch, char *argument )
     return;
   }
 
-
-
   if( !str_cmp( arg2, "rmed" ) )
   {
     if( arg3[0] == '\0' )
@@ -2437,15 +2435,6 @@ void do_oset( CHAR_DATA * ch, char *argument )
    * Generate usage message.
    */
   do_oset( ch, STRLIT_EMPTY );
-}
-
-
-/*
- * Obsolete Merc room editing routine
- */
-void do_rset( CHAR_DATA * ch, char *argument )
-{
-  return;
 }
 
 /*
@@ -4081,14 +4070,6 @@ void fold_area( const AREA_DATA * tarea, const char *filename, bool install )
   fprintf( fpout, "#$\n" );
   fclose( fpout );
   return;
-}
-
-void do_savearea( CHAR_DATA * ch, char *argument )
-{
-}
-
-void do_loadarea( CHAR_DATA * ch, char *argument )
-{
 }
 
 /*

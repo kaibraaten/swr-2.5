@@ -90,45 +90,41 @@ char *scramble( const char *argument, int modifier )
  * Best to leave the constants alone unless you've read Knuth.
  * -- Furey
  */
-static  int     rgiState[2+55];
+static int rgiState[2+55];
 
 void init_mm( void )
 {
-  int *piState;
-  int iState;
-
-  piState     = &rgiState[2];
+  int *piState = &rgiState[2];
+  int iState = 0;
 
   piState[-2] = 55 - 55;
   piState[-1] = 55 - 24;
 
   piState[0]  = ((int) time(0) ) & ((1 << 30) - 1);
   piState[1]  = 1;
+
   for ( iState = 2; iState < 55; iState++ )
   {
     piState[iState] = (piState[iState-1] + piState[iState-2])
       & ((1 << 30) - 1);
   }
-  return;
 }
 
 static int number_mm( void )
 {
-  int *piState;
-  int iState1;
-  int iState2;
-  int iRand;
+  int *piState = &rgiState[2];
+  int iState1 = piState[-2];
+  int iState2 = piState[-1];
+  int iRand = (piState[iState1] + piState[iState2]) & ((1 << 30) - 1);
 
-  piState             = &rgiState[2];
-  iState1             = piState[-2];
-  iState2             = piState[-1];
-  iRand               = (piState[iState1] + piState[iState2])
-    & ((1 << 30) - 1);
   piState[iState1]    = iRand;
+
   if ( ++iState1 == 55 )
     iState1 = 0;
+
   if ( ++iState2 == 55 )
     iState2 = 0;
+
   piState[-2]         = iState1;
   piState[-1]         = iState2;
   return iRand >> 6;
@@ -144,13 +140,16 @@ int number_bits( int width )
  */
 int dice( int number, int size )
 {
-  int idice;
-  int sum;
+  int idice = 0;
+  int sum = 0;
 
   switch ( size )
   {
-    case 0: return 0;
-    case 1: return number;
+    case 0:
+      return 0;
+
+    case 1:
+      return number;
   }
 
   for ( idice = 0, sum = 0; idice < number; idice++ )
@@ -166,8 +165,13 @@ int number_fuzzy( int number )
 {
   switch ( number_bits( 2 ) )
   {
-    case 0:  number -= 1; break;
-    case 3:  number += 1; break;
+    case 0:
+      number -= 1;
+      break;
+
+    case 3:
+      number += 1;
+      break;
   }
 
   return UMAX( 1, number );
@@ -197,7 +201,7 @@ int number_percent( void )
  */
 int number_door( void )
 {
-  int door;
+  int door = 0;
 
   while ( ( door = number_mm( ) & (16-1) ) > 9 )
     ;
@@ -205,26 +209,20 @@ int number_door( void )
   return door;
 }
 
-/*
- * Simple linear interpolation.
- */
-int interpolate( int level, int value_00, int value_32 )
-{
-  return value_00 + level * (value_32 - value_00) / 32;
-}
-
 char *flag_string( int bitvector, const char * const flagarray[] )
 {
   static char buf[MAX_STRING_LENGTH];
-  int x;
+  int x = 0;
 
   buf[0] = '\0';
+
   for ( x = 0; x < 32 ; x++ )
     if ( IS_SET( bitvector, 1 << x ) )
     {
       strcat( buf, flagarray[x] );
       strcat( buf, " " );
     }
+
   if ( (x=strlen( buf )) > 0 )
     buf[--x] = '\0';
 
