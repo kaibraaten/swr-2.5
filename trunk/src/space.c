@@ -24,7 +24,6 @@ static bool load_ship_file( const char *shipfile );
 void write_ship_list( void );
 static void fread_starsystem( SPACE_DATA * starsystem, FILE * fp );
 static bool load_starsystem( const char *starsystemfile );
-void write_starsystem_list( void );
 static void resetship( SHIP_DATA * ship );
 static void landship( SHIP_DATA * ship, char *arg );
 static void launchship( SHIP_DATA * ship );

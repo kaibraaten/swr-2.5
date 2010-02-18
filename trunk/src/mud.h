@@ -304,9 +304,9 @@ struct descriptor_data
   int pagetop;
   char *pagepoint;
 #if defined(AMIGA) || defined(__MORPHOS__)
-  signed
+  /*  signed*/
 #endif
-  char pagecmd;
+  signed char pagecmd;
   char pagecolor;
   int newstate;
   unsigned char	prevcolor;
@@ -3120,7 +3120,6 @@ BOARD_DATA * get_board( const OBJ_DATA *obj );
 void free_note( NOTE_DATA *pnote );
 
 /* build.c */
-int get_mpflag( const char *flag );
 int get_dir( const char *txt  );
 int get_vip_flag( const char *flag );
 int get_wanted_flag( const char *flag );
@@ -3238,17 +3237,12 @@ int get_position( const char *pos_name );
 size_t position_name_size( void );
 size_t halucinated_object_short_size( void );
 size_t halucinated_object_long_size( void );
-int get_otype( const char *type );
-int get_aflag( const char *flag );
 int get_trapflag( const char *flag );
-int get_atype( const char *type );
 int get_wearloc( const char *type );
 int get_exflag( const char *flag );
 int get_rflag( const char *flag );
 int get_mpflag( const char *flag );
-int get_oflag( const char *flag );
 int get_areaflag( const char *flag );
-int get_wflag( const char *flag );
 int get_actflag( const char *flag );
 int get_pcflag( const char *flag );
 int get_plrflag( const char *flag );

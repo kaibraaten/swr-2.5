@@ -2275,9 +2275,9 @@ void show_file( const CHAR_DATA * ch, const char *filename )
 {
   FILE *fp = NULL;
 #if defined(AMIGA) || defined(__MORPHOS__)
-  signed
+  /*signed*/
 #endif
-    char buf[MAX_STRING_LENGTH];
+    signed char buf[MAX_STRING_LENGTH];
   int c = 0;
   int num = 0;
 

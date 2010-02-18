@@ -1797,7 +1797,8 @@ void display_prompt( DESCRIPTOR_DATA * d )
       case '&':
       case '^':
 	p_stat = make_color_sequence( &prompt[-1], pbuf, d );
-	if( p_stat < 0 )
+
+      if( (int) p_stat < 0 )
 	  --prompt;
 	else if( p_stat > 0 )
 	  pbuf += p_stat;
@@ -1888,8 +1889,10 @@ void display_prompt( DESCRIPTOR_DATA * d )
 		    wizinvis : 0 ) );
 	    break;
 	}
+
 	if( p_stat != 0x80000000 )
 	  sprintf( pbuf, "%d", p_stat );
+
 	pbuf += strlen( pbuf );
 	break;
     }
@@ -1908,92 +1911,124 @@ int make_color_sequence( const char *col, char *buf, DESCRIPTOR_DATA * d )
   bool ansi = ( !IS_NPC( och ) && IS_SET( och->act, PLR_ANSI ) );
 
   col++;
-  if( !*col )
-    ln = -1;
-  else if( *ctype != '&' && *ctype != '^' )
-  {
-    bug( "Make_color_sequence: command '%c' not '&' or '^'.", *ctype );
-    ln = -1;
-  }
-  else if( *col == *ctype )
-  {
-    buf[0] = *col;
-    buf[1] = '\0';
-    ln = 1;
-  }
-  else if( !ansi )
-    ln = 0;
-  else
-  {
-    cl = d->prevcolor;
-    switch ( *ctype )
-    {
-      default:
-	bug( "Make_color_sequence: bad command char '%c'.", *ctype );
-	ln = -1;
-	break;
-      case '&':
-	if( *col == '-' )
-	{
-	  buf[0] = '~';
-	  buf[1] = '\0';
-	  ln = 1;
-	  break;
-	}
-      case '^':
-	{
-	  int newcol = 0;
 
-	  if( ( newcol = getcolor( *col ) ) < 0 )
-	  {
-	    ln = 0;
-	    break;
-	  }
-	  else if( *ctype == '&' )
-	    cl = ( cl & 0xF0 ) | newcol;
-	  else
-	    cl = ( cl & 0x0F ) | ( newcol << 4 );
-	}
-	if( cl == d->prevcolor )
-	{
-	  ln = 0;
-	  break;
-	}
-	strcpy( buf, "\033[" );
-	if( ( cl & 0x88 ) != ( d->prevcolor & 0x88 ) )
-	{
-	  strcat( buf, "m\033[" );
-	  if( ( cl & 0x08 ) )
-	    strcat( buf, "1;" );
-	  if( ( cl & 0x80 ) )
-	    strcat( buf, "5;" );
-	  d->prevcolor = 0x07 | ( cl & 0x88 );
-	  ln = strlen( buf );
-	}
-	else
-	  ln = 2;
-	if( ( cl & 0x07 ) != ( d->prevcolor & 0x07 ) )
-	{
-	  sprintf( buf + ln, "3%d;", cl & 0x07 );
-	  ln += 3;
-	}
-	if( ( cl & 0x70 ) != ( d->prevcolor & 0x70 ) )
-	{
-	  sprintf( buf + ln, "4%d;", ( cl & 0x70 ) >> 4 );
-	  ln += 3;
-	}
-	if( buf[ln - 1] == ';' )
-	  buf[ln - 1] = 'm';
-	else
-	{
-	  buf[ln++] = 'm';
-	  buf[ln] = '\0';
-	}
-	d->prevcolor = cl;
+  if( !*col )
+    {
+      ln = -1;
     }
-  }
+  else if( *ctype != '&' && *ctype != '^' )
+    {
+      bug( "Make_color_sequence: command '%c' not '&' or '^'.", *ctype );
+      ln = -1;
+    }
+  else if( *col == *ctype )
+    {
+      buf[0] = *col;
+      buf[1] = '\0';
+      ln = 1;
+    }
+  else if( !ansi )
+    {
+      ln = 0;
+    }
+  else
+    {
+      cl = d->prevcolor;
+
+      switch ( *ctype )
+	{
+	default:
+	  bug( "Make_color_sequence: bad command char '%c'.", *ctype );
+	  ln = -1;
+	  break;
+	case '&':
+	  if( *col == '-' )
+	    {
+	      buf[0] = '~';
+	      buf[1] = '\0';
+	      ln = 1;
+	      break;
+	    }
+	case '^':
+	  {
+	    int newcol = 0;
+
+	    if( ( newcol = getcolor( *col ) ) < 0 )
+	      {
+		ln = 0;
+		break;
+	      }
+	    else if( *ctype == '&' )
+	      {
+		cl = ( cl & 0xF0 ) | newcol;
+	      }
+	    else
+	      {
+		cl = ( cl & 0x0F ) | ( newcol << 4 );
+	      }
+	  }
+
+	  if( cl == d->prevcolor )
+	    {
+	      ln = 0;
+	      break;
+	    }
+
+	  strcpy( buf, "\033[" );
+
+	  if( ( cl & 0x88 ) != ( d->prevcolor & 0x88 ) )
+	    {
+	      strcat( buf, "m\033[" );
+
+	      if( ( cl & 0x08 ) )
+		{
+		  strcat( buf, "1;" );
+		}
+
+	      if( ( cl & 0x80 ) )
+		{
+		  strcat( buf, "5;" );
+		}
+
+	      d->prevcolor = 0x07 | ( cl & 0x88 );
+	      ln = strlen( buf );
+	    }
+	else
+	  {
+	    ln = 2;
+	  }
+
+	  if( ( cl & 0x07 ) != ( d->prevcolor & 0x07 ) )
+	    {
+	      sprintf( buf + ln, "3%d;", cl & 0x07 );
+	      ln += 3;
+	    }
+
+	  if( ( cl & 0x70 ) != ( d->prevcolor & 0x70 ) )
+	    {
+	      sprintf( buf + ln, "4%d;", ( cl & 0x70 ) >> 4 );
+	      ln += 3;
+	    }
+
+	  if( buf[ln - 1] == ';' )
+	    {
+	      buf[ln - 1] = 'm';
+	    }
+	  else
+	    {
+	      buf[ln++] = 'm';
+	      buf[ln] = '\0';
+	    }
+
+	  d->prevcolor = cl;
+	}
+    }
+
   if( ln <= 0 )
-    *buf = '\0';
+    {
+      *buf = '\0';
+    }
+
   return ln;
 }
 
