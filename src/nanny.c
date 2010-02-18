@@ -358,9 +358,6 @@ static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
   sprintf( log_buf, "%s@%s has connected.", ch->name, d->host );
   log_string_plus( log_buf, LOG_COMM );
   nanny_on_motd_state( d );
-
-  if( ch->pcdata->area )
-    do_loadarea( ch, STRLIT_EMPTY );
 }
 
 static void nanny_confirm_new_name( DESCRIPTOR_DATA * d, char *argument )

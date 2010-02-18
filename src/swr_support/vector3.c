@@ -67,7 +67,7 @@ double vector_dot( const Vector3 * const a, const Vector3 * const b )
  */
 void vector_normalize( Vector3 * const v )
 {
-  float magnitude = ( ( v->x * v->x ) + ( v->y * v->y ) + ( v->z * v->z ) );
+  float magnitude = ( v->x * v->x ) + ( v->y * v->y ) + ( v->z * v->z );
 
   if( magnitude == 0.0 )
     return;

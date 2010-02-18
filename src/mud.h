@@ -2799,7 +2799,6 @@ DECLARE_DO_FUN(	do_kill		);
 DECLARE_DO_FUN( do_last		);
 DECLARE_DO_FUN(	do_leave	);
 DECLARE_DO_FUN(	do_list		);
-DECLARE_DO_FUN( do_loadarea	);
 DECLARE_DO_FUN( do_loadup	);
 DECLARE_DO_FUN(	do_lock		);
 DECLARE_DO_FUN(	do_log		);
@@ -2874,10 +2873,8 @@ DECLARE_DO_FUN( do_retran       );
 DECLARE_DO_FUN(	do_return	);
 DECLARE_DO_FUN(	do_revert	);
 DECLARE_DO_FUN( do_rlist	);
-DECLARE_DO_FUN(	do_rset		);
 DECLARE_DO_FUN(	do_rstat	);
 DECLARE_DO_FUN(	do_save		);
-DECLARE_DO_FUN( do_savearea	);
 DECLARE_DO_FUN(	do_say		);
 DECLARE_DO_FUN( do_scan         );
 DECLARE_DO_FUN(	do_score	);
@@ -3079,7 +3076,6 @@ void log_printf( const char *fmt, ... );
 void copyover_recover( void );
 
 /* act_move.c */
-char *wordwrap( char *txt, short wrap );
 void clear_vrooms( void );
 EXIT_DATA *find_door( CHAR_DATA *ch, const char *arg, bool quiet );
 EXIT_DATA *get_exit( const ROOM_INDEX_DATA *room, short dir );

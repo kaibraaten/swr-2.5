@@ -8,14 +8,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-  void bug( const char *str, ... );
-
-  struct tm *update_time( struct tm* );
-  void subtract_times( struct timeval*, struct timeval* );
-  void start_timer( struct timeval* );
-  time_t end_timer( struct timeval* );
-
+void bug( const char *str, ... );
 #ifdef __cplusplus
 }
 #endif
@@ -45,15 +38,15 @@ void start_timer(struct timeval *start_time)
     bug( "Start_timer: NULL start_time.", 0 );
     return;
   }
+
   gettimeofday(start_time, NULL);
-  return;
 }
 
 time_t end_timer(struct timeval *start_time)
 {
   struct timeval etime;
 
-  /* Mark etime before checking start_time, so that we get a better reading.. */
+  /* Mark etime before checking start_time, so that we get a better reading. */
   gettimeofday(&etime, NULL);
 
   if ( !start_time || (!start_time->tv_sec && !start_time->tv_usec) )

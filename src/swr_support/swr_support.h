@@ -31,15 +31,8 @@ extern "C" {
 #define TRUE     1
 #endif
 
-#if     defined(_AIX)
-#if     !defined(const)
-#define const
-#endif
-typedef int                             bool;
-#define unix
-#else
 typedef unsigned char                   bool;
-#endif
+
 #else
 #if !defined(__STORMGCC__) && !defined(__MORPHOS__)
 #define TRUE true
@@ -182,13 +175,13 @@ do                                                              \
    (link)->next->prev        = (link)->prev;                 \
   } while(0)
 
-int advatoi (const char *s);
 int parsebet (const int currentbet, const char *s);
 int umin( int check, int ncheck );
 int umax( int check, int ncheck );
 int urange( int mincheck, int check, int maxcheck );
 
 /* string_handling.c */
+char *wordwrap( char *txt, unsigned short wrap );
 char *cat_sprintf(char *dest, const char *fmt, ...);
 bool is_number( const char *arg );
 int number_argument( const char *argument, char *arg );
@@ -242,7 +235,6 @@ int number_percent( void );
 int number_door( void );
 int number_bits( int width );
 int dice( int number, int size );
-int interpolate( int level, int value_00, int value_32 );
 
 /* time_fun.c */
 struct tm *update_time( struct tm *old_time );

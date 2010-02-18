@@ -17,17 +17,15 @@ typedef char *STRING_TOKENIZER( char*, char* );
 extern "C" {
 #endif
 void bug( const char *str, ... );
-
-bool is_name2( const char*, const char* );
-bool is_name2_prefix( const char*, const char* );
-char *wordwrap( char*, short );
-static bool is_name_internal( const char*, const char*, STRING_COMPARATOR*, STRING_TOKENIZER* );
-static bool nifty_is_name_internal( const char*, const char*,
-				    STRING_COMPARATOR*, STRING_TOKENIZER* );
 #ifdef __cplusplus
 }
 #endif
 
+static bool is_name2( const char*, const char* );
+static bool is_name2_prefix( const char*, const char* );
+static bool is_name_internal( const char*, const char*, STRING_COMPARATOR*, STRING_TOKENIZER* );
+static bool nifty_is_name_internal( const char*, const char*,
+				    STRING_COMPARATOR*, STRING_TOKENIZER* );
 /*
  * See if a string is one of the names of an object.
  */
@@ -127,11 +125,7 @@ bool nifty_is_name_prefix( const char *str, const char *namelist )
  */
 void smash_tilde( char *str )
 {
-  for ( ; *str != '\0'; str++ )
-    if ( *str == '~' )
-      *str = '-';
-
-  return;
+  replace_char( str, '~', '-' );
 }
 
 /*
@@ -140,19 +134,14 @@ void smash_tilde( char *str )
  */
 void hide_tilde( char *str )
 {
-  for ( ; *str != '\0'; str++ )
-    if ( *str == '~' )
-      *str = HIDDEN_TILDE;
-
-  return;
+  replace_char( str, '~', HIDDEN_TILDE );
 }
 
 char *show_tilde( char *str )
 {
   static char buf[MAX_STRING_LENGTH];
-  char *bufptr;
+  char *bufptr = buf;
 
-  bufptr = buf;
   for ( ; *str != '\0'; str++, bufptr++ )
   {
     if ( *str == HIDDEN_TILDE )
@@ -232,16 +221,13 @@ bool str_prefix( const char *astr, const char *bstr )
  */
 bool str_infix( const char *astr, const char *bstr )
 {
-  int sstr1;
-  int sstr2;
-  int ichar;
-  char c0;
+  int sstr1 = strlen(astr);
+  int sstr2 = strlen(bstr);
+  int ichar = 0;
+  char c0 = 0;
 
   if ( ( c0 = LOWER(astr[0]) ) == '\0' )
     return FALSE;
-
-  sstr1 = strlen(astr);
-  sstr2 = strlen(bstr);
 
   for ( ichar = 0; ichar <= sstr2 - sstr1; ichar++ )
     if ( c0 == LOWER(bstr[ichar]) && !str_prefix( astr, bstr + ichar ) )
@@ -276,7 +262,7 @@ char *capitalize( const char *str )
   char *dest = buf;
   enum { Normal, Color } state = Normal;
   bool bFirst = TRUE;
-  char c;
+  char c = 0;
 
   while( (c = *str++) )
   {
@@ -311,10 +297,11 @@ char *capitalize( const char *str )
 char *strlower( const char *str )
 {
   static char strlow[MAX_STRING_LENGTH];
-  int i;
+  int i = 0;
 
   for ( i = 0; str[i] != '\0'; i++ )
     strlow[i] = LOWER(str[i]);
+
   strlow[i] = '\0';
   return strlow;
 }
@@ -325,10 +312,11 @@ char *strlower( const char *str )
 char *strupper( const char *str )
 {
   static char strup[MAX_STRING_LENGTH];
-  int i;
+  int i = 0;
 
   for ( i = 0; str[i] != '\0'; i++ )
     strup[i] = UPPER(str[i]);
+
   strup[i] = '\0';
   return strup;
 }
@@ -342,9 +330,8 @@ static bool isavowel( unsigned letter )
 static bool isavowel( char letter )
 #endif
 {
-  char c;
+  char c = tolower( (int)letter );
 
-  c = tolower( (int)letter );
   if ( c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' )
     return TRUE;
   else
@@ -370,6 +357,7 @@ const char *aoran( const char *str )
     strcpy( temp, "an " );
   else
     strcpy( temp, "a " );
+
   strcat( temp, str );
   return temp;
 }
@@ -409,8 +397,8 @@ bool is_number( const char *arg )
  */
 int number_argument( const char *orig_argument, char *arg )
 {
-  char *pdot;
-  int number;
+  char *pdot = NULL;
+  int number = 0;
   char argument[MAX_STRING_LENGTH];
   snprintf( argument, MAX_STRING_LENGTH, "%s", orig_argument );
 
@@ -508,7 +496,7 @@ char *one_argument2( char *argument, char *arg_first )
 char *strip_cr( const char *str )
 {
   static char newstr[MAX_STRING_LENGTH];
-  int i, j;
+  int i = 0, j = 0;
 
   for ( i=j=0; str[i] != '\0'; i++ )
     if ( str[i] != '\r' )
@@ -524,30 +512,23 @@ char *strip_cr( const char *str )
  */
 void smush_tilde( char *str )
 {
-  int len;
-  char last;
-  char *strptr;
-
-  strptr = str;
-
-  len  = strlen( str );
-  if ( len )
-    last = strptr[len-1];
-  else
-    last = '\0';
+  char *strptr = str;
+  size_t len = strlen( str );
+  char last = len != 0 ? strptr[len-1] : '\0';
 
   for ( ; *str != '\0'; str++ )
   {
     if ( *str == '~' )
       *str = '-';
   }
+
   if ( len )
     strptr[len-1] = last;
 }
 
 static char *grab_word( char *argument, char *arg_first )
 {
-  char cEnd =  ' ';
+  char cEnd = ' ';
   short count = 0;
 
   while ( isspace((int)*argument) )
@@ -575,29 +556,34 @@ static char *grab_word( char *argument, char *arg_first )
   return argument;
 }
 
-char *wordwrap( char *txt, short wrap )
+char *wordwrap( char *txt, unsigned short wrap )
 {
   static char buf[MAX_STRING_LENGTH];
-  char *bufp;
+  char *bufp = buf;
 
   buf[0] = '\0';
-  bufp = buf;
+
   if ( txt != NULL )
   {
     char line[MAX_STRING_LENGTH];
     char temp[MAX_STRING_LENGTH];
-    char *ptr, *p;
-    int ln, x;
+    char *ptr = txt;
 
     ++bufp;
     line[0] = '\0';
-    ptr = txt;
+
     while ( *ptr )
     {
+      size_t ln = strlen( line );
+      size_t x = 0;
+
       ptr = grab_word( ptr, temp );
-      ln = strlen( line );  x = strlen( temp );
+      x = strlen( temp );
+
       if ( (ln + x + 1) < wrap )
       {
+	char *p = NULL;
+
 	if ( line[ln-1] == '.' )
 	  strcat( line, "  " );
 	else

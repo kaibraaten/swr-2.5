@@ -2671,7 +2671,7 @@ ch_ret spell_create_mob( int sn, int level, CHAR_DATA * ch, void *vo )
     UMIN( lvl,
 	skill->dice ? dice_parse( ch, level,
 	  skill->dice ) : mob->top_level );
-  mob->armor = interpolate( mob->top_level, 100, -100 );
+  mob->armor = 0;
 
   mob->max_hit =
     mob->top_level * 8 + number_range( mob->top_level * mob->top_level / 4,
