@@ -303,9 +303,6 @@ struct descriptor_data
   unsigned long	pagesize;
   int pagetop;
   char *pagepoint;
-#if defined(AMIGA) || defined(__MORPHOS__)
-  /*  signed*/
-#endif
   signed char pagecmd;
   char pagecolor;
   int newstate;
