@@ -2159,14 +2159,6 @@ Log         0
 End
 
 #COMMAND
-Name        rset~
-Code        do_rset
-Position    0
-Level       200
-Log         3
-End
-
-#COMMAND
 Name        rstat~
 Code        do_rstat
 Position    0
@@ -2268,14 +2260,6 @@ Code        do_stand
 Position    4
 Level       0
 Log         0
-End
-
-#COMMAND
-Name        savearea~
-Code        do_savearea
-Position    0
-Level       200
-Log         3
 End
 
 #COMMAND
