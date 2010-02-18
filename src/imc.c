@@ -4130,7 +4130,8 @@ static void imc_readhelp( IMC_HELP_DATA * help, FILE * fp )
             {
                int num = 0;
 
-               while( ( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+               while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF
+			 && hbuf[num] != '¢' && num < ( LGST - 2 ) )
                   num++;
                hbuf[num] = '\0';
                help->text = IMCSTRALLOC( hbuf );
@@ -4769,49 +4770,49 @@ static void imc_load_who_template( void )
 
       if( !strcasecmp( word, "Head:" ) )
       {
-         while( ( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+         while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
             ++num;
          hbuf[num] = '\0';
          whot->head = IMCSTRALLOC( parse_who_header( hbuf ) );
       }
       else if( !strcasecmp( word, "Tail:" ) )
       {
-         while( ( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+         while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
             ++num;
          hbuf[num] = '\0';
          whot->tail = IMCSTRALLOC( parse_who_tail( hbuf ) );
       }
       else if( !strcasecmp( word, "Plrline:" ) )
       {
-         while( ( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+         while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
             ++num;
          hbuf[num] = '\0';
          whot->plrline = IMCSTRALLOC( hbuf );
       }
       else if( !strcasecmp( word, "Immline:" ) )
       {
-         while( ( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+         while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
             ++num;
          hbuf[num] = '\0';
          whot->immline = IMCSTRALLOC( hbuf );
       }
       else if( !strcasecmp( word, "Immheader:" ) )
       {
-         while( ( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+         while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
             ++num;
          hbuf[num] = '\0';
          whot->immheader = IMCSTRALLOC( hbuf );
       }
       else if( !strcasecmp( word, "Plrheader:" ) )
       {
-         while( ( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+         while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
             ++num;
          hbuf[num] = '\0';
          whot->plrheader = IMCSTRALLOC( hbuf );
       }
       else if( !strcasecmp( word, "Master:" ) )
       {
-         while( ( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+         while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
             ++num;
          hbuf[num] = '\0';
          whot->master = IMCSTRALLOC( hbuf );
