@@ -350,7 +350,7 @@ void fwrite_char( const CHAR_DATA * ch, FILE * fp )
   if( ch->affected_by )
     fprintf( fp, "AffectedBy   %d\n", ch->affected_by );
   fprintf( fp, "Position     %d\n",
-      ch->position == POS_FIGHTING ? POS_STANDING : ch->position );
+	   ch->position == POS_FIGHTING ? (short)POS_STANDING : ch->position );
 
   fprintf( fp, "SavingThrows %d %d %d %d %d\n",
       ch->saving_poison_death,
