@@ -171,7 +171,7 @@ void interpret( CHAR_DATA * ch, char *argument )
   if( found && cmd->log == LOG_NEVER )
     strcpy( logline, "XXXXXXXX XXXXXXXX XXXXXXXX" );
 
-  loglvl = found ? cmd->log : LOG_NORMAL;
+  loglvl = found ? cmd->log : (short) LOG_NORMAL;
 
   if( ( !IS_NPC( ch ) && IS_SET( ch->act, PLR_LOG ) )
       || fLogAll
