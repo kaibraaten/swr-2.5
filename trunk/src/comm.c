@@ -265,7 +265,7 @@ SOCKET init_socket( int listen_port )
     exit( 1 );
   }
 
-#if defined(SO_DONTLINGER) && !defined(SYSV)
+#if defined(SO_DONTLINGER) && !defined(SYSV) && !defined(__sun__)
   {
     struct linger ld;
 
