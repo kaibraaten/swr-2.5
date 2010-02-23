@@ -7,27 +7,27 @@ VOTE_DATA *first_poll = NULL;
 VOTE_DATA *last_poll = NULL;
 
 /* local routines */
-static void fread_poll( VOTE_DATA * poll, FILE * fp );
+static void fread_poll( VOTE_DATA * vote, FILE * fp );
 static bool load_poll_file( const char *pollfile );
 
 /*
  * Save a poll's data to its data file
  */
-void save_poll( const VOTE_DATA * poll )
+void save_poll( const VOTE_DATA *vote )
 {
   FILE *fp;
   char player[256];
 
-  if( !poll )
+  if( !vote )
   {
     bug( "save_poll: null poll pointer!", 0 );
     return;
   }
 
-  if( !poll->player || poll->player[0] == '\0' )
+  if( !vote->player || vote->player[0] == '\0' )
     return;
 
-  sprintf( player, "%s%s", VOTE_DIR, poll->player );
+  sprintf( player, "%s%s", VOTE_DIR, vote->player );
 
   if( ( fp = fopen( player, "w" ) ) == NULL )
   {
@@ -37,13 +37,13 @@ void save_poll( const VOTE_DATA * poll )
   else
   {
     fprintf( fp, "#VOTE\n" );
-    fprintf( fp, "Player       %s~\n", poll->player );
-    fprintf( fp, "Type         %d\n", poll->type );
-    fprintf( fp, "Infavour     %d\n", poll->in_favour );
-    fprintf( fp, "Against      %d\n", poll->against );
-    fprintf( fp, "Timeofvote   %s~\n", poll->time_of_vote );
-    fprintf( fp, "Iplist       %s~\n", poll->ip_list );
-    fprintf( fp, "Namelist     %s~\n", poll->name_list );
+    fprintf( fp, "Player       %s~\n", vote->player );
+    fprintf( fp, "Type         %d\n", vote->type );
+    fprintf( fp, "Infavour     %d\n", vote->in_favour );
+    fprintf( fp, "Against      %d\n", vote->against );
+    fprintf( fp, "Timeofvote   %s~\n", vote->time_of_vote );
+    fprintf( fp, "Iplist       %s~\n", vote->ip_list );
+    fprintf( fp, "Namelist     %s~\n", vote->name_list );
     fprintf( fp, "End\n\n" );
     fprintf( fp, "#END\n" );
   }
@@ -53,7 +53,7 @@ void save_poll( const VOTE_DATA * poll )
 /*
  * Read in actual poll data.
  */
-void fread_poll( VOTE_DATA * poll, FILE * fp )
+void fread_poll( VOTE_DATA *vote, FILE * fp )
 {
   char buf[MAX_STRING_LENGTH];
   const char *word;
@@ -72,38 +72,38 @@ void fread_poll( VOTE_DATA * poll, FILE * fp )
 	break;
 
       case 'A':
-	KEY( "Against", poll->against, fread_number( fp ) );
+	KEY( "Against", vote->against, fread_number( fp ) );
 	break;
 
       case 'E':
 	if( !str_cmp( word, "End" ) )
 	{
-	  if( !poll->time_of_vote )
-	    poll->time_of_vote = STRALLOC( "" );
-	  if( !poll->ip_list )
-	    poll->ip_list = STRALLOC( "" );
-	  if( !poll->name_list )
-	    poll->name_list = STRALLOC( "" );
+	  if( !vote->time_of_vote )
+	    vote->time_of_vote = STRALLOC( "" );
+	  if( !vote->ip_list )
+	    vote->ip_list = STRALLOC( "" );
+	  if( !vote->name_list )
+	    vote->name_list = STRALLOC( "" );
 	  return;
 	}
 	break;
 
       case 'I':
-	KEY( "Infavour", poll->in_favour, fread_number( fp ) );
-	KEY( "Iplist", poll->ip_list, fread_string( fp ) );
+	KEY( "Infavour", vote->in_favour, fread_number( fp ) );
+	KEY( "Iplist", vote->ip_list, fread_string( fp ) );
 	break;
 
       case 'N':
-	KEY( "Namelist", poll->name_list, fread_string( fp ) );
+	KEY( "Namelist", vote->name_list, fread_string( fp ) );
 	break;
 
       case 'P':
-	KEY( "Player", poll->player, fread_string( fp ) );
+	KEY( "Player", vote->player, fread_string( fp ) );
 	break;
 
       case 'T':
-	KEY( "Timeofvote", poll->time_of_vote, fread_string( fp ) );
-	KEY( "Type", poll->type, fread_number( fp ) );
+	KEY( "Timeofvote", vote->time_of_vote, fread_string( fp ) );
+	KEY( "Type", vote->type, fread_number( fp ) );
 	break;
 
     }
@@ -124,13 +124,12 @@ void fread_poll( VOTE_DATA * poll, FILE * fp )
 bool load_poll_file( const char *pollfile )
 {
   char player[256];
-  VOTE_DATA *poll;
-  FILE *fp;
-  bool found;
+  VOTE_DATA *vote = NULL;
+  FILE *fp = NULL;
+  bool found = FALSE;
 
-  CREATE( poll, VOTE_DATA, 1 );
+  CREATE( vote, VOTE_DATA, 1 );
 
-  found = FALSE;
   sprintf( player, "%s%s", VOTE_DIR, pollfile );
 
   if( ( fp = fopen( player, "r" ) ) != NULL )
@@ -158,7 +157,7 @@ bool load_poll_file( const char *pollfile )
       word = fread_word( fp );
       if( !str_cmp( word, "VOTE" ) )
       {
-	fread_poll( poll, fp );
+	fread_poll( vote, fp );
 	break;
       }
       else if( !str_cmp( word, "END" ) )
@@ -177,11 +176,11 @@ bool load_poll_file( const char *pollfile )
 
   if( found )
   {
-    LINK( poll, first_poll, last_poll, next, prev );
+    LINK( vote, first_poll, last_poll, next, prev );
     return found;
   }
   else
-    DISPOSE( poll );
+    DISPOSE( vote );
 
   return found;
 }

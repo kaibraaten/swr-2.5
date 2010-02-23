@@ -27,7 +27,13 @@
 #define _SWR2_OS_UNIX_H_
 
 #include <netinet/in.h>
+
+#ifdef __sun__
+
+#else
 #include <sys/cdefs.h>
+#endif
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/time.h>

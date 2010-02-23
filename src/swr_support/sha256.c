@@ -30,15 +30,19 @@
 
 #if !defined(_WIN32)
 #include <sys/param.h>
+#ifndef __sun__
 #include <sys/cdefs.h>
+#endif /* !__sun__ */
 #if defined(__FreeBSD__)
 #include <sys/endian.h>
 #elif defined(AMIGA) || defined(__MORPHOS__)
 /* do nothing; just to prevent endian.h from being included */
 #else
+#ifndef __sun__
 #include <endian.h>
-#endif
-#endif
+#endif /* !__sun__*/
+#endif /* __FreeBSD__ */
+#endif /* !_WIN32 */
 #include "sha256.h"
 
 #if __FreeBSD_version < 500111

@@ -3130,7 +3130,7 @@ void save_clan( const CLAN_DATA *clan );
 
 /* vote.c */
 void load_polls( void );
-void save_poll( const VOTE_DATA *poll );
+void save_poll( const VOTE_DATA * );
 
 /* colony.c */
 void room_set_sector( ROOM_INDEX_DATA *room, int sector_type );

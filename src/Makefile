@@ -13,6 +13,12 @@ DEBUG_TELNET = -DSWR2_DEBUG_TELNET=0
 CCFLAGS = -g3 -MMD $(WFLAGS) -Iswr_support $(USE_DLSYM) $(DEBUG_TELNET)
 LDFLAGS = -lm -Lswr_support -lswr_support -Wl,-rpath,./src/swr_support -lz
 
+#Uncomment the next line of you're using Solaris and you get linker errors.
+#SOLARIS = 1
+ifdef SOLARIS
+LDFLAGS += -lsocket -lnsl
+endif
+
 #On some systems (e.g. FreeBSD) you may need to remove -ldl
 ifdef USE_DLSYM
 LDFLAGS += -ldl -rdynamic
