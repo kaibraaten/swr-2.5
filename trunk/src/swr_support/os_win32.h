@@ -34,6 +34,9 @@
 
 #ifdef _MSC_VER
 typedef int ssize_t;
+#define snprintf _snprintf
+#define strncasecmp strnicmp
+#define strcasecmp stricmp
 #endif
 
 typedef int socklen_t;

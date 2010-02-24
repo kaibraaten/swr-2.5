@@ -5,7 +5,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <zlib.h>
+#ifdef __cplusplus
+}
+#endif
 
 #ifndef __MORPHOS__
 #include <math.h> /* built-in */

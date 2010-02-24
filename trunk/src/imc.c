@@ -13,7 +13,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#if !defined(_WIN32)
 #include <unistd.h>
+#endif
 #include <errno.h>
 #if defined(__OpenBSD__) || defined(__FreeBSD__)
 #include <sys/types.h>
@@ -228,10 +230,10 @@ typedef void IMC_FUN( CHAR_DATA * ch, const char *argument );
 typedef void PACKET_FUN( IMC_PACKET * q, const char *packet );
 #define PFUN( name ) static void (name)( IMC_PACKET *q, const char *packet )
 
-static void imclog( const char *format, ... ) __attribute__ ( ( format( printf, 1, 2 ) ) );
-static void imcbug( const char *format, ... ) __attribute__ ( ( format( printf, 1, 2 ) ) );
-static void imc_printf( CHAR_DATA * ch, const char *fmt, ... ) __attribute__ ( ( format( printf, 2, 3 ) ) );
-static void imcpager_printf( CHAR_DATA * ch, const char *fmt, ... ) __attribute__ ( ( format( printf, 2, 3 ) ) );
+static void imclog( const char *format, ... );
+static void imcbug( const char *format, ... );
+static void imc_printf( CHAR_DATA * ch, const char *fmt, ... );
+static void imcpager_printf( CHAR_DATA * ch, const char *fmt, ... );
 static const char *imc_funcname( IMC_FUN * func );
 static IMC_FUN *imc_function( const char *func );
 static const char *imc_send_social( CHAR_DATA * ch, const char *argument, int telloption );
@@ -447,7 +449,7 @@ const char *const imcperm_names[] = {
    "Notset", "None", "Mort", "Imm", "Admin", "Imp"
 };
 
-SITEINFO *this_imcmud;
+SITEINFO *this_imcmud = NULL;
 IMC_CHANNEL *first_imc_channel;
 IMC_CHANNEL *last_imc_channel;
 REMOTEINFO *first_rinfo;
