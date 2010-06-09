@@ -25,6 +25,12 @@
 #ifndef _SWR2_OS_AMIGA_H_
 #define _SWR2_OS_AMIGA_H_
 
+#include <exec/exec.h>
+#if defined(__SASC) && !defined(__FUNCTION__)
+#define __FUNCTION__ __FUNC__
+typedef const STRPTR CONST_STRPTR;
+#endif
+
 #ifdef __STORMGCC__
 typedef long clock_t;
 typedef int ssize_t;
@@ -41,14 +47,16 @@ int isascii( int );
 #include <proto/socket.h>
 #endif
 
+#ifndef __SASC
 #include <sys/filio.h>
+#endif
 
 #if defined(SWR2_USE_DLSYM) && defined(__MORPHOS__)
 #include <proto/dynload.h>
 #endif
 
 #include <utility/tagitem.h>
-#include <exec/exec.h>
+/*#include <exec/exec.h>*/
 #include <proto/exec.h>
 #include <dos/dos.h>
 #include <proto/dos.h>
@@ -65,7 +73,10 @@ int isascii( int );
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <sys/time.h>
+
+#ifndef __SASC
 #include <db.h>
+#endif
 
 typedef LONG socklen_t;
 static const int INVALID_SOCKET = -1;

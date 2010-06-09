@@ -27,6 +27,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include "os.h"
+#include <dos/exall.h>
+
+#ifdef __SASC
+#include <sys/ioctl.h>
+#endif
 
 struct Library *SocketBase = NULL;
 struct Library *UserGroupBase = NULL;
