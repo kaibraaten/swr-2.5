@@ -1,0 +1,8 @@
+IncludeDirectory=/
+IncludeDirectory=swr_support
+IncludeDirectory=netinclude:
+Parameters=both
+StringsConst
+Ignore=all
+Define AMIGA=1
+NoVersion
