@@ -33,9 +33,9 @@
 #include <sys/ioctl.h>
 #endif
 
-struct Library *SocketBase = NULL;
-struct Library *UserGroupBase = NULL;
-struct UtilityBase *UtilityBase = NULL;
+__near struct Library *SocketBase = NULL;
+__near struct Library *UserGroupBase = NULL;
+__near struct UtilityBase *UtilityBase = NULL;
 
 #if defined(__MORPHOS__) && defined(SWR2_USE_DLSYM)
 struct Library *DynLoadBase = NULL;
@@ -157,17 +157,20 @@ void os_cleanup( void )
     UtilityBase = NULL;
   }
 
+  /*
   if( UserGroupBase )
   {
     CloseLibrary( UserGroupBase );
     UserGroupBase = NULL;
   }
-
+  */
+  /*
   if( SocketBase )
   {
     CloseLibrary( SocketBase );
     SocketBase = NULL;
   }
+  */
 
   if( out_stream )
   {

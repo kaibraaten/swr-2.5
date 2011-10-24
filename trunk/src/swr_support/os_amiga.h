@@ -39,7 +39,7 @@ extern "C" {
 
 typedef long socklen_t;
 typedef long SOCKET;
-typedef long size_t;
+typedef long ssize_t;
 
 #define INVALID_SOCKET -1
 #define SOCKET_ERROR -1
@@ -49,6 +49,9 @@ typedef long size_t;
 
 #define __FUNCTION__ __FUNC__
 typedef const STRPTR CONST_STRPTR;
+
+#define strcasecmp strcmp
+#define strncasecmp( a, b, len ) strcasecmp((a), (b))
 
 #if defined __cplusplus
 }
