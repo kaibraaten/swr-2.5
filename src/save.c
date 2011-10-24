@@ -3,6 +3,11 @@
 #include <string.h>
 #include "mud.h"
 
+#if defined (_AMIGA)
+#include <dos/dos.h>
+#include <proto/dos.h>
+#endif
+
 /*
  * Increment with every major format change.
  */

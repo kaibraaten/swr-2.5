@@ -449,7 +449,7 @@ const char *const imcperm_names[] = {
    "Notset", "None", "Mort", "Imm", "Admin", "Imp"
 };
 
-SITEINFO *this_imcmud = NULL;
+SITEINFO *this_imcmud;
 IMC_CHANNEL *first_imc_channel;
 IMC_CHANNEL *last_imc_channel;
 REMOTEINFO *first_rinfo;
