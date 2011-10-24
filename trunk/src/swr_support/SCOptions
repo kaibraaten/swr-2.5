@@ -4,4 +4,19 @@ Parameters=both
 StringsConst
 Ignore=all
 Define AMIGA=1
+Define __inline
 NoVersion
+MemorySize=huge
+CPU=68060
+Math=coprocessor
+StackExtend
+StripDebug
+ANSI
+ErrorRexx
+NoIcons
+Modified
+#Optimize
+#OptimizerSchedule
+#OptimizerLoop
+#OptimizerTime
+#OptimizerInline

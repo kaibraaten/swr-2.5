@@ -25,67 +25,34 @@
 #ifndef _SWR2_OS_AMIGA_H_
 #define _SWR2_OS_AMIGA_H_
 
-#include <exec/exec.h>
-#if defined(__SASC) && !defined(__FUNCTION__)
-#define __FUNCTION__ __FUNC__
-typedef const STRPTR CONST_STRPTR;
-#endif
-
-#ifdef __STORMGCC__
-typedef long clock_t;
-typedef int ssize_t;
-#ifdef __cplusplus
+#if defined __cplusplus
 extern "C" {
 #endif
-int isascii( int );
-#ifdef __cplusplus
+
+#include <sys/errno.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h>
+#include <sys/ioctl.h>
+#include <sys/time.h>
+#include <proto/socket.h>
+
+typedef long socklen_t;
+typedef long SOCKET;
+typedef long size_t;
+
+#define INVALID_SOCKET -1
+#define SOCKET_ERROR -1
+#define closesocket CloseSocket
+#define GETERROR Errno()
+#define MSG_NOSIGNAL 0
+
+#define __FUNCTION__ __FUNC__
+typedef const STRPTR CONST_STRPTR;
+
+#if defined __cplusplus
 }
 #endif
-#endif /* __STORMGCC__ */
-
-#ifdef __MORPHOS__
-#include <proto/socket.h>
-#endif
-
-#ifndef __SASC
-#include <sys/filio.h>
-#endif
-
-#if defined(SWR2_USE_DLSYM) && defined(__MORPHOS__)
-#include <proto/dynload.h>
-#endif
-
-#include <utility/tagitem.h>
-/*#include <exec/exec.h>*/
-#include <proto/exec.h>
-#include <dos/dos.h>
-#include <proto/dos.h>
-#include <unistd.h>
-#include <sys/types.h>
-
-#ifdef AMIGA
-#include <lineread.h>
-#endif
-
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-#include <sys/time.h>
-
-#ifndef __SASC
-#include <db.h>
-#endif
-
-typedef LONG socklen_t;
-static const int INVALID_SOCKET = -1;
-static const int SOCKET_ERROR = -1;
-#define GETERROR Errno()
-#define closesocket CloseSocket
-typedef int SOCKET;
-static const int MSG_NOSIGNAL = 0;
-typedef unsigned char sockbuf_t;
 
 #endif /* include guard */
 
