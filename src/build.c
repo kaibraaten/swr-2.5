@@ -3497,7 +3497,7 @@ void edit_buffer( CHAR_DATA * ch, char *argument )
       char word1[MAX_INPUT_LENGTH];
       char word2[MAX_INPUT_LENGTH];
       char *sptr, *wptr, *lwptr;
-      int x, count, wordln, word2ln, lineln;
+      int x, count, wordln, lineln;
 
       sptr = one_argument( argument, word1 );
       sptr = one_argument( sptr, word1 );
@@ -3515,7 +3515,6 @@ void edit_buffer( CHAR_DATA * ch, char *argument )
       }
       count = 0;
       wordln = strlen( word1 );
-      word2ln = strlen( word2 );
       ch_printf( ch, "Replacing all occurrences of %s with %s...\r\n",
 	  word1, word2 );
       for( x = 0; x < edit->numlines; x++ )
@@ -4212,12 +4211,10 @@ void do_aset( CHAR_DATA * ch, char *argument )
   char arg2[MAX_INPUT_LENGTH];
   char arg3[MAX_INPUT_LENGTH];
   bool proto, found;
-  long vnum;
   int value;
 
   argument = one_argument( argument, arg1 );
   argument = one_argument( argument, arg2 );
-  vnum = atoi( argument );
 
   if( arg1[0] == '\0' || arg2[0] == '\0' )
   {

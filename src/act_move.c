@@ -374,7 +374,7 @@ ch_ret move_char( CHAR_DATA * ch, EXIT_DATA * pexit, int fall )
   const char *txt = NULL;
   const char *dtxt = NULL;
   ch_ret retcode = rNONE;
-  short door = 0, distance = 0;
+  short door = 0;
   bool drunk = FALSE;
   bool brief = FALSE;
 
@@ -412,7 +412,6 @@ ch_ret move_char( CHAR_DATA * ch, EXIT_DATA * pexit, int fall )
   }
 
   door = pexit->vdir;
-  distance = pexit->distance;
 
   /*
    * Exit is only a "window", there is no way to travel in that direction

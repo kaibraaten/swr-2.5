@@ -727,7 +727,7 @@ void do_makejewelry( CHAR_DATA * ch, char *argument )
   char arg[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  int level = 0, chance = 0;
+  int chance = 0;
   bool checktool = FALSE, checkoven = FALSE, checkmetal = FALSE;
   OBJ_DATA *obj = NULL;
   OBJ_DATA *metal = NULL;
@@ -816,8 +816,6 @@ void do_makejewelry( CHAR_DATA * ch, char *argument )
 
   ch->substate = SUB_NONE;
 
-  level = character_skill_level( ch, gsn_makejewelry );
-
   checkmetal = FALSE;
   checkoven = FALSE;
   checktool = FALSE;
@@ -899,7 +897,7 @@ void do_makearmor( CHAR_DATA * ch, char *argument )
   char arg[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   char buf[MAX_STRING_LENGTH];
-  int level = 0, chance = 0;
+  int chance = 0;
   bool checksew = FALSE, checkfab = FALSE;
   OBJ_DATA *obj = NULL;
   OBJ_DATA *material = NULL;
@@ -988,8 +986,6 @@ void do_makearmor( CHAR_DATA * ch, char *argument )
   }
 
   ch->substate = SUB_NONE;
-
-  level = character_skill_level( ch, gsn_makearmor );
 
   checksew = FALSE;
   checkfab = FALSE;
