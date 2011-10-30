@@ -3052,7 +3052,6 @@ bool ship_to_room( SHIP_DATA * ship, long vnum )
 
 void do_board( CHAR_DATA * ch, char *argument )
 {
-  ROOM_INDEX_DATA *fromroom;
   ROOM_INDEX_DATA *toroom;
   SHIP_DATA *ship;
 
@@ -3074,8 +3073,6 @@ void do_board( CHAR_DATA * ch, char *argument )
 	TO_CHAR );
     return;
   }
-
-  fromroom = ch->in_room;
 
   if( ( toroom = ship->entrance ) != NULL )
   {
@@ -5670,13 +5667,12 @@ ch_ret drive_ship( CHAR_DATA * ch, SHIP_DATA * ship, EXIT_DATA * pexit,
 {
   ROOM_INDEX_DATA *in_room = NULL;
   ROOM_INDEX_DATA *to_room = NULL;
-  ROOM_INDEX_DATA *from_room = NULL;
   ROOM_INDEX_DATA *original = NULL;
   char buf[MAX_STRING_LENGTH];
   const char *txt = NULL;
   const char *dtxt = NULL;
   ch_ret retcode = rNONE;
-  short door = 0, distance = 0;
+  short door = 0;
   bool drunk = FALSE;
   CHAR_DATA *rch = NULL;
   CHAR_DATA *next_rch = NULL;
@@ -5701,7 +5697,6 @@ ch_ret drive_ship( CHAR_DATA * ch, SHIP_DATA * ship, EXIT_DATA * pexit,
 #endif
 
   in_room = get_room_index( ship->location );
-  from_room = in_room;
 
   if( !pexit || ( to_room = pexit->to_room ) == NULL )
   {
@@ -5714,7 +5709,6 @@ ch_ret drive_ship( CHAR_DATA * ch, SHIP_DATA * ship, EXIT_DATA * pexit,
   }
 
   door = pexit->vdir;
-  distance = pexit->distance;
 
   if( IS_SET( pexit->exit_info, EX_WINDOW )
       && !IS_SET( pexit->exit_info, EX_ISDOOR ) )

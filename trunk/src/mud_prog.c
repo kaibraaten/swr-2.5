@@ -1551,7 +1551,7 @@ int mprog_do_command( char *cmnd, CHAR_DATA * mob, CHAR_DATA * actor,
   char buf[MAX_INPUT_LENGTH];
   char tmp[MAX_INPUT_LENGTH];
   char *point, *str, *i;
-  int validif, vnum;
+  int validif;
 
   /* Isolate the first word of the line, it gives us a clue what
      we want to do. */
@@ -1618,7 +1618,6 @@ int mprog_do_command( char *cmnd, CHAR_DATA * mob, CHAR_DATA * actor,
   if( !str_cmp( firstword, "break" ) )
     return BERR;
 
-  vnum = mob->pIndexData->vnum;
   point = buf;
   str = cmnd;
 
@@ -2123,13 +2122,10 @@ void set_supermob( OBJ_DATA * obj )
 {
   ROOM_INDEX_DATA *room = NULL;
   OBJ_DATA *in_obj = NULL;
-  CHAR_DATA *mob = NULL;
   char buf[200];
 
   if( !supermob )
     supermob = create_mobile( get_mob_index( MOB_VNUM_SUPERMOB ) );
-
-  mob = supermob;		/* debugging */
 
   if( !obj )
     return;

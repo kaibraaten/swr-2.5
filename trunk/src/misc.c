@@ -1288,7 +1288,6 @@ void actiondesc( CHAR_DATA * ch, const OBJ_DATA * obj, void *vo )
 
 void do_hail( CHAR_DATA * ch, char *argument )
 {
-  int vnum = 0;
   ROOM_INDEX_DATA *room = NULL;
 
   if( !ch->in_room )
@@ -1329,8 +1328,6 @@ void do_hail( CHAR_DATA * ch, char *argument )
     send_to_char( "You don't have enough credits!\r\n", ch );
     return;
   }
-
-  vnum = ch->in_room->vnum;
 
   for( room = ch->in_room->area->first_room; room; room = room->next_in_area )
   {
@@ -1651,7 +1648,7 @@ void do_search( CHAR_DATA * ch, char *argument )
   OBJ_DATA *container;
   OBJ_DATA *startobj;
   int percent, door;
-  bool found, room;
+  bool found;
 
   door = -1;
   switch ( ch->substate )
@@ -1719,7 +1716,6 @@ void do_search( CHAR_DATA * ch, char *argument )
   ch->substate = SUB_NONE;
   if( arg[0] == '\0' )
   {
-    room = TRUE;
     startobj = ch->in_room->first_content;
   }
   else
@@ -1795,7 +1791,6 @@ void do_shove( CHAR_DATA * ch, char *argument )
   EXIT_DATA *pexit = NULL;
   CHAR_DATA *victim = NULL;
   bool nogo = FALSE;
-  ROOM_INDEX_DATA *to_room = NULL;
   int chance = 0;
 
   argument = one_argument( argument, arg );
@@ -1858,8 +1853,6 @@ void do_shove( CHAR_DATA * ch, char *argument )
       return;
     }
 
-  to_room = pexit->to_room;
-
   if( IS_NPC( victim ) )
     {
       send_to_char( "You can only shove player characters.\r\n", ch );
@@ -1908,7 +1901,6 @@ void do_drag( CHAR_DATA * ch, char *argument )
   int exit_dir = DIR_SOMEWHERE;
   CHAR_DATA *victim = NULL;
   EXIT_DATA *pexit = NULL;
-  ROOM_INDEX_DATA *to_room = NULL;
   bool nogo = FALSE;
   int chance = 0;
 
@@ -1977,7 +1969,6 @@ void do_drag( CHAR_DATA * ch, char *argument )
       return;
     }
 
-  to_room = pexit->to_room;
   chance = 50;
 
   /*

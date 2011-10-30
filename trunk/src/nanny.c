@@ -313,7 +313,7 @@ static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
 {
   CHAR_DATA *ch = d->character;
   char buf[MAX_STRING_LENGTH];
-  bool fOld = FALSE, chk = FALSE;
+  bool chk = FALSE;
   write_to_buffer( d, "\r\n", 2 );
 
   if( strcmp( encode_string( argument ), ch->pcdata->pwd ) )
@@ -353,7 +353,7 @@ static void nanny_get_old_password( DESCRIPTOR_DATA * d, char *argument )
   sprintf( buf, "%s", ch->name );
   d->character->desc = NULL;
   free_char( d->character );
-  fOld = load_char_obj( d, buf, FALSE );
+  load_char_obj( d, buf, FALSE );
   ch = d->character;
   sprintf( log_buf, "%s@%s has connected.", ch->name, d->host );
   log_string_plus( log_buf, LOG_COMM );

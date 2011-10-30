@@ -476,7 +476,6 @@ WHO_TEMPLATE *whot;
 static void imclog( const char *format, ... )
 {
    char buf[LGST], buf2[LGST];
-   char *strtime;
    va_list ap;
 
    va_start( ap, format );
@@ -485,7 +484,6 @@ static void imclog( const char *format, ... )
 
    snprintf( buf2, LGST, "IMC: %s", buf );
 
-   strtime = ctime( &imc_time );
    log_string( buf2 );
 }
 
@@ -493,7 +491,6 @@ static void imclog( const char *format, ... )
 static void imcbug( const char *format, ... )
 {
    char buf[LGST], buf2[LGST];
-   char *strtime;
    va_list ap;
 
    va_start( ap, format );
@@ -502,7 +499,6 @@ static void imcbug( const char *format, ... )
 
    snprintf( buf2, LGST, " IMC: %s", buf );
 
-   strtime = ctime( &imc_time );
    bug( "%s", buf2 );
 }
 

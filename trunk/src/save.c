@@ -913,7 +913,6 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
   short killcnt = 0;
   bool fMatch = FALSE;
   time_t lastplayed = 0;
-  int extra = 0;
 
   file_ver = 0;
 
@@ -1194,7 +1193,7 @@ void fread_char( CHAR_DATA * ch, FILE * fp, bool preload )
 	KEY( "PKills", ch->pcdata->pkills, fread_number( fp ) );
 	KEY( "Played", ch->played, fread_number( fp ) );
 	KEY( "Position", ch->position, fread_number( fp ) );
-	KEY( "Practice", extra, fread_number( fp ) );
+	/*KEY( "Practice", extra, fread_number( fp ) );*/
 	KEY( "Prompt", ch->pcdata->prompt, fread_string( fp ) );
 	if( !str_cmp( word, "PTimer" ) )
 	{
