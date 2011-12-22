@@ -21,7 +21,7 @@ endif
 
 #On some systems (e.g. FreeBSD) you may need to remove -ldl
 ifdef USE_DLSYM
-LDFLAGS += -ldl -rdynamic
+LDFLAGS += -ldl -rdynamic -export-all-symbols
 endif
 
 LDFLAGS += -lm
