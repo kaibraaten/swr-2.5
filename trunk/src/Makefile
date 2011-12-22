@@ -19,7 +19,6 @@ ifdef SOLARIS
 LDFLAGS += -lsocket -lnsl
 endif
 
-#CYGWIN = 1
 ifdef CYGWIN
 LDFLAGS += -export-all-symbols
 endif
