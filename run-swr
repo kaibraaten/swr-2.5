@@ -5,7 +5,7 @@ if ( "$1" != "" ) set port="$1"
 
 nohup
 nice
-limit stack 1024k
+
 if ( -e shutdown.txt ) rm -f shutdown.txt
 
 while ( 1 )
