@@ -28,8 +28,6 @@ ifdef USE_DLSYM
 LDFLAGS += -ldl -rdynamic
 endif
 
-LDFLAGS += -lm
-
 ODIR = obj
 _OBJ = act_comm.o act_info.o act_move.o act_obj.o act_wiz.o boards.o \
 	build.o clans.o colony.o comm.o const.o copyover.o db.o fight.o \
