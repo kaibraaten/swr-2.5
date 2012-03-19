@@ -1,4 +1,4 @@
-BINARY = swr
+BINARY = ../swr
 WFLAGS = -Werror -Wall -Wformat-security -Wpointer-arith -Wcast-align -Wwrite-strings -Wshadow -Wextra -Wno-unused-parameter -Wredundant-decls
 
 #Comment out the next line if your system doesn't have dlsym functionality.
@@ -52,7 +52,6 @@ libs:
 $(BINARY):	$(OBJ)
 		@echo "Linking" $(BINARY)
 		@$(CC) -o $@ $^ $(LDFLAGS)
-		@mv $(BINARY) ../
 		@echo "Done."
 
 $(ODIR)/%.o:	 %.c
