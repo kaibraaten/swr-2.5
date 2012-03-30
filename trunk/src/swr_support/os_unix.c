@@ -35,9 +35,14 @@ static const char *get_next_filename( const char *directory )
   return filename;
 }
 
+FILE *open_log_file(void)
+{
+	return fopen( get_next_filename( "log/" ), "w" );
+}
+
 void os_setup( void )
 {
-  out_stream = fopen( get_next_filename( "log/" ), "w" );
+  out_stream = open_log_file();
 
   if( !out_stream )
   {
