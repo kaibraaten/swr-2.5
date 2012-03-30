@@ -9,7 +9,13 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#if defined(_WIN32)
+#define ZLIB_WINAPI 1
+#endif
+
 #include <zlib.h>
+
 #ifdef __cplusplus
 }
 #endif
@@ -2025,7 +2031,11 @@ struct	system_data
   int save_flags;		/* Toggles for saving conditions */
   short	save_frequency;		/* How old to autosave someone */
   char *exe_filename;
+#ifdef _WIN32
+  HMODULE dl_handle;
+#else
   void *dl_handle;
+#endif
   unsigned char *mccp_buf;
 };
 

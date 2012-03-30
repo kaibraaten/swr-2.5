@@ -83,7 +83,11 @@ static void execute_on_exit( void )
   DISPOSE( sysdata.mccp_buf );
 
 #ifdef SWR2_USE_DLSYM
+#ifdef _WIN32
+  FreeLibrary(sysdata.dl_handle);
+#else
   dlclose( sysdata.dl_handle );
+#endif
 #endif
 
   os_cleanup();
@@ -104,6 +108,15 @@ int main( int argc, char **argv )
 
   atexit( execute_on_exit );
 #ifdef SWR2_USE_DLSYM
+#ifdef _WIN32
+  sysdata.dl_handle = LoadLibraryA("swr.exe");
+
+  if( !sysdata.dl_handle )
+  {
+    fprintf( out_stream, "Failed opening dl handle to self: %s\n", GetLastError() );
+    exit( 1 );
+  }
+#else
   sysdata.dl_handle = dlopen( NULL, RTLD_LAZY );
 
   if( !sysdata.dl_handle )
@@ -112,7 +125,7 @@ int main( int argc, char **argv )
     exit( 1 );
   }
 #endif
-
+#endif
   num_descriptors = 0;
   first_descriptor = NULL;
   last_descriptor = NULL;
