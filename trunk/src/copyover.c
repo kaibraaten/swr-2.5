@@ -169,6 +169,7 @@ void do_copyover( CHAR_DATA * ch, char *argument )
   sprintf(filename, "\"%s\"", sysdata.exe_filename);
 #else
   sprintf(filename, "%s", sysdata.exe_filename);
+#define _execl execl
 #endif
   _execl( filename, filename,
 	 buf, "copyover", buf2, buf3, NULL );
