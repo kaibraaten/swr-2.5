@@ -106,9 +106,14 @@ static const char *get_next_filename( CONST_STRPTR directory )
   return filename;
 }
 
+FILE *open_log_file(void)
+{
+	return fopen( get_next_filename( (CONST_STRPTR) "PROGDIR:log/" ), "w+" );
+}
+
 void os_setup( void )
 {
-  out_stream = fopen( get_next_filename( (CONST_STRPTR) "PROGDIR:log/" ), "w+" );
+  out_stream = open_log_file()
 
   if( !( SocketBase = OpenLibrary( (CONST_STRPTR) "bsdsocket.library", 2 ) ) )
   {
