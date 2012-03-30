@@ -34,6 +34,8 @@
 #include "os_unix.h"
 #endif
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,6 +43,7 @@ extern "C" {
 void os_setup( void );
 void os_cleanup( void );
 int set_nonblocking( SOCKET sock );
+FILE *open_log_file(void);
 
 #ifdef __cplusplus
 }

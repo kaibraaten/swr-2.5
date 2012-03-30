@@ -30,6 +30,10 @@
 #include "mud.h"
 #include "os.h"
 
+#ifdef _WIN32
+#include <process.h>
+#endif
+
 /* telopt.c */
 int start_compress( DESCRIPTOR_DATA *d );
 void end_compress( DESCRIPTOR_DATA *d );
@@ -50,6 +54,7 @@ extern SOCKET control;		/* Controlling descriptor       */
 
 void do_copyover( CHAR_DATA * ch, char *argument )
 {
+	char filename[256];
   DESCRIPTOR_DATA *d, *d_next;
   char buf[100];
   FILE *fp = fopen( COPYOVER_FILE, "w" );
@@ -158,14 +163,21 @@ void do_copyover( CHAR_DATA * ch, char *argument )
 
   fclose( out_stream );
   out_stream = NULL;
+  /*char filename[256];*/
 
-  execl( sysdata.exe_filename, sysdata.exe_filename,
-	 buf, "copyover", buf2, buf3, ( char * ) NULL );
+#ifdef _WIN32
+  sprintf(filename, "\"%s\"", sysdata.exe_filename);
+#else
+  sprintf(filename, "%s", sysdata.exe_filename);
+#endif
+  _execl( filename, filename,
+	 buf, "copyover", buf2, buf3, NULL );
 
   /* Failed - sucessful exec will not return */
-
+  out_stream = open_log_file();
   perror( "do_copyover: execl" );
   send_to_char( "Copyover FAILED!\r\n", ch );
+  ch_printf(ch, "%s\r\n", strerror(errno));
 #endif
 }
 
