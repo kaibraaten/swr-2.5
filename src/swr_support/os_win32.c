@@ -59,10 +59,15 @@ static const char *get_next_filename( const char *directory )
   return buf;
 }
 
+FILE *open_log_file(void)
+{
+	fopen( get_next_filename( "log/" ), "w" );
+}
+
 void os_setup( void )
 {
   WSADATA wsaData;
-  out_stream = fopen( get_next_filename( "log/" ), "w" );
+  out_stream = open_log_file();
 
   if( WSAStartup( MAKEWORD( 2, 2 ), &wsaData ) != 0 )
   {
