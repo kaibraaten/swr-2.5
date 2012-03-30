@@ -14,6 +14,15 @@ const char *const skill_tname[] = { "unknown", "Spell", "Skill", "Weapon" };
 
 SPELL_FUN *spell_function( const char *name )
 {
+#ifdef _WIN32
+	SPELL_FUN *fun_handle = (SPELL_FUN*) GetProcAddress( sysdata.dl_handle, name );
+
+  if( !fun_handle )
+  {
+    bug( "Could not find symbol '%s': %s", name, GetLastError() );
+    return spell_notfound;
+  }
+#else
   SPELL_FUN *fun_handle = (SPELL_FUN*) dlsym( sysdata.dl_handle, name );
 
   if( !fun_handle )
@@ -21,12 +30,22 @@ SPELL_FUN *spell_function( const char *name )
     bug( "Could not find symbol '%s': %s", name, dlerror() );
     return spell_notfound;
   }
+#endif
 
   return fun_handle;
 }
 
 DO_FUN *skill_function( const char *name )
 {
+#ifdef _WIN32
+	DO_FUN *fun_handle = (DO_FUN*) GetProcAddress( sysdata.dl_handle, name );
+
+  if( !fun_handle )
+  {
+    bug( "Could not find symbol '%s': %s", name, GetLastError() );
+    return skill_notfound;
+  }
+#else
   DO_FUN *fun_handle = (DO_FUN*) dlsym( sysdata.dl_handle, name );
 
   if( !fun_handle )
@@ -34,6 +53,7 @@ DO_FUN *skill_function( const char *name )
     bug( "Could not find symbol '%s': %s", name, dlerror() );
     return skill_notfound;
   }
+#endif
 
   return fun_handle;
 }

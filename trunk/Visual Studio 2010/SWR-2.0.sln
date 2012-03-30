@@ -2,6 +2,11 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SWR-2.0", "SWR-2.0\SWR-2.0.vcxproj", "{319EE2BB-16F0-465A-97F1-FD3CF632A137}"
+	ProjectSection(ProjectDependencies) = postProject
+		{1B571159-3196-421C-8378-61D54D7D58C4} = {1B571159-3196-421C-8378-61D54D7D58C4}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "swr_support", "swr_support\swr_support.vcxproj", "{1B571159-3196-421C-8378-61D54D7D58C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,6 +18,10 @@ Global
 		{319EE2BB-16F0-465A-97F1-FD3CF632A137}.Debug|Win32.Build.0 = Debug|Win32
 		{319EE2BB-16F0-465A-97F1-FD3CF632A137}.Release|Win32.ActiveCfg = Release|Win32
 		{319EE2BB-16F0-465A-97F1-FD3CF632A137}.Release|Win32.Build.0 = Release|Win32
+		{1B571159-3196-421C-8378-61D54D7D58C4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1B571159-3196-421C-8378-61D54D7D58C4}.Debug|Win32.Build.0 = Debug|Win32
+		{1B571159-3196-421C-8378-61D54D7D58C4}.Release|Win32.ActiveCfg = Release|Win32
+		{1B571159-3196-421C-8378-61D54D7D58C4}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
