@@ -19,7 +19,8 @@ ifdef SOLARIS
 LDFLAGS += -lsocket -lnsl
 endif
 
-ifdef CYGWIN
+#Only way I know of to detect Cygwin environment
+ifeq ($(shell echo $$OSTYPE),cygwin)
 LDFLAGS += -export-all-symbols
 endif
 
@@ -65,4 +66,3 @@ clean :
 
 mos:
 		$(MAKE) -f Makefile.MOS
-
