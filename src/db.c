@@ -2274,7 +2274,7 @@ void boot_log( const char *str, ... )
 void show_file( const CHAR_DATA * ch, const char *filename )
 {
   FILE *fp = NULL;
-  signed char buf[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH];
   int c = 0;
   int num = 0;
 
@@ -2282,9 +2282,10 @@ void show_file( const CHAR_DATA * ch, const char *filename )
   {
     while( !feof( fp ) )
     {
-      while( ( buf[num] = fgetc( fp ) ) != EOF
-	  && buf[num] != '\n'
-	  && buf[num] != '\r' && num < ( MAX_STRING_LENGTH - 2 ) )
+      while( ( buf[num] = fgetc( fp ) ) != (char) EOF
+	     && buf[num] != '\n'
+	     && buf[num] != '\r'
+	     && num < ( MAX_STRING_LENGTH - 2 ) )
 	num++;
       c = fgetc( fp );
       if( ( c != '\n' && c != '\r' ) || c == buf[num] )
