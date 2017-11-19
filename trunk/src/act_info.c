@@ -1613,7 +1613,10 @@ void do_examine( CHAR_DATA * ch, char *argument )
 	break;
 
       case ITEM_CONTAINER:
-	if( IS_OBJ_STAT( obj, ITEM_COVERING ) )
+	if( !IS_OBJ_STAT( obj, ITEM_COVERING ) )
+	  {
+	    examine_obj_drink_container( ch, obj );
+	  }
 	  break;
 
       case ITEM_DRINK_CON:
