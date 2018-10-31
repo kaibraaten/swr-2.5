@@ -1,0 +1,4 @@
+swr
+*.o
+*.d
+lib*.so
