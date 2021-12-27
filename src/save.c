@@ -1942,6 +1942,8 @@ void load_corpses( void )
       fread_corpse( de->d_name );
     }
   }
+
+  closedir(dp);
 }
 #endif
 

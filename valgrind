@@ -1,1 +1,6 @@
-valgrind -v --tool=memcheck --leak-check=full --show-reachable=yes --db-attach=yes --db-command="gdb %f %p" --num-callers=10 --track-fds=yes ./swr 9999
+#!/bin/csh -f
+
+set port = 9999
+if ( "$1" != "" ) set port="$1"
+
+valgrind -v --tool=memcheck --leak-check=full --show-reachable=no --num-callers=40 --track-fds=yes ./swr $port
