@@ -22,7 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-
+#ifdef _AMIGA
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -195,4 +195,5 @@ int isascii( int c )
 {
   return c > 0 && c <= 127 ? 1 : 0;
 }
+#endif
 #endif

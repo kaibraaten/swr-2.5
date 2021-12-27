@@ -22,7 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-
+#ifdef _WIN32
 #include <stdio.h>
 #include <time.h>
 #include "os.h"
@@ -137,3 +137,4 @@ int set_nonblocking( SOCKET sock )
   unsigned long optval = 1;
   return ioctlsocket( sock, FIONBIO, &optval );
 }
+#endif

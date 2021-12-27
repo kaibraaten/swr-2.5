@@ -1,7 +1,8 @@
+cmake_minimum_required(VERSION 3.21)
 project(swr2)
 
 include_directories(src libs/swr_support)
-link_directries(libs/swr_support)
+link_directories(libs/swr_support)
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
@@ -53,9 +54,9 @@ add_executable(swr2
 
 #target_compile_features(swr2 PRIVATE cxx_std_20)
 target_compile_options(swr2
-  PRIVATE $<$<CC_COMPILER_ID:GNU>:-DSWR2_USE_DLSYM -DSWR2_USE_IMC  -Werror -Wall -Wformat-security -Wshadow -Winline -Wpointer-arith -Wcast-align -Wredundant-decls -Wextra -Wno-unused-parameter -Wno-implicit-fallthrough -Wno-sign-compare -Wno-write-strings -Wno-format-truncation>
-  PRIVATE $<$<CC_COMPILER_ID:MSVC>:/D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_DEPRECATE /wd4244 /wd4996 /wd6262 /wd26451>
+  PRIVATE $<$<C_COMPILER_ID:GNU>:-DSWR2_USE_DLSYM -DSWR2_USE_IMC  -Werror -Wall -Wformat-security -Wshadow -Winline -Wpointer-arith -Wcast-align -Wredundant-decls -Wextra -Wno-unused-parameter -Wno-implicit-fallthrough -Wno-sign-compare -Wno-write-strings -Wno-format-truncation -Wno-format-overflow -Wno-stringop-overflow>
+  PRIVATE $<$<C_COMPILER_ID:MSVC>:/D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_DEPRECATE /wd4244 /wd4996 /wd6262 /wd26451>
   )
-target_link_libraries(swr2 dl swr_support)
+target_link_libraries(swr2 dl swr_support z)
 
 add_subdirectory(libs/swr_support)

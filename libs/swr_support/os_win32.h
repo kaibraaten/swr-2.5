@@ -22,7 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
-
+#ifdef _WIN32
 #ifndef _SWR2_OS_WIN32_H_
 #define _SWR2_OS_WIN32_H_
 
@@ -70,3 +70,4 @@ int gettimeofday( struct timeval*, struct timezone* );
 
 #endif /* include guard */
 
+#endif

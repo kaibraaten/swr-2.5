@@ -3,3 +3,5 @@ swr2
 *.d
 lib*.so
 Makefile
+cmake-build-debug/
+.idea/

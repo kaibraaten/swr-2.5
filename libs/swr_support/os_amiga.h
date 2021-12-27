@@ -22,6 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  * OTHER DEALINGS IN THE SOFTWARE.
  */
+#ifdef _AMIGA
 #ifndef _SWR2_OS_AMIGA_H_
 #define _SWR2_OS_AMIGA_H_
 
@@ -59,3 +60,4 @@ typedef const STRPTR CONST_STRPTR;
 
 #endif /* include guard */
 
+#endif
