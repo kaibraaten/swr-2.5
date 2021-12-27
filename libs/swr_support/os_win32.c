@@ -31,61 +31,61 @@ extern FILE *out_stream;
 
 static const char *get_next_filename( const char *directory )
 {
-  static char buf[256];
-  int high_num = 1000;
-  WIN32_FIND_DATA info;
-  HANDLE h;
+    static char buf[256];
+    int high_num = 1000;
+    WIN32_FIND_DATA info;
+    HANDLE h;
 
-  snprintf( buf, 256, "%s*.*", directory );
-  h = FindFirstFile( buf, &info );
+    snprintf( buf, 256, "%s*.*", directory );
+    h = FindFirstFile( buf, &info );
 
-  if( h != INVALID_HANDLE_VALUE )
-  {
-    do
+    if( h != INVALID_HANDLE_VALUE )
     {
-      if( info.cFileName[0] != '.' )
-      {
-	int curr = strtol( info.cFileName, 0, 10 );
-	high_num = curr > high_num ? curr : high_num;
-      }
+        do
+        {
+            if( info.cFileName[0] != '.' )
+            {
+                int curr = strtol( info.cFileName, 0, 10 );
+                high_num = curr > high_num ? curr : high_num;
+            }
+        }
+        while( FindNextFile( h, &info ) );
+
+        FindClose( h );
     }
-    while( FindNextFile( h, &info ) );
 
-    FindClose( h );
-  }
-
-  ++high_num;
-  snprintf( buf, 256, "%s%d.log", directory, high_num );
-  return buf;
+    ++high_num;
+    snprintf( buf, 256, "%s%d.log", directory, high_num );
+    return buf;
 }
 
 FILE *open_log_file(void)
 {
-	fopen( get_next_filename( "log/" ), "w" );
+    fopen( get_next_filename( "log/" ), "w" );
 }
 
 void os_setup( void )
 {
-  WSADATA wsaData;
-  out_stream = open_log_file();
+    WSADATA wsaData;
+    out_stream = open_log_file();
 
-  if( WSAStartup( MAKEWORD( 2, 2 ), &wsaData ) != 0 )
-  {
-    fprintf( out_stream, "%s (%s:%d) - WSAStartup failed.\n",
-	__FUNCTION__, __FILE__, __LINE__ );
-    exit( 1 );
-  }
+    if( WSAStartup( MAKEWORD( 2, 2 ), &wsaData ) != 0 )
+    {
+        fprintf( out_stream, "%s (%s:%d) - WSAStartup failed.\n",
+                 __FUNCTION__, __FILE__, __LINE__ );
+        exit( 1 );
+    }
 }
 
 void os_cleanup( void )
 {
-  WSACleanup();
+    WSACleanup();
 
-  if( out_stream )
-  {
-    fclose( out_stream );
-    out_stream = 0;
-  }
+    if( out_stream )
+    {
+        fclose( out_stream );
+        out_stream = 0;
+    }
 }
 
 // gettimeofday for Windows
@@ -98,43 +98,43 @@ void os_cleanup( void )
 
 int gettimeofday( struct timeval *tv, struct timezone *tz )
 {
-  FILETIME ft;
-  unsigned __int64 tmpres = 0;
-  static int tzflag = 0;
+    FILETIME ft;
+    unsigned __int64 tmpres = 0;
+    static int tzflag = 0;
 
-  if( NULL != tv )
-  {
-    GetSystemTimeAsFileTime( &ft );
-
-    tmpres |= ft.dwHighDateTime;
-    tmpres <<= 32;
-    tmpres |= ft.dwLowDateTime;
-
-    /*converting file time to unix epoch*/
-    tmpres /= 10;  /*convert into microseconds*/
-    tmpres -= DELTA_EPOCH_IN_MICROSECS; 
-    tv->tv_sec = (long)(tmpres / 1000000UL);
-    tv->tv_usec = (long)(tmpres % 1000000UL);
-  }
-
-  if( NULL != tz )
-  {
-    if( !tzflag )
+    if( NULL != tv )
     {
-      _tzset();
-      tzflag++;
+        GetSystemTimeAsFileTime( &ft );
+
+        tmpres |= ft.dwHighDateTime;
+        tmpres <<= 32;
+        tmpres |= ft.dwLowDateTime;
+
+        /*converting file time to unix epoch*/
+        tmpres /= 10;  /*convert into microseconds*/
+        tmpres -= DELTA_EPOCH_IN_MICROSECS;
+        tv->tv_sec = (long)(tmpres / 1000000UL);
+        tv->tv_usec = (long)(tmpres % 1000000UL);
     }
 
-    tz->tz_minuteswest = _timezone / 60;
-    tz->tz_dsttime = _daylight;
-  }
+    if( NULL != tz )
+    {
+        if( !tzflag )
+        {
+            _tzset();
+            tzflag++;
+        }
 
-  return 0;
+        tz->tz_minuteswest = _timezone / 60;
+        tz->tz_dsttime = _daylight;
+    }
+
+    return 0;
 }
 
 int set_nonblocking( SOCKET sock )
 {
-  unsigned long optval = 1;
-  return ioctlsocket( sock, FIONBIO, &optval );
+    unsigned long optval = 1;
+    return ioctlsocket( sock, FIONBIO, &optval );
 }
 #endif

@@ -12,8 +12,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-  void bug( const char *str, ... );
-  void shutdown_mud( const char *reason );
+    void bug( const char *str, ... );
+    void shutdown_mud( const char *reason );
 #ifdef __cplusplus
 }
 #endif
@@ -35,24 +35,24 @@ extern bool fBootDb;
  */
 char fread_letter( FILE *fp )
 {
-  char c = '\0';
+    char c = '\0';
 
-  do
-  {
-    if ( feof(fp) )
+    do
     {
-      bug("fread_letter: EOF encountered on read.\r\n");
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
+        if ( feof(fp) )
+        {
+            bug("fread_letter: EOF encountered on read.\r\n");
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
 
-      return '\0';
+            return '\0';
+        }
+
+        c = fgetc( fp );
     }
+    while ( isspace((int) c) );
 
-    c = fgetc( fp );
-  }
-  while ( isspace((int) c) );
-
-  return c;
+    return c;
 }
 
 /*
@@ -60,93 +60,93 @@ char fread_letter( FILE *fp )
  */
 float fread_float( FILE *fp )
 {
-  float number = 0.0;
-  bool sign = FALSE, decimal = FALSE;
-  char c = '\0';
-  double place = 0.0;
+    float number = 0.0;
+    bool sign = FALSE, decimal = FALSE;
+    char c = '\0';
+    double place = 0.0;
 
-  do
-  {
-    if( feof( fp ) )
+    do
     {
-      bug( "%s: EOF encountered on read.", __FUNCTION__ );
-      if( fBootDb )
-      {
-	shutdown_mud( "Corrupt file somewhere." );
-	exit( EXIT_FAILURE );
-      }
-      return 0;
+        if( feof( fp ) )
+        {
+            bug( "%s: EOF encountered on read.", __FUNCTION__ );
+            if( fBootDb )
+            {
+                shutdown_mud( "Corrupt file somewhere." );
+                exit( EXIT_FAILURE );
+            }
+            return 0;
+        }
+        c = fgetc( fp );
     }
-    c = fgetc( fp );
-  }
-  while( isspace( (int) c ) );
+    while( isspace( (int) c ) );
 
-  if( c == '+' )
-    c = fgetc( fp );
-  else if( c == '-' )
-  {
-    sign = TRUE;
-    c = fgetc( fp );
-  }
-
-  if( !isdigit( (int) c ) )
-  {
-    bug( "%s: bad format. (%c)", __FUNCTION__, c );
-
-    if( fBootDb )
-      exit( EXIT_FAILURE );
-    return 0;
-  }
-
-  while( 1 )
-  {
-    if( c == '.' || isdigit( (int) c ) )
+    if( c == '+' )
+        c = fgetc( fp );
+    else if( c == '-' )
     {
-      if( c == '.' )
-      {
-	decimal = TRUE;
-	c = fgetc( fp );
-      }
-
-      if( feof( fp ) )
-      {
-	bug( "%s: EOF encountered on read.", __FUNCTION__ );
-	if( fBootDb )
-	  exit( EXIT_FAILURE );
-	return number;
-      }
-      if( !decimal )
-	number = number * 10 + c - '0';
-      else
-      {
-	place++;
-	number += pow( (double) 10, ( -1 * place ) ) * ( c - '0' );
-      }
-      c = fgetc( fp );
-    }
-    else
-      break;
-  }
-
-  if( sign )
-    number = 0 - number;
-
-  if( c == '|' )
-    {
-      number += fread_float( fp );
-    }
-  else if( c != ' ' )
-    {
-      if( ungetc( c, fp ) == EOF )
-	{
-	  bug("fread_float: EOF encountered on ungetc.\r\n");
-
-	  if ( fBootDb )
-	    exit( EXIT_FAILURE );
-	}
+        sign = TRUE;
+        c = fgetc( fp );
     }
 
-  return number;
+    if( !isdigit( (int) c ) )
+    {
+        bug( "%s: bad format. (%c)", __FUNCTION__, c );
+
+        if( fBootDb )
+            exit( EXIT_FAILURE );
+        return 0;
+    }
+
+    while( 1 )
+    {
+        if( c == '.' || isdigit( (int) c ) )
+        {
+            if( c == '.' )
+            {
+                decimal = TRUE;
+                c = fgetc( fp );
+            }
+
+            if( feof( fp ) )
+            {
+                bug( "%s: EOF encountered on read.", __FUNCTION__ );
+                if( fBootDb )
+                    exit( EXIT_FAILURE );
+                return number;
+            }
+            if( !decimal )
+                number = number * 10 + c - '0';
+            else
+            {
+                place++;
+                number += pow( (double) 10, ( -1 * place ) ) * ( c - '0' );
+            }
+            c = fgetc( fp );
+        }
+        else
+            break;
+    }
+
+    if( sign )
+        number = 0 - number;
+
+    if( c == '|' )
+    {
+        number += fread_float( fp );
+    }
+    else if( c != ' ' )
+    {
+        if( ungetc( c, fp ) == EOF )
+        {
+            bug("fread_float: EOF encountered on ungetc.\r\n");
+
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+        }
+    }
+
+    return number;
 }
 
 /*
@@ -154,71 +154,71 @@ float fread_float( FILE *fp )
  */
 int fread_number( FILE *fp )
 {
-  int number = 0;
-  bool sign = FALSE;
-  char c = 0;
+    int number = 0;
+    bool sign = FALSE;
+    char c = 0;
 
-  do
-  {
-    if ( feof(fp) )
+    do
     {
-      bug("fread_number: EOF encountered on read.\r\n");
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
-      return 0;
-    }
-    c = fgetc( fp );
-  }
-  while ( isspace( (int) c ) );
-
-  if ( c == '+' )
-  {
-    c = fgetc( fp );
-  }
-  else if ( c == '-' )
-  {
-    sign = TRUE;
-    c = fgetc( fp );
-  }
-
-  if ( !isdigit((int) c) )
-  {
-    bug( "Fread_number: bad format. (%c)", c );
-    if ( fBootDb )
-      exit( EXIT_FAILURE );
-    return 0;
-  }
-
-  while ( isdigit( (int) c ) )
-  {
-    if ( feof(fp) )
-    {
-      bug("fread_number: EOF encountered on read.\r\n");
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
-      return number;
-    }
-    number = number * 10 + c - '0';
-    c      = fgetc( fp );
-  }
-
-  if ( sign )
-    number = 0 - number;
-
-  if ( c == '|' )
-    number += fread_number( fp );
-  else if ( c != ' ' )
-    {
-      if( ungetc( c, fp ) == EOF )
+        if ( feof(fp) )
         {
-          bug("fread_number: EOF encountered on ungetc.\r\n");
+            bug("fread_number: EOF encountered on read.\r\n");
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+            return 0;
+        }
+        c = fgetc( fp );
+    }
+    while ( isspace( (int) c ) );
 
-          if ( fBootDb )
+    if ( c == '+' )
+    {
+        c = fgetc( fp );
+    }
+    else if ( c == '-' )
+    {
+        sign = TRUE;
+        c = fgetc( fp );
+    }
+
+    if ( !isdigit((int) c) )
+    {
+        bug( "Fread_number: bad format. (%c)", c );
+        if ( fBootDb )
             exit( EXIT_FAILURE );
+        return 0;
+    }
+
+    while ( isdigit( (int) c ) )
+    {
+        if ( feof(fp) )
+        {
+            bug("fread_number: EOF encountered on read.\r\n");
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+            return number;
+        }
+        number = number * 10 + c - '0';
+        c      = fgetc( fp );
+    }
+
+    if ( sign )
+        number = 0 - number;
+
+    if ( c == '|' )
+        number += fread_number( fp );
+    else if ( c != ' ' )
+    {
+        if( ungetc( c, fp ) == EOF )
+        {
+            bug("fread_number: EOF encountered on ungetc.\r\n");
+
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
         }
     }
 
-  return number;
+    return number;
 }
 
 /*
@@ -226,14 +226,14 @@ int fread_number( FILE *fp )
  */
 char *str_dup( const char *str )
 {
-  static char *ret = NULL;
+    static char *ret = NULL;
 
-  if( !str )
-    return NULL;
+    if( !str )
+        return NULL;
 
-  CREATE( ret, char, strlen( str ) + 1 );
-  strcpy( ret, str );
-  return ret;
+    CREATE( ret, char, strlen( str ) + 1 );
+    strcpy( ret, str );
+    return ret;
 }
 
 /*
@@ -241,68 +241,68 @@ char *str_dup( const char *str )
  */
 char *fread_string( FILE *fp )
 {
-  char buf[MAX_STRING_LENGTH];
-  char *plast = buf;
-  char c = 0;
-  int ln = 0;
+    char buf[MAX_STRING_LENGTH];
+    char *plast = buf;
+    char c = 0;
+    int ln = 0;
 
-  buf[0] = '\0';
+    buf[0] = '\0';
 
-  /*
-   * Skip blanks.
-   * Read first char.
-   */
-  do
-  {
-    if ( feof(fp) )
+    /*
+     * Skip blanks.
+     * Read first char.
+     */
+    do
     {
-      bug("fread_string: EOF encountered on read.\r\n");
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
-      return STRALLOC("");
+        if ( feof(fp) )
+        {
+            bug("fread_string: EOF encountered on read.\r\n");
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+            return STRALLOC("");
+        }
+        c = fgetc( fp );
     }
-    c = fgetc( fp );
-  }
-  while ( isspace((int)c) );
+    while ( isspace((int)c) );
 
-  if ( ( *plast++ = c ) == '~' )
-    return STRALLOC( "" );
+    if ( ( *plast++ = c ) == '~' )
+        return STRALLOC( "" );
 
-  for ( ;; )
-  {
-    if ( ln >= (MAX_STRING_LENGTH - 1) )
+    for ( ;; )
     {
-      bug( "fread_string: string too long" );
-      *plast = '\0';
-      return STRALLOC( buf );
+        if ( ln >= (MAX_STRING_LENGTH - 1) )
+        {
+            bug( "fread_string: string too long" );
+            *plast = '\0';
+            return STRALLOC( buf );
+        }
+        switch ( (int)( *plast = fgetc( fp ) ) )
+        {
+        default:
+            plast++; ln++;
+            break;
+
+        case EOF:
+            bug( "Fread_string: EOF" );
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+            *plast = '\0';
+            return STRALLOC(buf);
+            break;
+
+        case '\n':
+            plast++;  ln++;
+            *plast++ = '\r';  ln++;
+            break;
+
+        case '\r':
+            break;
+
+        case '~':
+            *plast = '\0';
+            return STRALLOC( buf );
+        }
     }
-    switch ( (int)( *plast = fgetc( fp ) ) )
-    {
-      default:
-	plast++; ln++;
-	break;
-
-      case EOF:
-	bug( "Fread_string: EOF" );
-	if ( fBootDb )
-	  exit( EXIT_FAILURE );
-	*plast = '\0';
-	return STRALLOC(buf);
-	break;
-
-      case '\n':
-	plast++;  ln++;
-	*plast++ = '\r';  ln++;
-	break;
-
-      case '\r':
-	break;
-
-      case '~':
-	*plast = '\0';
-	return STRALLOC( buf );
-    }
-  }
 }
 
 /*
@@ -310,68 +310,68 @@ char *fread_string( FILE *fp )
  */
 char *fread_string_nohash( FILE *fp )
 {
-  char buf[MAX_STRING_LENGTH];
-  char *plast = buf;
-  char c = 0;
-  int ln = 0;
+    char buf[MAX_STRING_LENGTH];
+    char *plast = buf;
+    char c = 0;
+    int ln = 0;
 
-  buf[0] = '\0';
+    buf[0] = '\0';
 
-  /*
-   * Skip blanks.
-   * Read first char.
-   */
-  do
-  {
-    if ( feof(fp) )
+    /*
+     * Skip blanks.
+     * Read first char.
+     */
+    do
     {
-      bug("fread_string_no_hash: EOF encountered on read.\r\n");
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
-      return str_dup("");
+        if ( feof(fp) )
+        {
+            bug("fread_string_no_hash: EOF encountered on read.\r\n");
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+            return str_dup("");
+        }
+        c = fgetc( fp );
     }
-    c = fgetc( fp );
-  }
-  while ( isspace((int)c) );
+    while ( isspace((int)c) );
 
-  if ( ( *plast++ = c ) == '~' )
-    return str_dup( "" );
+    if ( ( *plast++ = c ) == '~' )
+        return str_dup( "" );
 
-  for ( ;; )
-  {
-    if ( ln >= (MAX_STRING_LENGTH - 1) )
+    for ( ;; )
     {
-      bug( "fread_string_no_hash: string too long" );
-      *plast = '\0';
-      return str_dup( buf );
+        if ( ln >= (MAX_STRING_LENGTH - 1) )
+        {
+            bug( "fread_string_no_hash: string too long" );
+            *plast = '\0';
+            return str_dup( buf );
+        }
+        switch ( (int)( *plast = fgetc( fp ) ) )
+        {
+        default:
+            plast++; ln++;
+            break;
+
+        case EOF:
+            bug( "Fread_string_no_hash: EOF" );
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+            *plast = '\0';
+            return str_dup(buf);
+            break;
+
+        case '\n':
+            plast++;  ln++;
+            *plast++ = '\r';  ln++;
+            break;
+
+        case '\r':
+            break;
+
+        case '~':
+            *plast = '\0';
+            return str_dup( buf );
+        }
     }
-    switch ( (int)( *plast = fgetc( fp ) ) )
-    {
-      default:
-	plast++; ln++;
-	break;
-
-      case EOF:
-	bug( "Fread_string_no_hash: EOF" );
-	if ( fBootDb )
-	  exit( EXIT_FAILURE );
-	*plast = '\0';
-	return str_dup(buf);
-	break;
-
-      case '\n':
-	plast++;  ln++;
-	*plast++ = '\r';  ln++;
-	break;
-
-      case '\r':
-	break;
-
-      case '~':
-	*plast = '\0';
-	return str_dup( buf );
-    }
-  }
 }
 
 /*
@@ -379,33 +379,33 @@ char *fread_string_nohash( FILE *fp )
  */
 void fread_to_eol( FILE *fp )
 {
-  char c = 0;
+    char c = 0;
 
-  do
-  {
-    if ( feof(fp) )
+    do
     {
-      bug("fread_to_eol: EOF encountered on read.\r\n");
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
-      return;
+        if ( feof(fp) )
+        {
+            bug("fread_to_eol: EOF encountered on read.\r\n");
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+            return;
+        }
+        c = fgetc( fp );
     }
-    c = fgetc( fp );
-  }
-  while ( c != '\n' && c != '\r' );
+    while ( c != '\n' && c != '\r' );
 
-  do
-  {
-    c = fgetc( fp );
-  }
-  while ( c == '\n' || c == '\r' );
-
-  if( ungetc( c, fp ) == EOF )
+    do
     {
-      bug("fread_to_eol: EOF encountered on ungetc.\r\n");
+        c = fgetc( fp );
+    }
+    while ( c == '\n' || c == '\r' );
 
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
+    if( ungetc( c, fp ) == EOF )
+    {
+        bug("fread_to_eol: EOF encountered on ungetc.\r\n");
+
+        if ( fBootDb )
+            exit( EXIT_FAILURE );
     }
 }
 
@@ -414,75 +414,75 @@ void fread_to_eol( FILE *fp )
  */
 char *fread_line( FILE *fp )
 {
-  static char line[MAX_STRING_LENGTH];
-  char *pline = line;
-  char c = 0;
-  int ln = 0;
+    static char line[MAX_STRING_LENGTH];
+    char *pline = line;
+    char c = 0;
+    int ln = 0;
 
-  line[0] = '\0';
+    line[0] = '\0';
 
-  /*
-   * Skip blanks.
-   * Read first char.
-   */
-  do
-  {
-    if ( feof(fp) )
+    /*
+     * Skip blanks.
+     * Read first char.
+     */
+    do
     {
-      bug("fread_line: EOF encountered on read.\r\n");
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
-      strcpy(line, "");
-      return line;
+        if ( feof(fp) )
+        {
+            bug("fread_line: EOF encountered on read.\r\n");
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+            strcpy(line, "");
+            return line;
+        }
+        c = fgetc( fp );
     }
-    c = fgetc( fp );
-  }
-  while ( isspace((int)c) );
+    while ( isspace((int)c) );
 
-  if( ungetc( c, fp ) == EOF )
+    if( ungetc( c, fp ) == EOF )
     {
-      bug("fread_line: EOF encountered on ungetc.\r\n");
+        bug("fread_line: EOF encountered on ungetc.\r\n");
 
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
-    }
-
-  do
-  {
-    if ( feof(fp) )
-    {
-      bug("fread_line: EOF encountered on read.\r\n");
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
-      *pline = '\0';
-      return line;
-    }
-    c = fgetc( fp );
-    *pline++ = c; ln++;
-    if ( ln >= (MAX_STRING_LENGTH - 1) )
-    {
-      bug( "fread_line: line too long" );
-      break;
-    }
-  }
-  while ( c != '\n' && c != '\r' );
-
-  do
-  {
-    c = fgetc( fp );
-  }
-  while ( c == '\n' || c == '\r' );
-
-  if( ungetc( c, fp ) == EOF )
-    {
-      bug("%s: EOF encountered on ungetc.\r\n", __FUNCTION__);
-
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
+        if ( fBootDb )
+            exit( EXIT_FAILURE );
     }
 
-  *pline = '\0';
-  return line;
+    do
+    {
+        if ( feof(fp) )
+        {
+            bug("fread_line: EOF encountered on read.\r\n");
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+            *pline = '\0';
+            return line;
+        }
+        c = fgetc( fp );
+        *pline++ = c; ln++;
+        if ( ln >= (MAX_STRING_LENGTH - 1) )
+        {
+            bug( "fread_line: line too long" );
+            break;
+        }
+    }
+    while ( c != '\n' && c != '\r' );
+
+    do
+    {
+        c = fgetc( fp );
+    }
+    while ( c == '\n' || c == '\r' );
+
+    if( ungetc( c, fp ) == EOF )
+    {
+        bug("%s: EOF encountered on ungetc.\r\n", __FUNCTION__);
+
+        if ( fBootDb )
+            exit( EXIT_FAILURE );
+    }
+
+    *pline = '\0';
+    return line;
 }
 
 /*
@@ -490,67 +490,67 @@ char *fread_line( FILE *fp )
  */
 char *fread_word( FILE *fp )
 {
-  static char word[MAX_INPUT_LENGTH];
-  char *pword = NULL;
-  char cEnd ='\0';
+    static char word[MAX_INPUT_LENGTH];
+    char *pword = NULL;
+    char cEnd ='\0';
 
-  do
-  {
-    if ( feof(fp) )
+    do
     {
-      bug("fread_word: EOF encountered on read.\r\n");
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
-      word[0] = '\0';
-      return word;
+        if ( feof(fp) )
+        {
+            bug("fread_word: EOF encountered on read.\r\n");
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+            word[0] = '\0';
+            return word;
+        }
+        cEnd = fgetc( fp );
     }
-    cEnd = fgetc( fp );
-  }
-  while ( isspace( (int) cEnd ) );
+    while ( isspace( (int) cEnd ) );
 
-  if ( cEnd == '\'' || cEnd == '"' )
-  {
-    pword   = word;
-  }
-  else
-  {
-    word[0] = cEnd;
-    pword   = word+1;
-    cEnd    = ' ';
-  }
-
-  for ( ; pword < word + MAX_INPUT_LENGTH; pword++ )
-  {
-    if ( feof(fp) )
+    if ( cEnd == '\'' || cEnd == '"' )
     {
-      bug("fread_word: EOF encountered on read.\r\n");
-      if ( fBootDb )
-	exit( EXIT_FAILURE );
-      *pword = '\0';
-      return word;
+        pword   = word;
     }
-    *pword = fgetc( fp );
-    if ( cEnd == ' ' ? isspace((int) *pword) : *pword == cEnd )
+    else
     {
-      if ( cEnd == ' ' )
-	{
-	  if( ungetc( *pword, fp ) == EOF )
-	    {
-	      bug("%s: EOF encountered on ungetc.\r\n", __FUNCTION__);
-
-	      if ( fBootDb )
-		exit( EXIT_FAILURE );
-	    }
-	}
-
-      *pword = '\0';
-      return word;
+        word[0] = cEnd;
+        pword   = word+1;
+        cEnd    = ' ';
     }
-  }
 
-  bug( "Fread_word: word too long" );
-  exit( EXIT_FAILURE );
-  return NULL;
+    for ( ; pword < word + MAX_INPUT_LENGTH; pword++ )
+    {
+        if ( feof(fp) )
+        {
+            bug("fread_word: EOF encountered on read.\r\n");
+            if ( fBootDb )
+                exit( EXIT_FAILURE );
+            *pword = '\0';
+            return word;
+        }
+        *pword = fgetc( fp );
+        if ( cEnd == ' ' ? isspace((int) *pword) : *pword == cEnd )
+        {
+            if ( cEnd == ' ' )
+            {
+                if( ungetc( *pword, fp ) == EOF )
+                {
+                    bug("%s: EOF encountered on ungetc.\r\n", __FUNCTION__);
+
+                    if ( fBootDb )
+                        exit( EXIT_FAILURE );
+                }
+            }
+
+            *pword = '\0';
+            return word;
+        }
+    }
+
+    bug( "Fread_word: word too long" );
+    exit( EXIT_FAILURE );
+    return NULL;
 }
 
 /*
@@ -558,11 +558,11 @@ char *fread_word( FILE *fp )
  */
 void append_to_file( const char *file, const char *str )
 {
-  FILE *fp = NULL;
+    FILE *fp = NULL;
 
-  if ( ( fp = fopen( file, "a" ) ) )
-  {
-    fprintf( fp, "%s\n", str );
-    fclose( fp );
-  }
+    if ( ( fp = fopen( file, "a" ) ) )
+    {
+        fprintf( fp, "%s\n", str );
+        fclose( fp );
+    }
 }

@@ -31,9 +31,9 @@
  */
 void vector_copy( Vector3 * const to, const Vector3 * const from )
 {
-  to->x = from->x;
-  to->y = from->y;
-  to->z = from->z;
+    to->x = from->x;
+    to->y = from->y;
+    to->z = from->z;
 }
 
 /*
@@ -41,7 +41,7 @@ void vector_copy( Vector3 * const to, const Vector3 * const from )
  */
 double vector_length( const Vector3 * const v )
 {
-  return sqrt( v->x * v->x + v->y * v->y + v->z * v->z );
+    return sqrt( v->x * v->x + v->y * v->y + v->z * v->z );
 }
 
 /*
@@ -49,9 +49,9 @@ double vector_length( const Vector3 * const v )
  */
 double vector_distance( const Vector3 * const a, const Vector3 * const b )
 {
-  return sqrt( ( a->x - b->x ) * ( a->x - b->x )
-	       + ( a->y - b->y ) * ( a->y - b->y )
-	       + ( a->z - b->z ) * ( a->z - b->z ) );
+    return sqrt( ( a->x - b->x ) * ( a->x - b->x )
+                 + ( a->y - b->y ) * ( a->y - b->y )
+                 + ( a->z - b->z ) * ( a->z - b->z ) );
 }
 
 /*
@@ -59,7 +59,7 @@ double vector_distance( const Vector3 * const a, const Vector3 * const b )
  */
 double vector_dot( const Vector3 * const a, const Vector3 * const b )
 {
-  return ( a->x * b->x ) + ( a->y * b->y ) + ( a->z * b->z );
+    return ( a->x * b->x ) + ( a->y * b->y ) + ( a->z * b->z );
 }
 
 /*
@@ -67,15 +67,15 @@ double vector_dot( const Vector3 * const a, const Vector3 * const b )
  */
 void vector_normalize( Vector3 * const v )
 {
-  float magnitude = ( v->x * v->x ) + ( v->y * v->y ) + ( v->z * v->z );
+    float magnitude = ( v->x * v->x ) + ( v->y * v->y ) + ( v->z * v->z );
 
-  if( magnitude == 0.0 )
-    return;
+    if( magnitude == 0.0 )
+        return;
 
-  magnitude = sqrt( magnitude );
-  v->x /= magnitude;
-  v->y /= magnitude;
-  v->z /= magnitude;
+    magnitude = sqrt( magnitude );
+    v->x /= magnitude;
+    v->y /= magnitude;
+    v->z /= magnitude;
 }
 
 /*
@@ -83,14 +83,14 @@ void vector_normalize( Vector3 * const v )
  */
 void vector_init( Vector3 * const v )
 {
-  v->x = 0.0;
-  v->y = 0.0;
-  v->z = 0.0;
+    v->x = 0.0;
+    v->y = 0.0;
+    v->z = 0.0;
 }
 
 void vector_set( Vector3 * const vec, double x, double y, double z )
 {
-  vec->x = x;
-  vec->y = y;
-  vec->z = z;
+    vec->x = x;
+    vec->y = y;
+    vec->z = z;
 }

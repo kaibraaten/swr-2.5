@@ -75,37 +75,37 @@
  * }
  */
 static bool ship_is_facing( const SHIP_DATA * const ship,
-    const Vector3 * const target )
+                            const Vector3 * const target )
 {
-  Vector3 h, d;
-  bool facing = FALSE;
-  double cosofa = 0.0;
+    Vector3 h, d;
+    bool facing = FALSE;
+    double cosofa = 0.0;
 
-  vector_copy( &h, &ship->head );
+    vector_copy( &h, &ship->head );
 
-  d.x = target->x - ship->pos.x;
-  d.y = target->y - ship->pos.y;
-  d.z = target->z - ship->pos.z;
+    d.x = target->x - ship->pos.x;
+    d.y = target->y - ship->pos.y;
+    d.z = target->z - ship->pos.z;
 
-  cosofa =
-    vector_dot( &h, &d ) / ( vector_length( &h ) + vector_length( &d ) );
+    cosofa =
+        vector_dot( &h, &d ) / ( vector_length( &h ) + vector_length( &d ) );
 
-  if( cosofa > 0.75 )
-    facing = TRUE;
+    if( cosofa > 0.75 )
+        facing = TRUE;
 
-  return facing;
+    return facing;
 }
 
 bool ship_is_facing_ship( const SHIP_DATA * const ship,
-    const SHIP_DATA * const target )
+                          const SHIP_DATA * const target )
 {
-  return ship_is_facing( ship, &target->pos );
+    return ship_is_facing( ship, &target->pos );
 }
 
 bool ship_is_facing_planet( const SHIP_DATA * const ship,
-    const PLANET_DATA * const target )
+                            const PLANET_DATA * const target )
 {
-  return ship_is_facing( ship, &target->pos );
+    return ship_is_facing( ship, &target->pos );
 }
 
 /*
@@ -113,9 +113,9 @@ bool ship_is_facing_planet( const SHIP_DATA * const ship,
  */
 void ship_turn_180( SHIP_DATA * const ship )
 {
-  ship->head.x *= -1;
-  ship->head.y *= -1;
-  ship->head.z *= -1;
+    ship->head.x *= -1;
+    ship->head.y *= -1;
+    ship->head.z *= -1;
 }
 
 /*
@@ -130,33 +130,33 @@ void ship_turn_180( SHIP_DATA * const ship )
  * Etc, etc...
  */
 void ship_set_course( SHIP_DATA * const ship,
-    const Vector3 * const destination )
+                      const Vector3 * const destination )
 {
-  ship->head.x = destination->x - ship->pos.x;
-  ship->head.y = destination->y - ship->pos.y;
-  ship->head.z = destination->z - ship->pos.z;
-  vector_normalize( &ship->head );
+    ship->head.x = destination->x - ship->pos.x;
+    ship->head.y = destination->y - ship->pos.y;
+    ship->head.z = destination->z - ship->pos.z;
+    vector_normalize( &ship->head );
 }
 
 void ship_set_course_to_ship( SHIP_DATA * const ship,
-    const SHIP_DATA * const target )
+                              const SHIP_DATA * const target )
 {
-  ship_set_course( ship, &target->pos );
+    ship_set_course( ship, &target->pos );
 }
 
 void ship_set_course_to_planet( SHIP_DATA * const ship,
-    const PLANET_DATA * const target )
+                                const PLANET_DATA * const target )
 {
-  ship_set_course( ship, &target->pos );
+    ship_set_course( ship, &target->pos );
 }
 
 void missile_set_course_to_ship( MISSILE_DATA * const missile,
-    const SHIP_DATA * const target )
+                                 const SHIP_DATA * const target )
 {
-  missile->head.x = target->pos.x - missile->pos.x;
-  missile->head.y = target->pos.y - missile->pos.y;
-  missile->head.z = target->pos.z - missile->pos.z;
-  vector_normalize( &missile->head );
+    missile->head.x = target->pos.x - missile->pos.x;
+    missile->head.y = target->pos.y - missile->pos.y;
+    missile->head.z = target->pos.z - missile->pos.z;
+    vector_normalize( &missile->head );
 }
 
 /*
@@ -164,9 +164,9 @@ void missile_set_course_to_ship( MISSILE_DATA * const missile,
  * Useful for grouped ships, docked ships, etc.
  */
 void ship_align_heading( SHIP_DATA * const ship,
-    const SHIP_DATA * const target )
+                         const SHIP_DATA * const target )
 {
-  vector_copy( &ship->head, &target->head );
+    vector_copy( &ship->head, &target->head );
 }
 
 /*
@@ -174,56 +174,56 @@ void ship_align_heading( SHIP_DATA * const ship,
  */
 
 static void move_space_object( Vector3 * const pos,
-    const Vector3 * const head, const int speed )
+                               const Vector3 * const head, const int speed )
 {
-  if( speed > 0 )
-  {
-    const double change = vector_length( head );
-
-    if( change > 0 )
+    if( speed > 0 )
     {
-      Vector3 tmpv;
-      tmpv.x = head->x / change;
-      tmpv.y = head->y / change;
-      tmpv.z = head->z / change;
-      pos->x += ( tmpv.x * speed ) / 5;
-      pos->y += ( tmpv.y * speed ) / 5;
-      pos->z += ( tmpv.z * speed ) / 5;
+        const double change = vector_length( head );
+
+        if( change > 0 )
+        {
+            Vector3 tmpv;
+            tmpv.x = head->x / change;
+            tmpv.y = head->y / change;
+            tmpv.z = head->z / change;
+            pos->x += ( tmpv.x * speed ) / 5;
+            pos->y += ( tmpv.y * speed ) / 5;
+            pos->z += ( tmpv.z * speed ) / 5;
+        }
     }
-  }
 }
 
 void ship_move( SHIP_DATA * const ship )
 {
-  move_space_object( &ship->pos, &ship->head, ship->currspeed );
+    move_space_object( &ship->pos, &ship->head, ship->currspeed );
 }
 
 void missile_move( MISSILE_DATA * const missile )
 {
-  move_space_object( &missile->pos, &missile->head, missile->speed );
+    move_space_object( &missile->pos, &missile->head, missile->speed );
 }
 
 double ship_distance_to_ship( const SHIP_DATA * const ship,
-    const SHIP_DATA * const target )
+                              const SHIP_DATA * const target )
 {
-  return vector_distance( &ship->pos, &target->pos );
+    return vector_distance( &ship->pos, &target->pos );
 }
 
 double ship_distance_to_planet( const SHIP_DATA * const ship,
-    const PLANET_DATA * const planet )
+                                const PLANET_DATA * const planet )
 {
-  return vector_distance( &ship->pos, &planet->pos );
+    return vector_distance( &ship->pos, &planet->pos );
 }
 
 double missile_distance_to_ship( const MISSILE_DATA * const missile,
-    const SHIP_DATA * const target )
+                                 const SHIP_DATA * const target )
 {
-  return vector_distance( &missile->pos, &target->pos );
+    return vector_distance( &missile->pos, &target->pos );
 }
 
 void vector_randomize( Vector3 * const vec, int from, int to )
 {
-  vec->x += number_range( from, to );
-  vec->y += number_range( from, to );
-  vec->z += number_range( from, to );
+    vec->x += number_range( from, to );
+    vec->y += number_range( from, to );
+    vec->z += number_range( from, to );
 }
