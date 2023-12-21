@@ -793,7 +793,7 @@ void do_drink( CHAR_DATA * ch, char *argument )
     if( arg[0] == '\0' )
     {
         for( obj = ch->in_room->first_content; obj; obj = obj->next_content )
-            if( ( obj->item_type == ITEM_FOUNTAIN ) )
+            if(obj->item_type == ITEM_FOUNTAIN)
                 break;
 
         if( !obj )

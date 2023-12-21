@@ -56,6 +56,7 @@ add_executable(swr2
 target_compile_options(swr2
   PRIVATE $<$<C_COMPILER_ID:GNU>:-DSWR2_USE_DLSYM -DSWR2_USE_IMC  -Werror -Wall -Wformat-security -Wshadow -Winline -Wpointer-arith -Wcast-align -Wredundant-decls -Wextra -Wno-unused-parameter -Wno-implicit-fallthrough -Wno-sign-compare -Wno-write-strings -Wno-format-truncation -Wno-format-overflow -Wno-stringop-overflow>
   PRIVATE $<$<C_COMPILER_ID:MSVC>:/D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_DEPRECATE /wd4244 /wd4996 /wd6262 /wd26451>
+  PRIVATE $<$<CXX_COMPILER_ID:IntelLLVM>:-Rno-debug-disables-optimization -Wno-deprecated-declarations -DSWR2_USE_IMC -DSWR2_USE_DLSYM>
   )
 target_link_libraries(swr2 dl swr_support z)
 
