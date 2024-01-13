@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-add_library(swr_support SHARED
+add_library(swr_support STATIC
   bet.c
   buffer.c
   file_io.c
@@ -20,4 +20,9 @@ target_compile_options(swr_support
   PRIVATE $<$<C_COMPILER_ID:MSVC>:/D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_DEPRECATE /wd4996 /wd6262 /wd26451 /wd4267 /wd4244 /wd4018 /we4805 /we4305>
   PRIVATE $<$<CXX_COMPILER_ID:IntelLLVM>:-Rno-debug-disables-optimization -Wno-deprecated-declarations>
   )
-target_link_libraries(swr_support m)
+
+if(WIN32)
+  target_link_libraries(swr_support WS2_32)
+else()
+  target_link_libraries(swr_support m)
+endif()

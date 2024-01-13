@@ -8,6 +8,7 @@
  * License terms are available in the imc2freedom.license file.
  */
 
+#ifdef SWR2_USE_IMC
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -4070,7 +4071,7 @@ static void imc_savehelps( void )
         fprintf( fp, "%s", "#HELP\n" );
         fprintf( fp, "Name %s\n", help->name );
         fprintf( fp, "Perm %s\n", imcperm_names[help->level] );
-        fprintf( fp, "Text %s¢\n", help->text );
+        fprintf( fp, "Text %sï¿½\n", help->text );
         fprintf( fp, "%s", "End\n\n" );
     }
     fprintf( fp, "%s", "#END\n" );
@@ -4129,7 +4130,7 @@ static void imc_readhelp( IMC_HELP_DATA * help, FILE * fp )
                 int num = 0;
 
                 while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF
-                       && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+                       && hbuf[num] != 'ï¿½' && num < ( LGST - 2 ) )
                     num++;
                 hbuf[num] = '\0';
                 help->text = IMCSTRALLOC( hbuf );
@@ -4768,49 +4769,49 @@ static void imc_load_who_template( void )
 
         if( !strcasecmp( word, "Head:" ) )
         {
-            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != 'ï¿½' && num < ( LGST - 2 ) )
                 ++num;
             hbuf[num] = '\0';
             whot->head = IMCSTRALLOC( parse_who_header( hbuf ) );
         }
         else if( !strcasecmp( word, "Tail:" ) )
         {
-            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != 'ï¿½' && num < ( LGST - 2 ) )
                 ++num;
             hbuf[num] = '\0';
             whot->tail = IMCSTRALLOC( parse_who_tail( hbuf ) );
         }
         else if( !strcasecmp( word, "Plrline:" ) )
         {
-            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != 'ï¿½' && num < ( LGST - 2 ) )
                 ++num;
             hbuf[num] = '\0';
             whot->plrline = IMCSTRALLOC( hbuf );
         }
         else if( !strcasecmp( word, "Immline:" ) )
         {
-            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != 'ï¿½' && num < ( LGST - 2 ) )
                 ++num;
             hbuf[num] = '\0';
             whot->immline = IMCSTRALLOC( hbuf );
         }
         else if( !strcasecmp( word, "Immheader:" ) )
         {
-            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != 'ï¿½' && num < ( LGST - 2 ) )
                 ++num;
             hbuf[num] = '\0';
             whot->immheader = IMCSTRALLOC( hbuf );
         }
         else if( !strcasecmp( word, "Plrheader:" ) )
         {
-            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != 'ï¿½' && num < ( LGST - 2 ) )
                 ++num;
             hbuf[num] = '\0';
             whot->plrheader = IMCSTRALLOC( hbuf );
         }
         else if( !strcasecmp( word, "Master:" ) )
         {
-            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != '¢' && num < ( LGST - 2 ) )
+            while( (signed char)( hbuf[num] = fgetc( fp ) ) != EOF && hbuf[num] != 'ï¿½' && num < ( LGST - 2 ) )
                 ++num;
             hbuf[num] = '\0';
             whot->master = IMCSTRALLOC( hbuf );
@@ -7925,3 +7926,4 @@ SOCKET imc_getsocket( SITEINFO *site )
 {
     return site ? site->desc : INVALID_SOCKET;
 }
+#endif

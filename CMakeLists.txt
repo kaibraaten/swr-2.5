@@ -58,6 +58,11 @@ target_compile_options(swr2
   PRIVATE $<$<C_COMPILER_ID:MSVC>:/D_CRT_SECURE_NO_WARNINGS /D_CRT_NONSTDC_NO_DEPRECATE /wd4244 /wd4996 /wd6262 /wd26451>
   PRIVATE $<$<CXX_COMPILER_ID:IntelLLVM>:-Rno-debug-disables-optimization -Wno-deprecated-declarations -DSWR2_USE_IMC -DSWR2_USE_DLSYM>
   )
-target_link_libraries(swr2 dl swr_support z)
+
+if(WIN32)
+  target_link_libraries(swr2 swr_support)
+else()
+  target_link_libraries(swr2 dl swr_support z)
+endif()
 
 add_subdirectory(libs/swr_support)

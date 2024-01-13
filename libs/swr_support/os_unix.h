@@ -23,6 +23,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#ifdef __unix__
 #ifndef _SWR2_OS_UNIX_H_
 #define _SWR2_OS_UNIX_H_
 
@@ -60,3 +61,4 @@ typedef char sockbuf_t;
 
 #endif /* include guard */
 
+#endif

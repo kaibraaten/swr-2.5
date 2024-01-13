@@ -14,7 +14,9 @@ extern "C" {
 #define ZLIB_WINAPI 1
 #endif
 
+#ifdef __unix__
 #include <zlib.h>
+#endif
 
 #ifdef __cplusplus
 }
@@ -325,7 +327,9 @@ struct descriptor_data
   int teltop;
   short cols;
   short rows;
+#ifdef __unix__
   z_stream *mccp;
+#endif
 };
 
 /*
@@ -1876,8 +1880,6 @@ struct	pc_data
   IMC_CHARDATA *imcchardata;
 #endif
 };
-
-
 
 /*
  * Liquids.

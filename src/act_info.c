@@ -3398,7 +3398,12 @@ void do_whois( CHAR_DATA * ch, char *argument )
 
             snprintf( buf2, MAX_STRING_LENGTH, "Terminal type: %s  MCCP: %s\r\n",
                       victim->desc->terminal_type,
-                      victim->desc->mccp ? "Yes" : "No" );
+#ifdef __unix__
+                      victim->desc->mccp ? "Yes" : "No"
+#else
+                        "No"
+#endif
+            );
             send_to_char( buf2, ch );
         }
 

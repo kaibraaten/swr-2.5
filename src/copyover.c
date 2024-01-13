@@ -118,7 +118,12 @@ void do_copyover( CHAR_DATA * ch, char *argument )
             SOCKET cur_desc = d->descriptor;
 #endif
 
-            fprintf( fp, "%d %d %s %s\n", cur_desc, d->mccp ? 1 : 0,
+            fprintf( fp, "%d %d %s %s\n", cur_desc,
+#ifdef __unix__
+                     d->mccp ? 1 : 0,
+#else
+                     0,
+#endif
                      och->name, d->host );
             save_char_obj( och );
             write_to_descriptor( d, buf, 0 );

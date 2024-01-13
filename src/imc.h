@@ -11,21 +11,23 @@
 #ifndef __IMC2_H__
 #define __IMC2_H__
 
+#ifdef SWR2_USE_IMC
+
 typedef struct imc_siteinfo SITEINFO;  /* The given mud :) */
 typedef struct imcchar_data IMC_CHARDATA; /* Player flags */
 
 extern SITEINFO *this_imcmud;
 
-bool imc_command_hook( CHAR_DATA * ch, const char *command,
-		       const char *argument );
-void imc_hotboot( void );
-void imc_startup( bool force, SOCKET desc, bool connected );
-void imc_shutdown( bool reconnect );
-void imc_initchar( CHAR_DATA * ch );
-bool imc_loadchar( CHAR_DATA * ch, FILE * fp, const char *word );
-void imc_savechar( const CHAR_DATA * ch, FILE * fp );
-void imc_freechardata( CHAR_DATA * ch );
-void imc_loop( void );
-SOCKET imc_getsocket( SITEINFO* );
+bool imc_command_hook(CHAR_DATA *ch, const char *command, const char *argument);
+void imc_hotboot(void);
+void imc_startup(bool force, SOCKET desc, bool connected);
+void imc_shutdown(bool reconnect);
+void imc_initchar(CHAR_DATA *ch);
+bool imc_loadchar(CHAR_DATA *ch, FILE *fp, const char *word);
+void imc_savechar(const CHAR_DATA *ch, FILE *fp);
+void imc_freechardata(CHAR_DATA *ch);
+void imc_loop(void);
+SOCKET imc_getsocket(SITEINFO *);
 
+#endif
 #endif

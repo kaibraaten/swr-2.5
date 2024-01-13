@@ -912,6 +912,7 @@ void zlib_free( void *opaque, void *address )
 
 int start_compress( DESCRIPTOR_DATA *d )
 {
+#ifdef __unix__
     const char start_mccp[] = { IAC, SB, TELOPT_MCCP, IAC, SE, 0 };
     z_stream *stream = NULL;
 
@@ -954,10 +955,14 @@ int start_compress( DESCRIPTOR_DATA *d )
     d->mccp = stream;
 
     return TRUE;
+#else
+    return FALSE;
+#endif
 }
 
 void end_compress( DESCRIPTOR_DATA *d )
 {
+#ifdef __unix__
     if (d->mccp == NULL)
     {
         return;
@@ -983,10 +988,12 @@ void end_compress( DESCRIPTOR_DATA *d )
 
     DISPOSE(d->mccp);
     d->mccp = NULL;
+#endif
 }
 
 void write_compressed( DESCRIPTOR_DATA *d )
 {
+#ifdef __unix__
     d->mccp->next_in    = (unsigned char*) d->outbuf;
     d->mccp->avail_in   = d->outtop;
 
@@ -1001,10 +1008,12 @@ void write_compressed( DESCRIPTOR_DATA *d )
     }
 
     process_compressed(d);
+#endif
 }
 
 void process_compressed( DESCRIPTOR_DATA *d )
 {
+#ifdef __unix__
     int length = COMPRESS_BUF_SIZE - d->mccp->avail_out;
 
     if (send(d->descriptor, sysdata.mccp_buf, length, 0) < 1)
@@ -1012,6 +1021,7 @@ void process_compressed( DESCRIPTOR_DATA *d )
         log_printf("process_compressed D%d@%s", d->descriptor, d->host);
         return;
     }
+#endif
 }
 
 int process_do_mccp( DESCRIPTOR_DATA *d, unsigned char *src, int srclen )

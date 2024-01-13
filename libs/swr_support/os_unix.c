@@ -1,3 +1,4 @@
+#ifdef __unix__
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -65,3 +66,4 @@ int set_nonblocking( SOCKET sock )
 {
     return fcntl( sock, F_SETFL, O_NONBLOCK );
 }
+#endif
